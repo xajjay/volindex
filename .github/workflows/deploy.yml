@@ -33,6 +33,10 @@ jobs:
         run: |
           mkdir _site
           cp -r index.html assets data _site/
+          # cache-busting: browsers re-download CSS, JS and data after every deploy
+          V=$(git rev-parse --short HEAD)-$(date +%s)
+          sed -i -E "s#(src|href)=\"((assets|data)/[^\"?]+)\"#\1=\"\2?v=$V\"#g" _site/index.html
+          grep -c "?v=$V" _site/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
