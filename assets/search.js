@@ -250,7 +250,7 @@
   /* =====================================================================
      UI: top-bar button, panel, home-page box, pinned answer
      ===================================================================== */
-  const EX = ['Lady Vols basketball schedule', 'Arkansas vs Tennessee', 'Who has the passing yards record?', 'Juke Harris', 'Volleyball ranking', 'Softball 2028 recruits', 'Vols games this week', 'Baseball podcasts'];
+  const EX = ['Football Roster', 'Volleyball Schedule', 'Basketball Recruiting', 'Lady Vols basketball schedule', 'Arkansas vs Tennessee', 'Who has the passing yards record?', 'Juke Harris', 'Vols games this week'];
   function card(a, i) {
     return `<div class="askcard" data-i="${i}"><div class="askcard-h"><b>${esc(a.title)}</b>${a.go ? `<a class="golink" href="${esc(a.go)}" data-askgo="${i}">Go to page ›</a>` : ''}</div><div class="askcard-b">${a.html}</div>${a.open ? `<button class="btn small" data-askopen="${i}">${esc(a.openLabel || 'Open')}</button>` : ''}</div>`;
   }
@@ -295,7 +295,7 @@
   function openPanel(q) {
     if (!panel) {
       panel = document.createElement('div'); panel.id = 'askPanel'; panel.hidden = true;
-      panel.innerHTML = `<div class="askback"></div><div class="askbox" role="dialog" aria-label="Ask the Index"><div class="askin"><span aria-hidden="true">⌕</span><input type="text" enterkeyhint="search" placeholder="Ask anything: schedules, scores, players, records…" aria-label="Ask a question" autocomplete="off"><button class="x" aria-label="Close">✕</button></div><div class="askres"></div><p class="dim small askfoot">Answers come from The Vol Index's own data. Press Enter to jump to the top answer's page.</p></div>`;
+      panel.innerHTML = `<div class="askback"></div><div class="askbox" role="dialog" aria-label="Ask the Index"><div class="askin"><span aria-hidden="true">⌕</span><input type="text" enterkeyhint="search" placeholder="Ask the Index: “Football Roster”, “Volleyball Schedule”, “Basketball Recruiting”" aria-label="Ask a question" autocomplete="off"><button class="x" aria-label="Close">✕</button></div><div class="askres"></div><p class="dim small askfoot">Answers come from The Vol Index's own data. Press Enter to jump to the top answer's page.</p></div>`;
       document.body.appendChild(panel);
       const inp = panel.querySelector('input');
       inp.addEventListener('input', () => draw(inp.value));
@@ -317,7 +317,7 @@
     const theme = document.getElementById('themeBtn'); theme ? bar.insertBefore(b, theme) : bar.appendChild(b);
   }
   // big box on the home page
-  window.askHero = () => `<form class="askhero" id="askHero" role="search"><span aria-hidden="true">⌕</span><input type="search" placeholder="Ask the Index: “Lady Vols schedule”, “Arkansas vs Tennessee”, “passing yards record”" aria-label="Ask the Index"><button class="btn primary" type="submit">Ask</button></form>`;
+  window.askHero = () => `<form class="askhero" id="askHero" role="search"><span aria-hidden="true">⌕</span><input type="search" placeholder="Ask the Index: “Football Roster”, “Volleyball Schedule”, “Basketball Recruiting”" aria-label="Ask the Index"><button class="btn primary" type="submit">Ask</button></form>`;
   window.wireAskHero = () => {
     const f = document.getElementById('askHero'); if (!f) return;
     const i = f.querySelector('input');
