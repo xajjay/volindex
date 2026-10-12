@@ -13,7 +13,7 @@
   const TABS = [
     ['overview', 'Overview'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['depth', 'Depth Chart'],
     ['stats', 'Stats'], ['advanced', 'Advanced'], ['recruits', 'Recruiting'], ['next', '2027 Preview'],
-    ['leaders', 'Leaders & Honors'], ['history', 'History'],
+    ['leaders', 'Leaders & Honors'], ['history', 'History'], ['media', 'Social & Media'],
   ];
   const app = document.getElementById('app');
   const $ = (s, el = document) => el.querySelector(s);
@@ -141,6 +141,7 @@
       <div class="eyebrow">University of Tennessee · Knoxville</div>
       <h1>The Vol <span>Index</span></h1>
       <p>Rosters, depth charts, lineups, recruits, ratings, schedules and history for Tennessee athletics: football, volleyball, soccer, basketball, baseball, softball and more to come.</p>
+      ${window.askHero ? window.askHero() : ''}
     </div>
     <div class="wrap grid g3">
       ${SPORTS.map(s => `<a class="sportcard live" href="#${s.key}">
@@ -153,7 +154,9 @@
         <div class="status">${(s.key === 'football' && F && F.schedule.some(g => g.result)) || (window.sportRecord && window.sportRecord(s.key)) ? '' : s.key === 'football' && F ? `${F.season}: ${F.team.record} (${F.team.sec} SEC)` : window.sportStatus && window.sportStatus(s.key) ? esc(window.sportStatus(s.key).split(' · Next')[0]) : 'Page in progress.'}</div>
         ${s.key === 'football' && F ? watchLine(next && Object.assign({ tv: (next.espn || {}).tv }, next), next && kick(next)) : window.sportNext ? (n => watchLine(n, n && (n.time ? n.time + ' ET' : null)))(window.sportNext(s.key)) : ''}
       </a>`).join('')}
-    </div>`;
+    </div>
+    ${window.mediaHub ? window.mediaHub() : ''}`;
+    window.wireAskHero && window.wireAskHero();
   }
   const POLL_SOURCES = [
     ['Football: AP Top 25', 'AP via ESPN', 'https://www.espn.com/college-football/rankings'],
@@ -287,7 +290,7 @@
   function renderFootball(tab) {
     initFootball();
     if (!TABS.find(t => t[0] === tab)) tab = 'overview';
-    const body = { overview, roster, depth: () => depthPanel('current'), next: () => depthPanel('next'), schedule, stats, advanced, recruits, leaders, history }[tab]();
+    const body = { overview, roster, depth: () => depthPanel('current'), next: () => depthPanel('next'), schedule, stats, advanced, recruits, leaders, history, media: () => window.renderMedia('football') }[tab]();
     app.innerHTML = header(tab) + `<main class="wrap" id="panel">${body}</main>` + footer();
     const after = { roster: wireRoster, depth: () => wireDepth('current'), next: () => wireDepth('next'), history: wireHistory, recruits: wireRecruits, stats: wireStats }[tab];
     after && after();
@@ -970,6 +973,9 @@ ${part('next')}
     if (!dlg.open) dlg.showModal ? dlg.showModal() : dlg.setAttribute('open', '');
     dlg.scrollTop = 0;
   }
+  window.fbOpenPlayer = name => { initFootball(); openPlayer(name); };
+  window.fbOpenGame = opp => { initFootball(); openGame(opp); };
+  window.fbData = () => { initFootball(); return F; };
   function openGame(opp) {
     const g = F.schedule.find(x => x.opp === opp); if (!g) return;
     if (g.result) openBox(g); else openPreview(g);

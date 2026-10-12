@@ -20,7 +20,7 @@
   function tabs(D) {
     const t = [['overview', 'Overview'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['lineup', D.lineupTab || (D.key === 'baseball' || D.key === 'softball' ? 'Projected Lineup' : 'Projected Starters')]];
     if (D.stats || D.statsAuto) t.push(['stats', 'Stats']);
-    return t.concat([['ratings', 'Rankings & Ratings']], X(D).advanced ? [['advanced', 'Advanced']] : [], [['recruiting', 'Recruiting'], ['review', D.prevLabel + ' Review'], ['moves', 'Roster Moves'], ['history', 'History']]);
+    return t.concat([['ratings', 'Rankings & Ratings']], X(D).advanced ? [['advanced', 'Advanced']] : [], [['recruiting', 'Recruiting'], ['review', D.prevLabel + ' Review'], ['moves', 'Roster Moves'], ['history', 'History'], ['media', 'Social & Media']]);
   }
   function header(D, tab) {
     return `<div class="teamhead"><div class="wrap">
@@ -593,7 +593,7 @@ ${rows}
     const D = applyAuto(window.SITE[k]); const app = document.getElementById('app');
     if (key !== k) { key = k; editing = false; rosterQ = ''; lineup = loadLineup(k); }
     if (!tabs(D).find(t => t[0] === tab)) tab = 'overview';
-    const body = { overview, roster, lineup: lineupPanel, schedule, stats, ratings, advanced: advancedSport, recruiting, review, moves, history }[tab](D);
+    const body = { overview, roster, lineup: lineupPanel, schedule, stats, ratings, advanced: advancedSport, recruiting, review, moves, history, media: () => window.renderMedia(D.key) }[tab](D);
     app.innerHTML = header(D, tab) + `<main class="wrap">${body}</main>` + footer(D);
     if (tab === 'roster') wireRoster(D);
     if (tab === 'lineup') wireLineup(D);
@@ -603,6 +603,10 @@ ${rows}
     app.querySelectorAll('[data-season]').forEach(el => { const go = () => openSeasonSport(D, el.dataset.season); el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter') go(); }); });
   }
   window.renderSport = render;
+  window.sportOpenPlayer = (k, n) => { const D = applyAuto(window.SITE[k]); if (key !== k) { key = k; lineup = loadLineup(k); } openPlayerSport(D, n); };
+  window.sportOpenGame = (k, i) => openGameSport(applyAuto(window.SITE[k]), i);
+  window.sportInfo = k => { const D = applyAuto(window.SITE && window.SITE[k]); if (!D) return null; const rs = rosterSet(D);
+    return { D, next: nextGame(D), leaders: leadersOf(D, 3).filter(l => rs.has(norm(l.name))), ptk: playersToKnow(D), lastStats: D.statsAuto && D.statsAuto.season !== D.season ? D.statsAuto.season : null }; };
   window.sportRecord = function (k) {
     const D = applyAuto(window.SITE && window.SITE[k]); if (!D || !D.inSeason) return null;
     const r = D.header.find(h => /record/i.test(h[1])), c = D.header.find(h => h[1] === 'SEC');

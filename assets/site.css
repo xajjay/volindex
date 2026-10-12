@@ -451,3 +451,41 @@ a[data-sp]:hover { color: var(--orange); border-color: var(--orange); }
 dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 10px 0; }
 dl.kv dt { color: var(--muted); font-size: 13px; }
 dl.kv dd { margin: 0; }
+
+/* ---------- Ask the Index ---------- */
+.askbtn { font: inherit; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: inherit; cursor: pointer; margin-left: auto; margin-right: 8px; }
+.askbtn:hover { border-color: var(--orange); color: var(--orange); }
+.askbtn span, .askin span, .askhero span { font-size: 18px; line-height: 1; color: var(--orange); }
+#askPanel { position: fixed; inset: 0; z-index: 60; }
+#askPanel[hidden] { display: none; }
+.askback { position: absolute; inset: 0; background: rgba(10, 14, 20, .55); }
+.askbox { position: relative; margin: 6vh auto 0; width: min(760px, calc(100% - 24px)); max-height: 86vh; overflow: auto; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.35); padding: 14px; display: grid; gap: 12px; }
+.askin { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 2px solid var(--orange); border-radius: 10px; padding: 8px 12px; position: sticky; top: 0; z-index: 1; }
+.askin input { flex: 1; border: 0; outline: 0; background: transparent; font: inherit; font-size: 17px; color: inherit; min-width: 0; }
+.askbox .x, .askpin .x { border: 0; background: transparent; color: var(--muted); font-size: 18px; cursor: pointer; }
+.askres { display: grid; gap: 10px; }
+.askex { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.askex .chip { font: inherit; font-size: 13px; cursor: pointer; border: 1px solid var(--line); }
+.askcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 8px; }
+.askcard-h { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.askcard-h b { font-size: 16px; }
+.askcard-b p { margin: 0 0 6px; }
+.askcard .btn { justify-self: start; }
+.asktable td { padding: 4px 8px; }
+.askfoot { margin: 0; }
+.askhero { margin-top: 22px; display: flex; align-items: center; gap: 10px; max-width: 720px; background: var(--surface); border: 2px solid var(--orange); border-radius: 12px; padding: 8px 8px 8px 14px; box-shadow: var(--shadow); }
+.askhero input { flex: 1; border: 0; outline: 0; background: transparent; font: inherit; font-size: 17px; color: inherit; min-width: 0; }
+#askPin .askpin { margin-top: 16px; border: 2px solid var(--orange); border-radius: 12px; background: var(--surface); padding: 10px 12px; }
+#askPin .askpin .askcard { border: 0; padding: 4px 2px; background: transparent; }
+.askpin-h { display: flex; justify-content: space-between; align-items: center; }
+body.asking { overflow: hidden; }
+/* ---------- Social & Media ---------- */
+.list.media li { align-items: flex-start; gap: 12px; }
+.medialinks { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.medialinks a { font-size: 13px; font-weight: 600; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; color: inherit; white-space: nowrap; }
+.medialinks a:hover { border-color: var(--orange); color: var(--orange); }
+.mediacard .medialinks { justify-content: flex-start; margin-top: 8px; }
+.mediacard { padding: 14px 16px; }
+.vix { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: #111; color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; }
+.vix span { opacity: .75; }
+@media (max-width: 640px) { .askbtn { margin-right: 4px; padding: 6px 10px; } .list.media li { flex-direction: column; } .medialinks { justify-content: flex-start; } }
