@@ -519,3 +519,12 @@ body.asking { overflow: hidden; }
 .statgrid .tile { padding: 8px 10px; }
 .statgrid .tile b { font-size: 20px; }
 .brand-text { font-weight: inherit; white-space: nowrap; }
+/* depth charts / lineups: names stand out */
+.dpos .pn { font-family: var(--f-display); font-size: 16px; font-weight: 700; color: var(--fg); line-height: 1.25; }
+.dpos li:first-child .pn { font-size: 17px; font-weight: 800; }
+.dpos .pn a[data-sp] { border-bottom: 0; }
+.dpos .pn a[data-sp]:hover { color: var(--orange-ink); text-decoration: underline; }
+.dpos .pn .pnum { color: var(--orange-ink); font-weight: 800; }
+.dpos .pn small, .dpos .pn .tags, .dpos .pn .statline, .dpos .pn .dim { font-family: var(--f-body); font-weight: 500; }
+.dpos .pn .statline { font-size: 12px; font-weight: 500; }
+.dpos .pn .dim.small { font-size: 12px; }
