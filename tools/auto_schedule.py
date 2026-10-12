@@ -79,8 +79,10 @@ def reasons_for(sport, day, stamps, force):
 
 # sport -> function that refreshes it. Phase 2 adds the other sports here.
 def updaters():
-    import update_data
-    return {"football": update_data.run_football}
+    import update_data, update_sports
+    out = {"football": update_data.run_football}
+    for k in update_sports.SPORTS: out[k] = update_sports.make_runner(k)
+    return out
 
 def main():
     force = "--force" in sys.argv

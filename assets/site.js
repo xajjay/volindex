@@ -87,6 +87,11 @@
   };
   function pollFor(key, F) {
     if (key === 'football') return F && F.team.ap ? { rank: F.team.ap, poll: 'AP Top 25', when: F.team.pollWeek || '' } : { rank: 'NR', poll: 'AP Top 25', when: F && F.team.pollWeek || '' };
+    const D = window.sportData ? window.sportData(key) : null;
+    const P = D && D.pollAuto;
+    // use the automatic poll once it's from the current season (a final poll from last season doesn't count)
+    const yr = D ? parseInt(D.season, 10) : 0, start = /baseball|softball/.test(key) ? `${yr}-01-01` : `${yr}-08-01`;
+    if (P && P.rank != null && P.date && P.date >= start) return { rank: P.rank, poll: P.poll, when: fmtDate(P.date, { month: 'short', day: 'numeric' }) };
     return POLLS[key];
   }
   function rankBlock(p) {
@@ -998,6 +1003,8 @@ ${part('next')}
       <p class="dim small">Box score: <a href="https://www.espn.com/college-football/game/_/gameId/${esc(B.id)}" target="_blank" rel="noopener">ESPN game page</a>.</p>`, true);
     wireDialogTabs('bx'); wirePlayers(dlg);
   }
+  window.showDialog = (h, b, w) => showDialog(h, b, w);
+  window.wireDialogTabs = k => wireDialogTabs(k);
   function wireDialogTabs(key) {
     dlg.querySelectorAll(`[data-${key}]`).forEach(b => b.addEventListener('click', () => {
       dlg.querySelectorAll(`[data-${key}]`).forEach(x => x.setAttribute('aria-pressed', x === b));

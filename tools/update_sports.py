@@ -43,6 +43,7 @@ def note(msg):
 def fetch(url, tries=3, binary=False):
     for i in range(tries):
         try:
+            time.sleep(0.4)                      # be polite to utsports.com
             with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=40) as r:
                 b = r.read()
                 return b if binary else b.decode("utf-8", "replace")
@@ -52,6 +53,7 @@ def fetch(url, tries=3, binary=False):
         except Exception:
             if i == tries - 1: raise
         time.sleep(2 * (i + 1))
+    return None
 
 def cached(name, fn, keep=True):
     os.makedirs(CACHE, exist_ok=True)
@@ -91,13 +93,13 @@ def nuxt(path):
 def first_value(d):
     return next(iter(d.values())) if isinstance(d, dict) and d else None
 
-SKIP = re.compile(r"(Url|Image|image|logo|Logo|Id|^id$|^code$|checkName|nameFromStats|isAFooterStat|playerUniform2|meetsMin)")
+SKIP = re.compile(r"(Url|Image|image|logo|Logo|Id|^id$|^code$|checkName|nameFromStats|isAFooterStat|playerUniform2|meetsMin|^venue$|^scoreSummary$|^breakdowns$)")
 def flat_stats(p):
     """Player/team stat dict -> {field: value}; nested *Stats dicts become prefixed fields."""
     out = {}
     for k, v in (p or {}).items():
         if SKIP.search(k): continue
-        if isinstance(v, dict) and k.endswith("Stats"):
+        if isinstance(v, dict):                      # nested groups: attackStats, shots, goalie, penalties ...
             for s, x in v.items():
                 if isinstance(x, (str, int, float)) and x not in ("", None):
                     out[k + s[0].upper() + s[1:]] = x
@@ -135,8 +137,10 @@ def schedule(slug, season):
         media = g.get("media") or {}
         box = (res.get("boxscore") or {}).get("url")
         status = res.get("status")
-        row = dict(id=g.get("id"), date=(g.get("date") or "")[:10], time=g.get("time"),
-                   opp=(opp.get("title") or "").strip(), site={"H": "H", "A": "A"}.get(g.get("location_indicator"), "N"),
+        title = (opp.get("title") or "").strip()
+        exh = bool(re.search(r"\(Exh\.?\)|exhibition", title, re.I))
+        row = dict(id=g.get("id"), date=(g.get("date") or "")[:10], time=g.get("time"), exh=exh,
+                   opp=re.sub(r"\s*\(Exh\.?\)", "", title, flags=re.I).strip(), site={"H": "H", "A": "A"}.get(g.get("location_indicator"), "N"),
                    loc=g.get("location"), conf=bool(g.get("conference")), type=g.get("type"),
                    tv=media.get("tv") or None, watch=(media.get("video") or {}).get("url"),
                    live=(media.get("stats") or {}).get("url"), history=g.get("opponent_history_path"),
@@ -227,6 +231,40 @@ def espn_poll(path):
                     top=[[r.get("current"), (r.get("team") or {}).get("location")] for r in (p.get("ranks") or [])[:25]])
     return None
 
+# ---------------------------------------------------------------- polls without a feed (official poll pages)
+def avca_poll():
+    html = fetch("https://www.avca.org/polls-awards/polls/?_season=%d&_divisions=division-i-women" % datetime.date.today().year)
+    if not html: return None
+    t = re.search(r"Division I WVB Poll\s*-\s*([A-Z][a-z]+\.?\s*\d+)", html)
+    m = re.search(r"<td>\s*<p>\s*(\d+)\s*</p>\s*</td>\s*<td>\s*<p>\s*Tennessee\s*</p>", html)
+    return dict(poll="AVCA Coaches Poll", rank=int(m.group(1)) if m else "NR", label=t.group(1) if t else None,
+                date=_poll_date(t.group(1)) if t else None)
+
+def usc_poll():
+    html = fetch("https://unitedsoccercoaches.org/rankings/college-rankings/ncaa-di-women/")
+    if not html: return None
+    for part in re.split(r"<h2[^>]*>", html):
+        h = re.match(r"\s*National\s*-\s*([^<]+?)\s*</h2>", part)
+        if not h: continue                                   # first "National - Poll N - date" block is the latest
+        table = part.split("</table>", 1)[0]
+        m = re.search(r'tdRank">\s*(\d+)\s*</td>\s*<td class="tdSchool">\s*University of Tennessee\s*</td>', table)
+        d = re.search(r"([A-Z][a-z]+ \d+, \d{4})", h.group(1))
+        return dict(poll="United Soccer Coaches", rank=int(m.group(1)) if m else "NR", label=h.group(1),
+                    date=datetime.datetime.strptime(d.group(1), "%B %d, %Y").date().isoformat() if d else None)
+    return None
+
+def _poll_date(label):
+    """'Oct. 5' -> ISO date in the current season."""
+    try:
+        mon, day = re.match(r"([A-Za-z]+)\.?\s*(\d+)", label).groups()
+        m = datetime.datetime.strptime(mon[:3], "%b").month
+        y = datetime.date.today().year
+        return datetime.date(y, m, int(day)).isoformat()
+    except Exception:
+        return None
+
+POLL_FN = {"volleyball": avca_poll, "soccer": usc_poll}
+
 # ---------------------------------------------------------------- one sport
 def run_sport(key):
     cfg = SPORTS[key]; slug = cfg["slug"]
@@ -251,16 +289,17 @@ def run_sport(key):
         except Exception as e: note(f"SKIP box {g['opp']}: {e}")
     if box: out["box"] = box; note(f"OK   box scores ({len(box)})")
     ser = {}
-    upcoming = [g for g in (sch or []) if not g.get("result") and g.get("history")]
+    today = datetime.date.today().isoformat()
+    upcoming = [g for g in (sch or []) if not g.get("result") and g.get("history") and (g.get("date") or "") >= today]
     for g in upcoming[:12]:
         try:
             s = series(g["history"])
             if s: ser[g["opp"]] = s
         except Exception as e: note(f"SKIP series {g['opp']}: {e}")
     if ser: out["series"] = ser; note(f"OK   series history ({len(ser)} opponents)")
-    if cfg.get("espn"):
+    if cfg.get("espn") or key in POLL_FN:
         try:
-            p = espn_poll(cfg["espn"])
+            p = POLL_FN[key]() if key in POLL_FN else espn_poll(cfg["espn"])
             if p: out["poll"] = p; note(f"OK   poll: {p['poll']} {p['rank']}")
         except Exception as e: note(f"SKIP poll: {e}")
     out["log"] = list(log)

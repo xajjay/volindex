@@ -1,4 +1,4 @@
-/* The Vol Index — shared team page for basketball, baseball and softball.
+/* The Vol Index — shared team page for volleyball, soccer, basketball, baseball and softball.
    Data: data/<sport>.js (window.SITE[sport]) + editable data/<sport>-lineup.js (window.LINEUP[sport]). */
 (function () {
   'use strict';
@@ -18,10 +18,9 @@
   const LKEY = k => 'vi-lineup-' + k + '-v1';
 
   function tabs(D) {
-    const t = [['overview', 'Overview'], ['roster', 'Roster'], ['lineup', D.lineupTab || (D.key === 'baseball' || D.key === 'softball' ? 'Projected Lineup' : 'Projected Starters')],
-      ['schedule', 'Schedule']];
-    if (D.stats) t.push(['stats', 'Stats']);
-    return t.concat([['ratings', 'Rankings & Ratings'], ['review', D.prevLabel + ' Review'], ['moves', 'Roster Moves'], ['history', 'History']]);
+    const t = [['overview', 'Overview'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['lineup', D.lineupTab || (D.key === 'baseball' || D.key === 'softball' ? 'Projected Lineup' : 'Projected Starters')]];
+    if (D.stats || D.statsAuto) t.push(['stats', 'Stats']);
+    return t.concat([['ratings', 'Rankings & Ratings'], ['recruiting', 'Recruiting'], ['review', D.prevLabel + ' Review'], ['moves', 'Roster Moves'], ['history', 'History']]);
   }
   function header(D, tab) {
     return `<div class="teamhead"><div class="wrap">
@@ -38,8 +37,221 @@
   const vsat = g => g.site === 'H' ? 'vs' : g.site === 'A' ? 'at' : 'vs';
   const kindChip = g => g.kind === 'exh' ? '<span class="chip">Exhibition</span>' : g.kind === 'conf' ? '<span class="chip">SEC</span>' : g.kind === 'event' ? '<span class="chip new">Event</span>' : '';
   const nextGame = D => D.schedule.find(g => !g.result && g.date >= today()) || null;
-  window.sportNext = k => (window.SITE && window.SITE[k]) ? nextGame(window.SITE[k]) : null;
+  window.sportNext = k => (window.SITE && window.SITE[k]) ? nextGame(applyAuto(window.SITE[k])) : null;
   const resStr = g => g.result ? `<span class="${g.result}">${g.result}</span>${g.us != null ? ' ' + g.us + '–' + g.them : ''}` : '';
+  /* ---------- auto data (data/<sport>-auto.js from tools/update_sports.py) ---------- */
+  const merged = new Set();
+  function applyAuto(D) {
+    if (!D || merged.has(D.key)) return D; merged.add(D.key);
+    const A = window.SITE_AUTO && window.SITE_AUTO[D.key];
+    D.histGames = (window.SITE_AUTO && window.SITE_AUTO[D.key + 'History']) || null;
+    if (!A) return D;
+    try {
+      if (A.schedule && A.schedule.length && A.season === D.season) {
+        const oldByDate = new Map(D.schedule.map(g => [g.date + '|' + g.opp.replace(/ \(.*\)$/, ''), g]));
+        D.schedule = A.schedule.map(g => {
+          const old = oldByDate.get(g.date + '|' + g.opp) || {};
+          return Object.assign({}, old, {
+            date: g.date, opp: g.opp, site: g.site, loc: g.loc || old.loc, tv: g.tv || old.tv || null,
+            time: g.time ? g.time.replace(/ ?ET$/i, '').replace(/\./g, '').replace(/ ?pm$/i, ' PM').replace(/ ?am$/i, ' AM') : old.time || null,
+            kind: g.exh || /^(E|S)$/.test(g.type || '') ? 'exh' : g.conf ? 'conf' : (old.kind === 'exh' ? 'nonconf' : old.kind || 'nonconf'),
+            result: g.result || null, us: g.us != null ? +g.us : null, them: g.them != null ? +g.them : null,
+            gid: g.id, hasBox: !!(A.box && A.box[String(g.id)]), watch: g.watch, live: g.live, event: g.tournament, note: g.note,
+          });
+        });
+        // header record from the live schedule
+        const real = D.schedule.filter(g => g.result && g.kind !== 'exh');
+        const rec = arr => { const w = arr.filter(g => g.result === 'W').length, l = arr.filter(g => g.result === 'L').length, t = arr.filter(g => g.result === 'T').length; return `${w}-${l}${t ? '-' + t : ''}`; };
+        if (real.length) {
+          D.header = D.header.map(h => /record/i.test(h[1]) && !/^\d{4}/.test(h[1]) ? [rec(real), h[1]] : h[1] === 'SEC' ? [rec(real.filter(g => g.kind === 'conf')), 'SEC'] : h);
+          D.inSeason = true;
+        }
+      }
+      if (A.stats) D.statsAuto = A.stats;
+      if (A.box) D.box = A.box;
+      if (A.series) D.series = A.series;
+      if (A.poll) D.pollAuto = A.poll;
+      if (A.updated) D.updated = A.updated > (D.updated || '') ? A.updated : D.updated;
+    } catch (e) { console.warn('Auto data skipped for ' + D.key, e); }
+    return D;
+  }
+  window.sportData = k => applyAuto(window.SITE && window.SITE[k]);
+
+  /* ---------- stat definitions per sport: [category, table, [[label, field], ...], default sort field] ---------- */
+  const BB = [
+    ['Scoring', 'individualStats', [['GP', 'gamesPlayed'], ['GS', 'gamesStarted'], ['MIN', 'minutesPerGame'], ['PTS', 'points'], ['PPG', 'pointsPerGame'], ['FG%', 'fieldGoalsPercentage'], ['3PM', 'threePointFieldGoals'], ['3P%', 'threePointFieldGoalsPercentage'], ['FT%', 'freeThrowsPercentage'], ['High', 'highestPoints']], 'pointsPerGame'],
+    ['Rebounding', 'individualStats', [['GP', 'gamesPlayed'], ['REB', 'rebounds'], ['RPG', 'reboundsPerGame'], ['OREB', 'reboundsOffensive'], ['DREB', 'reboundsDefensive']], 'reboundsPerGame'],
+    ['Playmaking', 'individualStats', [['GP', 'gamesPlayed'], ['AST', 'assists'], ['APG', 'assistsPerGame'], ['TO', 'turnovers'], ['A/TO', 'assistOverTurnovers']], 'assistsPerGame'],
+    ['Defense', 'individualStats', [['GP', 'gamesPlayed'], ['STL', 'steals'], ['SPG', 'stealsPerGame'], ['BLK', 'blocks'], ['BPG', 'blocksPerGame'], ['PF', 'personalFouls']], 'steals'],
+  ];
+  const DIA = [
+    ['Hitting', 'individualStats.individualHittingStats', [['G', 'gamesPlayed'], ['AB', 'atBats'], ['R', 'runs'], ['H', 'hits'], ['2B', 'doubles'], ['HR', 'homeRuns'], ['RBI', 'runsBattedIn'], ['BB', 'walks'], ['SO', 'strikeouts'], ['SB', 'stolenBases'], ['AVG', 'battingAverage'], ['OBP', 'onBasePercentage'], ['SLG', 'sluggingPercentage'], ['OPS', 'ops']], 'ops'],
+    ['Pitching', 'individualStats.individualPitchingStats', [['APP', 'appearances'], ['GS', 'gamesStarted'], ['W', 'wins'], ['L', 'losses'], ['SV', 'saves'], ['IP', 'inningsPitched'], ['H', 'hitsAllowed'], ['ER', 'earnedRunsAllowed'], ['BB', 'walksAllowed'], ['SO', 'strikeouts'], ['ERA', 'earnedRunAverage'], ['WHIP', 'whip'], ['OBA', 'opponentsBattingAverage']], 'inningsPitched'],
+    ['Fielding', 'individualStats.individualFieldingStats', [['G', 'gamesPlayed'], ['TC', 'totalChances'], ['PO', 'putouts'], ['A', 'assists'], ['E', 'errors'], ['FLD%', 'fieldingPercentage'], ['SB-ATT', 'stolenBasesAgainst'], ['CS', 'caughtStealingBy']], 'totalChances'],
+  ];
+  const STATCFG = {
+    volleyball: [
+      ['Attacking', 'individualStats', [['SP', 'setsPlayed'], ['K', 'attackStatsKills'], ['K/S', 'attackStatsKillsPerSet'], ['E', 'attackStatsErrors'], ['TA', 'attackStatsTotalAttempts'], ['PCT', 'attackStatsHittingPercentage']], 'attackStatsKills'],
+      ['Setting', 'individualStats', [['SP', 'setsPlayed'], ['A', 'setStatsAssists'], ['A/S', 'setStatsAssistsPerSet'], ['Errors', 'setStatsSetErrors']], 'setStatsAssists'],
+      ['Serving', 'individualStats', [['SP', 'setsPlayed'], ['Aces', 'serveStatsServiceAces'], ['Aces/S', 'serveStatsServiceAcesPerSet'], ['Errors', 'serveStatsServiceErrors'], ['Attempts', 'serveStatsTotalServeAttempts']], 'serveStatsServiceAces'],
+      ['Defense', 'individualStats', [['SP', 'setsPlayed'], ['Digs', 'defenseStatsDigs'], ['Digs/S', 'defenseStatsDigsPerSet'], ['Rec. err', 'defenseStatsReceptionErrors'], ['Rec. %', 'defenseStatsReceptionPercentage']], 'defenseStatsDigs'],
+      ['Blocking', 'individualStats', [['SP', 'setsPlayed'], ['Solo', 'blockStatsSolos'], ['Assist', 'blockStatsAssists'], ['Total', 'blockStatsTotalBlocks'], ['Blk/S', 'blockStatsBlocksPerSet']], 'blockStatsTotalBlocks'],
+      ['Points', 'individualStats', [['SP', 'setsPlayed'], ['PTS', 'miscStatsPoints'], ['PTS/S', 'miscStatsPointsPerSet']], 'miscStatsPoints'],
+    ],
+    soccer: [
+      ['Scoring', 'individualOffensiveStats', [['GP', 'gamesPlayed'], ['GS', 'gamesStarted'], ['MIN', 'minutesPlayed'], ['G', 'goals'], ['A', 'assists'], ['PTS', 'points'], ['GW', 'gameWinners'], ['PK', 'penaltyKicksAndAttempts']], 'points'],
+      ['Shooting', 'individualOffensiveStats', [['GP', 'gamesPlayed'], ['SH', 'shots'], ['SOG', 'shotsOnGoal'], ['SOG%', 'shotsOnGoalPercentage'], ['SH%', 'shotPercentage'], ['YC-RC', 'yellowCardsRedCards']], 'shots'],
+      ['Goalkeeping', 'goalieStats', [['GP', 'gamesPlayed'], ['MIN', 'minutesPlayed'], ['GA', 'goalsAllowed'], ['GAA', 'goalsAgainstAverage'], ['SV', 'saves'], ['SV%', 'savesPercentage'], ['W', 'wins'], ['L', 'losses'], ['T', 'ties'], ['SHO', 'shutouts']], 'minutesPlayed'],
+    ],
+    mbb: BB, wbb: BB, baseball: DIA, softball: DIA,
+  };
+  // what an "impact player" is per sport: [label, table, field, unit]
+  const IMPACT = {
+    volleyball: [['Kills', 'individualStats', 'attackStatsKills', 'kills'], ['Assists', 'individualStats', 'setStatsAssists', 'assists'], ['Digs', 'individualStats', 'defenseStatsDigs', 'digs'], ['Blocks', 'individualStats', 'blockStatsTotalBlocks', 'blocks'], ['Aces', 'individualStats', 'serveStatsServiceAces', 'aces']],
+    soccer: [['Goals', 'individualOffensiveStats', 'goals', 'goals'], ['Assists', 'individualOffensiveStats', 'assists', 'assists'], ['Shots', 'individualOffensiveStats', 'shotsOnGoal', 'shots on goal'], ['Saves', 'goalieStats', 'saves', 'saves']],
+    mbb: [['Points', 'individualStats', 'pointsPerGame', 'ppg'], ['Rebounds', 'individualStats', 'reboundsPerGame', 'rpg'], ['Assists', 'individualStats', 'assistsPerGame', 'apg'], ['Steals', 'individualStats', 'steals', 'steals'], ['Blocks', 'individualStats', 'blocks', 'blocks']],
+    baseball: [['Home runs', 'individualStats.individualHittingStats', 'homeRuns', 'HR'], ['RBI', 'individualStats.individualHittingStats', 'runsBattedIn', 'RBI'], ['OPS', 'individualStats.individualHittingStats', 'ops', 'OPS'], ['Strikeouts', 'individualStats.individualPitchingStats', 'strikeouts', 'K'], ['Innings', 'individualStats.individualPitchingStats', 'inningsPitched', 'IP']],
+  };
+  IMPACT.wbb = IMPACT.mbb; IMPACT.softball = IMPACT.baseball;
+  const numv = v => { if (v == null || v === '') return null; const m = String(v).match(/-?\d*\.?\d+/); return m ? parseFloat(m[0]) : null; };
+  const human = k => k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()).replace(/ Pct$/, ' %').replace(/ Per /g, ' per ').trim();
+  const tableRows = (D, table) => ((D.statsAuto && D.statsAuto.tables) || {})[table] || [];
+  function leadersOf(D, n = 1) {
+    return (IMPACT[D.key] || []).map(([label, table, field, unit]) => {
+      const rows = tableRows(D, table).filter(r => numv(r.s[field]) > 0).sort((a, b) => numv(b.s[field]) - numv(a.s[field]));
+      return rows.slice(0, n).map(r => ({ label, name: r.name, val: r.s[field], unit }));
+    }).flat();
+  }
+  /* ---------- stats (auto) ---------- */
+  let sCat = 0, sView = 'player', sQ = '', sSort = null;
+  function statsAuto(D) {
+    const S = D.statsAuto;
+    const label = S.season === D.season ? `${D.season} Stats` : `${S.season} Stats`;
+    const note = S.season === D.season ? `Every Vol with a stat this season${S.record ? ' (' + esc(S.record) + ')' : ''}. Click a column to sort.` : `The ${esc(D.season)} season hasn't started, so these are last season's numbers. They switch to ${esc(D.season)} automatically after the first game.`;
+    return `<div class="panel-head"><div><h2>${esc(label)}</h2><p>${note}</p></div>
+      <div class="controls"><div class="seg" role="group" aria-label="Stats view">${[['player', 'Player stats'], ['team', 'Team stats']].map(([k, l]) => `<button data-sv="${k}" aria-pressed="${sView === k}">${l}</button>`).join('')}</div></div></div>
+      <div id="sStats"></div>
+      <p class="dim small">Stats: <a href="https://utsports.com/sports/${esc(SLUG[D.key])}/stats/${esc(S.season)}" target="_blank" rel="noopener">utsports.com cumulative stats</a>.</p>`;
+  }
+  const SLUG = { volleyball: 'womens-volleyball', soccer: 'womens-soccer', mbb: 'mens-basketball', wbb: 'womens-basketball', baseball: 'baseball', softball: 'softball' };
+  function playerTable(D) {
+    const cfg = STATCFG[D.key] || []; const c = cfg[sCat] || cfg[0]; if (!c) return '';
+    const [, table, cols, def] = c; const q = sQ.toLowerCase();
+    let rows = tableRows(D, table).filter(r => cols.some(([, f]) => numv(r.s[f]) && !/^(gamesPlayed|setsPlayed|appearances)$/.test(f)) && (!q || r.name.toLowerCase().includes(q)));
+    const si = sSort && sSort.cat === sCat ? sSort.f : def, dir = sSort && sSort.cat === sCat ? sSort.dir : -1;
+    const low = /earnedRunAverage|whip|opponentsBattingAverage|goalsAgainstAverage|errors|turnovers/i.test(si);
+    rows.sort((a, b) => si === 'name' ? dir * a.name.localeCompare(b.name) : (low && !sSort ? 1 : dir) * ((numv(a.s[si]) ?? -1e9) - (numv(b.s[si]) ?? -1e9)));
+    const roster = new Map(D.roster.map(p => [p.name.toLowerCase(), p]));
+    return `<div class="tablewrap"><table><thead><tr><th><button data-ss="name">Player</button></th>${cols.map(([l, f]) => `<th class="n"><button data-ss="${f}">${esc(l)}${si === f ? (dir > 0 ? ' ▲' : ' ▼') : ''}</button></th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r => { const p = roster.get(r.name.toLowerCase()); return `<tr><td><b>${esc(r.name)}</b> <span class="dim small">${p ? esc(p.pos + ' · ' + p.cls) : r.num ? '#' + esc(r.num) : ''}</span></td>${cols.map(([, f]) => `<td class="n">${esc(r.s[f] ?? '—')}</td>`).join('')}</tr>`; }).join('') || `<tr><td colspan="${cols.length + 1}">No players match.</td></tr>`}</tbody></table></div>`;
+  }
+  function teamTable(D) {
+    const T = D.statsAuto.team || {}; const us = T.us || {}, op = T.opp || {};
+    const keys = Object.keys(us).filter(k => k in op && !/Attendance|Streak|HomeGames|DatesAndAverage|^TotalScoringConf/i.test(k));
+    return `<div class="tablewrap"><table class="mini"><thead><tr><th>Stat</th><th class="n">Tennessee</th><th class="n">Opponents</th></tr></thead>
+      <tbody>${keys.map(k => { const a = numv(us[k]), b = numv(op[k]); return `<tr><td>${esc(human(k))}</td><td class="n"><b>${esc(us[k])}</b></td><td class="n">${esc(op[k])}</td></tr>`; }).join('')}</tbody></table></div>`;
+  }
+  function wireStatsAuto(D) {
+    const draw = () => {
+      const box = $('#sStats');
+      if (sView === 'team') { box.innerHTML = teamTable(D); return; }
+      const cfg = STATCFG[D.key] || [];
+      box.innerHTML = `<div class="controls" style="margin-bottom:12px"><div class="seg" role="group" aria-label="Stat category">${cfg.map((c, i) => `<button data-sc="${i}" aria-pressed="${i === sCat}">${esc(c[0])}</button>`).join('')}</div>
+        <input type="search" id="sStatQ" placeholder="Filter by name" value="${esc(sQ)}" aria-label="Filter players"></div><div id="sStatT">${playerTable(D)}</div>`;
+      const wireT = () => $('#sStatT').querySelectorAll('[data-ss]').forEach(b => b.addEventListener('click', () => {
+        const f = b.dataset.ss; sSort = sSort && sSort.cat === sCat && sSort.f === f ? { cat: sCat, f, dir: -sSort.dir } : { cat: sCat, f, dir: f === 'name' ? 1 : -1 };
+        $('#sStatT').innerHTML = playerTable(D); wireT();
+      }));
+      wireT();
+      box.querySelectorAll('[data-sc]').forEach(b => b.addEventListener('click', () => { sCat = +b.dataset.sc; sSort = null; draw(); }));
+      $('#sStatQ').addEventListener('input', e => { sQ = e.target.value; $('#sStatT').innerHTML = playerTable(D); wireT(); });
+    };
+    document.querySelectorAll('[data-sv]').forEach(b => b.addEventListener('click', () => { sView = b.dataset.sv; document.querySelectorAll('[data-sv]').forEach(x => x.setAttribute('aria-pressed', x === b)); draw(); }));
+    draw();
+  }
+
+  /* ---------- game dialogs ---------- */
+  const BOXCOLS = {
+    volleyball: [['K', 'attackStatsKills'], ['E', 'attackStatsErrors'], ['TA', 'attackStatsTotalAttempts'], ['PCT', 'attackStatsHittingPercentage'], ['A', 'setStatsAssists'], ['SA', 'serveStatsServiceAces'], ['Digs', 'defenseStatsDigs'], ['BS', 'blockStatsSolos'], ['BA', 'blockStatsAssists'], ['PTS', 'miscStatsPoints']],
+    soccer: [['MIN', 'minutesPlayed'], ['SH', 'shotsNumberOfShots'], ['SOG', 'shotsShotsOnGoal'], ['G', 'shotsGoals'], ['A', 'shotsAssists'], ['YC', 'penaltiesYellow'], ['SV', 'goalieSaves'], ['GA', 'goalieGoalsAllowed']],
+    mbb: [['MIN', 'minutesPlayed'], ['PTS', 'points'], ['FG', 'fieldGoals'], ['FGA', 'fieldGoalsAttempted'], ['3P', 'threePointFieldGoals'], ['3PA', 'threePointFieldGoalsAttempted'], ['FT', 'freeThrows'], ['FTA', 'freeThrowsAttempted'], ['REB', 'rebounds'], ['AST', 'assists'], ['STL', 'steals'], ['BLK', 'blocks'], ['TO', 'turnovers']],
+    baseball: [['AB', 'atBats'], ['R', 'runs'], ['H', 'hits'], ['RBI', 'runsBattedIn'], ['BB', 'walks'], ['SO', 'strikeouts'], ['HR', 'homeRuns']],
+  };
+  BOXCOLS.wbb = BOXCOLS.mbb; BOXCOLS.softball = BOXCOLS.baseball;
+  function boxCols(D, players) {
+    const want = BOXCOLS[D.key] || [];
+    const has = f => players.some(p => p.s[f] != null && p.s[f] !== '');
+    const cols = want.filter(([, f]) => has(f));
+    if (cols.length >= 3) return cols;
+    const keys = {}; players.forEach(p => Object.keys(p.s).forEach(k => { if (numv(p.s[k]) != null && !/PerSet|PerGame|gamePlayed|gameStarted/i.test(k)) keys[k] = (keys[k] || 0) + 1; }));
+    return Object.keys(keys).sort((a, b) => keys[b] - keys[a]).slice(0, 10).map(k => [human(k).replace(/^(Attack|Set|Serve|Defense|Block|Misc) Stats /, ''), k]);
+  }
+  function openBoxSport(D, g) {
+    const B = D.box && D.box[String(g.gid)];
+    const head = `<div><div class="eyebrow">Final · ${fmtDate(g.date, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</div><h3>Tennessee ${g.us ?? ''}, ${esc(g.opp)} ${g.them ?? ''}</h3></div>`;
+    if (!B) { window.showDialog(head, `<p>Full box score loads with the next automatic update.</p>`); return; }
+    const T = B.teams;
+    const per = B.periods && B.periods.length ? `<div class="tablewrap"><table class="mini box-line"><thead><tr><th>Team</th>${B.periods.map(p => `<th class="n">${esc(p)}</th>`).join('')}</tr></thead>
+      <tbody>${[['away', B.periodsAway], ['home', B.periodsHome]].map(([side, sc], i) => { const t = T.find(x => x.home === (side === 'home')) || {}; return `<tr class="${/Tennessee/.test(t.name || '') ? 'me' : ''}"><td><b>${esc(t.name || '')}</b></td>${(sc || []).map(v => `<td class="n">${esc(v)}</td>`).join('')}</tr>`; }).join('')}</tbody></table></div>` : '';
+    const ptable = t => { const cols = boxCols(D, t.players || []); return `<div class="tablewrap"><table class="mini"><thead><tr><th>${esc(t.name)}</th>${cols.map(([l]) => `<th class="n">${esc(l)}</th>`).join('')}</tr></thead>
+      <tbody>${(t.players || []).map(p => `<tr><td>${p.num ? '<span class="dim small">' + esc(p.num) + '</span> ' : ''}${esc(p.name)}</td>${cols.map(([, f]) => `<td class="n">${esc(p.s[f] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; };
+    const ut = T.find(t => /Tennessee/.test(t.name || '')) || T[1], op = T.find(t => t !== ut) || T[0];
+    window.showDialog(head, `<p class="dim small">${esc([B.stadium, B.location].filter(Boolean).join(', '))}${B.attendance ? ' · Attendance ' + Number(B.attendance).toLocaleString() : ''}</p>${per}
+      <div class="seg" role="group" style="margin:14px 0 10px">${[['ut', 'Tennessee'], ['op', esc(op ? op.name : 'Opponent')]].map(([k, l], i) => `<button data-bx="${k}" aria-pressed="${i === 0}">${l}</button>`).join('')}</div>
+      <div data-bxp="ut">${ut ? ptable(ut) : ''}</div><div data-bxp="op" hidden>${op ? ptable(op) : ''}</div>
+      <p class="dim small">Box score: <a href="${esc(B.url)}" target="_blank" rel="noopener">utsports.com</a>.</p>`, true);
+    window.wireDialogTabs('bx');
+  }
+  function openPreviewSport(D, g) {
+    const w = window.howToWatch ? window.howToWatch(g.tv) : null;
+    const S = (D.series || {})[g.opp];
+    const played = D.schedule.filter(x => x.result && x.kind !== 'exh');
+    const last5 = played.slice(-5);
+    const lead = leadersOf(D, 1);
+    const head = `<div><div class="eyebrow">Preview · ${fmtDate(g.date, { weekday: 'long', month: 'long', day: 'numeric' })}${g.time ? ' · ' + esc(g.time) + ' ET' : ''}</div><h3>${g.site === 'A' ? 'Tennessee at ' + esc(g.opp) : esc(g.opp) + (g.site === 'N' ? ' vs. Tennessee' : ' at Tennessee')}</h3></div>`;
+    const rec = played.length ? `${played.filter(x => x.result === 'W').length}-${played.filter(x => x.result === 'L').length}${played.some(x => x.result === 'T') ? '-' + played.filter(x => x.result === 'T').length : ''}` : null;
+    const text = [
+      `Tennessee ${g.site === 'A' ? 'travels to ' + esc(g.loc || g.opp) : g.site === 'H' ? 'hosts ' + esc(g.opp) + ' at ' + esc(D.venue) : 'meets ' + esc(g.opp) + ' in ' + esc(g.loc || 'a neutral site')}${g.event ? ' (' + esc(g.event) + ')' : ''}.`,
+      rec ? `The ${D.short || 'Vols'} are ${rec} this season${last5.length ? `, ${last5.filter(x => x.result === 'W').length}-${last5.filter(x => x.result !== 'W').length} in the last ${last5.length}` : ''}.` : '',
+      S ? `Tennessee is ${S.w}-${S.l}${S.t ? '-' + S.t : ''} all-time against ${esc(g.opp)}${S.last && S.last.length ? `; the last meeting (${S.last[S.last.length - 1][0].slice(0, 4)}) was a ${S.last[S.last.length - 1][1] === 'W' ? 'Tennessee win' : S.last[S.last.length - 1][1] === 'T' ? 'tie' : 'loss'}, ${S.last[S.last.length - 1][2]}-${S.last[S.last.length - 1][3]}` : ''}.` : '',
+      lead.length ? `Players to watch: ${lead.slice(0, 3).map(l => `${esc(l.name)} (${esc(l.val)} ${esc(l.unit)})`).join(', ')}.` : '',
+    ].filter(Boolean).join(' ');
+    window.showDialog(head, `<div class="tiles" style="margin-bottom:14px">
+        <div class="tile"><b style="font-size:22px">${w ? esc(w.net) : 'TBA'}</b><span>How to watch</span><em>${w ? esc(w.stream) : 'Usually announced 1–2 weeks out'}</em></div>
+        <div class="tile"><b style="font-size:22px">${S ? `${S.w}-${S.l}${S.t ? '-' + S.t : ''}` : '—'}</b><span>All-time vs. ${esc(g.opp)}</span><em>${S && S.first ? 'Since ' + esc(S.first) : ''}</em></div>
+        <div class="tile"><b style="font-size:22px">${rec || '0-0'}</b><span>Tennessee record</span><em>${esc(g.loc || '')}</em></div></div>
+      <p class="lede">${text}</p>
+      ${lead.length ? `<h5 class="subhead">Tennessee leaders</h5><ul class="list">${lead.map(l => `<li><span class="chip">${esc(l.label)}</span><b class="grow">${esc(l.name)}</b><span class="num">${esc(l.val)} ${esc(l.unit)}</span></li>`).join('')}</ul>` : ''}
+      ${S && S.last && S.last.length ? `<h5 class="subhead">Recent meetings</h5><ul class="list">${S.last.slice().reverse().map(x => `<li><b class="num">${esc(x[0].slice(0, 4))}</b><span class="grow">${x[4] === 'H' ? 'Home' : x[4] === 'A' ? 'Away' : 'Neutral'}</span><span class="num">${esc(x[2])}-${esc(x[3])}</span><span class="${x[1]}">${x[1]}</span></li>`).join('')}</ul>` : ''}
+      <p class="small">${g.watch ? `<a href="${esc(g.watch)}" target="_blank" rel="noopener">Watch link</a> · ` : ''}${g.live ? `<a href="${esc(g.live)}" target="_blank" rel="noopener">Live stats</a> · ` : ''}<span class="dim">Data: utsports.com</span></p>`, true);
+  }
+  function openGameSport(D, i) {
+    const g = D.schedule[i]; if (!g) return;
+    if (g.result) openBoxSport(D, g); else openPreviewSport(D, g);
+  }
+  function openSeasonSport(D, season) {
+    const H = D.histGames && D.histGames[season];
+    const row = D.history.seasons.find(s => String(s.season) === String(season));
+    const head = `<div><div class="eyebrow">${esc(D.name)} · ${esc(season)}${row ? ' · ' + esc(row.coach) : ''}</div><h3>${esc(season)}: ${row ? esc(row.overall) : ''}</h3></div>`;
+    if (!H || !H.length) { window.showDialog(head, `<p>Game-by-game results for this season load with the next automatic update${row && row.post ? '' : ''}.</p>`); return; }
+    window.showDialog(head, `<div class="tablewrap"><table class="mini"><thead><tr><th>Date</th><th>Opponent</th><th class="n">Result</th><th>Note</th></tr></thead>
+      <tbody>${H.map(g => `<tr><td class="num">${fmtDate(g[0], { month: 'short', day: 'numeric' })}</td><td><b>${g[2] === 'A' ? 'at ' : g[2] === 'N' ? 'vs. ' : ''}${esc(g[1])}</b>${g[6] ? ' <span class="chip">SEC</span>' : ''}</td><td class="n">${g[3] ? `<span class="${g[3]}">${g[3]}</span> ${esc(g[4])}–${esc(g[5])}` : '—'}</td><td class="dim small">${esc(g[7] || '')}</td></tr>`).join('')}</tbody></table></div>
+      <p class="dim small">Results: <a href="https://utsports.com/sports/${esc(SLUG[D.key])}/schedule/${esc(season)}" target="_blank" rel="noopener">utsports.com ${esc(season)} schedule</a>.</p>`, true);
+  }
+
+  /* ---------- recruiting ---------- */
+  function recruiting(D) {
+    const R = (window.RECRUITING || {})[D.key] || {};
+    const fr = D.roster.filter(p => /^(Fr|RS Fr)/i.test(p.cls || ''));
+    return `<div class="panel-head"><div><h2>Recruiting</h2><p>${esc(R.intro || 'Commitments for upcoming classes, this year\'s freshmen and where to follow recruiting.')}</p></div></div>
+      <div class="section" style="margin-top:0"><h3>Class of ${esc(R.year || '2027')} <small>${R.commits && R.commits.length ? R.commits.length + ' public commitments' : 'No public commitments confirmed yet'}</small></h3>
+        ${R.commits && R.commits.length ? `<div class="tablewrap"><table><thead><tr><th>Name</th><th>Pos</th><th class="hide-sm">From</th><th>Rating / rank</th><th class="hide-sm">Committed</th></tr></thead>
+          <tbody>${R.commits.map(c => `<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.pos)}</td><td class="hide-sm">${esc(c.from || '')}</td><td>${esc(c.rank || '—')}</td><td class="hide-sm">${c.src ? `<a href="${esc(c.src)}" target="_blank" rel="noopener">${esc(c.date || 'Source')}</a>` : esc(c.date || '')}</td></tr>`).join('')}</tbody></table></div>` : `<p class="dim">${esc(R.none || 'Nothing public yet. Check the trackers below.')}</p>`}
+        ${R.note ? `<p class="dim small">${esc(R.note)}</p>` : ''}</div>
+      ${R.lastClass ? `<div class="section"><h3>${esc(R.lastClass.title)}</h3><div class="box"><ul class="list">${R.lastClass.rows.map(r => `<li><b class="grow">${esc(r[0])}</b><span class="dim">${esc(r[1])}</span><span class="small">${esc(r[2] || '')}</span></li>`).join('')}</ul></div>${R.lastClass.src ? `<p class="dim small">Source: <a href="${esc(R.lastClass.src)}" target="_blank" rel="noopener">${esc(R.lastClass.srcName || 'link')}</a></p>` : ''}</div>` : ''}
+      ${fr.length ? `<div class="section"><h3>This year's freshmen <small>${fr.length} on the ${esc(D.season)} roster</small></h3><div class="box"><ul class="list">${fr.map(p => `<li><b class="grow">${esc(p.name)}</b><span class="dim">${esc(p.pos)}</span><span class="small">${esc([p.hs, p.home].filter(Boolean).join(' · '))}</span></li>`).join('')}</ul></div></div>` : ''}
+      ${R.trackers ? `<div class="section"><h3>Follow recruiting</h3><ul class="srclist">${R.trackers.map(t => `<li><span>${esc(t[0])}</span> <a href="${esc(t[2])}" target="_blank" rel="noopener">${esc(t[1])}</a></li>`).join('')}</ul></div>` : ''}`;
+  }
 
   /* ---------- overview ---------- */
   function overview(D) {
@@ -47,11 +259,12 @@
     const newcomers = D.roster.filter(p => p.note && p.note !== 'Freshman').slice(0, 8);
     return `<div class="box quick"><div class="eyebrow">The quick read</div><ul>${D.quick.map(q => `<li>${q}</li>`).join('')}</ul></div>
       <div class="grid g2">
-        ${n ? `<div class="box nextgame matchup"><div class="eyebrow">${n.kind === 'exh' ? 'Next exhibition' : 'Next up'} · ${fmtDate(n.date, { weekday: 'long', month: 'long', day: 'numeric' })}${n.time ? ' · ' + esc(n.time) + ' ET' : ''}${n.tv ? ' · ' + esc(n.tv) : ''}</div>
+        ${n ? `<div class="box nextgame matchup click" data-sg="${D.schedule.indexOf(n)}" tabindex="0" role="button"><div class="eyebrow">${n.kind === 'exh' ? 'Next exhibition' : 'Next up'} · ${fmtDate(n.date, { weekday: 'long', month: 'long', day: 'numeric' })}${n.time ? ' · ' + esc(n.time) + ' ET' : ''}${n.tv ? ' · ' + esc(n.tv) : ''}</div>
           <div class="vs">${vsat(n)} ${esc(n.opp)}</div><div class="meta">${esc(n.loc)} ${kindChip(n)}</div>
-          ${(w => w ? `<div class="meta"><b>📺 How to watch: ${esc(w.net)}</b> · ${esc(w.stream)}</div>` : '<div class="meta">📺 TV: TBA (usually announced 1–2 weeks out)</div>')(window.howToWatch && window.howToWatch(n.tv))}</div>` : ''}
-        ${D.inSeason ? (() => { const played = D.schedule.filter(g => g.result && g.kind !== 'exh'); return `<div class="box nextgame"><div class="eyebrow">This season · ${esc(D.season)}</div>
-          <div class="controls">${played.slice(-6).map(g => `<span class="chip">${resStr(g)} ${vsat(g) === 'at' ? '@' : 'v'} ${esc(g.opp.replace(/ \(No\. \d+\)/, ''))}</span>`).join('')}</div>
+          ${(w => w ? `<div class="meta"><b>📺 How to watch: ${esc(w.net)}</b> · ${esc(w.stream)}</div>` : '<div class="meta">📺 TV: TBA (usually announced 1–2 weeks out)</div>')(window.howToWatch && window.howToWatch(n.tv))}
+          <div class="golink" style="margin-top:8px">Preview: series history, leaders, how to watch ›</div></div>` : ''}
+        ${D.inSeason ? (() => { const played = D.schedule.filter(g => g.result && g.kind !== 'exh'); return `<div class="box nextgame"><div class="eyebrow">This season · ${esc(D.season)} · click for box scores</div>
+          <div class="controls">${played.slice(-6).map(g => `<span class="chip click" data-sg="${D.schedule.indexOf(g)}" tabindex="0" role="button" title="Box score">${resStr(g)} ${vsat(g) === 'at' ? '@' : 'v'} ${esc(g.opp.replace(/ \(No\. \d+\)/, ''))}</span>`).join('')}</div>
           <div class="meta">${esc(D.header.map(h => h[1] + ': ' + h[0]).slice(0, 3).join(' · '))}</div></div>`; })() : `<div class="box nextgame"><div class="eyebrow">Last season · ${esc(D.last.label)}</div>
           <div class="vs">${esc(D.last.record)}</div><div class="meta">${esc(D.last.conf)} · ${esc(D.last.finish)}</div><div class="meta">${esc(D.last.rank)}</div></div>`}
       </div>
@@ -160,16 +373,17 @@ ${rows}
   function schedule(D) {
     const n = nextGame(D);
     const conf = D.schedule.filter(g => g.kind === 'conf').length, home = D.schedule.filter(g => g.site === 'H' && g.kind !== 'exh').length;
-    return `<div class="panel-head"><div><h2>${esc(D.season)} Schedule</h2><p>${D.scheduleNote ? esc(D.scheduleNote) + ' ' : ''}Home games at ${esc(D.venue)}. Times Eastern.</p></div></div>
+    return `<div class="panel-head"><div><h2>${esc(D.season)} Schedule</h2><p>${D.scheduleNote ? esc(D.scheduleNote) + ' ' : ''}Home games at ${esc(D.venue)}. Times Eastern. Click a game for its box score or preview.</p></div></div>
       <div class="tiles four" style="margin-bottom:16px"><div class="tile"><b>${D.schedule.filter(g => g.kind !== 'exh').length}</b><span>${D.key === 'baseball' || D.key === 'softball' ? 'Dates / series listed' : 'Games'}</span></div>
         <div class="tile"><b>${conf}</b><span>SEC ${D.key === 'baseball' || D.key === 'softball' ? 'series' : 'games'}</span></div><div class="tile"><b>${home}</b><span>Home dates</span></div>
         <div class="tile"><b>${n ? fmtDate(n.date, { month: 'short', day: 'numeric' }) : '—'}</b><span>Next: ${n ? esc(n.opp) : 'TBA'}</span></div></div>
-      <div class="tablewrap"><table><thead><tr><th>Date</th><th>Opponent</th><th class="hide-sm">Location</th><th>${D.inSeason ? 'Result / Time' : 'Time'}</th><th class="hide-sm">TV</th></tr></thead>
-      <tbody>${D.schedule.map(g => `<tr class="${n && g === n ? 'me' : ''}"><td class="num">${fmtDate(g.date)}</td><td><b>${vsat(g)} ${esc(g.opp)}</b> ${kindChip(g)}</td><td class="hide-sm">${esc(g.loc)}</td><td class="num">${g.result ? resStr(g) : esc(g.time ? g.time + ' ET' : g.kind === 'exh' ? '—' : 'TBA')}</td><td class="hide-sm">${esc(g.tv || '—')}</td></tr>`).join('')}</tbody></table></div>`;
+      <div class="tablewrap"><table><thead><tr><th>Date</th><th>Opponent</th><th class="hide-sm">Location</th><th>${D.inSeason ? 'Result / Time' : 'Time'}</th><th class="hide-sm">TV</th><th></th></tr></thead>
+      <tbody>${D.schedule.map((g, i) => `<tr class="click ${n && g === n ? 'me' : ''}" data-sg="${i}" tabindex="0"><td class="num">${fmtDate(g.date)}</td><td><b>${vsat(g)} ${esc(g.opp)}</b> ${kindChip(g)}</td><td class="hide-sm">${esc(g.loc)}</td><td class="num">${g.result ? resStr(g) : esc(g.time ? g.time + ' ET' : g.kind === 'exh' ? '—' : 'TBA')}</td><td class="hide-sm">${esc(g.tv || '—')}</td><td class="n"><span class="golink">${g.result ? (g.hasBox ? 'Box score ›' : 'Result ›') : 'Preview ›'}</span></td></tr>`).join('')}</tbody></table></div>`;
   }
 
   /* ---------- stats ---------- */
   function stats(D) {
+    if (D.statsAuto) return statsAuto(D);
     const T = D.stats; const rows = T.rows.slice().sort((a, b) => (b[T.sort] ?? -1) - (a[T.sort] ?? -1));
     return `<div class="panel-head"><div><h2>${esc(T.title)}</h2><p>${esc(T.note || '')}</p></div></div>
       <div class="tablewrap"><table><thead><tr><th>Player</th>${T.cols.map(c => `<th class="n">${esc(c)}</th>`).join('')}</tr></thead>
@@ -209,8 +423,7 @@ ${rows}
         <div class="box"><div class="lb"><h4>Additions <span>${M.added.length}</span></h4></div><ul class="list">${M.added.map(a => `<li><b class="grow">${esc(a[0])}</b><span class="dim">${esc(a[1])}</span>${a[2] ? `<span class="num small">${esc(a[2])}</span>` : ''}</li>`).join('')}</ul></div>
         <div class="box"><div class="lb"><h4>Departures <span>${M.lost.length}</span></h4></div><ul class="list">${M.lost.map(a => `<li><b class="grow">${esc(a[0])}</b><span class="dim">${esc(a[1])}</span></li>`).join('') || '<li class="dim">Not tracked yet.</li>'}</ul></div>
       </div>
-      <div class="section"><h3>Recruiting <small>${esc(M.recruitNote || '')}</small></h3>
-        ${M.recruits.length ? `<div class="box"><ul class="list">${M.recruits.map(r => `<li><b class="grow">${esc(r.name)}</b><span class="dim">${esc(r.pos)}</span><span class="small">${esc(r.note)}</span></li>`).join('')}</ul></div>` : `<p class="dim">${esc(M.recruitNote || 'No commitments listed yet.')}</p>`}</div>`;
+      <p class="dim" style="margin-top:14px">Commitments and incoming classes are on the <a href="#${D.key}-recruiting">Recruiting</a> tab.</p>`;
   }
 
   /* ---------- history ---------- */
@@ -220,22 +433,25 @@ ${rows}
       <div class="grid g4">${H.titles.map(t => `<div class="box titlebox"><b>${esc(t[0])}</b><div class="eyebrow">${esc(t[1])}</div><p>${esc(t[2])}</p></div>`).join('')}</div>
       ${H.retired && H.retired.length ? `<div class="section"><h3>Retired jerseys</h3><div class="grid g4">${H.retired.map(r => `<div class="box retired"><span class="rnum">${esc(r[0])}</span><div><b>${esc(r[1])}</b></div></div>`).join('')}</div></div>` : ''}
       ${H.notable ? `<p class="dim" style="margin-top:16px">${esc(H.notable)}</p>` : ''}
-      <div class="section"><h3>Season by season</h3><div class="tablewrap" style="max-height:600px"><table><thead><tr><th>Season</th><th>Coach</th><th>Overall</th><th>SEC</th><th>Postseason</th></tr></thead>
-      <tbody>${H.seasons.map(s => `<tr><td class="num"><b>${esc(s.season)}</b></td><td>${esc(s.coach)}</td><td class="num">${esc(s.overall)}</td><td class="num">${esc(s.conf || '—')}</td><td>${/champion/i.test(s.post || '') ? `<span class="chip honor">${esc(s.post)}</span>` : esc(s.post || '—')}</td></tr>`).join('')}</tbody></table></div></div>`;
+      <div class="section"><h3>Season by season <small>Click a season for its schedule and results</small></h3><div class="tablewrap" style="max-height:600px"><table><thead><tr><th>Season</th><th>Coach</th><th>Overall</th><th>SEC</th><th>Postseason</th></tr></thead>
+      <tbody>${H.seasons.map(s => `<tr class="click" data-season="${esc(s.season)}" tabindex="0"><td class="num"><b>${esc(s.season)}</b></td><td>${esc(s.coach)}</td><td class="num">${esc(s.overall)}</td><td class="num">${esc(s.conf || '—')}</td><td>${/champion/i.test(s.post || '') ? `<span class="chip honor">${esc(s.post)}</span>` : esc(s.post || '—')}</td></tr>`).join('')}</tbody></table></div></div>`;
   }
 
   function render(k, tab) {
-    const D = window.SITE[k]; const app = document.getElementById('app');
+    const D = applyAuto(window.SITE[k]); const app = document.getElementById('app');
     if (key !== k) { key = k; editing = false; rosterQ = ''; lineup = loadLineup(k); }
     if (!tabs(D).find(t => t[0] === tab)) tab = 'overview';
-    const body = { overview, roster, lineup: lineupPanel, schedule, stats, ratings, review, moves, history }[tab](D);
+    const body = { overview, roster, lineup: lineupPanel, schedule, stats, ratings, recruiting, review, moves, history }[tab](D);
     app.innerHTML = header(D, tab) + `<main class="wrap">${body}</main>` + footer(D);
     if (tab === 'roster') wireRoster(D);
     if (tab === 'lineup') wireLineup(D);
+    if (tab === 'stats' && D.statsAuto) wireStatsAuto(D);
+    app.querySelectorAll('[data-sg]').forEach(el => { const go = () => openGameSport(D, +el.dataset.sg); el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter') go(); }); });
+    app.querySelectorAll('[data-season]').forEach(el => { const go = () => openSeasonSport(D, el.dataset.season); el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter') go(); }); });
   }
   window.renderSport = render;
   window.sportStatus = function (k) {
-    const D = window.SITE && window.SITE[k]; if (!D) return null;
+    const D = applyAuto(window.SITE && window.SITE[k]); if (!D) return null;
     const n = nextGame(D);
     const cur = D.inSeason ? (() => { const r = D.header.find(h => /record/i.test(h[1])); const c = D.header.find(h => h[1] === 'SEC'); return `${D.season}: ${r ? r[0] : ''}${c ? ' (' + c[0] + ' SEC)' : ''}`; })() : `${D.prevLabel}: ${D.last.record}`;
     return `${cur}${n ? ' · Next: ' + n.opp.replace(/ \(\d games\)/, '') + ' ' + fmtDate(n.date, { month: 'short', day: 'numeric' }) : ''}`;
