@@ -2,24 +2,27 @@
    Layout: airy white page, hairline rules, rounded cards, pill tabs. Light-first; dark theme via toggle.
    Signature: orange/white checkerboard logo + a thin checker strip under the header. */
 :root {
-  --orange: #E87400;
-  --orange-ink: #B85C00;
-  --orange-soft: #FFF4EA;
-  --smokey: #5D6670;
-  --bg: #F4F5F7;
+  /* Official University of Tennessee palette (brand.utk.edu): Tennessee Orange #FF8200, White, Smokey Gray #4B4B4B.
+     UT's guide says no black: Smokey Gray is used for type and anything that would be black.
+     --orange-ink is only for small orange text, where #FF8200 on white is too faint to read. */
+  --orange: #FF8200;
+  --orange-ink: #B35C00;
+  --orange-soft: #FFF3E6;
+  --smokey: #4B4B4B;
+  --bg: #F5F5F5;
   --surface: #FFFFFF;
-  --surface-2: #ECEEF1;
-  --fg: #161B21;
-  --muted: #4A535D;
-  --line: #CDD2D8;
-  --line-strong: #B4BBC3;
+  --surface-2: #EDEDED;
+  --fg: #4B4B4B;
+  --muted: #5F5F5F;
+  --line: #D6D6D6;
+  --line-strong: #BDBDBD;
   --shadow: 0 1px 2px rgba(22, 27, 33, .06), 0 2px 8px rgba(22, 27, 33, .04);
   --win: #1E7A44;
   --loss: #B3261E;
   --warn: #A15C00;
   --chip-new: #E7F0FF;
   --chip-new-ink: #1D4E9E;
-  --head-bg: #1E242B;
+  --head-bg: #4B4B4B;
   --head-fg: #FFFFFF;
   --band: #FFFFFF;
   --gold: #6B5200;
@@ -31,10 +34,10 @@
   color-scheme: light;
 }
 :root[data-theme="dark"] {
-  --orange: #FF8F1F; --orange-ink: #FF9D3C; --orange-soft: #2E2214; --smokey: #A3ABB4;
-  --bg: #12161A; --surface: #1A1F24; --surface-2: #232A31; --fg: #E9ECEF; --muted: #A3ABB4; --line: #2C343C; --line-strong: #3D4752; --shadow: none;
+  --orange: #FF8200; --orange-ink: #FF8200; --orange-soft: #33261A; --smokey: #4B4B4B;
+  --bg: #1E1E1E; --surface: #282828; --surface-2: #333333; --fg: #F2F2F2; --muted: #B8B8B8; --line: #4B4B4B; --line-strong: #5E5E5E; --shadow: none;
   --win: #5CC48A; --loss: #F2867E; --warn: #F0B35C; --chip-new: #1D2B44; --chip-new-ink: #A9C5FF;
-  --head-bg: #E9ECEF; --head-fg: #12161A; --band: #12161A; --gold: #F5D46B; --gold-bg: #3A3010;
+  --head-bg: #F2F2F2; --head-fg: #1E1E1E; --band: #1E1E1E; --gold: #F5D46B; --gold-bg: #3A3010;
   color-scheme: dark;
 }
 
@@ -120,7 +123,7 @@ main { padding-block: 24px 64px; }
 /* badges */
 .rate { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .rate .g { font-family: var(--f-mono); font-weight: 600; padding: 1px 6px; border-radius: 3px; background: var(--surface-2); }
-.rate.on3 .g { background: var(--orange); color: #1B1A19; }
+.rate.on3 .g { background: var(--orange); color: #FFFFFF; }
 .stars { color: var(--orange-ink); letter-spacing: 1px; }
 .stars i { color: var(--line); font-style: normal; }
 .chip { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
@@ -153,7 +156,7 @@ tr.click:hover td { background: var(--surface-2); }
 input[type="search"], select { border: 1px solid var(--line); background: var(--surface); border-radius: 5px; padding: 6px 10px; font-size: 14px; }
 .btn { border: 1px solid var(--line); background: var(--surface); border-radius: 5px; padding: 7px 12px; cursor: pointer; font-weight: 600; font-size: 13px; }
 .btn:hover { border-color: var(--fg); }
-.btn.primary { background: var(--orange); border-color: var(--orange); color: #1B1A19; }
+.btn.primary { background: var(--orange); border-color: var(--orange); color: #FFFFFF; font-weight: 700; }
 .btn.small { padding: 3px 8px; font-size: 12px; }
 
 /* depth chart */
@@ -234,7 +237,7 @@ textarea.export { width: 100%; min-height: 220px; font: 12px/1.4 var(--f-mono); 
 /* player dialog */
 dialog { border: 1px solid var(--line); border-radius: 8px; padding: 0; background: var(--surface); color: var(--fg); width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); }
 dialog::backdrop { background: rgb(0 0 0 / .5); }
-.dlg-h { background: #1B1A19; color: #fff; padding: 18px 20px; display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; }
+.dlg-h { background: var(--smokey); color: #fff; padding: 18px 20px; display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; }
 .dlg-h .jersey { color: var(--orange); font-size: 46px; }
 .dlg-h h3 { font-size: 30px; text-transform: uppercase; }
 .dlg-h p { margin: 2px 0 0; font-size: 13px; color: #CFCBC6; }
@@ -486,6 +489,16 @@ body.asking { overflow: hidden; }
 .medialinks a:hover { border-color: var(--orange); color: var(--orange); }
 .mediacard .medialinks { justify-content: flex-start; margin-top: 8px; }
 .mediacard { padding: 14px 16px; }
-.vix { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: #111; color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; }
+.vix { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--smokey); color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; }
 .vix span { opacity: .75; }
 @media (max-width: 640px) { .askbtn { margin-right: 4px; padding: 6px 10px; } .list.media li { flex-direction: column; } .medialinks { justify-content: flex-start; } }
+
+/* ---------- Home title: Tennessee Orange with a Smokey Gray outline ---------- */
+.hub-hero h1, .hub-hero h1 span { color: var(--orange); -webkit-text-stroke: .045em var(--smokey); paint-order: stroke fill; }
+:root[data-theme="dark"] .hub-hero h1, :root[data-theme="dark"] .hub-hero h1 span { -webkit-text-stroke-color: #8C8C8C; }
+.hub-hero h1 { text-shadow: none; }
+.hub-hero .eyebrow { color: var(--smokey); }
+:root[data-theme="dark"] .hub-hero .eyebrow { color: var(--muted); }
+/* the checkerboard (Neyland end zones) under the title */
+.hub-hero h1::after { content: ""; display: block; height: 12px; width: min(420px, 70%); margin-top: 14px; -webkit-text-stroke: 0;
+  background: conic-gradient(var(--orange) 25%, var(--surface) 0 50%, var(--orange) 0 75%, var(--surface) 0) 0 0 / 12px 12px; border: 1px solid var(--line); border-radius: 2px; }
