@@ -5,7 +5,7 @@
 const xs = q => 'https://x.com/search?q=' + encodeURIComponent(q) + '&f=user';
 window.SOCIAL = {
   // The Vol Index's own X account. Put the handle here (without @) and it shows across the site.
-  volIndexX: '',
+  volIndexX: 'Volindex',
 
   // shown on every sport's Social & Media tab and on the home page
   general: {
