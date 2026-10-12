@@ -420,3 +420,4 @@ th button { white-space: nowrap; }
 .matchup .golink { white-space: normal; } .matchup { min-width: 0; }
 .sportcard { position: relative; }
 .sportcard .upd { position: absolute; top: 16px; right: 18px; font-size: 11px; color: var(--muted); font-weight: 600; }
+tr.unq td { opacity: .55; }
