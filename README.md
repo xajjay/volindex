@@ -6,7 +6,7 @@ Independent fan site, not affiliated with the University of Tennessee. Every sou
 
 ## How it updates
 
-`.github/workflows/update.yml` runs every morning. `tools/auto_schedule.py` decides what's new that day (the morning after games, the morning after each sport's poll comes out, Thursday football lines, Monday weekly refresh), runs the updaters, and commits the new data. The site then redeploys on its own.
+`.github/workflows/update.yml` runs every morning. `tools/auto_schedule.py` decides what's new that day (the morning after games, the morning after each sport's poll comes out, Thursday football lines, Monday weekly refresh), runs the updaters, and commits the new data. `.github/workflows/deploy.yml` then republishes the site to GitHub Pages on its own.
 
 - Run it by hand: **Actions → Update data → Run workflow** (tick *force* to refresh everything).
 - Needs one repository secret: `CFBD_API_KEY` (free key from collegefootballdata.com).
