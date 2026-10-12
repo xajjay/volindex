@@ -17,10 +17,11 @@
   let S, key, lineup, editing = false, rosterQ = '';
   const LKEY = k => 'vi-lineup-' + k + '-v1';
 
+  const NO_REVIEW = new Set(['volleyball', 'soccer']); // last-season review tab removed for these
   function tabs(D) {
     const t = [['overview', 'Overview'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['lineup', D.lineupTab || (D.key === 'baseball' || D.key === 'softball' ? 'Projected Lineup' : 'Projected Starters')]];
     if (D.stats || D.statsAuto) t.push(['stats', 'Stats']);
-    return t.concat([['ratings', 'Rankings & Ratings']], X(D).advanced ? [['advanced', 'Advanced']] : [], [['recruiting', 'Recruiting'], ['review', D.prevLabel + ' Review'], ['moves', 'Roster Moves'], ['history', 'History'], ['media', 'Social & Media']]);
+    return t.concat([['ratings', 'Rankings & Ratings']], X(D).advanced ? [['advanced', 'Advanced']] : [], [['recruiting', 'Recruiting'], ...(NO_REVIEW.has(D.key) ? [] : [['review', D.prevLabel + ' Review']]), ['moves', 'Roster Moves'], ['history', 'History'], ['media', 'Social & Media']]);
   }
   function header(D, tab) {
     return `<div class="teamhead"><div class="wrap">
