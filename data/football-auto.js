@@ -1364,12 +1364,12 @@ window.SITE_AUTO.football = {
    "line": "ALA -8.5",
    "ou": 53.5,
    "ml": "+260",
-   "book": "DraftKings",
+   "book": "Draft Kings",
    "win": 28.8
   },
   "South Carolina": {
    "tv": null,
-   "kick": "2026-10-24T04:00Z",
+   "kick": "2026-10-24T19:30Z",
    "win": 56.4
   },
   "Kentucky": {
