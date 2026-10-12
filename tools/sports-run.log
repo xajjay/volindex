@@ -1,0 +1,41 @@
+== volleyball
+OK   schedule (27 games)
+OK   stats 2026 (18 rows)
+OK   box scores (15)
+OK   series history (12 opponents)
+Wrote /home/runner/work/volindex/volindex/data/volleyball-auto.js
+OK   past seasons (11)
+== soccer
+OK   schedule (18 games)
+OK   stats 2026 (26 rows)
+OK   box scores (12)
+OK   series history (6 opponents)
+Wrote /home/runner/work/volindex/volindex/data/soccer-auto.js
+OK   past seasons (11)
+== mbb
+OK   schedule (34 games)
+OK   stats 2025-26 (17 rows)
+OK   series history (12 opponents)
+OK   poll: AP Top 25 12
+Wrote /home/runner/work/volindex/volindex/data/mbb-auto.js
+OK   past seasons (26)
+== wbb
+OK   schedule (33 games)
+OK   stats 2025-26 (14 rows)
+OK   series history (9 opponents)
+OK   poll: AP Top 25 NR
+Wrote /home/runner/work/volindex/volindex/data/wbb-auto.js
+OK   past seasons (26)
+== baseball
+OK   schedule (57 games)
+OK   stats 2026 (67 rows)
+OK   series history (7 opponents)
+Wrote /home/runner/work/volindex/volindex/data/baseball-auto.js
+OK   past seasons (25)
+== softball
+OK   schedule (33 games)
+OK   stats 2026 (39 rows)
+OK   series history (4 opponents)
+SKIP poll: HTTP Error 400: Bad Request
+Wrote /home/runner/work/volindex/volindex/data/softball-auto.js
+OK   past seasons (22)
