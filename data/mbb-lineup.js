@@ -9,14 +9,15 @@ window.LINEUP = window.LINEUP || {};
 window.LINEUP.mbb = {
   "label": "2026-27 projected starting five",
   "updated": "2026-10-12",
+  "rev": 2,
   "basedOn": "The Vol Index preseason projection",
   "chart": {
     "Starting five": [
       ["PG", ["Terrence Hill Jr.", "Dai Dai Ames", "Troy Henderson"]],
       ["SG", ["Dai Dai Ames", "Tyler Lundblade", "Marquis Clark"]],
-      ["SF", ["Juke Harris", "Campbell Duncan", "Manny Green"]],
+      ["SF", ["Juke Harris", "Jalen Haralson", "Manny Green"]],
       ["PF", ["Jalen Haralson", "Braedan Lue", "Chris Washington Jr."]],
-      ["C", ["Miles Rubin", "DeWayne Brown II", "Christian Fermin", "Jalen Washington"]]
+      ["C", ["Miles Rubin", "DeWayne Brown II", "Jalen Washington", "Christian Fermin"]]
     ],
     "Rotation": [
       ["6th man", ["Tyler Lundblade"]],

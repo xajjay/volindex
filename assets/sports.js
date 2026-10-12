@@ -437,7 +437,11 @@
   }
 
   /* ---------- lineup (editable) ---------- */
-  function loadLineup(k) { const d = store.get(LKEY(k)); const l = d || JSON.parse(JSON.stringify(window.LINEUP[k])); l._draft = !!d; return l; }
+  function loadLineup(k) {
+    let d = store.get(LKEY(k));
+    // a saved draft that now matches the file (or predates a newer file) is dropped, so the file is the default
+    if (d && (JSON.stringify(d.chart) === JSON.stringify(window.LINEUP[k].chart) || (d.rev || 0) < (window.LINEUP[k].rev || 0) || (d.updated && window.LINEUP[k].updated && d.updated < window.LINEUP[k].updated))) { store.del(LKEY(k)); d = null; }
+    const l = d || JSON.parse(JSON.stringify(window.LINEUP[k])); l._draft = !!d; return l; }
   function lineupPanel(D) {
     const L = lineup, byName = new Map(D.roster.map(p => [p.name, p]));
     const pool = D.roster.map(p => [p.name, `${p.name} · ${p.pos} #${p.num}`]).sort((a, b) => a[0].localeCompare(b[0]));
@@ -471,6 +475,7 @@ window.LINEUP = window.LINEUP || {};
 window.LINEUP.${D.key} = {
   "label": ${JSON.stringify(L.label)},
   "updated": "${today()}",
+  "rev": ${(L.rev || 0) + 1},
   "basedOn": ${JSON.stringify(L.basedOn)},
   "chart": {
 ${rows}
