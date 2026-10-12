@@ -293,6 +293,7 @@
     const ls = lineFor(D, S.tables, name); if (!ls.length) return null;
     return { season: S.season, lines: ls };
   }
+  const statusChip = p => p && p.status ? ` <span class="chip risk-Watch" title="${esc(p.note || p.status)}">${esc(p.status)}</span>` : '';
   function playersToKnow(D) {
     const E = X(D), names = new Set();
     (E.playersToKnow || []).forEach(n => names.add(n));
@@ -311,7 +312,7 @@
   }
   function pcardSport(D, p) {
     const E = X(D), rec = (E.recruit || {})[p.name];
-    return `<button class="pcard" data-sp="${esc(p.name)}"><div class="pcard-top"><span class="jersey">${esc(p.num)}</span><div><div class="nm">${esc(p.name)}</div><div class="sub">${esc(p.pos)} · ${esc(p.cls)}${p.prev ? ' · from ' + esc(String(p.prev).split(' / ').pop()) : ''}</div></div></div>
+    return `<button class="pcard" data-sp="${esc(p.name)}"><div class="pcard-top"><span class="jersey">${esc(p.num)}</span><div><div class="nm">${esc(p.name)}${statusChip(p)}</div><div class="sub">${esc(p.pos)} · ${esc(p.cls)}${p.prev ? ' · from ' + esc(String(p.prev).split(' / ').pop()) : ''}</div></div></div>
       ${rec ? (m => `<div class="tagrow"><span class="chip new">${esc(m ? m[1] : 'Recruit')}</span> <span class="small dim">${esc(m ? m[2] : rec)}</span></div>`)(rec.match(/^([^:]{1,16}):\s*(.+)$/)) : ''}
       <div class="why">${whyPlayer(D, p)}</div></button>`;
   }
@@ -324,7 +325,7 @@
     const prevLine = !groups.length && p && p.prev && /\d/.test(p.note || '') ? p.note : null;
     const statTitle = S ? (inSzn ? `${S.season} stats` : `${S.season} stats · last season`) : 'Stats';
     const inLineup = []; Object.values((lineup && lineup.chart) || {}).forEach(rows => rows.forEach(([pos, ns]) => { const i = ns.findIndex(n => norm(n) === norm(name)); if (i >= 0) inLineup.push(`${pos} (${i === 0 ? 'starter' : ordn(i + 1)})`); }));
-    const head = `<span class="jersey">${esc(p ? p.num : '')}</span><div><h3>${esc(p ? p.name : name)}</h3><p>${p ? esc([p.pos, p.cls, p.ht && p.ht + (p.wt ? ', ' + p.wt + ' lb' : ''), p.bt && 'B/T ' + p.bt].filter(Boolean).join(' · ')) : esc(D.name)}</p></div>`;
+    const head = `<span class="jersey">${esc(p ? p.num : '')}</span><div><h3>${esc(p ? p.name : name)}${statusChip(p)}</h3><p>${p ? esc([p.pos, p.cls, p.ht && p.ht + (p.wt ? ', ' + p.wt + ' lb' : ''), p.bt && 'B/T ' + p.bt].filter(Boolean).join(' · ')) : esc(D.name)}</p></div>`;
     const body = `${rec ? `<div class="tagrow"><span class="chip new">Recruiting</span> <span class="small">${esc(rec)}</span></div>` : ''}
       <dl class="kv">${p ? `<dt>Hometown</dt><dd>${esc(p.home || '—')}</dd>${p.hs ? `<dt>High school</dt><dd>${esc(p.hs)}</dd>` : ''}${p.prev ? `<dt>Previous school</dt><dd>${esc(p.prev)}</dd>` : ''}` : ''}
         <dt>${esc(lineup ? lineup.label : 'Lineup')}</dt><dd>${inLineup.join(', ') || 'Not in the projected lineup'}</dd>
@@ -429,7 +430,7 @@
     const draw = () => {
       const q = rosterQ.toLowerCase();
       $('#sRosterBody').innerHTML = D.roster.filter(p => !q || Object.values(p).join(' ').toLowerCase().includes(q)).map(p =>
-        `<tr>${D.rosterCols.map(c => c === 'num' ? `<td class="n"><b>${esc(p.num)}</b></td>` : c === 'name' ? `<td><a href="#" data-sp="${esc(p.name)}"><b>${esc(p.name)}</b></a>${(X(D).honors || {})[p.name] ? ' <span class="chip honor" title="Honors">★</span>' : ''}</td>` : `<td class="${HIDE_SM.has(c) ? 'hide-sm' : ''}${c === 'note' ? ' dim small' : ''}">${esc(p[c] || (c === 'prev' ? '' : '—'))}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${D.rosterCols.length}">No players match.</td></tr>`;
+        `<tr>${D.rosterCols.map(c => c === 'num' ? `<td class="n"><b>${esc(p.num)}</b></td>` : c === 'name' ? `<td><a href="#" data-sp="${esc(p.name)}"><b>${esc(p.name)}</b></a>${statusChip(p)}${(X(D).honors || {})[p.name] ? ' <span class="chip honor" title="Honors">★</span>' : ''}</td>` : `<td class="${HIDE_SM.has(c) ? 'hide-sm' : ''}${c === 'note' ? ' dim small' : ''}">${esc(p[c] || (c === 'prev' ? '' : '—'))}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${D.rosterCols.length}">No players match.</td></tr>`;
     };
     $('#sRosterQ').addEventListener('input', e => { rosterQ = e.target.value; draw(); wirePlayersSport(D, $('#sRosterBody')); });
     draw();
@@ -449,7 +450,7 @@
       <div class="${editing ? 'editing' : ''}">${Object.entries(L.chart).map(([grp, rows]) => `<div class="side-title">${esc(grp)}</div>
         <div class="dgrid">${rows.map(([pos, names], ri) => `<div class="dpos"><div class="dpos-h"><b>${esc(pos)}</b><span>${names.length} listed</span></div>
           <ol>${names.map((n, i) => { const p = byName.get(n); return `<li><span class="ord">${i + 1}</span><div class="pn">${p ? `<b class="num pnum">${esc(p.num)}</b>` : ''}${editing ? esc(n) : `<a href="#" data-sp="${esc(n)}">${esc(n)}</a>`}<small>${esc(p ? p.cls : '')}</small>
-            <div class="tags">${p ? (p.prev && !/^20\d\d:|last season/i.test(p.note || '') ? '<span class="chip">Transfer</span>' : p.cls === 'Fr.' ? '<span class="chip new">Freshman</span>' : '<span class="chip">Returner</span>') : '<span class="chip risk-Watch">Not on roster</span>'}</div>${(sl => sl ? `<div class="statline"><b>${esc(sl.season)}</b> ${sl.lines.map(l => (l.label ? esc(l.label) + ': ' : '') + esc(l.text)).join(' / ')}</div>` + (p && p.note && i === 0 ? `<div class="dim small">${esc(p.note)}</div>` : '')
+            <div class="tags">${statusChip(p)}${p ? (p.prev && !/^20\d\d:|last season/i.test(p.note || '') ? '<span class="chip">Transfer</span>' : p.cls === 'Fr.' ? '<span class="chip new">Freshman</span>' : '<span class="chip">Returner</span>') : '<span class="chip risk-Watch">Not on roster</span>'}</div>${(sl => sl ? `<div class="statline"><b>${esc(sl.season)}</b> ${sl.lines.map(l => (l.label ? esc(l.label) + ': ' : '') + esc(l.text)).join(' / ')}</div>` + (p && p.note && i === 0 ? `<div class="dim small">${esc(p.note)}</div>` : '')
               : p && p.prev && /\d/.test(p.note || '') && i < 2 ? `<div class="statline">${D.statsAuto && D.statsAuto.season !== D.season ? `<b>${esc(D.statsAuto.season)}</b> ` : ''}${esc(p.note)}${/ at /i.test(p.note) ? '' : ` at ${esc(String(p.prev).split(' / ').pop())}`}</div>`
               : (p && p.note && i === 0 ? `<div class="dim small">${esc(p.note)}</div>` : ''))(i < 2 ? seasonLine(D, n) : null)}</div>
             ${editing ? `<div class="edit-tools" data-g="${esc(grp)}" data-r="${ri}" data-i="${i}"><button data-m="up" aria-label="Move ${esc(n)} up">↑</button><button data-m="down" aria-label="Move ${esc(n)} down">↓</button><button data-m="rm" aria-label="Remove ${esc(n)}">✕</button></div>` : '<span></span>'}</li>`; }).join('')}</ol>

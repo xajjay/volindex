@@ -165,7 +165,8 @@ window.SITE.mbb = {
    "home": "Gary, Ind.",
    "hs": "West Side Leadership Academy",
    "prev": "Vanderbilt / North Carolina",
-   "note": null
+   "note": "Fighting for a fifth year of eligibility",
+   "status": "If eligible"
   },
   {
    "num": 10,

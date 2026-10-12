@@ -13,15 +13,15 @@ window.LINEUP.mbb = {
   "chart": {
     "Starting five": [
       ["PG", ["Terrence Hill Jr.", "Dai Dai Ames", "Troy Henderson"]],
-      ["SG", ["Dai Dai Ames", "Tyler Lundblade", "Manny Green"]],
-      ["SF", ["Juke Harris", "Campbell Duncan", "Marquis Clark"]],
+      ["SG", ["Dai Dai Ames", "Tyler Lundblade", "Marquis Clark"]],
+      ["SF", ["Juke Harris", "Campbell Duncan", "Manny Green"]],
       ["PF", ["Jalen Haralson", "Braedan Lue", "Chris Washington Jr."]],
       ["C", ["Miles Rubin", "DeWayne Brown II", "Christian Fermin", "Jalen Washington"]]
     ],
     "Rotation": [
       ["6th man", ["Tyler Lundblade"]],
       ["Bigs off bench", ["DeWayne Brown II", "Braedan Lue"]],
-      ["Developing", ["Ralph Scott", "Chris Washington Jr."]]
+      ["Developing", ["Ralph Scott", "Chris Washington Jr.", "Marquis Clark"]]
     ]
   }
 };
