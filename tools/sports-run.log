@@ -2,14 +2,16 @@
 OK   schedule (27 games)
 OK   stats 2026 (18 rows)
 OK   box scores (15)
-OK   series history (12 opponents)
+OK   series history (10 opponents)
+OK   poll: AVCA Coaches Poll 10
 Wrote /home/runner/work/volindex/volindex/data/volleyball-auto.js
 OK   past seasons (11)
 == soccer
 OK   schedule (18 games)
 OK   stats 2026 (26 rows)
 OK   box scores (12)
-OK   series history (6 opponents)
+OK   series history (4 opponents)
+OK   poll: United Soccer Coaches NR
 Wrote /home/runner/work/volindex/volindex/data/soccer-auto.js
 OK   past seasons (11)
 == mbb
