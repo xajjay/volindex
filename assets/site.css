@@ -3,7 +3,7 @@
    Signature: orange/white checkerboard logo + a thin checker strip under the header. */
 :root {
   /* Official University of Tennessee palette (brand.utk.edu): Tennessee Orange #FF8200, White, Smokey Gray #4B4B4B.
-     UT's guide says no black: Smokey Gray is used for type and anything that would be black.
+     Text and dark elements use black (site choice); Smokey Gray is kept for the home-page title outline.
      --orange-ink is only for small orange text, where #FF8200 on white is too faint to read. */
   --orange: #FF8200;
   --orange-ink: #B35C00;
@@ -12,8 +12,8 @@
   --bg: #F5F5F5;
   --surface: #FFFFFF;
   --surface-2: #EDEDED;
-  --fg: #4B4B4B;
-  --muted: #5F5F5F;
+  --fg: #141414;
+  --muted: #4D4D4D;
   --line: #D6D6D6;
   --line-strong: #BDBDBD;
   --shadow: 0 1px 2px rgba(22, 27, 33, .06), 0 2px 8px rgba(22, 27, 33, .04);
@@ -22,7 +22,7 @@
   --warn: #A15C00;
   --chip-new: #E7F0FF;
   --chip-new-ink: #1D4E9E;
-  --head-bg: #4B4B4B;
+  --head-bg: #141414;
   --head-fg: #FFFFFF;
   --band: #FFFFFF;
   --gold: #6B5200;
@@ -237,7 +237,7 @@ textarea.export { width: 100%; min-height: 220px; font: 12px/1.4 var(--f-mono); 
 /* player dialog */
 dialog { border: 1px solid var(--line); border-radius: 8px; padding: 0; background: var(--surface); color: var(--fg); width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); }
 dialog::backdrop { background: rgb(0 0 0 / .5); }
-.dlg-h { background: var(--smokey); color: #fff; padding: 18px 20px; display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; }
+.dlg-h { background: #141414; color: #fff; padding: 18px 20px; display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; }
 .dlg-h .jersey { color: var(--orange); font-size: 46px; }
 .dlg-h h3 { font-size: 30px; text-transform: uppercase; }
 .dlg-h p { margin: 2px 0 0; font-size: 13px; color: #CFCBC6; }
@@ -489,7 +489,7 @@ body.asking { overflow: hidden; }
 .medialinks a:hover { border-color: var(--orange); color: var(--orange); }
 .mediacard .medialinks { justify-content: flex-start; margin-top: 8px; }
 .mediacard { padding: 14px 16px; }
-.vix { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--smokey); color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; }
+.vix { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: #000; color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; }
 .vix span { opacity: .75; }
 @media (max-width: 640px) { .askbtn { margin-right: 4px; padding: 6px 10px; } .list.media li { flex-direction: column; } .medialinks { justify-content: flex-start; } }
 
@@ -497,7 +497,7 @@ body.asking { overflow: hidden; }
 .hub-hero h1, .hub-hero h1 span { color: var(--orange); -webkit-text-stroke: .045em var(--smokey); paint-order: stroke fill; }
 :root[data-theme="dark"] .hub-hero h1, :root[data-theme="dark"] .hub-hero h1 span { -webkit-text-stroke-color: #8C8C8C; }
 .hub-hero h1 { text-shadow: none; }
-.hub-hero .eyebrow { color: var(--smokey); }
+.hub-hero .eyebrow { color: var(--muted); }
 :root[data-theme="dark"] .hub-hero .eyebrow { color: var(--muted); }
 /* the checkerboard (Neyland end zones) under the title */
 .hub-hero h1::after { content: ""; display: block; height: 12px; width: min(420px, 70%); margin-top: 14px; -webkit-text-stroke: 0;
