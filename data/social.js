@@ -31,7 +31,7 @@ window.SOCIAL = {
   football: {
     official: [{ name: 'Tennessee Football', about: 'Official team accounts', links: [['X @Vol_Football', 'https://x.com/Vol_Football'], ['Instagram', 'https://instagram.com/vol_football'], ['Facebook', 'https://www.facebook.com/VolFootball'], ['utsports.com', 'https://utsports.com/sports/football']] }],
     creators: [
-      { name: "Talkin' VAWLS", about: 'Fan podcast and post-game shows (Boogey Bentley)', links: [['X @TalkinVAWLS_pod', 'https://x.com/TalkinVAWLS_pod'], ['Podcast', 'https://player.fm/series/talkin-vawls-2351044'], ['Facebook', 'https://www.facebook.com/talkinVAWLS/'], ['Find Boogey Bentley on X', xs('Boogey Bentley')]] },
+      { name: "Talkin' VAWLS", about: 'Fan podcast and post-game shows (Boogey Bentley)', links: [['X @TalkinVAWLS_pod', 'https://x.com/TalkinVAWLS_pod'], ['YouTube', 'https://www.youtube.com/@TalkinVAWLSNetwork'], ['Facebook', 'https://www.facebook.com/talkinVAWLS/'], ['Find Boogey Bentley on X', xs('Boogey Bentley')]] },
       { name: 'Brent Hubbs', about: 'VolQuest publisher, longtime Tennessee insider', links: [['VolQuest', 'https://www.on3.com/teams/tennessee-volunteers/'], ['Find on X', xs('Brent Hubbs')]] },
       { name: 'Eric Cain', about: 'Host of Locked On Vols, a daily Tennessee podcast', links: [['Locked On Vols', 'https://lockedonpodcasts.com/hosts/eric-cain/'], ['Find on X', xs('Eric Cain Vols')]] },
       { name: 'Rocky Top Insider football', about: 'Daily football coverage and podcasts', links: [['Football news', 'https://www.rockytopinsider.com/category/football/']] },
