@@ -1,0 +1,6 @@
+# never upload your API key
+tools/cfbd_key.txt
+tools/__pycache__/
+*.zip
+.DS_Store
+Thumbs.db
