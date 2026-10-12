@@ -195,7 +195,8 @@
     applyAuto(F);
     byName = new Map(F.players.map(p => [p.name, p]));
     recByName = new Map(F.recruits.concat(F.recruits2028 || []).map(r => [r.name, r]));
-    const draft = store.get(DKEY);
+    let draft = store.get(DKEY);
+    if (draft && (draft.rev || 0) < (window.DEPTH.football.rev || 0)) { store.del(DKEY); draft = null; } // a newer chart file wins over old browser edits
     depthState = draft || JSON.parse(JSON.stringify(window.DEPTH.football));
     ['current', 'next'].forEach(k => { depthState[k].chart = splitOffense(depthState[k].chart); });
     depthState._draft = !!draft;
@@ -400,6 +401,7 @@
   }
   function status27(p) {
     if (p.leaving) return '<span class="chip leave">Out of eligibility</span>';
+    if (p.confirmed27) return '<span class="chip new">Returning (confirmed)</span>';
     if (p.draft) return `<span class="chip risk-${p.draft.level}">Draft: ${p.draft.level}</span>`;
     if (p.cls === 'Sr.') return '<span class="chip">5th year</span>';
     return '<span class="chip">Returns</span>';
@@ -430,7 +432,7 @@
   function chartFor(which) {
     const d = depthState[which];
     if (which !== 'next' || !showRisk) return d.chart;
-    const risk = F.players.filter(p => p.draft && !p.leaving).map(p => p.name);
+    const risk = F.players.filter(p => p.draft && !p.leaving && !p.confirmed27).map(p => p.name);
     const out = {};
     Object.entries(d.chart).forEach(([side, rows]) => {
       const curRows = depthState.current.chart[side] || [];
@@ -449,9 +451,10 @@
     if (p) {
       const cls = which === 'next' ? NEXT_CLASS[p.cls] : p.cls;
       const tags = [];
-      if (which === 'next' && p.draft) tags.push(`<span class="chip risk-${p.draft.level}">Draft risk: ${p.draft.level}</span>`);
-      if (which === 'next' && p.cls === 'Sr.') tags.push('<span class="chip">5th-year return</span>');
+      if (which === 'next' && p.draft && !p.confirmed27) tags.push(`<span class="chip risk-${p.draft.level}">Draft risk: ${p.draft.level}</span>`);
+      if (which === 'next' && p.cls === 'Sr.' && !p.confirmed27) tags.push('<span class="chip">5th-year return</span>');
       if (which === 'next' && p.leaving) tags.push('<span class="chip leave">Out of eligibility</span>');
+      if (which === 'next' && p.confirmed27) tags.push('<span class="chip new">Confirmed 5th year</span>');
       if (which === 'current') { tags.push(rankChips(p)); if (p.honors.length) tags.push('<span class="chip honor">Honors</span>'); }
       return { num: p.num, cls, rating: p.rating, tags, known: true, nick: p.nick };
     }
@@ -488,7 +491,7 @@
   }
   function nextSummary() {
     const leaving = F.players.filter(p => p.leaving);
-    const risk = F.players.filter(p => p.draft && !p.leaving);
+    const risk = F.players.filter(p => p.draft && !p.leaving && !p.confirmed27);
     const seniors = F.players.filter(p => p.cls === 'Sr.');
     const starters = Object.values(depthState.current.chart).flat().filter(r => !['H', 'KO', 'PR', 'KR'].includes(r[0])).map(r => r[1][0]);
     const uniq = [...new Set(starters)];
@@ -521,6 +524,7 @@
    ============================================================ */
 window.DEPTH = window.DEPTH || {};
 window.DEPTH.football = {
+  "rev": ${(depthState.rev || 0) + 1},
 ${part('current')},
 ${part('next')}
 };
@@ -953,7 +957,7 @@ ${part('next')}
         ${p.r247 && p.r247.hs ? `<dt>247 HS composite</dt><dd>${p.r247.hs.grade.toFixed(2)} · ${p.r247.hs.stars || '?'}-star · class of ${p.r247.hs.cls}${p.r247.hs.nat ? ' · No. ' + p.r247.hs.nat + ' nationally' : ''}</dd>` : ''}
         ${p.r247 && p.r247.transfer && p.r247.transfer.grade ? `<dt>247 transfer rating</dt><dd>${p.r247.transfer.grade.toFixed(2)} · ${p.r247.transfer.stars || '?'}-star · ${p.r247.transfer.season} portal from ${esc(p.r247.transfer.origin)}</dd>` : ''}
         <dt>Depth chart</dt><dd>${depthSpots.join(', ') || 'Not on the depth chart'}</dd>
-        <dt>2027</dt><dd>${p.leaving ? 'Out of eligibility (5th-year player)' : p.draft ? `Draft risk (${p.draft.level}): ${esc(p.draft.note)}` : p.cls === 'Sr.' ? 'Eligible to return for a 5th year' : 'Expected to return as a ' + NEXT_CLASS[p.cls]}</dd>
+        <dt>2027</dt><dd>${p.confirmed27 ? esc(p.confirmed27) : p.leaving ? 'Out of eligibility (5th-year player)' : p.draft ? `Draft risk (${p.draft.level}): ${esc(p.draft.note)}` : p.cls === 'Sr.' ? 'Eligible to return for a 5th year' : 'Expected to return as a ' + NEXT_CLASS[p.cls]}</dd>
         ${p.future ? `<dt>Draft buzz</dt><dd>No. ${p.future.rank} on the ${p.future.year} consensus big board</dd>` : ''}</dl>
         ${careerTable(p)}
         ${p.honors.length ? `<div><h4>Honors & watch lists</h4><ul>${p.honors.map(h => `<li>${esc(h)}</li>`).join('')}</ul></div>` : ''}`;

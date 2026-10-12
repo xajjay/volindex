@@ -716,6 +716,7 @@ window.SITE.football = {
   {
    "id": "ethan-davis",
    "name": "Ethan Davis",
+   "confirmed27": "Confirmed returning for a 5th year in 2027; projected starting TE",
    "num": 0,
    "pos": "TE",
    "ht": "6'5\"",

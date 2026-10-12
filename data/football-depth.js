@@ -9,6 +9,7 @@
    ============================================================ */
 window.DEPTH = window.DEPTH || {};
 window.DEPTH.football = {
+  "rev": 2,
   "current": {
     "label": "2026 depth chart",
     "updated": "2026-10-12",
@@ -72,7 +73,7 @@ window.DEPTH.football = {
       ["WR-X", ["Radarious Jackson", "Travis Smith Jr.", "Kesean Bowman", "Nathan Roberts"]],
       ["WR-Z", ["TK Keys", "Dayon Cooper", "Deon Hardin"]],
       ["WR-SL", ["Tyreek King", "Ian Duarte"]],
-      ["TE", ["DaSaahn Brame", "Trent Thomas", "Luca Wolf", "Malik Howard"]]
+      ["TE", ["Ethan Davis", "DaSaahn Brame", "Trent Thomas", "Luca Wolf", "Malik Howard"]]
     ],
     "Offensive Line": [
       ["LT", ["David Sanders Jr.", "Gabriel Osenda", "Niko Kampas", "Jeremias Heard"]],
