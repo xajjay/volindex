@@ -312,7 +312,7 @@
   function pcardSport(D, p) {
     const E = X(D), rec = (E.recruit || {})[p.name];
     return `<button class="pcard" data-sp="${esc(p.name)}"><div class="pcard-top"><span class="jersey">${esc(p.num)}</span><div><div class="nm">${esc(p.name)}</div><div class="sub">${esc(p.pos)} · ${esc(p.cls)}${p.prev ? ' · from ' + esc(String(p.prev).split(' / ').pop()) : ''}</div></div></div>
-      ${rec ? `<div class="tagrow"><span class="chip new">${esc(rec.split(':')[0])}</span> <span class="small dim">${esc(rec.split(': ').slice(1).join(': '))}</span></div>` : ''}
+      ${rec ? (m => `<div class="tagrow"><span class="chip new">${esc(m ? m[1] : 'Recruit')}</span> <span class="small dim">${esc(m ? m[2] : rec)}</span></div>`)(rec.match(/^([^:]{1,16}):\s*(.+)$/)) : ''}
       <div class="why">${whyPlayer(D, p)}</div></button>`;
   }
   function openPlayerSport(D, name) {

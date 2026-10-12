@@ -29,7 +29,7 @@ window.SITE.volleyball = {
   ]
  ],
  "quick": [
-  "The Lady Vols are <b>12-3</b> (3-2 SEC) and <b>No. 10</b> in the AVCA poll, with wins over No. 21 Indiana and No. 9 Penn State.",
+  "The Lady Vols are <b>12-3</b> (3-2 SEC) and <b>No. 9</b> in the AVCA poll (up from 10), with wins over No. 21 Indiana and No. 9 Penn State.",
   "Losses: No. 2 Pitt, No. 7 Texas (in five) and No. 7 Florida. They've won three straight since.",
   "SMU transfer <b>Kennedi Rogers</b> leads with 4.55 kills per set; three-time All-American setter <b>Caroline Kerr</b> runs an offense hitting <b>.295</b>.",
   "Next: at <b>Arkansas Oct. 16</b> and at <b>Oklahoma Oct. 18</b>, then No. 4 Kentucky visits Oct. 21."

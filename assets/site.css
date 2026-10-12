@@ -502,3 +502,16 @@ body.asking { overflow: hidden; }
 /* the checkerboard (Neyland end zones) under the title */
 .hub-hero h1::after { content: ""; display: block; height: 12px; width: min(420px, 70%); margin-top: 14px; -webkit-text-stroke: 0;
   background: conic-gradient(var(--orange) 25%, var(--surface) 0 50%, var(--orange) 0 75%, var(--surface) 0) 0 0 / 12px 12px; border: 1px solid var(--line); border-radius: 2px; }
+
+/* cards never spill out of their box */
+.pcard { min-width: 0; overflow: hidden; overflow-wrap: anywhere; }
+.pcard .chip, .pcard .rate { white-space: normal; }
+.pcard .why, .pcard .tagrow, .pcard .sub { overflow-wrap: anywhere; }
+.pcard .tagrow { display: flex; flex-wrap: wrap; align-items: center; }
+.box, .card, .askcard { min-width: 0; overflow-wrap: anywhere; }
+/* top-left logo matches the home title: Tennessee Orange, Smokey Gray outline */
+.brand, .brand span { color: var(--orange); -webkit-text-stroke: 1px var(--smokey); paint-order: stroke fill; }
+:root[data-theme="dark"] .brand, :root[data-theme="dark"] .brand span { -webkit-text-stroke-color: #8C8C8C; }
+.list li > * { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.list .chip { white-space: normal; }
+.titlebox b, .titlebox b.num { font-size: clamp(24px, 2.5vw, 38px); }
