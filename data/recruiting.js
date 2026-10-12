@@ -8,12 +8,12 @@ window.RECRUITING = {
     commits: [],
     none: 'No 2027 commitments yet, per 247Sports (October 2026).',
     lastClass: {
-      title: '2026 signing class (now freshmen) · 247Sports ratings',
+      title: '2026 signing class (now freshmen) · 247Sports and On3 ratings',
       rows: [
-        ['Christopher Washington Jr.', 'SF · Providence Christian Academy (Murfreesboro, Tenn.)', '4-star · 92 · No. 53 nationally'],
-        ['Ralph Scott', 'SF · IMG Academy (Bradenton, Fla.)', '4-star · 92 · No. 73 nationally'],
-        ['Manny Green', 'SF · Cedar Grove (Ellenwood, Ga.)', '4-star · 90 · No. 118 nationally'],
-        ['Marquis Clark', 'PG · Whitney Young (Chicago, Ill.)', '3-star · 87 · No. 226 nationally'],
+        ['Christopher Washington Jr.', 'SF · Providence Christian Academy (Murfreesboro, Tenn.)', '247: 4-star, 92, No. 53 · On3: 4-star, 94, No. 51'],
+        ['Ralph Scott', 'SF · IMG Academy (Bradenton, Fla.)', '247: 4-star, 92, No. 73 · On3: 4-star, 91, No. 88'],
+        ['Manny Green', 'SF · Cedar Grove (Ellenwood, Ga.)', '247: 4-star, 90, No. 118 · On3: 3-star, 88'],
+        ['Marquis Clark', 'PG · Whitney Young (Chicago, Ill.)', '247: 3-star, 87, No. 226 · On3: 3-star, 87'],
       ],
       src: 'https://247sports.com/college/tennessee/season/2026-basketball/commits/', srcName: '247Sports 2026 Tennessee basketball commits',
     },
@@ -49,17 +49,38 @@ window.RECRUITING = {
   },
   softball: {
     year: 2027,
-    intro: "Karen Weekly's recruiting: 2027 commitments, this year's freshmen and where to follow along.",
-    commits: [
-      { name: 'Emma Pynes', pos: 'OF', from: 'Florida', rank: '4-star · No. 59 overall', date: 'Oct. 2, 2025', src: 'https://www.si.com/college/tennessee/recruiting/commit-alert-2027-4-star-of-emma-pynes-picks-tennessee-softball-01k6khsah7ax' },
-      { name: 'Gracyn Needle', pos: 'SS / C / 3B', from: "The King's Academy (Palm Beach, Fla.)", rank: '—', date: 'Sept. 8, 2025', src: 'https://247sports.com/college/tennessee/article/lady-vols-softball-commits-253718620/' },
-      { name: 'Kamryn Potts', pos: '1B / C', from: 'Viera HS (Viera, Fla.)', rank: '—', date: 'Sept. 8, 2025', src: 'https://247sports.com/college/tennessee/article/lady-vols-softball-commits-253718620/' },
-      { name: 'Evelynn Swartzlander', pos: 'SS', from: 'Birdville HS (North Richland Hills, Texas)', rank: '—', date: 'Sept. 8, 2025', src: 'https://247sports.com/college/tennessee/article/lady-vols-softball-commits-253718620/' },
+    intro: "Karen Weekly's recruiting: the next two classes, this year's freshmen and where to follow along. Ratings are On3's.",
+    classes: [
+      { year: 2027, rank: 'On3 class rank No. 25 (No. 4 in the SEC)', commits: [
+        { name: 'Kaylee Hodges', pos: 'P', from: 'Matoaca (Chesterfield, Va.)', rank: '5-star · 99 · No. 2 nationally · No. 1 pitcher', date: 'Oct. 2, 2025' },
+        { name: 'Gracyn Needle', pos: 'MI', from: "The King's Academy (Royal Palm Beach, Fla.)", rank: '4-star · 95 · No. 37', date: 'Sept. 8, 2025' },
+        { name: 'Evelynn Swartzlander', pos: 'MI', from: 'Birdville (North Richland Hills, Texas)', rank: '4-star · 94 · No. 60', date: 'Sept. 7, 2025' },
+        { name: 'Emma Pynes', pos: 'OF', from: 'Cornerstone Charter (Orlando, Fla.)', rank: '4-star · 94 · No. 57', date: 'Sept. 27, 2025' },
+        { name: 'Mia Roland', pos: 'MI', from: 'Charles D. Owen (Black Mountain, N.C.)', rank: '4-star · 93 · No. 67', date: 'July 28, 2026' },
+        { name: 'Kamryn Potts', pos: 'C', from: 'Viera (Rockledge, Fla.)', rank: '4-star · 93 · No. 74', date: 'Sept. 8, 2025' },
+      ], src: 'https://www.on3.com/college/tennessee-volunteers/softball/2027/industry-comparison-commits/' },
+      { year: 2028, rank: 'On3 class rank No. 2 (Sept. 22, 2026 update)', commits: [
+        { name: 'Caelyn Campos', pos: 'OF', from: 'Del Oro (Rocklin, Calif.)', rank: '5-star · 99 · No. 4 nationally · No. 1 outfielder', date: 'Sept. 22, 2026' },
+        { name: 'Reagan Eldred', pos: 'P', from: 'Klein Oak (Spring, Texas)', rank: '5-star · 98 · No. 14 nationally', date: 'Sept. 20, 2026' },
+        { name: 'Nevaeh Wilson', pos: 'MI', from: 'Ganesha (Corona, Calif.)', rank: '4-star · 95 · No. 32', date: 'Sept. 7, 2026' },
+        { name: 'Kenzie White', pos: 'CI', from: 'Clarksville (Clarksville, Tenn.)', rank: '4-star · 90 · No. 119', date: 'Sept. 7, 2026' },
+        { name: 'Sophia Galindo', pos: 'CI', from: 'Hollister (Hollister, Calif.)', rank: '3-star · 88', date: 'Sept. 7, 2026' },
+      ], src: 'https://www.on3.com/college/tennessee-volunteers/softball/2028/industry-comparison-commits/' },
     ],
-    note: 'Public commitments found in news reports; the full class is announced at signing in November.',
+    lastClass: {
+      title: '2026 signing class (now freshmen) · On3 ratings',
+      rows: [
+        ['Avary Stockwell', 'C · Green Hill (Mount Juliet, Tenn.)', '4-star · 97 · No. 16'],
+        ['Bailee Shelton', 'P · McNairy Central (Selmer, Tenn.)', '4-star · 97 · No. 24'],
+        ['Halle Bailey', 'IF · Alcoa (Alcoa, Tenn.)', '4-star · 96 · No. 26'],
+        ['Maggie Krause', 'P · Northview (Terre Haute, Ind.)', '4-star · 93 · No. 77'],
+      ],
+      src: 'https://www.on3.com/college/tennessee-volunteers/softball/2026/industry-comparison-commits/', srcName: 'On3 2026 Tennessee softball commits',
+    },
     trackers: [
+      ['2027 commits', 'On3', 'https://www.on3.com/college/tennessee-volunteers/softball/2027/industry-comparison-commits/'],
+      ['2028 commits', 'On3', 'https://www.on3.com/college/tennessee-volunteers/softball/2028/industry-comparison-commits/'],
       ['Class rankings', 'Extra Inning Softball', 'https://extrainningsoftball.com/'],
-      ['2026 class breakdown', 'On3', 'https://www.on3.com/softball/news/2026-signing-class-breakdown-tennessee'],
     ],
   },
   volleyball: {
@@ -67,6 +88,18 @@ window.RECRUITING = {
     intro: "Eve Rackham Watt's recruiting: the next class, this year's freshmen and where to follow along.",
     commits: [],
     none: 'The 2027 class is announced at signing in November. Volleyball commitments are rarely public before then.',
+    lastClass: {
+      title: '2026 signing class (now freshmen)',
+      rows: [
+        ['Emma Frietch', 'L · Cincinnati, Ohio (Northern Kentucky VBC)', 'Prep Dig No. 43 overall'],
+        ['Morgan Williams', 'OH · Burke, Va. (Metro VBC)', 'Prep Dig No. 82 overall'],
+        ['Jolene Oddo', 'MB · Clayton, N.C. (Cleveland HS)', 'PrepVolleyball No. 111'],
+        ['Anni Tang', 'MB · Sydney, Australia (ProVolley Academy)', 'International · now a starter'],
+        ['Camille Perry', 'MB · Frisco, Texas (Lone Star HS)', '—'],
+        ['Jade Williams', 'RS · Atlanta, Ga. (Woodward Academy)', '—'],
+      ],
+      src: 'https://utsports.com/news/2025/11/17/volleyball-rackham-watt-announces-six-signings-in-2026-recruiting-class', srcName: 'utsports.com signing class announcement',
+    },
     trackers: [
       ['2026 signing class (six signees)', 'utsports.com', 'https://utsports.com/news/2025/11/17/volleyball-rackham-watt-announces-six-signings-in-2026-recruiting-class'],
       ['Class rankings', 'PrepVolleyball', 'https://prepvolleyball.com/articles/tag/recruiting-class-rankings'],

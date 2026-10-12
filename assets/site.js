@@ -149,7 +149,8 @@
         <h2>${esc(s.name)} ${rankBlock(pollFor(s.key, F))}</h2></div>
         ${pollLine(pollFor(s.key, F))}
         ${(d => d ? `<div class="upd">Updated ${fmtDate(d, { month: 'short', day: 'numeric' })}</div>` : '')(lastUpdated(s.key))}
-        <div class="status">${s.key === 'football' && F ? `${F.season}: ${F.team.record} (${F.team.sec} SEC)` : window.sportStatus && window.sportStatus(s.key) ? esc(window.sportStatus(s.key).split(' · Next')[0]) : 'Page in progress.'}</div>
+        ${(r => r ? `<div class="bigrec"><b>${esc(r.rec)}</b>${r.sec ? `<span>${esc(r.sec)} <em>SEC</em></span>` : ''}<small>${esc(r.season)} record</small></div>` : '')(s.key === 'football' && F ? (F.schedule.some(g => g.result) ? { season: F.season, rec: F.team.record, sec: F.team.sec } : null) : window.sportRecord && window.sportRecord(s.key))}
+        <div class="status">${(s.key === 'football' && F && F.schedule.some(g => g.result)) || (window.sportRecord && window.sportRecord(s.key)) ? '' : s.key === 'football' && F ? `${F.season}: ${F.team.record} (${F.team.sec} SEC)` : window.sportStatus && window.sportStatus(s.key) ? esc(window.sportStatus(s.key).split(' · Next')[0]) : 'Page in progress.'}</div>
         ${s.key === 'football' && F ? watchLine(next && Object.assign({ tv: (next.espn || {}).tv }, next), next && kick(next)) : window.sportNext ? (n => watchLine(n, n && (n.time ? n.time + ' ET' : null)))(window.sportNext(s.key)) : ''}
       </a>`).join('')}
     </div>`;

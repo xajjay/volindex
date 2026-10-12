@@ -9,15 +9,15 @@ window.LINEUP = window.LINEUP || {};
 window.LINEUP.volleyball = {
   "label": "Starting lineup",
   "updated": "2026-10-12",
-  "basedOn": "Based on 2026 sets played (utsports.com stats)",
+  "basedOn": "Starting lineup from the Oct. 11 win over LSU (@Vol_VBall)",
   "chart": {
     "Starters": [
       ["S", ["Caroline Kerr", "Mallory Matheny"]],
       ["OH", ["Kennedi Rogers", "Nia Hall"]],
       ["OH", ["Maggie Dostic", "Morgan Williams"]],
       ["OPP", ["Jalyn Stout", "Jade Williams"]],
-      ["MB", ["Chelsea Sutton", "Anni Tang"]],
-      ["MB", ["Jolene Oddo", "Camille Perry"]],
+      ["MB", ["Chelsea Sutton", "Jolene Oddo"]],
+      ["MB", ["Anni Tang", "Camille Perry"]],
       ["L", ["Raegan Burns", "Emma Frietch"]]
     ],
     "Serve and defense": [

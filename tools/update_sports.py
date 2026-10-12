@@ -263,7 +263,41 @@ def _poll_date(label):
     except Exception:
         return None
 
-POLL_FN = {"volleyball": avca_poll, "soccer": usc_poll}
+def ncaa_rank(path, label):
+    """Tennessee's row on an NCAA.com rankings page (polls, RPI, NET). None if the page or row is missing."""
+    html = fetch("https://www.ncaa.com/rankings/" + path)
+    if not html: return None
+    when = re.search(r"Through Games\s*([A-Za-z]+\.?\s*\d+,?\s*\d{4})", html)
+    head = None
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", html, re.S):
+        cells = [re.sub(r"<[^>]+>", "", c).strip() for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.S)]
+        if not cells: continue
+        if head is None: head = [c.upper() for c in cells]; continue
+        if len(cells) > 1 and cells[1] == "Tennessee":
+            d = dict(zip(head, cells))
+            rank = int(re.sub(r"\D", "", cells[0]) or 0) or "NR"
+            date = None
+            if when:
+                try: date = datetime.datetime.strptime(when.group(1).replace(".", "").replace(",", ""), "%b %d %Y").date().isoformat()
+                except ValueError: pass
+            return dict(poll=label, rank=rank, record=d.get("RECORD"), prev=d.get("PREV") or d.get("PREVIOUS RANK"), date=date, source="https://www.ncaa.com/rankings/" + path)
+    return dict(poll=label, rank="NR", date=None, source="https://www.ncaa.com/rankings/" + path)
+
+def vb_poll():
+    return ncaa_rank("volleyball-women/d1/avca-coaches", "AVCA Coaches Poll") or avca_poll()
+
+def soccer_poll():
+    p = ncaa_rank("soccer-women/d1/united-soccer-coaches", "United Soccer Coaches")
+    return p if p and p.get("date") else usc_poll()
+
+POLL_FN = {"volleyball": vb_poll, "soccer": soccer_poll}
+# NCAA's own metric for each sport (RPI or NET), read from NCAA.com once it is published
+RPI_PATH = {"volleyball": ("volleyball-women/d1/ncaa-womens-volleyball-rpi", "NCAA RPI"),
+            "soccer": ("soccer-women/d1/ncaa-womens-soccer-rpi", "NCAA RPI"),
+            "mbb": ("basketball-men/d1/ncaa-mens-basketball-net-rankings", "NCAA NET"),
+            "wbb": ("basketball-women/d1/ncaa-womens-basketball-net-rankings", "NCAA NET"),
+            "baseball": ("baseball/d1/rpi", "NCAA RPI"),
+            "softball": ("softball/d1/ncaa-softball-rpi", "NCAA RPI")}
 
 # ---------------------------------------------------------------- one sport
 def run_sport(key):
@@ -302,6 +336,22 @@ def run_sport(key):
             p = POLL_FN[key]() if key in POLL_FN else espn_poll(cfg["espn"])
             if p: out["poll"] = p; note(f"OK   poll: {p['poll']} {p['rank']}")
         except Exception as e: note(f"SKIP poll: {e}")
+    if key in RPI_PATH:
+        try:
+            r = ncaa_rank(*RPI_PATH[key])
+            if r and r.get("date"): out["rpi"] = r; note(f"OK   {r['poll']}: {r['rank']}")
+        except Exception as e: note(f"SKIP rpi: {e}")
+    # earlier seasons' stats for player cards (cached once a season is over)
+    career = {}
+    for s_ in history_seasons(key)[:4]:
+        if s_ in (cfg["season"],): continue
+        try:
+            st = cached(f"{key}-stats-{s_}", lambda s_=s_: season_stats(slug, s_))
+            if st: career[s_] = st["tables"]
+        except Exception as e: note(f"SKIP stats {s_}: {e}")
+    if out.get("stats") and out["stats"].get("season") == cfg["season"]:
+        career[cfg["season"]] = out["stats"]["tables"]
+    if career: out["career"] = career; note(f"OK   career stats ({len(career)} seasons)")
     out["log"] = list(log)
     path = os.path.join(DATA, f"{key}-auto.js")
     prev = {}

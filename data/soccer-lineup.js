@@ -9,7 +9,7 @@ window.LINEUP = window.LINEUP || {};
 window.LINEUP.soccer = {
   "label": "Starting XI",
   "updated": "2026-10-12",
-  "basedOn": "Based on 2026 starts (utsports.com stats)",
+  "basedOn": "Starting XI from the Oct. 9 match at South Carolina (@Vol_Soccer)",
   "chart": {
     "Goalkeeper": [
       ["GK", ["Cayden Norris", "Lauryn Berry", "Morgan Weaver"]]
@@ -26,9 +26,9 @@ window.LINEUP.soccer = {
       ["CM", ["Emerson Moore", "Olivia Feagin"]]
     ],
     "Attack": [
-      ["LW", ["Taylor Cheatham", "Kai Tsakiris"]],
+      ["LW", ["Ayva Jordan", "Taylor Cheatham", "Kai Tsakiris"]],
       ["ST", ["Kylee Simmons", "Jayla Blue"]],
-      ["RW", ["Shae O'Rourke", "Ayva Jordan"]]
+      ["RW", ["Shae O'Rourke", "Taylor Cheatham"]]
     ]
   }
 };
