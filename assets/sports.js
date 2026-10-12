@@ -318,9 +318,11 @@
   function openPlayerSport(D, name) {
     const p = D.roster.find(x => norm(x.name) === norm(name));
     const E = X(D); const honors = (E.honors || {})[p ? p.name : name] || [], draft = (E.draft || {})[p ? p.name : name], rec = (E.recruit || {})[p ? p.name : name];
-    const career = Object.assign({}, (window.SITE_AUTO && window.SITE_AUTO[D.key] && window.SITE_AUTO[D.key].career) || {});
-    if (D.statsAuto && !career[D.statsAuto.season]) career[D.statsAuto.season] = D.statsAuto.tables;
-    const seasons = Object.keys(career).sort().reverse().map(s => ({ s, lines: lineFor(D, career[s], name) })).filter(x => x.lines.length);
+    const S = D.statsAuto, inSzn = !!(S && S.season === D.season);
+    const groups = S ? (LINES[D.key] || []).map(([table, label, cols, test]) => { const r = statRow(S.tables, table, name); if (!r || !(numv(r.s[test]) > 0)) return null;
+      return { label, tiles: cols.map(([l, f]) => [l, l === 'W-L' ? (r.s.wins != null ? `${r.s.wins}-${r.s.losses}` : null) : l === 'W-L-T' ? (r.s.wins != null ? `${r.s.wins}-${r.s.losses}-${r.s.ties || 0}` : null) : r.s[f]]).filter(([, v]) => v != null && v !== '') }; }).filter(Boolean) : [];
+    const prevLine = !groups.length && p && p.prev && /\d/.test(p.note || '') ? p.note : null;
+    const statTitle = S ? (inSzn ? `${S.season} stats` : `${S.season} stats · last season`) : 'Stats';
     const inLineup = []; Object.values((lineup && lineup.chart) || {}).forEach(rows => rows.forEach(([pos, ns]) => { const i = ns.findIndex(n => norm(n) === norm(name)); if (i >= 0) inLineup.push(`${pos} (${i === 0 ? 'starter' : ordn(i + 1)})`); }));
     const head = `<span class="jersey">${esc(p ? p.num : '')}</span><div><h3>${esc(p ? p.name : name)}</h3><p>${p ? esc([p.pos, p.cls, p.ht && p.ht + (p.wt ? ', ' + p.wt + ' lb' : ''), p.bt && 'B/T ' + p.bt].filter(Boolean).join(' · ')) : esc(D.name)}</p></div>`;
     const body = `${rec ? `<div class="tagrow"><span class="chip new">Recruiting</span> <span class="small">${esc(rec)}</span></div>` : ''}
@@ -328,9 +330,10 @@
         <dt>${esc(lineup ? lineup.label : 'Lineup')}</dt><dd>${inLineup.join(', ') || 'Not in the projected lineup'}</dd>
         ${draft ? `<dt>Pro outlook</dt><dd><span class="chip risk-${draft.level}">${esc(draft.level)}</span> ${esc(draft.note)}${draft.src ? ` (<a href="${esc(draft.src)}" target="_blank" rel="noopener">source</a>)` : ''}</dd>` : ''}
         ${p && p.note ? `<dt>Notes</dt><dd>${esc(p.note)}</dd>` : ''}</dl>
-      ${(A => { const r = A && A.players && A.players.find(x => norm(x[0]) === norm(name)); return r ? `<div><h4>${esc(A.playersTitle || 'Player ratings')}</h4><div class="tiles four">${A.playerCols.map((c, i) => `<div class="tile"><b style="font-size:20px">${r[i + 1] == null ? '—' : esc(r[i + 1])}</b><span>${esc(c)}</span></div>`).join('')}</div></div>` : ''; })(E.advanced)}
       ${honors.length ? `<div><h4>Honors & watch lists</h4><ul>${honors.map(h => `<li>${esc(h)}</li>`).join('')}</ul></div>` : ''}
-      ${seasons.length ? `<div><h4>Stats at Tennessee by season</h4><div class="tablewrap"><table class="mini"><tbody>${seasons.map(x => x.lines.map((l, i) => `<tr><td class="num">${i === 0 ? `<b>${esc(x.s)}</b>` : ''}</td><td>${l.label ? `<span class="chip">${esc(l.label)}</span> ` : ''}${esc(l.text)}</td></tr>`).join('')).join('')}</tbody></table></div></div>` : `<p class="dim small">${p && p.prev ? 'No Tennessee stats yet (transfer).' : 'No Tennessee stats yet.'}</p>`}
+      <div><h4>${esc(statTitle)}</h4>${groups.length ? groups.map(g => `${g.label ? `<div class="eyebrow" style="margin:6px 0 4px">${esc(g.label)}</div>` : ''}<div class="tiles four statgrid">${g.tiles.map(([l, v]) => `<div class="tile"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>`).join('')
+        : prevLine ? `<p>${esc(prevLine)}${/ at /.test(prevLine) ? '' : ` (at ${esc(String(p.prev).split(' / ').pop())})`}</p><p class="dim small">Last season was at another school; Tennessee stats start with the first game.</p>`
+        : `<p class="dim small">${p && p.prev && !inSzn ? `Played last season at ${esc(String(p.prev).split(' / ').pop())}; Tennessee stats start with the first game.` : p && /Fr/.test(p.cls || '') ? 'Freshman: no college stats yet.' : inSzn ? 'Hasn\'t recorded a stat yet this season.' : 'No stats last season.'}</p>`}</div>
       <p class="dim small">Stats: utsports.com${rec ? ' · recruiting ratings as listed' : ''}.</p>`;
     window.showDialog(head, body, false);
   }

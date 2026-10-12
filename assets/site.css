@@ -515,3 +515,6 @@ body.asking { overflow: hidden; }
 .list li > * { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
 .list .chip { white-space: normal; }
 .titlebox b, .titlebox b.num { font-size: clamp(24px, 2.5vw, 38px); }
+.statgrid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)) !important; gap: 8px; }
+.statgrid .tile { padding: 8px 10px; }
+.statgrid .tile b { font-size: 20px; }
