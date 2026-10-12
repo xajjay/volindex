@@ -518,3 +518,4 @@ body.asking { overflow: hidden; }
 .statgrid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)) !important; gap: 8px; }
 .statgrid .tile { padding: 8px 10px; }
 .statgrid .tile b { font-size: 20px; }
+.brand-text { font-weight: inherit; white-space: nowrap; }
