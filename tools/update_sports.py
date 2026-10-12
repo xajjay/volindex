@@ -33,7 +33,7 @@ SPORTS = {
     "mbb":        dict(slug="mens-basketball", season="2026-27", last="2025-26", espn="basketball/mens-college-basketball"),
     "wbb":        dict(slug="womens-basketball", season="2026-27", last="2025-26", espn="basketball/womens-college-basketball"),
     "baseball":   dict(slug="baseball", season="2027", last="2026", espn="baseball/college-baseball"),
-    "softball":   dict(slug="softball", season="2027", last="2026", espn="softball/college-softball"),
+    "softball":   dict(slug="softball", season="2027", last="2026", espn=None),   # no free poll feed; preseason poll set by hand in January
 }
 
 log = []
@@ -140,7 +140,7 @@ def schedule(slug, season):
         title = (opp.get("title") or "").strip()
         exh = bool(re.search(r"\(Exh\.?\)|exhibition", title, re.I))
         row = dict(id=g.get("id"), date=(g.get("date") or "")[:10], time=g.get("time"), exh=exh,
-                   opp=re.sub(r"\s*\(Exh\.?\)", "", title, flags=re.I).strip(), site={"H": "H", "A": "A"}.get(g.get("location_indicator"), "N"),
+                   opp=re.sub(r"\s*\((Exh\.?|Exhibition|Scrimmage)\)", "", title, flags=re.I).strip(), site={"H": "H", "A": "A"}.get(g.get("location_indicator"), "N"),
                    loc=g.get("location"), conf=bool(g.get("conference")), type=g.get("type"),
                    tv=media.get("tv") or None, watch=(media.get("video") or {}).get("url"),
                    live=(media.get("stats") or {}).get("url"), history=g.get("opponent_history_path"),

@@ -52,9 +52,9 @@
         D.schedule = A.schedule.map(g => {
           const old = oldByDate.get(g.date + '|' + g.opp) || {};
           return Object.assign({}, old, {
-            date: g.date, opp: g.opp, site: g.site, loc: g.loc || old.loc, tv: g.tv || old.tv || null,
-            time: g.time ? g.time.replace(/ ?ET$/i, '').replace(/\./g, '').replace(/ ?pm$/i, ' PM').replace(/ ?am$/i, ' AM') : old.time || null,
-            kind: g.exh || /^(E|S)$/.test(g.type || '') ? 'exh' : g.conf ? 'conf' : (old.kind === 'exh' ? 'nonconf' : old.kind || 'nonconf'),
+            date: g.date, opp: g.opp.replace(/\s*\((Exh\.?|Exhibition|Scrimmage)\)/i, ''), site: g.site, loc: g.loc || old.loc, tv: g.tv || old.tv || null,
+            time: g.time && !/TBD|TBA/i.test(g.time) ? g.time.replace(/ ?ET$/i, '').replace(/\./g, '').replace(/ ?pm$/i, ' PM').replace(/ ?am$/i, ' AM') : old.time || null,
+            kind: g.exh || /\((Exh|Exhibition|Scrimmage)/i.test(g.opp) || /^(E|S)$/.test(g.type || '') ? 'exh' : g.conf ? 'conf' : (old.kind === 'exh' ? 'nonconf' : old.kind || 'nonconf'),
             result: g.result || null, us: g.us != null ? +g.us : null, them: g.them != null ? +g.them : null,
             gid: g.id, hasBox: !!(A.box && A.box[String(g.id)]), watch: g.watch, live: g.live, event: g.tournament, note: g.note,
           });
@@ -70,7 +70,16 @@
       if (A.stats) D.statsAuto = A.stats;
       if (A.box) D.box = A.box;
       if (A.series) D.series = A.series;
-      if (A.poll) D.pollAuto = A.poll;
+      if (A.poll) {
+        D.pollAuto = A.poll;
+        const yr = parseInt(D.season, 10), start = /baseball|softball/.test(D.key) ? `${yr}-01-01` : `${yr}-08-01`;
+        if (A.poll.date && A.poll.date >= start) {
+          const i = D.header.findIndex(h => /AVCA|Soccer Coaches|AP Top|poll/i.test(h[1]));
+          const label = `${A.poll.poll} (${fmtDate(A.poll.date, { month: 'short', day: 'numeric' })})`;
+          const val = typeof A.poll.rank === 'number' ? 'No. ' + A.poll.rank : 'NR';
+          if (i >= 0) D.header[i] = [val, label]; else D.header.unshift([val, label]);
+        }
+      }
       if (A.updated) D.updated = A.updated > (D.updated || '') ? A.updated : D.updated;
     } catch (e) { console.warn('Auto data skipped for ' + D.key, e); }
     return D;
@@ -140,10 +149,15 @@
     let rows = tableRows(D, table).filter(r => cols.some(([, f]) => numv(r.s[f]) && !/^(gamesPlayed|setsPlayed|appearances)$/.test(f)) && (!q || r.name.toLowerCase().includes(q)));
     const si = sSort && sSort.cat === sCat ? sSort.f : def, dir = sSort && sSort.cat === sCat ? sSort.dir : -1;
     const low = /earnedRunAverage|whip|opponentsBattingAverage|goalsAgainstAverage|errors|turnovers/i.test(si);
-    rows.sort((a, b) => si === 'name' ? dir * a.name.localeCompare(b.name) : (low && !sSort ? 1 : dir) * ((numv(a.s[si]) ?? -1e9) - (numv(b.s[si]) ?? -1e9)));
+    // rate stats (AVG, ERA, PCT, FG% ...) only rank players with enough volume; the rest sort after them
+    const VOL = { Hitting: 'atBats', Pitching: 'inningsPitched', Fielding: 'totalChances', Attacking: 'attackStatsTotalAttempts', Shooting: 'shots', Goalkeeping: 'minutesPlayed', Scoring: D.key === 'soccer' ? 'minutesPlayed' : 'gamesPlayed' };
+    const vf = VOL[c[0]] || cols[0][1]; const maxV = Math.max(1, ...rows.map(r => numv(r.s[vf]) || 0));
+    const isRate = rows.some(r => /^-?\d*\.\d+$/.test(String(r.s[si] || '')) && String(r.s[si]).startsWith('.')) || /Percentage|Average|whip|ops|PerGame|PerSet/i.test(si);
+    const qual = r => !isRate || (numv(r.s[vf]) || 0) >= maxV * 0.25;
+    rows.sort((a, b) => (qual(b) - qual(a)) || (si === 'name' ? dir * a.name.localeCompare(b.name) : (low && !sSort ? 1 : dir) * ((numv(a.s[si]) ?? -1e9) - (numv(b.s[si]) ?? -1e9))));
     const roster = new Map(D.roster.map(p => [p.name.toLowerCase(), p]));
     return `<div class="tablewrap"><table><thead><tr><th><button data-ss="name">Player</button></th>${cols.map(([l, f]) => `<th class="n"><button data-ss="${f}">${esc(l)}${si === f ? (dir > 0 ? ' ▲' : ' ▼') : ''}</button></th>`).join('')}</tr></thead>
-      <tbody>${rows.map(r => { const p = roster.get(r.name.toLowerCase()); return `<tr><td><b>${esc(r.name)}</b> <span class="dim small">${p ? esc(p.pos + ' · ' + p.cls) : r.num ? '#' + esc(r.num) : ''}</span></td>${cols.map(([, f]) => `<td class="n">${esc(r.s[f] ?? '—')}</td>`).join('')}</tr>`; }).join('') || `<tr><td colspan="${cols.length + 1}">No players match.</td></tr>`}</tbody></table></div>`;
+      <tbody>${rows.map(r => { const p = roster.get(r.name.toLowerCase()); return `<tr class="${qual(r) ? '' : 'unq'}" title="${qual(r) ? '' : 'Below the playing-time minimum for rate-stat rankings'}"><td><b>${esc(r.name)}</b> <span class="dim small">${p ? esc(p.pos + ' · ' + p.cls) : r.num ? '#' + esc(r.num) : ''}</span></td>${cols.map(([, f]) => `<td class="n">${esc(r.s[f] ?? '—')}</td>`).join('')}</tr>`; }).join('') || `<tr><td colspan="${cols.length + 1}">No players match.</td></tr>`}</tbody></table></div>`;
   }
   function teamTable(D) {
     const T = D.statsAuto.team || {}; const us = T.us || {}, op = T.opp || {};
@@ -191,10 +205,10 @@
     const head = `<div><div class="eyebrow">Final · ${fmtDate(g.date, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</div><h3>Tennessee ${g.us ?? ''}, ${esc(g.opp)} ${g.them ?? ''}</h3></div>`;
     if (!B) { window.showDialog(head, `<p>Full box score loads with the next automatic update.</p>`); return; }
     const T = B.teams;
-    const per = B.periods && B.periods.length ? `<div class="tablewrap"><table class="mini box-line"><thead><tr><th>Team</th>${B.periods.map(p => `<th class="n">${esc(p)}</th>`).join('')}</tr></thead>
-      <tbody>${[['away', B.periodsAway], ['home', B.periodsHome]].map(([side, sc], i) => { const t = T.find(x => x.home === (side === 'home')) || {}; return `<tr class="${/Tennessee/.test(t.name || '') ? 'me' : ''}"><td><b>${esc(t.name || '')}</b></td>${(sc || []).map(v => `<td class="n">${esc(v)}</td>`).join('')}</tr>`; }).join('')}</tbody></table></div>` : '';
+    const per = B.periods && B.periods.length ? `<div class="tablewrap"><table class="mini box-line"><thead><tr><th>Team</th>${B.periods.map(p => `<th class="n">${esc(p)}</th>`).join('')}<th class="n">${D.key === 'volleyball' ? 'Sets' : 'F'}</th></tr></thead>
+      <tbody>${[['away', B.periodsAway], ['home', B.periodsHome]].map(([side, sc], i) => { const t = T.find(x => x.home === (side === 'home')) || {}; return `<tr class="${/Tennessee/.test(t.name || '') ? 'me' : ''}"><td><b>${esc(t.name || '')}</b></td>${(sc || []).map(v => `<td class="n">${esc(v)}</td>`).join('')}<td class="n"><b>${esc(t.score ?? '')}</b></td></tr>`; }).join('')}</tbody></table></div>` : '';
     const ptable = t => { const cols = boxCols(D, t.players || []); return `<div class="tablewrap"><table class="mini"><thead><tr><th>${esc(t.name)}</th>${cols.map(([l]) => `<th class="n">${esc(l)}</th>`).join('')}</tr></thead>
-      <tbody>${(t.players || []).map(p => `<tr><td>${p.num ? '<span class="dim small">' + esc(p.num) + '</span> ' : ''}${esc(p.name)}</td>${cols.map(([, f]) => `<td class="n">${esc(p.s[f] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; };
+      <tbody>${(t.players || []).map(p => `<tr><td>${p.num ? '<span class="dim small">' + esc(p.num) + '</span> ' : ''}${esc(p.name)}</td>${cols.map(([, f]) => `<td class="n">${esc(/^-?NaN$/.test(String(p.s[f])) ? '' : (p.s[f] ?? ''))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; };
     const ut = T.find(t => /Tennessee/.test(t.name || '')) || T[1], op = T.find(t => t !== ut) || T[0];
     window.showDialog(head, `<p class="dim small">${esc([B.stadium, B.location].filter(Boolean).join(', '))}${B.attendance ? ' · Attendance ' + Number(B.attendance).toLocaleString() : ''}</p>${per}
       <div class="seg" role="group" style="margin:14px 0 10px">${[['ut', 'Tennessee'], ['op', esc(op ? op.name : 'Opponent')]].map(([k, l], i) => `<button data-bx="${k}" aria-pressed="${i === 0}">${l}</button>`).join('')}</div>
@@ -378,7 +392,7 @@ ${rows}
         <div class="tile"><b>${conf}</b><span>SEC ${D.key === 'baseball' || D.key === 'softball' ? 'series' : 'games'}</span></div><div class="tile"><b>${home}</b><span>Home dates</span></div>
         <div class="tile"><b>${n ? fmtDate(n.date, { month: 'short', day: 'numeric' }) : '—'}</b><span>Next: ${n ? esc(n.opp) : 'TBA'}</span></div></div>
       <div class="tablewrap"><table><thead><tr><th>Date</th><th>Opponent</th><th class="hide-sm">Location</th><th>${D.inSeason ? 'Result / Time' : 'Time'}</th><th class="hide-sm">TV</th><th></th></tr></thead>
-      <tbody>${D.schedule.map((g, i) => `<tr class="click ${n && g === n ? 'me' : ''}" data-sg="${i}" tabindex="0"><td class="num">${fmtDate(g.date)}</td><td><b>${vsat(g)} ${esc(g.opp)}</b> ${kindChip(g)}</td><td class="hide-sm">${esc(g.loc)}</td><td class="num">${g.result ? resStr(g) : esc(g.time ? g.time + ' ET' : g.kind === 'exh' ? '—' : 'TBA')}</td><td class="hide-sm">${esc(g.tv || '—')}</td><td class="n"><span class="golink">${g.result ? (g.hasBox ? 'Box score ›' : 'Result ›') : 'Preview ›'}</span></td></tr>`).join('')}</tbody></table></div>`;
+      <tbody>${D.schedule.map((g, i) => { const link = g.result || g.date >= today(); return `<tr class="${link ? 'click ' : ''}${n && g === n ? 'me' : ''}" ${link ? `data-sg="${i}" tabindex="0"` : ''}><td class="num">${fmtDate(g.date)}</td><td><b>${vsat(g)} ${esc(g.opp)}</b> ${kindChip(g)}</td><td class="hide-sm">${esc(g.loc)}</td><td class="num">${g.result ? resStr(g) : esc(g.time ? g.time + ' ET' : g.kind === 'exh' ? '—' : 'TBA')}</td><td class="hide-sm">${esc(g.tv || '—')}</td><td class="n">${link ? `<span class="golink">${g.result ? (g.hasBox ? 'Box score ›' : 'Result ›') : 'Preview ›'}</span>` : ''}</td></tr>`; }).join('')}</tbody></table></div>`;
   }
 
   /* ---------- stats ---------- */
