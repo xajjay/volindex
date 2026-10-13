@@ -129,7 +129,10 @@ def ncaa_standings(path):
         i = html.find("Tennessee")
         return None, {"len": len(html), "title": (re.search(r"<title>(.*?)</title>", html, re.S) or [None, ""])[1][:120],
                       "secHits": [html[max(0, j.start() - 120): j.start() + 60] for j in re.finditer(r"Southeastern|>SEC", html)][:3],
-                      "nearTN": html[max(0, i - 900): i + 300] if i >= 0 else None}
+                      "nearTN": html[max(0, i - 900): i + 300] if i >= 0 else None,
+                      "links": sorted(set(re.findall(r'href="(/standings/[^"#?]+)"', html)))[:60],
+                      "h": re.findall(r"<h[1-4][^>]*>(.*?)</h[1-4]>", html, re.S)[:15],
+                      "tables": len(re.findall(r"<table", html)), "firstTable": (re.search(r"<table.*?</table>", html, re.S) or [""])[0][:900] if re.search(r"<table", html) else None}
     t = re.search(r"<table.*?</table>", html[m.end():], re.S)
     if not t: return None, "no table after SEC heading"
     rows = []

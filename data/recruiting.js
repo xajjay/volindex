@@ -7,6 +7,16 @@ window.RECRUITING = {
     intro: "Rick Barnes' recruiting: the class of 2027, this year's freshmen and where to follow along.",
     commits: [],
     none: 'No 2027 commitments yet, per 247Sports (October 2026).',
+    targets: {
+      title: 'Top 2027 targets',
+      note: 'Uncommitted prospects Tennessee is recruiting, in The Vol Index priority order. Ratings from 247Sports (Oct. 2026).',
+      rows: [
+        { name: 'Malachi Jordan', pos: 'SF', ht: "6-7, 225", from: 'Prolific Prep · Nashville, Tenn. native', rank: '247: 97, No. 23 · Composite: .9928 (5-star), No. 19', src: 'https://247sports.com/player/malachi-jordan-46146933/' },
+        { name: 'Dylan Jones', pos: 'SF', ht: "6-6, 210", from: 'Bartlett (Bartlett, Tenn.)', rank: '247: 92, No. 40 · Composite: .9875 (5-star), No. 35 · No. 1 in Tennessee', src: 'https://247sports.com/player/dylan-jones-46158933/' },
+        { name: 'Chris Brown', pos: 'C', ht: "6-9, 210", from: 'Dream City Christian (Glendale, Ariz.)', rank: '247: 90, No. 124 · Composite: .9424 (4-star), No. 110', src: 'https://247sports.com/player/chris-brown-46153130/' },
+        { name: 'Reese Alston', pos: 'PG', ht: "6-2, 175", from: 'Houston Second Baptist (Houston, Texas)', rank: '247: 98, No. 9 · Composite: .9973 (5-star), No. 8 · No. 1 in Texas', src: 'https://247sports.com/player/reese-alston-46151465/' },
+      ],
+    },
     lastClass: {
       title: '2026 signing class (now freshmen) · 247Sports and On3 ratings',
       rows: [
