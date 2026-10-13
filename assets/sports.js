@@ -17,7 +17,7 @@
   let S, key, lineup, editing = false, rosterQ = '';
   const LKEY = k => 'vi-lineup-' + k + '-v1';
 
-  const NO_REVIEW = new Set(['volleyball', 'soccer']); // last-season review tab removed for these
+  const NO_REVIEW = new Set(['volleyball', 'soccer', 'mbb', 'wbb']); // last-season review tab removed for these
   function tabs(D) {
     const t = [['overview', 'Overview'], ['schedule', 'Schedule & Standings'], ['roster', 'Roster'], ['lineup', D.lineupTab || (D.key === 'baseball' || D.key === 'softball' ? 'Projected Lineup' : 'Projected Starters')]];
     if (D.stats || D.statsAuto) t.push(['stats', 'Stats']);

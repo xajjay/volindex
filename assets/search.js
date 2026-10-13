@@ -152,7 +152,7 @@
     if (topic === 'record' || topic === 'review') {
       const r = recordOf(k, D);
       if (topic === 'record' && r && sched.some(g => g.result)) return { title: `${nm}: ${r.rec}${r.sec ? ` (${r.sec} SEC)` : ''}`, html: `<p>${esc(nm)} is <b>${esc(r.rec)}</b>${r.sec ? `, <b>${esc(r.sec)}</b> in the SEC,` : ''} in ${esc(r.season)}.${nextG ? ` Next: ${vs(nextG)} ${esc(cleanOpp(nextG.opp))} on ${fmtDate(nextG.date, { month: 'short', day: 'numeric' })}.` : ''}</p>${schedRows(k, D, sched.filter(g => g.result).slice(-5).reverse(), 5)}`, go: `#${k}-schedule` };
-      if (k !== 'football' && D.last) return { title: `${nm} ${D.last.label}: ${D.last.record}`, html: `<p>${esc(D.last.label)}: <b>${esc(D.last.record)}</b> · ${esc(D.last.conf)} · ${esc(D.last.finish)}. ${esc(D.last.rank || '')}</p>${D.inSeason ? '' : `<p class="dim small">The ${esc(D.season)} season hasn't started yet.</p>`}`, go: `#${k}-review` };
+      if (k !== 'football' && D.last) return { title: `${nm} ${D.last.label}: ${D.last.record}`, html: `<p>${esc(D.last.label)}: <b>${esc(D.last.record)}</b> · ${esc(D.last.conf)} · ${esc(D.last.finish)}. ${esc(D.last.rank || '')}</p>${D.inSeason ? '' : `<p class="dim small">The ${esc(D.season)} season hasn't started yet.</p>`}`, go: `#${k}-${['volleyball', 'soccer', 'mbb', 'wbb'].includes(k) ? 'history' : 'review'}` };
     }
     if (topic === 'ratings' && k !== 'football') {
       const E = (window.EXTRAS || {})[k] || {}; const rows = (E.ratings || (D.ratings && D.ratings.rows) || []).filter(r => !/check/i.test(r[1])).slice(0, 6);
