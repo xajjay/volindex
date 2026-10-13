@@ -294,6 +294,10 @@
     return { season: S.season, lines: ls };
   }
   const statusChip = p => p && p.status ? ` <span class="chip risk-Watch" title="${esc(p.note || p.status)}">${esc(p.status)}</span>` : '';
+  // last season at a previous school (basketball transfers), from data/transfer-stats.js
+  const transferLine = (D, p) => { const T = p && (((window.SITE_AUTO || {}).transfers || {})[D.key] || {})[p.name]; if (!T || T.ppg == null) return null;
+    const n = v => v == null || v === '' ? null : String(v);
+    return { season: T.season, text: [n(T.ppg) && n(T.ppg) + ' PPG', n(T.rpg) && n(T.rpg) + ' RPG', n(T.apg) && n(T.apg) + ' APG'].filter(Boolean).join(' · ') + (T.team ? ' at ' + T.team : ''), gp: T.gp, team: T.team, T }; };
   function playersToKnow(D) {
     const E = X(D), names = new Set();
     (E.playersToKnow || []).forEach(n => names.add(n));
@@ -322,7 +326,8 @@
     const S = D.statsAuto, inSzn = !!(S && S.season === D.season);
     const groups = S ? (LINES[D.key] || []).map(([table, label, cols, test]) => { const r = statRow(S.tables, table, name); if (!r || !(numv(r.s[test]) > 0)) return null;
       return { label, tiles: cols.map(([l, f]) => [l, l === 'W-L' ? (r.s.wins != null ? `${r.s.wins}-${r.s.losses}` : null) : l === 'W-L-T' ? (r.s.wins != null ? `${r.s.wins}-${r.s.losses}-${r.s.ties || 0}` : null) : r.s[f]]).filter(([, v]) => v != null && v !== '') }; }).filter(Boolean) : [];
-    const prevLine = !groups.length && p && p.prev && /\d/.test(p.note || '') ? p.note : null;
+    const tLine = !groups.length ? transferLine(D, p) : null;
+    const prevLine = !groups.length && !tLine && p && p.prev && /\d/.test(p.note || '') ? p.note : null;
     const statTitle = S ? (inSzn ? `${S.season} stats` : `${S.season} stats · last season`) : 'Stats';
     const inLineup = []; Object.values((lineup && lineup.chart) || {}).forEach(rows => rows.forEach(([pos, ns]) => { const i = ns.findIndex(n => norm(n) === norm(name)); if (i >= 0) inLineup.push(`${pos} (${i === 0 ? 'starter' : ordn(i + 1)})`); }));
     const head = `<span class="jersey">${esc(p ? p.num : '')}</span><div><h3>${esc(p ? p.name : name)}${statusChip(p)}</h3><p>${p ? esc([p.pos, p.cls, p.ht && p.ht + (p.wt ? ', ' + p.wt + ' lb' : ''), p.bt && 'B/T ' + p.bt].filter(Boolean).join(' · ')) : esc(D.name)}</p></div>`;
@@ -333,6 +338,7 @@
         ${p && p.note ? `<dt>Notes</dt><dd>${esc(p.note)}</dd>` : ''}</dl>
       ${honors.length ? `<div><h4>Honors & watch lists</h4><ul>${honors.map(h => `<li>${esc(h)}</li>`).join('')}</ul></div>` : ''}
       <div><h4>${esc(statTitle)}</h4>${groups.length ? groups.map(g => `${g.label ? `<div class="eyebrow" style="margin:6px 0 4px">${esc(g.label)}</div>` : ''}<div class="tiles four statgrid">${g.tiles.map(([l, v]) => `<div class="tile"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>`).join('')
+        : tLine ? `<div class="tiles four statgrid">${[['PPG', tLine.T.ppg], ['RPG', tLine.T.rpg], ['APG', tLine.T.apg], ['GP', tLine.T.gp]].filter(([, v]) => v != null && v !== '').map(([l, v]) => `<div class="tile"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div><p class="dim small">At ${esc(tLine.team || String(p.prev).split(' / ').pop())} (${esc(tLine.season)}). Tennessee stats start with the first game.</p>`
         : prevLine ? `<p>${esc(prevLine)}${/ at /.test(prevLine) ? '' : ` (at ${esc(String(p.prev).split(' / ').pop())})`}</p><p class="dim small">Last season was at another school; Tennessee stats start with the first game.</p>`
         : `<p class="dim small">${p && p.prev && !inSzn ? `Played last season at ${esc(String(p.prev).split(' / ').pop())}; Tennessee stats start with the first game.` : p && /Fr/.test(p.cls || '') ? 'Freshman: no college stats yet.' : inSzn ? 'Hasn\'t recorded a stat yet this season.' : 'No stats last season.'}</p>`}</div>
       <p class="dim small">Stats: utsports.com${rec ? ' · recruiting ratings as listed' : ''}.</p>`;
@@ -459,8 +465,9 @@
         <div class="dgrid">${rows.map(([pos, names], ri) => `<div class="dpos"><div class="dpos-h"><b>${esc(pos)}</b><span>${names.length} listed</span></div>
           <ol>${names.map((n, i) => { const p = byName.get(n); return `<li><span class="ord">${i + 1}</span><div class="pn">${p ? `<b class="num pnum">${esc(p.num)}</b>` : ''}${editing ? esc(n) : `<a href="#" data-sp="${esc(n)}">${esc(n)}</a>`}<small>${esc(p ? p.cls : '')}</small>
             <div class="tags">${statusChip(p)}${p ? (p.prev && !/^20\d\d:|last season/i.test(p.note || '') ? '<span class="chip">Transfer</span>' : p.cls === 'Fr.' ? '<span class="chip new">Freshman</span>' : '<span class="chip">Returner</span>') : '<span class="chip risk-Watch">Not on roster</span>'}</div>${(sl => sl ? `<div class="statline"><b>${esc(sl.season)}</b> ${sl.lines.map(l => (l.label ? esc(l.label) + ': ' : '') + esc(l.text)).join(' / ')}</div>` + (p && p.note && i === 0 ? `<div class="dim small">${esc(p.note)}</div>` : '')
-              : p && p.prev && /\d/.test(p.note || '') && i < 2 ? `<div class="statline">${D.statsAuto && D.statsAuto.season !== D.season ? `<b>${esc(D.statsAuto.season)}</b> ` : ''}${esc(p.note)}${/ at /i.test(p.note) ? '' : ` at ${esc(String(p.prev).split(' / ').pop())}`}</div>`
-              : (p && p.note && i === 0 ? `<div class="dim small">${esc(p.note)}</div>` : ''))(i < 2 ? seasonLine(D, n) : null)}</div>
+              : transferLine(D, p) ? (tl => `<div class="statline"><b>${esc(tl.season)}</b> ${esc(tl.text)}</div>`)(transferLine(D, p))
+              : p && p.prev && /\d/.test(p.note || '') ? `<div class="statline">${D.statsAuto && D.statsAuto.season !== D.season ? `<b>${esc(D.statsAuto.season)}</b> ` : ''}${esc(p.note)}${/ at /i.test(p.note) ? '' : ` at ${esc(String(p.prev).split(' / ').pop())}`}</div>`
+              : (p && p.note && i === 0 ? `<div class="dim small">${esc(p.note)}</div>` : ''))(seasonLine(D, n))}</div>
             ${editing ? `<div class="edit-tools" data-g="${esc(grp)}" data-r="${ri}" data-i="${i}"><button data-m="up" aria-label="Move ${esc(n)} up">↑</button><button data-m="down" aria-label="Move ${esc(n)} down">↓</button><button data-m="rm" aria-label="Remove ${esc(n)}">✕</button></div>` : '<span></span>'}</li>`; }).join('')}</ol>
           ${editing ? `<div class="addrow"><select data-add="${esc(grp)}|${ri}" aria-label="Add player to ${esc(pos)}"><option value="">+ Add player…</option>${pool.map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join('')}</select></div>` : ''}
         </div>`).join('')}</div>`).join('')}</div>`;

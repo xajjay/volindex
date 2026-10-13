@@ -106,6 +106,10 @@ def main():
         import update_standings; update_standings.main()
     except Exception as e:
         print(f"!! standings failed: {e}")
+    try:
+        import transfer_stats; transfer_stats.main()
+    except Exception as e:
+        print(f"!! transfer stats failed: {e}")
     save_stamps(stamps)
     print("updated:", ", ".join(ran) or "nothing")
 

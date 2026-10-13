@@ -183,7 +183,6 @@ def main(keys=None):
                     rows.sort(key=lambda r: (-wl(r["conf"])[3], -wl(r["conf"])[0], -wl(r["overall"])[3], r["team"]))
                     final = sum(sum(wl(r["overall"])[:3]) for r in rows) > 0 and k in ("baseball", "softball")
                     label = last_label if final else label
-                out.setdefault("_debug", {})[k] = dbg
             if rows:
                 out[k] = dict(season=label, final=final, rows=rows, source=url, updated=datetime.date.today().isoformat())
                 print(f"OK   {k}: {len(rows)} SEC teams ({label}{' final' if final else ''})")
@@ -191,6 +190,7 @@ def main(keys=None):
                 print(f"SKIP {k}: no SEC standings found")
         except Exception as e:
             print(f"SKIP {k}: {e}")
+    out.pop("_debug", None)
     with open(OUT, "w", encoding="utf-8") as f:
         f.write("/* Written by tools/update_standings.py from ESPN's standings feed. Do not edit by hand. */\n")
         f.write("window.SITE_AUTO = window.SITE_AUTO || {};\nwindow.SITE_AUTO.standings = " + json.dumps(out, separators=(",", ":"), ensure_ascii=False) + ";\n")
