@@ -10,7 +10,7 @@ window.LINEUP.mbb = {
   "label": "2026-27 projected starting five",
   "updated": "2026-10-12",
   "rev": 2,
-  "basedOn": "The Vol Index preseason projection",
+  "basedOn": "The Vol Index projected starting five (unofficial)",
   "chart": {
     "Starting five": [
       ["PG", ["Terrence Hill Jr.", "Dai Dai Ames", "Troy Henderson"]],

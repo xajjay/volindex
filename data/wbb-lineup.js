@@ -9,7 +9,7 @@ window.LINEUP = window.LINEUP || {};
 window.LINEUP.wbb = {
   "label": "2026-27 projected starting five",
   "updated": "2026-10-12",
-  "basedOn": "The Vol Index projection (no published projection yet). Edit me",
+  "basedOn": "The Vol Index projected starting five (unofficial)",
   "chart": {
     "Starting five": [
       ["PG", ["Kennedy Fauntleroy", "Shaelyn Steele", "Jada Eads"]],

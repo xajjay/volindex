@@ -9,7 +9,7 @@ window.LINEUP = window.LINEUP || {};
 window.LINEUP.volleyball = {
   "label": "Starting lineup",
   "updated": "2026-10-12",
-  "basedOn": "Starting lineup from the Oct. 11 win over LSU (@Vol_VBall)",
+  "basedOn": "The Vol Index lineup (unofficial), based on the starters in the Oct. 11 win over LSU",
   "chart": {
     "Starters": [
       ["S", ["Caroline Kerr", "Mallory Matheny"]],

@@ -9,7 +9,7 @@ window.LINEUP = window.LINEUP || {};
 window.LINEUP.soccer = {
   "label": "Starting XI",
   "updated": "2026-10-12",
-  "basedOn": "Starting XI from the Oct. 9 match at South Carolina (@Vol_Soccer)",
+  "basedOn": "The Vol Index starting XI (unofficial), based on the starters in the Oct. 9 match at South Carolina",
   "chart": {
     "Goalkeeper": [
       ["GK", ["Cayden Norris", "Lauryn Berry", "Morgan Weaver"]]

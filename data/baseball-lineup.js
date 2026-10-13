@@ -9,7 +9,7 @@ window.LINEUP = window.LINEUP || {};
 window.LINEUP.baseball = {
   "label": "2027 projected lineup and pitching staff",
   "updated": "2026-10-12",
-  "basedOn": "The Vol Index projection from 2026 stats and transfer additions. Edit me",
+  "basedOn": "The Vol Index projected lineup and pitching staff (unofficial), built from 2026 stats and transfer additions",
   "chart": {
     "Lineup": [
       ["C", ["Trent Grindlinger", "Stone Lawless", "Sean Dunlap"]],

@@ -9,11 +9,11 @@
    ============================================================ */
 window.DEPTH = window.DEPTH || {};
 window.DEPTH.football = {
-  "rev": 2,
+  "rev": 3,
   "current": {
     "label": "2026 depth chart",
     "updated": "2026-10-12",
-    "basedOn": "AJ's depth chart (edited from Ourlads)",
+    "basedOn": "The Vol Index depth chart (unofficial)",
     "chart": {
     "Backfield": [
       ["QB", ["George MacIntyre", "Faizon Brandon", "Ryan Staub"]],
@@ -63,7 +63,7 @@ window.DEPTH.football = {
   "next": {
     "label": "2027 projected depth chart",
     "updated": "2026-10-12",
-    "basedOn": "Projection: 2026 chart minus 5th-year players and NFL draft risks, plus 2027 commits. Seniors are shown returning for their 5th year",
+    "basedOn": "The Vol Index 2027 projected depth chart (unofficial). Projection: 2026 chart minus 5th-year players and NFL draft risks, plus 2027 commits. Seniors are shown returning for their 5th year",
     "chart": {
     "Backfield": [
       ["QB", ["Faizon Brandon", "George MacIntyre", "Ryan Staub", "Derrick Baker"]],

@@ -475,7 +475,7 @@
   function depthPanel(which) {
     const d = depthState[which]; const isEdit = editing === which;
     const intro = which === 'current'
-      ? `<h2>Depth Chart</h2><p>${esc(d.label)}: ${esc(d.basedOn)}, updated ${fmtDate(d.updated, { month: 'short', day: 'numeric', year: 'numeric' })}. Click a name for the player card.</p>`
+      ? `<h2>Depth Chart</h2><p>${esc(d.basedOn)}. Updated ${fmtDate(d.updated, { month: 'short', day: 'numeric', year: 'numeric' })}. Click a name for the player card.</p>`
       : `<h2>2027 Preview</h2><p>${esc(d.basedOn)}. Under the new rule every player gets a 5th year, so only 5th-year players are out of eligibility. Classes shown are next season's. You can edit the preview and add anyone back, including draft risks.</p>`;
     const extra = which === 'next' ? nextSummary() : '';
     return `${depthState._draft ? `<div class="notice"><span><b>Unsaved edits.</b> You're seeing depth chart changes stored in this browser only. Save them to the data file to make them permanent.</span><button class="btn small" data-act="export">Save to file</button><button class="btn small" data-act="discard">Discard my edits</button></div>` : ''}

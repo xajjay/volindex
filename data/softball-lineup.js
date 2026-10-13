@@ -9,7 +9,7 @@ window.LINEUP = window.LINEUP || {};
 window.LINEUP.softball = {
   "label": "2027 projected lineup and circle",
   "updated": "2026-10-12",
-  "basedOn": "The Vol Index projection from 2026 stats. Edit me",
+  "basedOn": "The Vol Index projected lineup and circle (unofficial), built from 2026 stats",
   "chart": {
     "Lineup": [
       ["C", ["Elsa Morrison", "Avary Stockwell"]],
