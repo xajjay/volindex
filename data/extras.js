@@ -220,14 +220,13 @@ window.EXTRAS = {
       'Blaine Brown': ['2026 Baseball America Preseason All-American (second team)', '2026 John Olerud Two-Way Player of the Year watch list', '2025 First Team All-American Conference (Rice)'],
     },
     draft: {
-      'Trent Grindlinger': { level: 'High', note: '2027 MLB Draft top 100: No. 14 overall (Oliver Boctor, Sept. 2026) · Perfect Game: No. 83 college prospect (Dec. 2025)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
-      'Levi Clark': { level: 'High', note: 'Perfect Game: No. 7 college prospect for the 2027 MLB Draft (Dec. 2025)', src: 'https://www.perfectgame.org/Articles/View.aspx?article=24044' },
-      'Blaine Brown': { level: 'High', note: '2027 MLB Draft top 100: No. 87 overall (Oliver Boctor, Sept. 2026) · Perfect Game: No. 11 college prospect (Dec. 2025)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
-      'Landon Mack': { level: 'Medium', note: '2027 MLB Draft top 100: No. 65 overall (Oliver Boctor, Sept. 2026) · Perfect Game: No. 38 college prospect (Dec. 2025)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
+      'Trent Grindlinger': { level: 'High', note: '2027 MLB Draft top 100: No. 14 overall (Oliver Boctor, Sept. 2026)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
+      'Blaine Brown': { level: 'High', note: '2027 MLB Draft top 100: No. 87 overall (Oliver Boctor, Sept. 2026)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
+      'Landon Mack': { level: 'Medium', note: '2027 MLB Draft top 100: No. 65 overall (Oliver Boctor, Sept. 2026)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
       'Chris Ramirez': { level: 'Watch', note: '2027 MLB Draft top 100: No. 74 overall (Oliver Boctor, Sept. 2026)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
       'Wyatt Hanoian': { level: 'Watch', note: '2027 MLB Draft top 100: No. 83 overall (Oliver Boctor, Sept. 2026)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
     },
-    draftNote: 'Five current Vols are in Oliver Boctor\'s 2027 MLB Draft top 100 (Sept. 2026), plus four Tennessee commits: Dylan Seward (No. 4), Max Hemenway (No. 36), Leo Nockley (No. 76) and Sushi Wilson (No. 82). Levi Clark is ranked by Perfect Game.',
+    draftNote: 'Five current Vols are in Oliver Boctor\'s 2027 MLB Draft top 100 (Sept. 2026), plus four Tennessee commits: Dylan Seward (No. 4), Max Hemenway (No. 36), Leo Nockley (No. 76) and Sushi Wilson (No. 82).',
     departures: [
       ['Manny Marin', 'Transferred to Arkansas'], ['Brayden Krenzel', 'Transferred to Arkansas'], ['Jay Abernathy', 'Transferred to Oklahoma'], ['Ethan Moore', 'Transferred to Missouri'],
       ['Ariel Antigua', 'Transferred to Arizona'], ['Evan Hankins', 'Transferred to Virginia Tech'], ['Cash Williams', 'Transferred to West Virginia'], ['Taylor Tracey', 'Transferred to TCU'],
@@ -238,7 +237,6 @@ window.EXTRAS = {
     sources: [
       ['Team ratings and game projections', 'PEAR Ratings', 'https://pearatings.com/cbase/d1/team-profile?team=Tennessee&season=2027'],
       ['2027 MLB Draft top 100 (Sept. 2026)', 'Oliver Boctor', 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e'],
-      ['2027 college draft prospects', 'Perfect Game', 'https://www.perfectgame.org/Articles/View.aspx?article=24044'],
       ['Outgoing transfers', 'Rocky Top Insider', 'https://www.rockytopinsider.com/2026/07/03/where-tennessee-baseball-outgoing-transfers-have-committed/'],
       ['Honors', 'utsports.com', 'https://utsports.com/sports/baseball/roster/levi-clark/22636'],
     ],
