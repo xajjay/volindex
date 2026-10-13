@@ -110,6 +110,10 @@ def main():
         import transfer_stats; transfer_stats.main()
     except Exception as e:
         print(f"!! transfer stats failed: {e}")
+    try:
+        import baseball_transfers; baseball_transfers.main()
+    except Exception as e:
+        print(f"!! baseball transfer stats failed: {e}")
     save_stamps(stamps)
     print("updated:", ", ".join(ran) or "nothing")
 
