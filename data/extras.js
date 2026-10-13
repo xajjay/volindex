@@ -5,8 +5,11 @@
    advanced: team metrics, conference comparison and player ratings for the Advanced tab
    honors / draft / recruit: keyed by player name
    departures: [name, reason] (anyone else who played last season and isn't on the roster is listed automatically)
-   playersToKnow: names always shown on the overview */
+   playersToKnow: the overview's Players to know, exactly these names in this order (when set) */
 window.EXTRAS = {
+  football: {
+    playersToKnow: ['Xavier Gilliam', 'DeSean Bishop', 'Mike Matthews', 'David Sanders Jr.', 'Arion Carter', 'Ty Redmond', 'Dejuan Lane', 'George MacIntyre'],
+  },
   mbb: {
     ratings: [
       ['SEC media preseason poll', 'No. 4', 'Predicted order, released Oct. 12, 2026. Florida 1st, Texas 2nd, Arkansas 3rd.', 'https://utsports.com/news/2026/10/12/mens-basketball-vols-voted-fourth-in-sec-by-media-harris-named-first-team-all-sec'],
@@ -79,7 +82,7 @@ window.EXTRAS = {
       ['Bishop Boswell', 'Transferred to Maryland'], ['J.P. Estrella', 'Transferred to Michigan'], ['Jaylen Carey', 'Transferred to Missouri'],
       ['Amari Evans', 'Transferred to Texas'], ['Cade Phillips', 'Transferred to Texas A&M'], ['Clarence Massamba', 'Transferred to UC Davis'],
     ],
-    playersToKnow: ['Juke Harris', 'Dai Dai Ames', 'Jalen Haralson', 'Jalen Washington', 'Terrence Hill Jr.', 'DeWayne Brown II', 'Tyler Lundblade', 'Miles Rubin'],
+    playersToKnow: ['Juke Harris', 'Terrence Hill Jr.', 'DeWayne Brown II', 'Jalen Haralson', 'Dai Dai Ames', 'Miles Rubin', 'Tyler Lundblade', 'Braedan Lue'],
     sources: [
       ['SEC media poll and preseason All-SEC', 'utsports.com', 'https://utsports.com/news/2026/10/12/mens-basketball-vols-voted-fourth-in-sec-by-media-harris-named-first-team-all-sec'],
       ['Team ratings', 'KenPom', 'https://kenpom.com/'], ['Team ratings and player projections', 'Bart Torvik (T-Rank)', 'https://barttorvik.com/team.php?team=Tennessee&year=2027'],
@@ -89,6 +92,7 @@ window.EXTRAS = {
     ],
   },
   wbb: {
+    playersToKnow: ['Rylie Theuerkauf', 'Kaylene Smikle', 'Kennedy Fauntleroy', 'Fatmata Janneh', 'Aaliyah Moore', 'Naomi White', 'Harissoum Coulibaly', 'Riley Makalusky', 'Avery Mills', 'Gabby Minus'],
     ratings: [
       ['SEC media preseason poll', 'No. 8', 'Predicted order, released Oct. 12, 2026. South Carolina 1st.', 'https://www.on3.com/news/sec-womens-basketball-preseason-poll-predicted-order-of-finish-released-2026-27-season'],
       ['Massey Ratings preseason', 'No. 14', 'Power No. 12 · offense No. 10 · defense No. 31 · expected 21-10', 'https://masseyratings.com/cbw/ncaa-d1/ratings'],
@@ -151,7 +155,7 @@ window.EXTRAS = {
       ['Paityn Chapman', 'Transferred to Illinois'], ['Zoe Humphrey', 'Transferred to Georgia Tech'], ['Izzy Mogridge', 'Transferred to Utah'],
       ['Camdyn Stucky', 'Transferred to Kansas State'], ['Keondreya Granberry', 'Transferred to Indiana (final year)'], ['Starr Williams', 'Entered the transfer portal'], ['Cate Schnell', 'Entered the transfer portal'],
     ],
-    playersToKnow: ['Caroline Kerr', 'Kennedi Rogers', 'Jalyn Stout', 'Maggie Dostic', 'Chelsea Sutton', 'Anni Tang', 'Raegan Burns', 'Jolene Oddo'],
+    playersToKnow: ['Kennedi Rogers', 'Caroline Kerr', 'Jalyn Stout', 'Maggie Dostic', 'Chelsea Sutton', 'Raegan Burns', 'Jolene Oddo', 'Anni Tang'],
     sources: [
       ['AVCA poll and NCAA RPI', 'NCAA.com', 'https://www.ncaa.com/rankings/volleyball-women/d1/avca-coaches'], ['Computer ratings', 'Massey Ratings', 'https://masseyratings.com/cvol/ncaa-d1/ratings'],
       ['Honors', 'utsports.com', 'https://utsports.com/news/2026/9/7/volleyball-trio-of-lady-vols-earn-sec-weekly-honors'],
@@ -183,7 +187,7 @@ window.EXTRAS = {
       'Ayva Jordan': ['TopDrawerSoccer Preseason Freshman Best XI'],
     },
     recruit: { 'Ayva Jordan': 'TopDrawerSoccer: No. 6 in the 2026 freshman class' },
-    playersToKnow: ['Ines Derrien', 'Kylee Simmons', 'Cayden Norris', "Shae O'Rourke", 'Dakota Brown', 'Ayva Jordan', 'Devin Davis', 'Nyla Blue'],
+    playersToKnow: ['Kylee Simmons', 'Ines Derrien', 'Cayden Norris', "Shae O'Rourke", 'Taylor Cheatham', 'Devin Davis', 'Milee Zych', 'Nyla Blue'],
     sources: [
       ['Poll', 'United Soccer Coaches', 'https://unitedsoccercoaches.org/rankings/college-rankings/ncaa-di-women/'], ['NCAA RPI', 'NCAA.com', 'https://www.ncaa.com/rankings/soccer-women/d1/ncaa-womens-soccer-rpi'],
       ['Computer ratings', 'Massey Ratings', 'https://masseyratings.com/csocw/ncaa-d1/ratings'],
@@ -193,6 +197,7 @@ window.EXTRAS = {
     ],
   },
   baseball: {
+    playersToKnow: ['Trent Grindlinger', 'Cam Appenzeller', 'Landon Mack', 'Levi Clark', 'Blaine Brown', 'Chris Ramirez', 'Travis Sanders', 'Blake Grimmer'],
     ratings: [
       ['PEAR team strength (TSR)', 'No. 10', 'TSR 5.18 (8th in SEC) · projected 38-18, 15-15 SEC · expected 36.9 wins (range 27-47)', 'https://pearatings.com/cbase/d1/team-profile?team=Tennessee&season=2027'],
       ['PEAR projected PCR', 'No. 15', 'Projected end-of-season résumé rank', 'https://pearatings.com/cbase/d1/team-profile?team=Tennessee&season=2027'],

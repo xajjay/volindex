@@ -345,11 +345,26 @@
           ${trs.length ? `<td class="hide-sm small">${r.tr ? `${r.tr.rating} · ${r.tr.stars}★ · No. ${r.tr.ovr} overall` : '—'}</td>` : ''}</tr>`).join('')}</tbody></table></div>
       <p class="dim small">${trs.length ? 'Most recent rating = the 247Sports transfer rating for transfers, otherwise the high school rating (247Sports Composite × 100).' : 'Ratings are ESPN SC Next 100 high school grades.'} The team composite is The Vol Index's average of those, not an official ranking. ${R.B.note ? esc(R.B.note) + ' ' : ''}Source: <a href="${esc(R.B.src)}" target="_blank" rel="noopener">${esc(R.B.srcName)}</a>.</p></div>`;
   }
-  const transferLine = (D, p) => { const T = p && (((window.SITE_AUTO || {}).transfers || {})[D.key] || {})[p.name]; if (!T || T.ppg == null) return null;
+  const transferLine = (D, p) => { const T = p && (((window.SITE_AUTO || {}).transfers || {})[D.key] || {})[p.name]; if (!T) return null;
     const n = v => v == null || v === '' ? null : String(v);
+    if (T.bat || T.pitch) { // baseball: batting and/or pitching line
+      const b = T.bat || {}, q = T.pitch || {}, pitcherFirst = /P/.test(p.pos || '') && T.pitch;
+      const bt = T.bat && [n(b.AVG) && b.AVG + ' AVG', n(b.HR) && b.HR + ' HR', n(b.RBI) && b.RBI + ' RBI'].filter(Boolean).join(' · ');
+      let pt = T.pitch && [n(q.ERA) && q.ERA + ' ERA', n(q.IP) && q.IP + ' IP', n(q.SO) && q.SO + ' K'].filter(Boolean).join(' · ');
+      const tiles = [];
+      if (T.pitch) tiles.push(['ERA', q.ERA], ['IP', q.IP], ['K', q.SO], ['W-L', q['W-L']]);
+      if (T.bat) tiles.push(['AVG', b.AVG], ['HR', b.HR], ['RBI', b.RBI], ['OPS', b.OPS]);
+      if (pitcherFirst === false && T.pitch && T.bat) tiles.push(...tiles.splice(0, 4));
+      if (T.pitch && !n(q.ERA) && n(q['W-L'])) pt = [q['W-L'] + ' record', n(q.SV) && q.SV + ' saves', n(q.IP) && q.IP + ' IP', n(q.SO) && q.SO + ' K'].filter(Boolean).join(' · ');
+      if (T.pitch && !n(q.ERA) && !n(q['W-L'])) pt = [n(q['APP-GS']) && q['APP-GS'], n(q.IP) && q.IP + ' IP', n(q.SO) && q.SO + ' K'].filter(Boolean).join(' · ');
+      if (T.pitch && !n(q.ERA)) { tiles.splice(0, 4, ['W-L', q['W-L']], ['SV', q.SV], ['IP', q.IP], ['K', q.SO]); }
+      return { season: T.season, text: [pitcherFirst ? pt : bt, pitcherFirst ? bt : pt].filter(Boolean).join(' / ') + (T.team ? ' at ' + T.team : '') + (T.note ? ' (' + T.note.replace(/^./, c => c.toLowerCase()) + ')' : ''), team: T.team, T, tiles: tiles.filter(([, v]) => n(v)) };
+    }
+    if (T.ppg == null) return null;
     return { season: T.season, text: [n(T.ppg) && n(T.ppg) + ' PPG', n(T.rpg) && n(T.rpg) + ' RPG', n(T.apg) && n(T.apg) + ' APG'].filter(Boolean).join(' · ') + (T.team ? ' at ' + T.team : ''), gp: T.gp, team: T.team, T }; };
   function playersToKnow(D) {
     const E = X(D), names = new Set();
+    if ((E.playersToKnow || []).length) return E.playersToKnow.map(n => D.roster.find(p => norm(p.name) === norm(n))).filter(Boolean); // hand-picked list, in order
     (E.playersToKnow || []).forEach(n => names.add(n));
     Object.keys(E.honors || {}).forEach(n => names.add(n)); Object.keys(E.draft || {}).forEach(n => names.add(n));
     const rs = rosterSet(D);
@@ -362,6 +377,7 @@
     if (h) return `<span class="chip honor">Honor</span> ${esc(h[0])}`;
     if (d) return `<span class="chip risk-${d.level}">Pro</span> ${esc(d.note)}`;
     if (sl) return `<b>${esc(sl.season)}:</b> ${esc(sl.lines[0].text)}`;
+    const tl = transferLine(D, p); if (tl) return `<b>${esc(tl.season)}:</b> ${esc(tl.text)}`;
     return esc(p.note || '');
   }
   function pcardSport(D, p) {
@@ -379,7 +395,7 @@
       return { label, tiles: cols.map(([l, f]) => [l, l === 'W-L' ? (r.s.wins != null ? `${r.s.wins}-${r.s.losses}` : null) : l === 'W-L-T' ? (r.s.wins != null ? `${r.s.wins}-${r.s.losses}-${r.s.ties || 0}` : null) : r.s[f]]).filter(([, v]) => v != null && v !== '') }; }).filter(Boolean) : [];
     const tLine = !groups.length ? transferLine(D, p) : null;
     const prevLine = !groups.length && !tLine && p && p.prev && /\d/.test(p.note || '') ? p.note : null;
-    const statTitle = S ? (inSzn ? `${S.season} stats` : `${S.season} stats · last season`) : 'Stats';
+    const statTitle = tLine && S && tLine.season !== S.season ? `${tLine.season} stats · last season played` : S ? (inSzn ? `${S.season} stats` : `${S.season} stats · last season`) : 'Stats';
     const inLineup = []; Object.values((lineup && lineup.chart) || {}).forEach(rows => rows.forEach(([pos, ns]) => { const i = ns.findIndex(n => norm(n) === norm(name)); if (i >= 0) inLineup.push(`${pos} (${i === 0 ? 'starter' : ordn(i + 1)})`); }));
     const head = `<span class="jersey">${esc(p ? p.num : '')}</span><div><h3>${esc(p ? p.name : name)}${statusChip(p)}</h3><p>${p ? esc([p.pos, p.cls, p.ht && p.ht + (p.wt ? ', ' + p.wt + ' lb' : ''), p.bt && 'B/T ' + p.bt].filter(Boolean).join(' · ')) : esc(D.name)}</p></div>`;
     const body = `${rec ? `<div class="tagrow"><span class="chip new">Recruiting</span> <span class="small">${esc(rec)}</span></div>` : ''}
@@ -389,7 +405,7 @@
         ${p && p.note ? `<dt>Notes</dt><dd>${esc(p.note)}</dd>` : ''}</dl>
       ${honors.length ? `<div><h4>Honors & watch lists</h4><ul>${honors.map(h => `<li>${esc(h)}</li>`).join('')}</ul></div>` : ''}
       <div><h4>${esc(statTitle)}</h4>${groups.length ? groups.map(g => `${g.label ? `<div class="eyebrow" style="margin:6px 0 4px">${esc(g.label)}</div>` : ''}<div class="tiles four statgrid">${g.tiles.map(([l, v]) => `<div class="tile"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>`).join('')
-        : tLine ? `<div class="tiles four statgrid">${[['PPG', tLine.T.ppg], ['RPG', tLine.T.rpg], ['APG', tLine.T.apg], ['GP', tLine.T.gp]].filter(([, v]) => v != null && v !== '').map(([l, v]) => `<div class="tile"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div><p class="dim small">At ${esc(tLine.team || String(p.prev).split(' / ').pop())} (${esc(tLine.season)}). Tennessee stats start with the first game.</p>`
+        : tLine ? `<div class="tiles four statgrid">${(tLine.tiles || [['PPG', tLine.T.ppg], ['RPG', tLine.T.rpg], ['APG', tLine.T.apg], ['GP', tLine.T.gp]]).filter(([, v]) => v != null && v !== '').map(([l, v]) => `<div class="tile"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div><p class="dim small">At ${esc(tLine.team || String(p.prev).split(' / ').pop())} (${esc(tLine.season)}). Tennessee stats start with the first game.</p>`
         : prevLine ? `<p>${esc(prevLine)}${/ at /.test(prevLine) ? '' : ` (at ${esc(String(p.prev).split(' / ').pop())})`}</p><p class="dim small">Last season was at another school; Tennessee stats start with the first game.</p>`
         : `<p class="dim small">${p && p.prev && !inSzn ? `Played last season at ${esc(String(p.prev).split(' / ').pop())}; Tennessee stats start with the first game.` : p && /Fr/.test(p.cls || '') ? 'Freshman: no college stats yet.' : inSzn ? 'Hasn\'t recorded a stat yet this season.' : 'No stats last season.'}</p>`}</div>
       <p class="dim small">Stats: utsports.com${RATED.has(D.key) ? (D.key === 'wbb' ? ' · ratings: ESPN' : ' · ratings: 247Sports') : ''}${rec ? ' · recruiting ratings as listed' : ''}.</p>`;

@@ -375,6 +375,56 @@ window.SITE_AUTO.transfers = {
    "season": "2026",
    "v": 2,
    "src": "https://wsuraiders.com/sports/baseball/stats/2026"
+  },
+  "Ricky Ojeda": {
+   "pitch": {
+    "ERA": "3.77",
+    "W-L": "3-3",
+    "APP-GS": "18-7",
+    "SV": "3",
+    "IP": "62.0",
+    "SO": "62"
+   },
+   "team": "UC Irvine",
+   "season": "2026",
+   "v": 2,
+   "src": "https://ucirvinesports.com/news/2026/6/4/2026-baseball-season-review"
+  },
+  "Hayden Simmerson": {
+   "pitch": {
+    "W-L": "1-2",
+    "SV": "4"
+   },
+   "team": "Clemson",
+   "season": "2026",
+   "v": 2,
+   "src": "https://en.wikipedia.org/wiki/2026_Clemson_Tigers_baseball_team"
+  },
+  "Parker Detmers": {
+   "pitch": {
+    "ERA": "3.94",
+    "W-L": "1-1",
+    "APP-GS": "4-4",
+    "IP": "16.0",
+    "SO": "15"
+   },
+   "team": "Louisville",
+   "season": "2025",
+   "v": 2,
+   "note": "Missed 2026 with an injury",
+   "src": "https://gocards.com/sports/baseball/roster/parker-detmers/17860"
+  },
+  "Jake McCoy": {
+   "pitch": {
+    "APP-GS": "14 GS",
+    "IP": "76.0",
+    "SO": "97"
+   },
+   "team": "South Carolina",
+   "season": "2025",
+   "v": 2,
+   "note": "Missed 2026 with a UCL tear",
+   "src": "https://www.live5news.com/2026/01/28/south-carolinas-jake-mccoy-miss-season-with-ucl-tear/"
   }
  },
  "_bdebug": {},

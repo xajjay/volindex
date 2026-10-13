@@ -363,8 +363,9 @@
     const t = F.team, R = t.ranks; const next = F.schedule.find(g => !g.result && !(g.date < etToday()));
     const played = F.schedule.filter(g => g.result);
     const qb1 = byName.get(((depthState.current.chart.Backfield || []).find(r => r[0] === 'QB') || [, []])[1][0]);
-    let top = standouts().slice(0, 8);
-    if (qb1 && !top.some(p => p.pos === 'QB')) top = top.slice(0, 7).concat([qb1]);
+    const pick = (((window.EXTRAS || {}).football || {}).playersToKnow || []).map(n => byName.get(n)).filter(Boolean);
+    let top = pick.length ? pick : standouts().slice(0, 8);
+    if (!pick.length && qb1 && !top.some(p => p.pos === 'QB')) top = top.slice(0, 7).concat([qb1]);
     const E = next ? (next.espn || {}) : {};
     return `
     ${quickHits()}
@@ -387,7 +388,7 @@
         ${rankTile(R.rushYpg[0], 'Rush yards', R.rushYpg)}${rankTile(R.passYpg[0], 'Pass yards', R.passYpg)}
         ${rankTile(R.oPassYpg[0], 'Pass yds allowed', R.oPassYpg)}${rankTile(R.oRushYpg[0], 'Rush yds allowed', R.oRushYpg)}
       </div></div>
-    <div class="section"><h3>Players to know <small>Top-rated players, national stat leaders, award lists and NFL prospects</small></h3>
+    <div class="section"><h3>Players to know <small>${pick.length ? 'The Vol Index picks · click a player for his card' : 'Top-rated players, national stat leaders, award lists and NFL prospects'}</small></h3>
       <div class="grid g4">${top.map(p => pcard(p, p.honors[0] ? '<span class="chip honor">Honor</span> ' + esc(p.honors[0]) : p.draft ? '<span class="chip risk-' + p.draft.level + '">NFL</span> ' + esc(p.draft.note) : p.pos === 'QB' ? '<span class="chip">QB1</span> Starting quarterback' + (p.stats.pass ? ': ' + p.stats.pass[2] + ' yds, ' + p.stats.pass[3] + ' TD, ' + p.stats.pass[4] + ' INT' : '') : '')).join('')}</div></div>
     <div class="section"><h3>Coaching staff</h3>
       <div class="box"><ul class="list">${t.staff.concat([['John Bonamego', 'Assistant Special Teams Coach']]).map(s => `<li><b class="grow">${esc(s[0])}</b><span class="dim">${esc(s[1])}</span></li>`).join('')}</ul></div></div>`;
