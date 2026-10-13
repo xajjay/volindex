@@ -2,7 +2,7 @@
    e.g. /football/depth or /mbb/lineup, so the GoatCounter dashboard shows which sections people use.
    Set GOATCOUNTER_CODE to the site code from goatcounter.com (the part before .goatcounter.com). */
 (function () {
-  var GOATCOUNTER_CODE = '';
+  var GOATCOUNTER_CODE = 'xajjay';
   if (!GOATCOUNTER_CODE || !/volindex\.net$|github\.io$/.test(location.hostname)) return; // only count the real site
   var last = null;
   function path() { var h = (location.hash || '#home').slice(1) || 'home'; var p = h.split('-'); return '/' + p[0] + (p[1] ? '/' + p.slice(1).join('-') : ''); }
