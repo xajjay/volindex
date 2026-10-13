@@ -206,7 +206,7 @@
     const { k, p } = h; const tab = k === 'football' ? 'roster' : 'roster';
     const E = (window.EXTRAS || {})[k] || {};
     const hon = (p.honors && p.honors[0]) || ((E.honors || {})[p.name] || [])[0];
-    return { title: `${p.name} · ${NAME[k]}`, html: `<p><b>#${esc(p.num)}</b> · ${esc(p.pos)} · ${esc(p.cls)}${p.ht ? ' · ' + esc(p.ht) : ''}${p.home ? ' · ' + esc(p.home) : ''}${p.prev ? ' · from ' + esc(p.prev) : ''}</p>${hon ? `<p><span class="chip honor">Honor</span> ${esc(hon)}</p>` : ''}${p.note ? `<p class="dim small">${esc(p.note)}</p>` : ''}`,
+    return { title: `${p.name} · ${NAME[k]}`, html: `<p><b>#${esc(p.num)}</b> · ${esc(p.pos)} · ${esc((m => m ? 'RS ' + { FR: 'Fr.', SO: 'So.', JR: 'Jr.', SR: 'Sr.' }[m[1]] : p.cls)(/^RS (FR|SO|JR|SR)/.exec(p.elig || '')))}${p.ht ? ' · ' + esc(p.ht) : ''}${p.home ? ' · ' + esc(p.home) : ''}${p.prev ? ' · from ' + esc(p.prev) : ''}</p>${hon ? `<p><span class="chip honor">Honor</span> ${esc(hon)}</p>` : ''}${p.note ? `<p class="dim small">${esc(p.note)}</p>` : ''}`,
       go: `#${k}-${tab}`, open: k === 'football' ? { type: 'fbplayer', name: p.name } : { type: 'player', k, name: p.name }, openLabel: 'Open player card', score: 60 };
   }
   function recordAnswer(rec) {

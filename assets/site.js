@@ -52,6 +52,11 @@
     return m[p] || p;
   }
   const NEXT_CLASS = { 'Fr.': 'So.', 'So.': 'Jr.', 'Jr.': 'Sr.', 'Sr.': '5th', '5th': '—' };
+  // shown class: official redshirt eligibility from the roster (RS Fr., RS So., ...) when the player has one
+  const RS = { FR: 'Fr.', SO: 'So.', JR: 'Jr.', SR: 'Sr.' }, RS_NEXT = { FR: 'So.', SO: 'Jr.', JR: 'Sr.', SR: null };
+  const rsOf = p => { const m = /^RS (FR|SO|JR|SR)/.exec(p.elig || ''); return m ? m[1] : null; };
+  const clsLabel = p => { const r = rsOf(p); return r ? 'RS ' + RS[r] : p.cls; };
+  const nextLabel = p => { const r = rsOf(p); return r ? (RS_NEXT[r] ? 'RS ' + RS_NEXT[r] : '—') : NEXT_CLASS[p.cls]; };
   const TIPS = {
     FPI: "ESPN's Football Power Index: how many points better (or worse) a team is than an average FBS team on a neutral field. ESPN's game win chances and season projections come from it.",
     'SP+': "Bill Connelly's tempo- and opponent-adjusted efficiency rating, in points per game vs. an average FBS team.",
@@ -322,7 +327,7 @@
   }
   function pcard(p, why) {
     return `<button class="pcard" data-player="${esc(p.name)}">
-      <div class="pcard-top"><span class="jersey">${p.num}</span><div><div class="nm">${esc(p.name)}${p.nick ? ` <span class="nick">"${esc(p.nick)}"</span>` : ''}</div><div class="sub">${p.pos} · ${p.cls}${p.prev ? ' · from ' + esc(p.prev.split('/').pop()) : ''}</div></div></div>
+      <div class="pcard-top"><span class="jersey">${p.num}</span><div><div class="nm">${esc(p.name)}${p.nick ? ` <span class="nick">"${esc(p.nick)}"</span>` : ''}</div><div class="sub">${p.pos} · ${clsLabel(p)}${p.prev ? ' · from ' + esc(p.prev.split('/').pop()) : ''}</div></div></div>
       <div class="tagrow">${rateBadge(p.rating)}${rankChips(p)}</div>
       ${why ? `<div class="why">${why}</div>` : ''}
     </button>`;
@@ -415,7 +420,7 @@
       rows.sort(rosterState.sort === 'name' ? (a, b) => a.name.localeCompare(b.name) : rosterState.sort === 'rating' ? (a, b) => rv(b) - rv(a) : (a, b) => a.num - b.num);
       body.innerHTML = rows.map(p => `<tr class="click" data-player="${esc(p.name)}" tabindex="0">
         <td class="n"><b>${p.num}</b></td><td><b>${esc(p.name)}</b></td><td>${p.pos}</td><td>${rateBadge(p.rating, true)}</td>
-        <td>${p.cls}</td><td class="hide-sm num">${p.ht} / ${p.wt}</td>
+        <td>${clsLabel(p)}</td><td class="hide-sm num">${p.ht} / ${p.wt}</td>
         <td class="hide-sm">${esc(p.home)}<br><span class="dim small">${esc(p.prev ? p.prev.split('/').pop() + ' (transfer)' : p.hs)}</span></td>
         <td>${status27(p)}</td></tr>`).join('') || '<tr><td colspan="8">No players match.</td></tr>';
       body.querySelectorAll('[data-player]').forEach(el => { el.addEventListener('click', () => openPlayer(el.dataset.player)); el.addEventListener('keydown', e => { if (e.key === 'Enter') openPlayer(el.dataset.player); }); });
@@ -449,7 +454,7 @@
   function who(name, which) {
     const p = byName.get(name);
     if (p) {
-      const cls = which === 'next' ? NEXT_CLASS[p.cls] : p.cls;
+      const cls = which === 'next' ? nextLabel(p) : clsLabel(p);
       const tags = [];
       if (which === 'next' && p.draft && !p.confirmed27) tags.push(`<span class="chip risk-${p.draft.level}">Draft risk: ${p.draft.level}</span>`);
       if (which === 'next' && p.cls === 'Sr.' && !p.confirmed27) tags.push('<span class="chip">5th-year return</span>');
@@ -504,8 +509,8 @@
         <div class="tile"><b>${risk.length}</b><span>NFL draft risks</span></div>
         <div class="tile"><b>${F.recruits.length}</b><span>2027 commits</span></div></div>
       <div class="grid g2" style="margin-bottom:8px">
-        <div class="box"><div class="lb"><h4>Out of eligibility after 2026 <span>5th-year players</span></h4></div><ul class="list">${leaving.map(p => `<li data-player="${esc(p.name)}" class="click-li"><span class="grow"><b>${esc(p.name)}</b> <span class="dim">${p.pos} · ${p.cls}</span></span>${rateBadge(p.rating, true)}</li>`).join('')}</ul></div>
-        <div class="box"><div class="lb"><h4>NFL draft risk <span>From mock drafts, big boards and big seasons</span></h4></div><ul class="list">${risk.sort((a, b) => order[a.draft.level] - order[b.draft.level]).map(p => `<li data-player="${esc(p.name)}" class="click-li"><span class="grow"><b>${esc(p.name)}</b> <span class="dim">${p.pos} · ${p.cls}</span><br><span class="dim">${esc(p.draft.note)}</span></span><span class="chip risk-${p.draft.level}">${p.draft.level}</span></li>`).join('')}</ul></div>
+        <div class="box"><div class="lb"><h4>Out of eligibility after 2026 <span>5th-year players</span></h4></div><ul class="list">${leaving.map(p => `<li data-player="${esc(p.name)}" class="click-li"><span class="grow"><b>${esc(p.name)}</b> <span class="dim">${p.pos} · ${clsLabel(p)}</span></span>${rateBadge(p.rating, true)}</li>`).join('')}</ul></div>
+        <div class="box"><div class="lb"><h4>NFL draft risk <span>From mock drafts, big boards and big seasons</span></h4></div><ul class="list">${risk.sort((a, b) => order[a.draft.level] - order[b.draft.level]).map(p => `<li data-player="${esc(p.name)}" class="click-li"><span class="grow"><b>${esc(p.name)}</b> <span class="dim">${p.pos} · ${clsLabel(p)}</span><br><span class="dim">${esc(p.draft.note)}</span></span><span class="chip risk-${p.draft.level}">${p.draft.level}</span></li>`).join('')}</ul></div>
       </div>`;
   }
   function saveDraft() { depthState._draft = true; store.set(DKEY, depthState); }
@@ -745,7 +750,7 @@ ${part('next')}
       <div class="controls">${recSeg()}</div></div>
       ${rows.length ? `<div class="tiles" style="margin-bottom:16px">${T ? `<div class="tile"><b>${T.rank}</b><span>247 Team Talent Composite</span><em>Score ${T.score} · of ${T.of} teams</em></div>` : ''}<div class="tile"><b>${avg.toFixed(2)}</b><span>Avg. HS composite</span></div>${stars.map(([n, c]) => `<div class="tile"><b>${c}</b><span>${n}-star (HS)</span></div>`).join('')}<div class="tile"><b>${rows.filter(x => x.tr).length}</b><span>Rated transfers</span></div></div>
       <div class="tablewrap" style="max-height:640px"><table><thead><tr><th>Player</th><th>Pos</th><th>HS rating</th><th class="n">Nat'l</th><th class="n">Class</th><th class="hide-sm">High school</th><th>Transfer rating</th></tr></thead>
-      <tbody>${rows.map(({ p, hs, tr }) => `<tr class="click" data-player="${esc(p.name)}"><td><b>${esc(p.name)}</b> <span class="dim small">${p.cls}</span></td><td>${p.pos}</td>
+      <tbody>${rows.map(({ p, hs, tr }) => `<tr class="click" data-player="${esc(p.name)}"><td><b>${esc(p.name)}</b> <span class="dim small">${clsLabel(p)}</span></td><td>${p.pos}</td>
         <td>${hs ? rateBadge({ src: '247', grade: Math.floor(hs.grade), stars: hs.stars, label: '247 composite' }) + ` <span class="dim small">${hs.grade.toFixed(2)}</span>` : '—'}</td><td class="n">${hs && hs.nat ? hs.nat : '—'}</td><td class="n">${hs ? hs.cls : '—'}</td>
         <td class="hide-sm">${hs ? esc(hs.school || '') + (hs.committedTo && hs.committedTo !== 'Tennessee' ? `<br><span class="dim small">Signed with ${esc(hs.committedTo)}</span>` : '') : ''}</td>
         <td>${tr && tr.grade ? rateBadge({ src: '247t', grade: Math.floor(tr.grade), stars: tr.stars }) + ` <span class="dim small">from ${esc(tr.origin)}</span>` : '—'}</td></tr>`).join('')}</tbody></table></div>
@@ -803,7 +808,7 @@ ${part('next')}
       <div class="section"><h3>Awards, watch lists & weekly honors <small>2026</small></h3>
         <div class="box"><ul class="list">${honored.map(p => p.honors.map(h => `<li data-player="${esc(p.name)}" class="click-li"><b class="namecol">${esc(p.name)}</b><span class="grow">${esc(h)}</span><span class="dim">${p.pos}</span></li>`).join('')).join('')}</ul></div></div>
       <div class="section"><h3>NFL draft outlook <small>2027 consensus big board, mock drafts and big seasons</small></h3>
-        <div class="box"><ul class="list">${prospects.map(p => `<li data-player="${esc(p.name)}" class="click-li"><b class="namecol">${esc(p.name)}</b><span class="grow dim">${p.pos} · ${p.cls} · ${esc(p.draft.note)}</span><span class="chip risk-${p.draft.level}">${p.draft.level}</span></li>`).join('')}</ul></div>
+        <div class="box"><ul class="list">${prospects.map(p => `<li data-player="${esc(p.name)}" class="click-li"><b class="namecol">${esc(p.name)}</b><span class="grow dim">${p.pos} · ${clsLabel(p)} · ${esc(p.draft.note)}</span><span class="chip risk-${p.draft.level}">${p.draft.level}</span></li>`).join('')}</ul></div>
         ${future.length ? `<p class="dim small" style="margin-top:10px">Future first-round buzz: ${future.map(p => `<b>${esc(p.name)}</b> (No. ${p.future.rank} on the ${p.future.year} consensus board)`).join(', ')}.</p>` : ''}</div>
       <div class="section"><h3>On3 Top 300 college players <small>Tennessee players ranked among the nation's best (updated Oct. 12; arrows show movement since Oct. 5)</small></h3>
         <div class="grid g3">${P.filter(p => p.rating && p.rating.src === 'on3').sort((a, b) => a.rating.rank - b.rating.rank).map(p => pcard(p)).join('')}</div></div>`;
@@ -950,7 +955,7 @@ ${part('next')}
     let head, body;
     if (p) {
       const depthSpots = []; Object.values(depthState.current.chart).forEach(rows => rows.forEach(([pos, ns]) => { const i = ns.indexOf(name); if (i >= 0) depthSpots.push(`${pos} (${ord(i + 1)})`); }));
-      head = `<span class="jersey">${p.num}</span><div><h3>${esc(p.name)}${p.nick ? ` <span class="nick">"${esc(p.nick)}"</span>` : ''}</h3><p>${p.pos} · ${p.cls} · ${p.ht}, ${p.wt} lb</p></div>`;
+      head = `<span class="jersey">${p.num}</span><div><h3>${esc(p.name)}${p.nick ? ` <span class="nick">"${esc(p.nick)}"</span>` : ''}</h3><p>${p.pos} · ${clsLabel(p)} · ${p.ht}, ${p.wt} lb</p></div>`;
       const rl = p.rating ? (p.rating.src === 'on3' ? 'On3 college grade (Top 300)' : p.rating.src === '247t' ? '247Sports transfer rating' : p.rating.label) : 'No rating listed';
       body = `<div class="tagrow">${rateBadge(p.rating)} <span class="dim small">${esc(rl)}</span>${(p.natRanks || []).map(x => `<span class="chip nat">No. ${x.rank} nat'l · ${esc(x.stat)}</span>`).join('')}</div>
         <dl class="kv"><dt>Hometown</dt><dd>${esc(p.home)}</dd><dt>High school</dt><dd>${esc(p.hs || '—')}</dd>${p.prev ? `<dt>Previous schools</dt><dd>${esc(p.prev.replace(/\//g, ', '))}</dd>` : ''}
