@@ -5,7 +5,7 @@
   var GOATCOUNTER_CODE = 'xajjay';
   if (!GOATCOUNTER_CODE || !/volindex\.net$|github\.io$/.test(location.hostname)) return; // only count the real site
   var last = null;
-  function path() { var h = (location.hash || '#home').slice(1) || 'home'; var p = h.split('-'); return '/' + p[0] + (p[1] ? '/' + p.slice(1).join('-') : ''); }
+  function path() { var k = window.VI_ROUTER ? window.VI_ROUTER.key() : ((location.hash || '#home').slice(1) || 'home'); return k === 'home' ? '/' : window.VI_ROUTER.path(k); }
   function send() {
     var p = path(); if (p === last || !window.goatcounter || !window.goatcounter.count) return; last = p;
     window.goatcounter.count({ path: p, title: document.title + ' · ' + p.slice(1).replace('/', ' › '), event: false });
@@ -16,5 +16,5 @@
   s.setAttribute('data-goatcounter', 'https://' + GOATCOUNTER_CODE + '.goatcounter.com/count');
   s.onload = send;
   document.head.appendChild(s);
-  window.addEventListener('hashchange', function () { setTimeout(send, 50); });
+  window.addEventListener('vi:route', function () { setTimeout(send, 50); });
 })();

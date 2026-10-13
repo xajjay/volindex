@@ -266,7 +266,7 @@
   function go(a, open) {
     closePanel();
     pin(a);
-    if (a.go && location.hash !== a.go) location.hash = a.go;
+    if (a.go && '#' + window.VI_ROUTER.key() !== a.go) window.VI_ROUTER.go(a.go.slice(1));
     if (open) doOpen(a.open);
   }
   let pinned = null;
@@ -278,7 +278,7 @@
     el.querySelector('.x').addEventListener('click', () => { el.innerHTML = ''; pinned = null; });
     const ob = el.querySelector('[data-askopen]'); ob && ob.addEventListener('click', () => doOpen(a.open));
   }
-  window.addEventListener('hashchange', () => { const el = document.getElementById('askPin'); if (el && pinned && location.hash !== pinned.go) { el.innerHTML = ''; pinned = null; } });
+  window.addEventListener('vi:route', () => { const el = document.getElementById('askPin'); if (el && pinned && '#' + window.VI_ROUTER.key() !== pinned.go) { el.innerHTML = ''; pinned = null; } });
 
   let panel, results = [];
   function draw(q) {

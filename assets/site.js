@@ -67,7 +67,7 @@
 
   /* ---------- router ---------- */
   function route() {
-    const h = (location.hash || '#home').slice(1);
+    const h = window.VI_ROUTER ? window.VI_ROUTER.key() : ((location.hash || '#home').slice(1));
     const [sport, tab] = h.split('-');
     const d = document.getElementById('playerDlg'); if (d && d.open) d.close();
     document.querySelectorAll('.sportnav a').forEach(a => a.setAttribute('aria-current', a.dataset.sport === sport ? 'page' : 'false'));
@@ -77,7 +77,7 @@
     else renderHub();
     window.scrollTo(0, 0);
   }
-  window.addEventListener('hashchange', route);
+  window.addEventListener('vi:route', route);
 
   /* ---------- hub ---------- */
   /* Official polls only (the most-used one per sport). rank: number, 'NR' (unranked) or 'TBA' (not released yet).
@@ -850,7 +850,7 @@ ${part('next')}
     const H = F.histAuto && F.histAuto.seasons && F.histAuto.seasons[year];
     const row = F.history.find(r => String(r.year) === String(year));
     const head = `<div><div class="eyebrow">Season ${year}${row ? ' · ' + esc(row.coach) : ''}</div><h3>${year} Tennessee: ${row ? esc(parseRec(row.overall).t ? row.overall : row.overall.replace(/-0$/, '')) : ''}</h3></div>`;
-    if (String(year) === String(F.season)) { location.hash = '#football-schedule'; return; }
+    if (String(year) === String(F.season)) { window.VI_ROUTER.go('football-schedule'); return; }
     if (!H) { showDialog(head, `<p>Game-by-game results load after the next data update (run <b>tools/update_data.bat</b>).</p><p><a href="https://www.sports-reference.com/cfb/schools/tennessee/${year}-schedule.html" target="_blank" rel="noopener">${year} schedule on Sports Reference</a></p>`); return; }
     const L = F.histAuto.leaders && F.histAuto.leaders[year];
     const lead = L ? `<div class="tiles" style="margin-bottom:12px">${[['pass_', 'Passing yds'], ['rush', 'Rushing yds'], ['rec', 'Receiving yds'], ['tkl', 'Tackles'], ['sacks', 'Sacks'], ['int_', 'INT']].filter(([k]) => L[k]).map(([k, l]) => `<div class="tile"><b style="font-size:22px">${n1(L[k][1])}</b><span>${l}</span><em>${esc(L[k][0])}</em></div>`).join('')}</div>` : '';
