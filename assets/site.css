@@ -55,7 +55,7 @@ h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-
 .topbar { background: var(--bg); color: var(--fg); padding-inline: 16px; border-bottom: 1px solid var(--line); }
 .topbar-in { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 18px; min-height: 52px; flex-wrap: wrap; padding-block: 6px; }
 .brand { font-family: var(--f-display); font-weight: 800; font-size: 21px; letter-spacing: -.01em; color: var(--fg); text-decoration: none; display: flex; align-items: center; gap: 10px; }
-.brand-mark { width: 28px; height: 28px; display: block; flex: none; border-radius: 6px; box-shadow: 0 0 0 1px var(--orange); }
+.brand-mark { width: 32px; height: 32px; display: block; flex: none; }
 .brand span { color: var(--orange); }
 .sportnav { display: flex; gap: 2px; flex-wrap: wrap; margin-left: auto; }
 .sportnav a { color: var(--muted); text-decoration: none; padding: 6px 10px; border-radius: 4px; font-size: 13px; font-weight: 500; letter-spacing: .02em; }
