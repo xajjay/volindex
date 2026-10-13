@@ -49,7 +49,7 @@ def main():
     dbg = {}
     if todo:
         for yr in CLASSES:
-            url = f"https://www.espn.com/college-sports/basketball/recruiting/playerrankings/_/view/hoopgurlz/class/{yr}"
+            url = f"https://www.espn.com/high-school/girls-basketball/recruiting/rankings/scnext100girls/_/class/{yr}"
             page = get(url)
             if not page: dbg[yr] = "no page"; continue
             rows = re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S)
@@ -57,7 +57,10 @@ def main():
             for tr in rows:
                 txt = norm(strip(tr))
                 for n in todo:
-                    if n in players or norm(n) not in txt: continue
+                    last = norm(n.split()[-1])
+                    if n in players or last not in txt: continue
+                    if norm(n) not in txt and norm(n.split()[0][:3]) not in txt: continue
+                    if "html" not in dbg: dbg["html"] = tr[:2500]
                     cells = [strip(c) for c in re.findall(r"<td[^>]*>(.*?)</td>", tr, re.S)]
                     stars = len(re.findall(r'class="[^"]*star[^"]*full', tr)) or len(re.findall(r"star-full|icon-star-solid", tr))
                     grade = next((int(c) for c in cells if re.fullmatch(r"\d{2}", c) and 60 <= int(c) <= 100), None)
