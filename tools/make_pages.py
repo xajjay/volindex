@@ -18,5 +18,6 @@ for s in SPORTS:
     write(s); n += 1
     for t in TABS: write(os.path.join(s, t)); n += 1
 write("sources"); n += 1
+write("about"); write(os.path.join("about", "fix")); n += 2
 open(os.path.join(site, "404.html"), "w", encoding="utf-8").write(html)
 print(f"wrote {n} page folders + 404.html")

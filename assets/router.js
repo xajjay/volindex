@@ -13,7 +13,7 @@
   var SPORT_BACK = {}, TAB_BACK = {};
   Object.keys(SPORT).forEach(function (k) { SPORT_BACK[SPORT[k]] = k; });
   Object.keys(TAB).forEach(function (k) { if (k !== 'recruits' && k !== 'ratings') TAB_BACK[TAB[k]] = k; });
-  var KEY_RE = /^(home|sources|football|volleyball|soccer|mbb|wbb|baseball|softball)(-[a-z0-9]+)?$/;
+  var KEY_RE = /^(home|sources|about|football|volleyball|soccer|mbb|wbb|baseball|softball)(-[a-z0-9]+)?$/;
 
   var host = location.hostname, BASE = null;
   if (/^https?:$/.test(location.protocol)) {

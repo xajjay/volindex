@@ -74,6 +74,7 @@
     if (sport === 'football') renderFootball(tab || 'overview');
     else if (SPORTS.find(s => s.key === sport)) { if (window.SITE && window.SITE[sport] && window.renderSport) window.renderSport(sport, tab || 'overview'); else renderComing(sport); }
     else if (sport === 'sources') renderSources();
+    else if (sport === 'about' && window.renderAbout) { window.renderAbout(app, tab); return; }
     else renderHub();
     window.scrollTo(0, 0);
   }
