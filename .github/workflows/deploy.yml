@@ -32,11 +32,13 @@ jobs:
       - name: Package site (skip tools and caches)
         run: |
           mkdir _site
-          cp -r index.html assets data _site/
+          cp -r index.html manifest.webmanifest sw.js assets data _site/
+          [ -f CNAME ] && cp CNAME _site/ || true
           # cache-busting: browsers re-download CSS, JS and data after every deploy
           V=$(git rev-parse --short HEAD)-$(date +%s)
           sed -i -E "s#(src|href)=\"((assets|data)/[^\"?]+)\"#\1=\"\2?v=$V\"#g" _site/index.html
           grep -c "?v=$V" _site/index.html
+          sed -i "s/volindex-v1/volindex-$V/" _site/sw.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

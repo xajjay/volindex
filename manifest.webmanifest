@@ -1,0 +1,23 @@
+{
+  "name": "The Vol Index",
+  "short_name": "Vol Index",
+  "description": "Tennessee athletics in one place: schedules, scores, rosters, depth charts, rankings, recruiting and history.",
+  "id": "/",
+  "start_url": "./?source=app",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F5F5",
+  "theme_color": "#FF8200",
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Football", "url": "./#football" },
+    { "name": "Men's Basketball", "url": "./#mbb" },
+    { "name": "Women's Basketball", "url": "./#wbb" },
+    { "name": "Volleyball", "url": "./#volleyball" }
+  ]
+}
