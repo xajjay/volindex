@@ -126,7 +126,7 @@
      ===================================================================== */
   const TAB = {
     football: { schedule: 'schedule', watch: 'schedule', roster: 'roster', lineup: 'depth', stats: 'stats', ratings: 'overview', advanced: 'advanced', recruiting: 'recruits', moves: 'next', history: 'history', record: 'overview', media: 'media', review: 'history' },
-    other: { schedule: 'schedule', watch: 'schedule', roster: 'roster', lineup: 'lineup', stats: 'stats', ratings: 'ratings', advanced: 'advanced', recruiting: 'recruiting', moves: 'moves', history: 'history', record: 'overview', media: 'media', review: 'review' },
+    other: { schedule: 'schedule', watch: 'schedule', roster: 'roster', lineup: 'lineup', stats: 'stats', ratings: 'advanced', advanced: 'advanced', recruiting: 'recruiting', moves: 'moves', history: 'history', record: 'overview', media: 'media', review: 'review' },
   };
   const tabFor = (k, t) => (k === 'football' ? TAB.football : TAB.other)[t] || 'overview';
   const TAB_LABEL = { schedule: 'schedule', roster: 'roster', lineup: 'projected lineup', depth: 'depth chart', stats: 'stats', ratings: 'rankings & ratings', advanced: 'advanced stats', recruiting: 'recruiting', recruits: 'recruiting', moves: 'roster moves', next: '2027 preview', history: 'history', overview: 'overview', media: 'social & media', review: 'season review' };

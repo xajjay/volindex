@@ -21,7 +21,7 @@
   function tabs(D) {
     const t = [['overview', 'Overview'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['lineup', D.lineupTab || (D.key === 'baseball' || D.key === 'softball' ? 'Projected Lineup' : 'Projected Starters')]];
     if (D.stats || D.statsAuto) t.push(['stats', 'Stats']);
-    return t.concat([['ratings', 'Rankings & Ratings']], X(D).advanced ? [['advanced', 'Advanced']] : [], [['recruiting', 'Recruiting'], ...(NO_REVIEW.has(D.key) ? [] : [['review', D.prevLabel + ' Review']]), ['moves', 'Roster Moves'], ['history', 'History'], ['media', 'Social & Media']]);
+    return t.concat(X(D).advanced ? [['advanced', 'Advanced']] : [['ratings', 'Rankings & Ratings']], [['recruiting', 'Recruiting'], ...(NO_REVIEW.has(D.key) ? [] : [['review', D.prevLabel + ' Review']]), ['moves', 'Roster Moves'], ['history', 'History'], ['media', 'Social & Media']]);
   }
   function header(D, tab) {
     return `<div class="teamhead"><div class="wrap">
@@ -374,6 +374,8 @@
         <tbody>${A.players.slice().sort((a, b) => (b[1] ?? -9) - (a[1] ?? -9)).map(r => `<tr><td><a href="#" data-sp="${esc(r[0])}"><b>${esc(r[0])}</b></a></td>${r.slice(1).map(v => `<td class="n">${v == null ? '—' : esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="dim small">${esc(A.playersNote || '')}</p></div>` : ''}
       ${A.pearGames ? `<div class="section"><h3>Game-by-game projections <small>PEAR win chance for Tennessee · opponent's PEAR rank</small></h3><div class="tablewrap"><table class="mini"><thead><tr><th>Date</th><th>Opponent</th><th class="n">Opp. rank</th><th>Win chance</th></tr></thead>
         <tbody>${A.pearGames.map(g => `<tr><td class="num">${fmtDate(g[0], { month: 'short', day: 'numeric' })}</td><td><b>${esc(g[1])}</b></td><td class="n">${g[2]}</td><td><span class="winbar"><i style="width:${g[3]}%"></i></span> <b class="num">${g[3].toFixed(1)}%</b></td></tr>`).join('')}</tbody></table></div></div>` : ''}
+      ${(rows => rows.length ? `<div class="section"><h3>Polls & rankings <small>Media polls, preseason rankings and other ratings</small></h3><div class="tablewrap"><table><thead><tr><th>Source</th><th class="n">Tennessee</th><th>Notes</th></tr></thead>
+        <tbody>${rows.map(r => `<tr><td><a href="${esc(r[3])}" target="_blank" rel="noopener"><b>${esc(r[0])}</b></a></td><td class="n"><b>${esc(r[1])}</b></td><td class="dim">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div></div>` : '')(ratingRows(D).filter(r => !A.teams.some(t => r[0].toLowerCase().split(' ')[0] === t.src.toLowerCase().split(' ')[0] && !/poll|projected/i.test(r[0]))))}
       ${A.glossary ? `<details class="box gloss"><summary>What do these numbers mean?</summary><dl>${A.glossary.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></details>` : ''}`;
   }
 
@@ -545,7 +547,7 @@ ${rows}
   }
 
   /* ---------- ratings ---------- */
-  function ratings(D) {
+  function ratingRows(D) {
     const R = D.ratings; const E = X(D);
     let rows = (E.ratings || R.rows).map(r => r.slice());
     [D.pollCur, D.rpiAuto].filter(Boolean).forEach(a => {
@@ -556,7 +558,10 @@ ${rows}
       const row = [a.poll, val, note, a.source || (i >= 0 ? rows[i][3] : '#')];
       if (i >= 0) rows[i] = row; else rows.unshift(row);
     });
-    rows = rows.filter(r => !/^check$/i.test(String(r[1])));
+    return rows.filter(r => !/^check$/i.test(String(r[1])));
+  }
+  function ratings(D) {
+    const R = D.ratings; const E = X(D); const rows = ratingRows(D);
     return `<div class="panel-head"><div><h2>Rankings & Ratings</h2><p>${esc(R.intro)}${E.advanced ? ` Team-strength numbers (offense, defense, projections) are on the <a href="#${D.key}-advanced">Advanced</a> tab.` : ''}</p></div></div>
       <div class="tablewrap"><table><thead><tr><th>Source</th><th class="n">Tennessee</th><th>Notes</th></tr></thead>
       <tbody>${rows.map(r => `<tr><td><a href="${r[3]}" target="_blank" rel="noopener"><b>${esc(r[0])}</b></a></td><td class="n"><b>${esc(r[1])}</b></td><td class="dim">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>
@@ -604,6 +609,7 @@ ${rows}
   function render(k, tab) {
     const D = applyAuto(window.SITE[k]); const app = document.getElementById('app');
     if (key !== k) { key = k; editing = false; rosterQ = ''; lineup = loadLineup(k); }
+    if (tab === 'ratings' && X(D).advanced) tab = 'advanced';
     if (!tabs(D).find(t => t[0] === tab)) tab = 'overview';
     const body = { overview, roster, lineup: lineupPanel, schedule, stats, ratings, advanced: advancedSport, recruiting, review, moves, history, media: () => window.renderMedia(D.key) }[tab](D);
     app.innerHTML = header(D, tab) + `<main class="wrap">${body}</main>` + footer(D);
