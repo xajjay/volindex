@@ -92,7 +92,7 @@ window.EXTRAS = {
     ],
   },
   wbb: {
-    playersToKnow: ['Rylie Theuerkauf', 'Kaylene Smikle', 'Kennedy Fauntleroy', 'Fatmata Janneh', 'Aaliyah Moore', 'Naomi White', 'Harissoum Coulibaly', 'Riley Makalusky', 'Avery Mills', 'Gabby Minus'],
+    playersToKnow: ['Rylie Theuerkauf', 'Kaylene Smikle', 'Kennedy Fauntleroy', 'Fatmata Janneh', 'Aaliyah Moore', 'Naomi White', 'Harissoum Coulibaly', 'Avery Mills'],
     ratings: [
       ['SEC media preseason poll', 'No. 8', 'Predicted order, released Oct. 12, 2026. South Carolina 1st.', 'https://www.on3.com/news/sec-womens-basketball-preseason-poll-predicted-order-of-finish-released-2026-27-season'],
       ['Massey Ratings preseason', 'No. 14', 'Power No. 12 · offense No. 10 · defense No. 31 · expected 21-10', 'https://masseyratings.com/cbw/ncaa-d1/ratings'],
