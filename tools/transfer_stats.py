@@ -64,7 +64,7 @@ def find_athlete(name, league):
 def season_line(aid, league, season):
     d = get(f"https://site.web.api.espn.com/apis/common/v3/sports/basketball/{league}/athletes/{aid}/stats")
     if not d: return None
-    teams = {str(t.get("id")): t.get("displayName") or t.get("location") for t in (d.get("teams") or {}).values()} if isinstance(d.get("teams"), dict) else {}
+    teams = {str(t.get("id")): t.get("location") or t.get("displayName") for t in (d.get("teams") or {}).values()} if isinstance(d.get("teams"), dict) else {}
     for cat in d.get("categories", []) or []:
         if (cat.get("name") or "").lower() not in ("averages", "pergame"): continue
         labels = [l.upper() for l in cat.get("labels") or cat.get("names") or []]
@@ -87,12 +87,12 @@ def main():
         bucket = out.setdefault(key, {})
         for p in D.get("roster", []):
             name = p.get("name")
-            if not p.get("prev") or norm(name) in have or (name in bucket and bucket[name].get("ppg")): continue
+            if not p.get("prev") or norm(name) in have or (name in bucket and bucket[name].get("ppg") and bucket[name].get("v") == 2): continue
             try:
                 aid = find_athlete(name, league)
                 line = season_line(aid, league, season) if aid else None
                 if line and line.get("ppg") is not None:
-                    line.update(season=label, espnId=aid); bucket[name] = line
+                    line.update(season=label, espnId=aid, v=2); bucket[name] = line
                     print(f"OK   {key} {name}: {line['ppg']} ppg at {line.get('team')}")
                 else:
                     print(f"SKIP {key} {name}: {'no ESPN match' if not aid else 'no ' + label + ' line'}")
