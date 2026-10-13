@@ -10,7 +10,7 @@
     del(k) { try { localStorage.removeItem(k); } catch (e) {} },
   };
   const fmtDate = (iso, o) => { if (!iso) return 'TBA'; const d = new Date(iso + 'T12:00:00'); return d.toLocaleDateString('en-US', o || { weekday: 'short', month: 'short', day: 'numeric' }); };
-  const today = () => new Date().toISOString().slice(0, 10);
+  const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // Eastern time
   const COLS = { num: '#', name: 'Name', pos: 'Pos', rate: 'Rating', bt: 'B/T', ht: 'Ht', wt: 'Wt', cls: 'Class', home: 'Hometown', hs: 'High school', prev: 'Previous school', note: 'Notes' };
   const HIDE_SM = new Set(['bt', 'wt', 'home', 'hs', 'prev', 'note']);
 

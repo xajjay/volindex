@@ -5,7 +5,7 @@
   'use strict';
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmtDate = (iso, o) => { if (!iso) return 'TBA'; const d = new Date(iso + 'T12:00:00'); return d.toLocaleDateString('en-US', o || { weekday: 'short', month: 'short', day: 'numeric' }); };
-  const today = () => new Date().toISOString().slice(0, 10);
+  const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // Eastern time
   const KEYS = ['football', 'volleyball', 'soccer', 'mbb', 'wbb', 'baseball', 'softball'];
   const NAME = { football: 'Football', volleyball: 'Volleyball', soccer: 'Soccer', mbb: "Men's Basketball", wbb: "Lady Vols Basketball", baseball: 'Baseball', softball: 'Softball' };
   const S = () => window.SOCIAL || {};

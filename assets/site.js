@@ -132,6 +132,7 @@
       <div class="dim">${fmtDate(g.date, { weekday: 'short', month: 'short', day: 'numeric' })} · ${esc(when || 'Time TBA')}</div>
       <div class="tv">${w ? `<b>📺 ${esc(w.net)}</b><span>${esc(w.stream)}</span>` : '<b>📺 TV TBA</b><span>Network usually announced 1–2 weeks out</span>'}</div></div>`;
   }
+  const etToday = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
   function lastUpdated(k) {
     const U = window.SITE_UPDATED || {};
     const own = k === 'football' ? F && F.updated : window.SITE[k] && window.SITE[k].updated;
@@ -140,7 +141,7 @@
   window.lastUpdated = lastUpdated;
   function renderHub() {
     if (window.SITE && window.SITE.football) initFootball();
-    const next = F && F.schedule.find(g => !g.result);
+    const next = F && F.schedule.find(g => !g.result && !(g.date < etToday()));
     app.innerHTML = `
     <div class="wrap hub-hero">
       <div class="eyebrow">University of Tennessee · Knoxville</div>
@@ -149,7 +150,7 @@
       ${window.askHero ? window.askHero() : ''}
     </div>
     <div class="wrap grid g3">
-      ${SPORTS.map(s => `<a class="sportcard live" href="#${s.key}">
+      ${SPORTS.map(s => `<a class="sportcard live" data-sport="${s.key}" href="#${s.key}">
         <div class="sc-name">
         <div class="eyebrow">${s.key === 'football' ? '2026 season' : window.SITE && window.SITE[s.key] ? window.SITE[s.key].season + ' season' : 'Coming soon'}</div>
         <h2>${esc(s.name)} ${rankBlock(pollFor(s.key, F))}</h2></div>
@@ -341,7 +342,7 @@
   const ABBR = { 'Alabama': 'BAMA', 'South Carolina': 'SC', 'Kentucky': 'UK', 'Texas A&M': 'TAMU', 'LSU': 'LSU', 'Vanderbilt': 'VAN' };
   const abbr = n => ABBR[n] || n.slice(0, 4).toUpperCase();
   function quickHits() {
-    const t = F.team, R = t.ranks, next = F.schedule.find(g => !g.result);
+    const t = F.team, R = t.ranks, next = F.schedule.find(g => !g.result && !(g.date < etToday()));
     const P = F.players;
     const best = (f) => P.map(p => [p, f(p)]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1])[0];
     const rb = best(p => p.stats.rush ? p.stats.rush[1] : 0), sk = best(p => p.stats.def ? p.stats.def.tfl : 0);
@@ -358,7 +359,7 @@
     return `<div class="tile"><b>${val}</b><span>${label}</span><em>No. ${r[1]} FBS · ${ord(r[2])} SEC</em></div>`;
   }
   function overview() {
-    const t = F.team, R = t.ranks; const next = F.schedule.find(g => !g.result);
+    const t = F.team, R = t.ranks; const next = F.schedule.find(g => !g.result && !(g.date < etToday()));
     const played = F.schedule.filter(g => g.result);
     const qb1 = byName.get(((depthState.current.chart.Backfield || []).find(r => r[0] === 'QB') || [, []])[1][0]);
     let top = standouts().slice(0, 8);
