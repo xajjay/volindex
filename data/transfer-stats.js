@@ -1,4 +1,4 @@
-/* Written by tools/transfer_stats.py from ESPN. Last-season averages for incoming basketball transfers. */
+/* Written by tools/transfer_stats.py (ESPN, basketball) and tools/baseball_transfers.py (school stats pages, baseball). Last-season stats for incoming transfers. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.transfers = {
  "mbb": {
@@ -257,6 +257,428 @@ window.SITE_AUTO.transfers = {
    "items": []
   }
  },
- "baseball": {},
- "_bdebug": {}
+ "baseball": {
+  "Chris Ramirez": {
+   "bat": {
+    "AVG": ".389",
+    "OPS": "1.027",
+    "GP-GS": "59 - 58",
+    "AB": "252",
+    "R": "71",
+    "H": "98",
+    "HR": "7",
+    "RBI": "42",
+    "SB-ATT": "21 - 28"
+   },
+   "team": "Cal Baptist",
+   "season": "2026",
+   "v": 2,
+   "src": "https://cbulancers.com/sports/baseball/stats/2026"
+  },
+  "Brody Trosclair": {
+   "pitch": {
+    "ERA": "1.89",
+    "WHIP": "1.13",
+    "W-L": "5-1",
+    "APP-GS": "10-4",
+    "SV": "1",
+    "IP": "38.0",
+    "BB": "11",
+    "SO": "55"
+   },
+   "team": "Northwestern State",
+   "season": "2026",
+   "v": 2,
+   "src": "https://nsudemons.com/sports/baseball/stats/2026"
+  },
+  "Wyatt Hanoian": {
+   "bat": {
+    "AVG": ".357",
+    "OPS": "1.071",
+    "GP-GS": "53 - 53",
+    "AB": "185",
+    "R": "49",
+    "H": "66",
+    "HR": "6",
+    "RBI": "49",
+    "SB-ATT": "6 - 9"
+   },
+   "team": "Air Force",
+   "season": "2026",
+   "v": 2,
+   "src": "https://goairforcefalcons.com/sports/baseball/stats/2026"
+  },
+  "Travis Sanders": {
+   "bat": {
+    "AVG": ".369",
+    "OPS": "1.044",
+    "GP-GS": "54 - 54",
+    "AB": "222",
+    "R": "49",
+    "H": "82",
+    "HR": "9",
+    "RBI": "44",
+    "SB-ATT": "24 - 30"
+   },
+   "team": "Baylor",
+   "season": "2026",
+   "v": 2,
+   "src": "https://baylorbears.com/sports/baseball/stats/2026"
+  },
+  "Braydon Kersey": {
+   "bat": {
+    "AVG": ".325",
+    "OPS": "1.122",
+    "GP-GS": "56 - 56",
+    "AB": "206",
+    "R": "50",
+    "H": "67",
+    "HR": "21",
+    "RBI": "67",
+    "SB-ATT": "9 - 11"
+   },
+   "team": "Mercer",
+   "season": "2026",
+   "v": 2,
+   "src": "https://mercerbears.com/sports/baseball/stats/2026"
+  },
+  "Mario Trivella": {
+   "bat": {
+    "AVG": ".287",
+    "OPS": ".964",
+    "GP-GS": "52-49",
+    "AB": "181",
+    "R": "45",
+    "H": "52",
+    "HR": "15",
+    "RBI": "50",
+    "SB-ATT": "4-7"
+   },
+   "team": "FIU",
+   "season": "2026",
+   "v": 2,
+   "src": "https://fiusports.com/sports/baseball/stats/2026"
+  },
+  "Andrew Duncan": {
+   "bat": {
+    "AVG": ".367",
+    "OPS": "1.013",
+    "GP-GS": "54 - 53",
+    "AB": "215",
+    "R": "44",
+    "H": "79",
+    "HR": "6",
+    "RBI": "36",
+    "SB-ATT": "19 - 22"
+   },
+   "team": "Wright State",
+   "season": "2026",
+   "v": 2,
+   "src": "https://wsuraiders.com/sports/baseball/stats/2026"
+  }
+ },
+ "_bdebug": {},
+ "_bbdebug": {
+  "Blaine Brown": {
+   "dom": "riceowls.com",
+   "len": 1692806,
+   "tables": [
+    [
+     "#",
+     "Player",
+     "AVG",
+     "OPS",
+     "GP-GS",
+     "AB",
+     "r",
+     "h",
+     "2B",
+     "3b",
+     "hr",
+     "rbi"
+    ],
+    [
+     "-",
+     "Rice",
+     "Opponents"
+    ],
+    [
+     "Date",
+     "opponent",
+     "LOC",
+     "w/l",
+     "Score",
+     "AB",
+     "R",
+     "H",
+     "RBI",
+     "2b",
+     "3b",
+     "hr"
+    ],
+    [
+     "-",
+     "HIGH",
+     "OPPONENT"
+    ],
+    [
+     "Player",
+     "2",
+     "3",
+     "4",
+     "5+",
+     "total"
+    ]
+   ]
+  },
+  "Brady Frederick": {
+   "dom": "etsubucs.com",
+   "len": 1210872,
+   "tables": [
+    [
+     "#",
+     "Player",
+     "AVG",
+     "OPS",
+     "GP-GS",
+     "AB",
+     "R",
+     "H",
+     "2B",
+     "3B",
+     "HR",
+     "RBI"
+    ],
+    [
+     "#",
+     "Player",
+     "ERA",
+     "WHIP",
+     "W-L",
+     "APP-GS",
+     "CG",
+     "SHO",
+     "SV",
+     "IP",
+     "H",
+     "R"
+    ],
+    [
+     "#",
+     "Player",
+     "C",
+     "PO",
+     "A",
+     "E",
+     "FLD%",
+     "DP",
+     "SBA",
+     "CSB",
+     "PB",
+     "CI"
+    ],
+    [
+     "#",
+     "Player",
+     "AVG",
+     "OPS",
+     "GP-GS",
+     "AB",
+     "R",
+     "H",
+     "2B",
+     "3B",
+     "HR",
+     "RBI"
+    ],
+    [
+     "#",
+     "Player",
+     "ERA",
+     "WHIP",
+     "W-L",
+     "APP-GS",
+     "CG",
+     "SHO",
+     "SV",
+     "IP",
+     "H",
+     "R"
+    ],
+    [
+     "#",
+     "Player",
+     "C",
+     "PO",
+     "A",
+     "E",
+     "FLD%",
+     "DP",
+     "SBA",
+     "CSB",
+     "PB",
+     "CI"
+    ]
+   ]
+  },
+  "Hayden Simmerson": "no page clemsontigers.com",
+  "Landon Mack": {
+   "dom": "scarletknights.com",
+   "len": 2023477,
+   "tables": [
+    [
+     "#",
+     "Player",
+     "AVG",
+     "OPS",
+     "GP-GS",
+     "AB",
+     "r",
+     "h",
+     "2B",
+     "3b",
+     "hr",
+     "rbi"
+    ],
+    [
+     "-",
+     "Rutgers",
+     "Opponents"
+    ],
+    [
+     "Date",
+     "opponent",
+     "LOC",
+     "w/l",
+     "Score",
+     "AB",
+     "R",
+     "H",
+     "RBI",
+     "2b",
+     "3b",
+     "hr"
+    ],
+    [
+     "-",
+     "HIGH",
+     "OPPONENT"
+    ],
+    [
+     "Player",
+     "2",
+     "3",
+     "4",
+     "5+",
+     "total"
+    ]
+   ]
+  },
+  "Tyler Myatt": "no site for Walters State CC",
+  "Jake McCoy": "no page gamecocksonline.com",
+  "Parker Detmers": {
+   "dom": "gocards.com",
+   "len": 1643304,
+   "tables": [
+    [
+     "#",
+     "Player",
+     "AVG",
+     "OPS",
+     "GP-GS",
+     "AB",
+     "r",
+     "h",
+     "2B",
+     "3b",
+     "hr",
+     "rbi"
+    ],
+    [
+     "-",
+     "Louisville",
+     "Opponents"
+    ],
+    [
+     "Date",
+     "opponent",
+     "LOC",
+     "w/l",
+     "Score",
+     "AB",
+     "R",
+     "H",
+     "RBI",
+     "2b",
+     "3b",
+     "hr"
+    ],
+    [
+     "-",
+     "HIGH",
+     "OPPONENT"
+    ],
+    [
+     "Player",
+     "2",
+     "3",
+     "4",
+     "5+",
+     "total"
+    ]
+   ]
+  },
+  "Ricky Ojeda": {
+   "dom": "ucirvinesports.com",
+   "len": 1828420,
+   "tables": [
+    [
+     "#",
+     "Player",
+     "AVG",
+     "OPS",
+     "GP-GS",
+     "AB",
+     "r",
+     "h",
+     "2B",
+     "3b",
+     "hr",
+     "rbi"
+    ],
+    [
+     "-",
+     "UC Irvine",
+     "Opponents"
+    ],
+    [
+     "Date",
+     "opponent",
+     "LOC",
+     "w/l",
+     "Score",
+     "AB",
+     "R",
+     "H",
+     "RBI",
+     "2b",
+     "3b",
+     "hr"
+    ],
+    [
+     "-",
+     "HIGH",
+     "OPPONENT"
+    ],
+    [
+     "Player",
+     "2",
+     "3",
+     "4",
+     "5+",
+     "total"
+    ]
+   ]
+  }
+ }
 };
