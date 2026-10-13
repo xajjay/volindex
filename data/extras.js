@@ -221,7 +221,7 @@ window.EXTRAS = {
     },
     draft: {
       'Trent Grindlinger': { level: 'High', note: '2027 MLB Draft top 100: No. 14 overall (Oliver Boctor, Sept. 2026)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
-      'Blaine Brown': { level: 'High', note: '2027 MLB Draft top 100: No. 87 overall (Oliver Boctor, Sept. 2026)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
+      'Blaine Brown': { level: 'Watch', note: '2027 MLB Draft top 100: No. 87 overall (Oliver Boctor, Sept. 2026)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
       'Landon Mack': { level: 'Medium', note: '2027 MLB Draft top 100: No. 65 overall (Oliver Boctor, Sept. 2026)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
       'Chris Ramirez': { level: 'Watch', note: '2027 MLB Draft top 100: No. 74 overall (Oliver Boctor, Sept. 2026)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
       'Wyatt Hanoian': { level: 'Watch', note: '2027 MLB Draft top 100: No. 83 overall (Oliver Boctor, Sept. 2026)', src: 'https://medium.com/@oliver.mitsuo/2027-mlb-draft-top-100-prospects-dfbd07a91f4e' },
