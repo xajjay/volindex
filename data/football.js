@@ -7179,8 +7179,8 @@ window.SITE.football = {
    "https://utsports.com/sports/football/roster"
   ],
   [
-   "Depth chart (2026 base)",
-   "Ourlads, updated 10/10/2026",
+   "Depth chart: The Vol Index's own (unofficial), from snap counts and game film; layout inspired by",
+   "Ourlads",
    "https://www.ourlads.com/ncaa-football-depth-charts/depth-chart/tennessee/91993"
   ],
   [
