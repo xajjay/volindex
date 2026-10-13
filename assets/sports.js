@@ -11,7 +11,7 @@
   };
   const fmtDate = (iso, o) => { if (!iso) return 'TBA'; const d = new Date(iso + 'T12:00:00'); return d.toLocaleDateString('en-US', o || { weekday: 'short', month: 'short', day: 'numeric' }); };
   const today = () => new Date().toISOString().slice(0, 10);
-  const COLS = { num: '#', name: 'Name', pos: 'Pos', bt: 'B/T', ht: 'Ht', wt: 'Wt', cls: 'Class', home: 'Hometown', hs: 'High school', prev: 'Previous school', note: 'Notes' };
+  const COLS = { num: '#', name: 'Name', pos: 'Pos', rate: 'Rating', bt: 'B/T', ht: 'Ht', wt: 'Wt', cls: 'Class', home: 'Hometown', hs: 'High school', prev: 'Previous school', note: 'Notes' };
   const HIDE_SM = new Set(['bt', 'wt', 'home', 'hs', 'prev', 'note']);
 
   let S, key, lineup, editing = false, rosterQ = '';
@@ -295,6 +295,56 @@
   }
   const statusChip = p => p && p.status ? ` <span class="chip risk-Watch" title="${esc(p.note || p.status)}">${esc(p.status)}</span>` : '';
   // last season at a previous school (basketball transfers), from data/transfer-stats.js
+  /* ---------- basketball player ratings (data/ratings-bb.js + data/ratings-wbb-auto.js) ---------- */
+  const RATED = new Set(['mbb', 'wbb']);
+  const starStr = n => n ? `<span class="stars" aria-label="${n} stars">${'★'.repeat(n)}<i>${'★'.repeat(5 - n)}</i></span>` : '';
+  function bbRatings(D) {
+    if (!RATED.has(D.key)) return null;
+    const B = (window.BB_RATINGS || {})[D.key] || { players: {} }, P = Object.assign({}, B.players);
+    return { B, P };
+  }
+  const hsGrade = h => h ? (h.comp ? Math.floor(h.comp * 100) : (h.grade || h.own)) : null;
+  const hsLabel = h => h.src === 'espn' ? `ESPN grade (SC Next 100), class of ${h.cls}${h.natl ? ' · No. ' + h.natl + ' nationally' : ''}`
+    : h.comp ? `247Sports Composite ${h.comp.toFixed(4).replace(/^0/, '')}, class of ${h.cls}${h.natl ? ' · No. ' + h.natl + ' nationally' : ''}`
+    : `247Sports rating, class of ${h.cls}${h.natl ? ' · No. ' + h.natl + ' nationally' : ''}`;
+  const bbRate = (D, p) => { const R = bbRatings(D); if (!R || !p) return null; return R.P[p.name] || { none: true }; };
+  const curScore = r => r && !r.none ? (r.tr ? r.tr.rating : hsGrade(r.hs)) : null;
+  const curStars = r => r && !r.none ? (r.tr ? r.tr.stars : r.hs && r.hs.stars) : null;
+  function trBadge(t, compact) { return `<span class="rate tr" title="247Sports transfer rating, ${t.year} portal · No. ${t.ovr} overall"><span class="g">${t.rating}</span>${compact ? 'TR' : 'Transfer'}${compact ? '' : ' ' + starStr(t.stars)}</span>`; }
+  function hsBadge(h) { return `<span class="rate" title="${esc(hsLabel(h))}"><span class="g">${hsGrade(h)}</span>${starStr(h.stars)}</span>`; }
+  function bbBadge(D, p, compact) {
+    const r = bbRate(D, p); if (!r) return '';
+    if (r.none || (!r.tr && !r.hs)) return '<span class="rate" title="No rating listed"><span class="g">NR</span></span>';
+    return r.tr ? trBadge(r.tr, compact) : hsBadge(r.hs);
+  }
+  function bbRatingRows(D, p) {
+    const r = bbRate(D, p); if (!r) return '';
+    const hsTxt = h => `${hsBadge(h)} <span class="small">${h.src === 'espn' ? `ESPN grade ${h.grade}` : h.comp ? `247 Composite ${h.comp.toFixed(4).replace(/^0/, '')}` : `247Sports ${h.own}`}${h.stars ? ' · ' + h.stars + '-star' : ''}${h.natl ? ' · No. ' + h.natl + ' nationally' : ''} · class of ${h.cls}${h.comp && h.own ? ` · 247's own rating ${h.own}` : ''}</span>`;
+    const none = D.key === 'wbb' ? 'Not in ESPN\'s top 100 for her class' : 'No recruiting rating listed';
+    if (r.none) return `<dt>${p.prev ? 'High school rating' : 'Rating'}</dt><dd class="dim">${none}</dd>` + (p.prev && D.key === 'wbb' ? `<dt>Transfer rating</dt><dd class="dim">Not published for women's basketball</dd>` : '');
+    return (r.tr ? `<dt>Transfer rating</dt><dd>${trBadge(r.tr)} <span class="small">247Sports, ${r.tr.year} portal · No. ${r.tr.ovr} overall</span></dd>` : '')
+      + (r.hs ? `<dt>High school rating</dt><dd>${hsTxt(r.hs)}</dd>` : p.prev ? `<dt>High school rating</dt><dd class="dim">Not rated coming out of high school</dd>` : '')
+      + (!r.tr && p.prev && D.key === 'wbb' ? `<dt>Transfer rating</dt><dd class="dim">Not published for women's basketball</dd>` : '');
+  }
+  function teamComposite(D) {
+    const R = bbRatings(D); if (!R) return '';
+    const rows = D.roster.map(p => ({ p, r: R.P[p.name] })).filter(x => x.r && curScore(x.r) != null).sort((a, b) => curScore(b.r) - curScore(a.r));
+    if (!rows.length) return `<div class="section"><h3>Team composite</h3><p class="dim">Player ratings load with the next automatic update.</p></div>`;
+    const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+    const cur = avg(rows.map(x => curScore(x.r))), comps = rows.map(x => x.r.hs && x.r.hs.comp).filter(Boolean), espn = rows.map(x => x.r.hs && x.r.hs.src === 'espn' && x.r.hs.grade).filter(Boolean), trs = rows.map(x => x.r.tr && x.r.tr.rating).filter(Boolean);
+    const st = [5, 4, 3].map(n => [n, rows.filter(x => curStars(x.r) === n).length]).filter(([, c]) => c);
+    return `<div class="section" id="teamComposite"><h3>Team composite <small>${rows.length} of ${D.roster.length} players rated</small></h3>
+      <div class="tiles" style="margin-bottom:12px"><div class="tile"><b>${cur.toFixed(1)}</b><span>Team composite</span><em>Avg. of each player's most recent rating</em></div>
+        ${comps.length ? `<div class="tile"><b>${avg(comps).toFixed(4).replace(/^0/, '')}</b><span>Avg. 247 HS Composite</span><em>${comps.length} players</em></div>` : ''}
+        ${espn.length && trs.length ? `<div class="tile"><b>${avg(espn).toFixed(1)}</b><span>Avg. ESPN HS grade</span><em>${espn.length} players</em></div>` : ''}
+        ${trs.length ? `<div class="tile"><b>${avg(trs).toFixed(1)}</b><span>Avg. transfer rating</span><em>${trs.length} transfers · 247Sports</em></div>` : ''}
+        ${st.map(([n, c]) => `<div class="tile"><b>${c}</b><span>${n}-star players</span></div>`).join('')}</div>
+      <div class="tablewrap"><table><thead><tr><th>Name</th><th>Pos</th><th>Most recent</th><th class="hide-sm">High school</th>${trs.length ? '<th class="hide-sm">Transfer</th>' : ''}</tr></thead>
+        <tbody>${rows.map(({ p, r }) => `<tr><td><a href="#" data-sp="${esc(p.name)}"><b>${esc(p.name)}</b></a></td><td>${esc(p.pos)}</td><td>${bbBadge(D, p)}</td>
+          <td class="hide-sm small">${r.hs ? `${r.hs.comp ? r.hs.comp.toFixed(4).replace(/^0/, '') : hsGrade(r.hs)}${r.hs.stars ? ' · ' + r.hs.stars + '★' : ''}${r.hs.natl ? ' · No. ' + r.hs.natl : ''} · ${r.hs.cls}` : '—'}</td>
+          ${trs.length ? `<td class="hide-sm small">${r.tr ? `${r.tr.rating} · ${r.tr.stars}★ · No. ${r.tr.ovr} overall` : '—'}</td>` : ''}</tr>`).join('')}</tbody></table></div>
+      <p class="dim small">${trs.length ? 'Most recent rating = the 247Sports transfer rating for transfers, otherwise the high school rating (247Sports Composite × 100).' : 'Ratings are ESPN SC Next 100 high school grades.'} The team composite is The Vol Index's average of those, not an official ranking. ${R.B.note ? esc(R.B.note) + ' ' : ''}Source: <a href="${esc(R.B.src)}" target="_blank" rel="noopener">${esc(R.B.srcName)}</a>.</p></div>`;
+  }
   const transferLine = (D, p) => { const T = p && (((window.SITE_AUTO || {}).transfers || {})[D.key] || {})[p.name]; if (!T || T.ppg == null) return null;
     const n = v => v == null || v === '' ? null : String(v);
     return { season: T.season, text: [n(T.ppg) && n(T.ppg) + ' PPG', n(T.rpg) && n(T.rpg) + ' RPG', n(T.apg) && n(T.apg) + ' APG'].filter(Boolean).join(' · ') + (T.team ? ' at ' + T.team : ''), gp: T.gp, team: T.team, T }; };
@@ -318,6 +368,7 @@
     const E = X(D), rec = (E.recruit || {})[p.name];
     return `<button class="pcard" data-sp="${esc(p.name)}"><div class="pcard-top"><span class="jersey">${esc(p.num)}</span><div><div class="nm">${esc(p.name)}${statusChip(p)}</div><div class="sub">${esc(p.pos)} · ${esc(p.cls)}${p.prev ? ' · from ' + esc(String(p.prev).split(' / ').pop()) : ''}</div></div></div>
       ${rec ? (m => `<div class="tagrow"><span class="chip new">${esc(m ? m[1] : 'Recruit')}</span> <span class="small dim">${esc(m ? m[2] : rec)}</span></div>`)(rec.match(/^([^:]{1,16}):\s*(.+)$/)) : ''}
+      ${RATED.has(D.key) ? `<div class="tagrow">${bbBadge(D, p)}</div>` : ''}
       <div class="why">${whyPlayer(D, p)}</div></button>`;
   }
   function openPlayerSport(D, name) {
@@ -332,7 +383,7 @@
     const inLineup = []; Object.values((lineup && lineup.chart) || {}).forEach(rows => rows.forEach(([pos, ns]) => { const i = ns.findIndex(n => norm(n) === norm(name)); if (i >= 0) inLineup.push(`${pos} (${i === 0 ? 'starter' : ordn(i + 1)})`); }));
     const head = `<span class="jersey">${esc(p ? p.num : '')}</span><div><h3>${esc(p ? p.name : name)}${statusChip(p)}</h3><p>${p ? esc([p.pos, p.cls, p.ht && p.ht + (p.wt ? ', ' + p.wt + ' lb' : ''), p.bt && 'B/T ' + p.bt].filter(Boolean).join(' · ')) : esc(D.name)}</p></div>`;
     const body = `${rec ? `<div class="tagrow"><span class="chip new">Recruiting</span> <span class="small">${esc(rec)}</span></div>` : ''}
-      <dl class="kv">${p ? `<dt>Hometown</dt><dd>${esc(p.home || '—')}</dd>${p.hs ? `<dt>High school</dt><dd>${esc(p.hs)}</dd>` : ''}${p.prev ? `<dt>Previous school</dt><dd>${esc(p.prev)}</dd>` : ''}` : ''}
+      <dl class="kv">${p ? `<dt>Hometown</dt><dd>${esc(p.home || '—')}</dd>${p.hs ? `<dt>High school</dt><dd>${esc(p.hs)}</dd>` : ''}${p.prev ? `<dt>Previous school</dt><dd>${esc(p.prev)}</dd>` : ''}${bbRatingRows(D, p)}` : ''}
         <dt>${esc(lineup ? lineup.label : 'Lineup')}</dt><dd>${inLineup.join(', ') || 'Not in the projected lineup'}</dd>
         ${draft ? `<dt>Pro outlook</dt><dd><span class="chip risk-${draft.level}">${esc(draft.level)}</span> ${esc(draft.note)}${draft.src ? ` (<a href="${esc(draft.src)}" target="_blank" rel="noopener">source</a>)` : ''}</dd>` : ''}
         ${p && p.note ? `<dt>Notes</dt><dd>${esc(p.note)}</dd>` : ''}</dl>
@@ -341,7 +392,7 @@
         : tLine ? `<div class="tiles four statgrid">${[['PPG', tLine.T.ppg], ['RPG', tLine.T.rpg], ['APG', tLine.T.apg], ['GP', tLine.T.gp]].filter(([, v]) => v != null && v !== '').map(([l, v]) => `<div class="tile"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div><p class="dim small">At ${esc(tLine.team || String(p.prev).split(' / ').pop())} (${esc(tLine.season)}). Tennessee stats start with the first game.</p>`
         : prevLine ? `<p>${esc(prevLine)}${/ at /.test(prevLine) ? '' : ` (at ${esc(String(p.prev).split(' / ').pop())})`}</p><p class="dim small">Last season was at another school; Tennessee stats start with the first game.</p>`
         : `<p class="dim small">${p && p.prev && !inSzn ? `Played last season at ${esc(String(p.prev).split(' / ').pop())}; Tennessee stats start with the first game.` : p && /Fr/.test(p.cls || '') ? 'Freshman: no college stats yet.' : inSzn ? 'Hasn\'t recorded a stat yet this season.' : 'No stats last season.'}</p>`}</div>
-      <p class="dim small">Stats: utsports.com${rec ? ' · recruiting ratings as listed' : ''}.</p>`;
+      <p class="dim small">Stats: utsports.com${RATED.has(D.key) ? (D.key === 'wbb' ? ' · ratings: ESPN' : ' · ratings: 247Sports') : ''}${rec ? ' · recruiting ratings as listed' : ''}.</p>`;
     window.showDialog(head, body, false);
   }
   const ordn = n => n + (['th', 'st', 'nd', 'rd'][(n % 100 - 20) % 10] || ['th', 'st', 'nd', 'rd'][n % 100] || 'th');
@@ -401,6 +452,7 @@
         ${R.note ? `<p class="dim small">${esc(R.note)}</p>` : ''}</div>`}
       ${R.targets ? `<div class="section"><h3>${esc(R.targets.title)} <small>${R.targets.rows.length} prospects</small></h3><div class="tablewrap"><table><thead><tr><th class="n">#</th><th>Name</th><th>Pos</th><th class="hide-sm">Ht / Wt</th><th class="hide-sm">School</th><th>Rating / rank</th></tr></thead>
         <tbody>${R.targets.rows.map((c, i) => `<tr><td class="n num"><b>${i + 1}</b></td><td><b>${c.src ? `<a href="${esc(c.src)}" target="_blank" rel="noopener">${esc(c.name)}</a>` : esc(c.name)}</b></td><td>${esc(c.pos)}</td><td class="hide-sm num">${esc(c.ht || '')}</td><td class="hide-sm">${esc(c.from || '')}</td><td class="small">${esc(c.rank || '—')}</td></tr>`).join('')}</tbody></table></div>${R.targets.note ? `<p class="dim small">${esc(R.targets.note)}</p>` : ''}</div>` : ''}
+      ${teamComposite(D)}
       ${R.lastClass ? `<div class="section"><h3>${esc(R.lastClass.title)}</h3><div class="box"><ul class="list">${R.lastClass.rows.map(r => `<li><b class="grow">${D.roster.some(p => norm(p.name) === norm(r[0])) ? `<a href="#" data-sp="${esc(r[0])}">${esc(r[0])}</a>` : esc(r[0])}</b><span class="dim">${esc(r[1])}</span><span class="small">${esc(r[2] || '')}</span></li>`).join('')}</ul></div>${R.lastClass.src ? `<p class="dim small">Source: <a href="${esc(R.lastClass.src)}" target="_blank" rel="noopener">${esc(R.lastClass.srcName || 'link')}</a></p>` : ''}</div>` : ''}
       ${fr.length ? `<div class="section"><h3>This year's freshmen <small>${fr.length} on the ${esc(D.season)} roster</small></h3><div class="box"><ul class="list">${fr.map(p => `<li><b class="grow"><a href="#" data-sp="${esc(p.name)}">${esc(p.name)}</a></b><span class="dim">${esc(p.pos)}</span><span class="small">${esc([p.hs, p.home].filter(Boolean).join(' · '))}</span>${rec[p.name] ? `<span class="chip new">${esc(rec[p.name].replace(/^On3: /, ''))}</span>` : ''}</li>`).join('')}</ul></div></div>` : ''}
       ${R.trackers ? `<div class="section"><h3>Follow recruiting</h3><ul class="srclist">${R.trackers.map(t => `<li><span>${esc(t[0])}</span> <a href="${esc(t[2])}" target="_blank" rel="noopener">${esc(t[1])}</a></li>`).join('')}</ul></div>` : ''}`;
@@ -431,16 +483,17 @@
   }
 
   /* ---------- roster ---------- */
+  const rcols = D => RATED.has(D.key) ? D.rosterCols.flatMap(c => c === 'pos' ? ['pos', 'rate'] : [c]) : D.rosterCols;
   function roster(D) {
-    return `<div class="panel-head"><div><h2>${esc(D.season)} Roster</h2><p>${D.roster.length} players.</p></div>
+    return `<div class="panel-head"><div><h2>${esc(D.season)} Roster</h2><p>${D.roster.length} players.${RATED.has(D.key) ? ` ${D.key === 'wbb' ? 'Ratings: ESPN high school grade (NR = not in ESPN\'s top 100 for the class).' : 'Ratings: each player\'s most recent rating ("TR" = 247Sports transfer rating, otherwise high school).'} <a href="${esc(window.VI_ROUTER ? window.VI_ROUTER.href(D.key + '-recruiting') : '#' + D.key + '-recruiting')}">Team composite ›</a>` : ''}</p></div>
       <div class="controls"><input type="search" id="sRosterQ" placeholder="Search name, hometown or school" value="${esc(rosterQ)}" aria-label="Search roster"></div></div>
-      <div class="tablewrap"><table><thead><tr>${D.rosterCols.map(c => `<th class="${c === 'num' ? 'n' : ''} ${HIDE_SM.has(c) ? 'hide-sm' : ''}">${COLS[c]}</th>`).join('')}</tr></thead><tbody id="sRosterBody"></tbody></table></div>`;
+      <div class="tablewrap"><table><thead><tr>${rcols(D).map(c => `<th class="${c === 'num' ? 'n' : ''} ${HIDE_SM.has(c) ? 'hide-sm' : ''}">${COLS[c]}</th>`).join('')}</tr></thead><tbody id="sRosterBody"></tbody></table></div>`;
   }
   function wireRoster(D) {
     const draw = () => {
       const q = rosterQ.toLowerCase();
       $('#sRosterBody').innerHTML = D.roster.filter(p => !q || Object.values(p).join(' ').toLowerCase().includes(q)).map(p =>
-        `<tr>${D.rosterCols.map(c => c === 'num' ? `<td class="n"><b>${esc(p.num)}</b></td>` : c === 'name' ? `<td><a href="#" data-sp="${esc(p.name)}"><b>${esc(p.name)}</b></a>${statusChip(p)}${(X(D).honors || {})[p.name] ? ' <span class="chip honor" title="Honors">★</span>' : ''}</td>` : `<td class="${HIDE_SM.has(c) ? 'hide-sm' : ''}${c === 'note' ? ' dim small' : ''}">${esc(p[c] || (c === 'prev' ? '' : '—'))}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${D.rosterCols.length}">No players match.</td></tr>`;
+        `<tr>${rcols(D).map(c => c === 'rate' ? `<td>${bbBadge(D, p, true)}</td>` : c === 'num' ? `<td class="n"><b>${esc(p.num)}</b></td>` : c === 'name' ? `<td><a href="#" data-sp="${esc(p.name)}"><b>${esc(p.name)}</b></a>${statusChip(p)}${(X(D).honors || {})[p.name] ? ' <span class="chip honor" title="Honors">★</span>' : ''}</td>` : `<td class="${HIDE_SM.has(c) ? 'hide-sm' : ''}${c === 'note' ? ' dim small' : ''}">${esc(p[c] || (c === 'prev' ? '' : '—'))}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${rcols(D).length}">No players match.</td></tr>`;
     };
     $('#sRosterQ').addEventListener('input', e => { rosterQ = e.target.value; draw(); wirePlayersSport(D, $('#sRosterBody')); });
     draw();
@@ -464,7 +517,7 @@
       <div class="${editing ? 'editing' : ''}">${Object.entries(L.chart).map(([grp, rows]) => `<div class="side-title">${esc(grp)}</div>
         <div class="dgrid">${rows.map(([pos, names], ri) => `<div class="dpos"><div class="dpos-h"><b>${esc(pos)}</b><span>${names.length} listed</span></div>
           <ol>${names.map((n, i) => { const p = byName.get(n); return `<li><span class="ord">${i + 1}</span><div class="pn">${p ? `<b class="num pnum">${esc(p.num)}</b>` : ''}${editing ? esc(n) : `<a href="#" data-sp="${esc(n)}">${esc(n)}</a>`}<small>${esc(p ? p.cls : '')}</small>
-            <div class="tags">${statusChip(p)}${p ? (p.prev && !/^20\d\d:|last season/i.test(p.note || '') ? '<span class="chip">Transfer</span>' : p.cls === 'Fr.' ? '<span class="chip new">Freshman</span>' : '<span class="chip">Returner</span>') : '<span class="chip risk-Watch">Not on roster</span>'}</div>${(sl => sl ? `<div class="statline"><b>${esc(sl.season)}</b> ${sl.lines.map(l => (l.label ? esc(l.label) + ': ' : '') + esc(l.text)).join(' / ')}</div>` + (p && p.note && i === 0 ? `<div class="dim small">${esc(p.note)}</div>` : '')
+            <div class="tags">${bbBadge(D, p, true)}${statusChip(p)}${p ? (p.prev && !/^20\d\d:|last season/i.test(p.note || '') ? '<span class="chip">Transfer</span>' : p.cls === 'Fr.' ? '<span class="chip new">Freshman</span>' : '<span class="chip">Returner</span>') : '<span class="chip risk-Watch">Not on roster</span>'}</div>${(sl => sl ? `<div class="statline"><b>${esc(sl.season)}</b> ${sl.lines.map(l => (l.label ? esc(l.label) + ': ' : '') + esc(l.text)).join(' / ')}</div>` + (p && p.note && i === 0 ? `<div class="dim small">${esc(p.note)}</div>` : '')
               : transferLine(D, p) ? (tl => `<div class="statline"><b>${esc(tl.season)}</b> ${esc(tl.text)}</div>`)(transferLine(D, p))
               : p && p.prev && /\d/.test(p.note || '') ? `<div class="statline">${D.statsAuto && D.statsAuto.season !== D.season ? `<b>${esc(D.statsAuto.season)}</b> ` : ''}${esc(p.note)}${/ at /i.test(p.note) ? '' : ` at ${esc(String(p.prev).split(' / ').pop())}`}</div>`
               : (p && p.note && i === 0 ? `<div class="dim small">${esc(p.note)}</div>` : ''))(seasonLine(D, n))}</div>
