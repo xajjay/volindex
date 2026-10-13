@@ -101,6 +101,59 @@ def standings(path, season):
         return rows, played, url
     return None, 0, None
 
+
+# ESPN has no SEC standings for these; NCAA.com does (server-rendered tables, one per conference)
+NCAA = {"volleyball": "volleyball-women/d1", "soccer": "soccer-women/d1", "baseball": "baseball/d1", "softball": "softball/d1"}
+
+def get_text(url):
+    for i in range(3):
+        try:
+            time.sleep(0.3)
+            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30) as r:
+                return r.read().decode("utf-8", "replace")
+        except urllib.error.HTTPError as e:
+            if e.code in (400, 404): return None
+        except Exception:
+            pass
+        time.sleep(2 * (i + 1))
+    return None
+
+def ncaa_standings(path):
+    import re
+    html = get_text("https://www.ncaa.com/standings/" + path)
+    if not html: return None, "no page"
+    strip = lambda x: re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", x)).strip()
+    # find the SEC block: a heading/caption mentioning SEC or Southeastern, then the next table
+    m = re.search(r">\s*(SEC|Southeastern(?: Conference)?)\s*<", html)
+    if not m: return None, "no SEC heading"
+    t = re.search(r"<table.*?</table>", html[m.end():], re.S)
+    if not t: return None, "no table after SEC heading"
+    rows = []
+    for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", t.group(0), re.S):
+        cells = [strip(c) for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", tr, re.S)]
+        if cells: rows.append(cells)
+    head = [r for r in rows if not any(re.fullmatch(r"\d+", c) for c in r[1:])]
+    body = [r for r in rows if any(re.fullmatch(r"\d+", c) for c in r[1:])]
+    out = []
+    for r in body:
+        team = r[0]
+        nums = r[1:]
+        # split numeric run on percentage-looking cells: [conf W L (T)] pct [overall W L (T)] pct ...
+        groups, cur = [], []
+        for c in nums:
+            if re.fullmatch(r"\d+", c): cur.append(c)
+            elif re.fullmatch(r"-?\.?\d*\.\d+|1\.000|0?\.\d+|-", c) or "." in c:
+                if cur: groups.append(cur); cur = []
+            else:
+                if cur: groups.append(cur); cur = []
+        if cur: groups.append(cur)
+        g = [x for x in groups if len(x) >= 2]
+        if len(g) < 2: continue
+        conf, ov = "-".join(g[0][:3]), "-".join(g[1][:3])
+        out.append(dict(team=team, name=team, abbr=None, conf=conf, overall=ov, streak=None))
+    dbg = {"head": head[:2], "first": body[:2]}
+    return (out or None), dbg
+
 def main(keys=None):
     try:
         t = open(OUT, encoding="utf-8").read()
@@ -116,6 +169,14 @@ def main(keys=None):
             if not rows or played == 0:
                 rows2, played2, url2 = standings(path, season - 1)
                 if rows2: rows, url, final, label = rows2, url2, True, last_label
+            if not rows and k in NCAA:
+                rows, dbg = ncaa_standings(NCAA[k])
+                url = "https://www.ncaa.com/standings/" + NCAA[k]; final = False
+                if rows:
+                    rows.sort(key=lambda r: (-wl(r["conf"])[3], -wl(r["conf"])[0], -wl(r["overall"])[3], r["team"]))
+                    final = sum(sum(wl(r["overall"])[:3]) for r in rows) > 0 and k in ("baseball", "softball")
+                    label = last_label if final else label
+                out.setdefault("_debug", {})[k] = dbg
             if rows:
                 out[k] = dict(season=label, final=final, rows=rows, source=url, updated=datetime.date.today().isoformat())
                 print(f"OK   {k}: {len(rows)} SEC teams ({label}{' final' if final else ''})")
