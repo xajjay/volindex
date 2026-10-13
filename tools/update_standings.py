@@ -125,7 +125,11 @@ def ncaa_standings(path):
     strip = lambda x: re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", x)).strip()
     # find the SEC block: a heading/caption mentioning SEC or Southeastern, then the next table
     m = re.search(r">\s*(SEC|Southeastern(?: Conference)?)\s*<", html)
-    if not m: return None, "no SEC heading"
+    if not m:
+        i = html.find("Tennessee")
+        return None, {"len": len(html), "title": (re.search(r"<title>(.*?)</title>", html, re.S) or [None, ""])[1][:120],
+                      "secHits": [html[max(0, j.start() - 120): j.start() + 60] for j in re.finditer(r"Southeastern|>SEC", html)][:3],
+                      "nearTN": html[max(0, i - 900): i + 300] if i >= 0 else None}
     t = re.search(r"<table.*?</table>", html[m.end():], re.S)
     if not t: return None, "no table after SEC heading"
     rows = []
