@@ -24,6 +24,6 @@
     return `<div class="section" id="standings"><h3>SEC standings <small>${S.final ? esc(S.season) + ' final (this season hasn\'t started yet)' : esc(S.season) + ' · updated ' + new Date(S.updated + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</small></h3>
       <div class="tablewrap standings"><table><thead><tr><th class="n">#</th><th>Team</th><th class="n">SEC</th><th class="n">Overall</th>${hasStreak ? '<th class="n hide-sm">Streak</th>' : ''}</tr></thead>
       <tbody>${rows.map(r => `<tr class="${isUT(r) ? 'me' : ''}"><td class="n num">${r.tie ? 'T-' : ''}${r.place}</td><td><b>${esc(r.team)}</b></td><td class="n num"><b>${esc(r.conf || '—')}</b></td><td class="n num">${esc(r.overall || '—')}</td>${hasStreak ? `<td class="n num hide-sm">${esc(r.streak || '')}</td>` : ''}</tr>`).join('')}</tbody></table></div>
-      <p class="dim small">Sorted by SEC winning percentage; ties share a place (official tiebreakers aren't applied). Source: ESPN.</p></div>`;
+      <p class="dim small">Sorted by SEC winning percentage; ties share a place (official tiebreakers aren't applied). Source: ${S.source ? `<a href="${esc(S.source.replace(/\/apis\/.*$/, '').replace('site.api.espn.com', 'www.espn.com'))}" target="_blank" rel="noopener">${esc(S.sourceName || 'ESPN')}</a>` : esc(S.sourceName || 'ESPN')}.</p></div>`;
   };
 })();

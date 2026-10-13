@@ -213,6 +213,16 @@ window.SITE_AUTO.transfers = {
    "season": "2025-26",
    "espnId": "5178583",
    "v": 2
+  },
+  "Aaliyah Moore": {
+   "gp": 19,
+   "ppg": "7.9",
+   "rpg": "4.6",
+   "apg": null,
+   "team": "Texas",
+   "season": "2024-25",
+   "v": 2,
+   "note": "Sat out 2025-26 rehabbing injuries; last season played was 2024-25 (utsports.com)"
   }
  },
  "_debug": {}

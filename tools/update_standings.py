@@ -9,7 +9,7 @@ Run:  python tools/update_standings.py          (all sports)
       python tools/update_standings.py mbb wbb  (some sports)
 Runs every morning from tools/auto_schedule.py.
 """
-import datetime, json, os, sys, time, urllib.request, urllib.error
+import datetime, json, os, re, sys, time, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "data", "standings-auto.js")
@@ -102,7 +102,40 @@ def standings(path, season):
     return None, 0, None
 
 
-# ESPN has no SEC standings for these; NCAA.com does (server-rendered tables, one per conference)
+# ESPN has no SEC standings for these; the SEC's own site (secsports.com) has a JSON feed
+SEC_SPORT = {"volleyball": (14, "2026"), "soccer": (9, "2026"), "baseball": (1, "2027"), "softball": (10, "2027")}
+MASCOTS = ["Crimson Tide", "Razorbacks", "Tigers", "Gators", "Bulldogs", "Wildcats", "Rebels", "Gamecocks", "Volunteers", "Lady Volunteers",
+           "Lady Vols", "Commodores", "Aggies", "Longhorns", "Sooners"]
+
+def sec_site(k):
+    sid, year = SEC_SPORT[k]
+    base = "https://www.secsports.com/api/"
+    d = get(base + f"schedules?per_page=100&include=season&filter[sport_id]={sid}")
+    if not d: return None, None, None
+    sch = {}
+    for x in d.get("data") or []:
+        t = str(x.get("title") or x.get("name") or "")
+        m = re.match(r"(\d{4})", t)
+        if m: sch[m.group(1)] = x["id"]
+    for yr, final in ((year, False), (str(int(year) - 1), True)):
+        if yr not in sch: continue
+        st = get(base + f"schedules/{sch[yr]}/standings?include=school")
+        rows = []
+        for r in (st or {}).get("data") or []:
+            nm = ((r.get("school") or {}).get("name") or "").strip()
+            team = nm
+            for mc in MASCOTS:
+                if team.endswith(" " + mc): team = team[: -len(mc) - 1]; break
+            rec3 = lambda a: f"{r.get(a + '_wins') or 0}-{r.get(a + '_loses') or 0}" + (f"-{r.get(a + '_ties')}" if r.get(a + "_ties") else "")
+            stk = f"{r.get('streak_type_label') or ''}{r.get('streak') or ''}" if r.get("streak") else None
+            rows.append(dict(team=team, name=nm, abbr=(r.get("school") or {}).get("short_name"), conf=rec3("conference"), overall=rec3("overall"), streak=stk))
+        played = sum(sum(wl(x["overall"])[:3]) for x in rows)
+        if rows and played:
+            rows.sort(key=lambda r: (-wl(r["conf"])[3], -wl(r["conf"])[0], -wl(r["overall"])[3], r["team"]))
+            return rows, final, yr
+    return None, None, None
+
+# (old) NCAA.com fallback — its standings pages are rendered by JavaScript, so this rarely finds anything
 NCAA = {"volleyball": "volleyball-women/d1", "soccer": "soccer-women/d1", "baseball": "baseball/d1", "softball": "softball/d1"}
 
 def get_text(url):
@@ -176,6 +209,12 @@ def main(keys=None):
             if not rows or played == 0:
                 rows2, played2, url2 = standings(path, season - 1)
                 if rows2: rows, url, final, label = rows2, url2, True, last_label
+            src = "ESPN"
+            if (not rows or final) and k in SEC_SPORT:
+                r2, f2, yr = sec_site(k)
+                if r2:
+                    rows, final, url, src = r2, f2, "https://www.secsports.com/standings/" + k, "SEC (secsports.com)"
+                    label = yr if not f2 else last_label
             if not rows and k in NCAA:
                 rows, dbg = ncaa_standings(NCAA[k])
                 url = "https://www.ncaa.com/standings/" + NCAA[k]; final = False
@@ -184,7 +223,7 @@ def main(keys=None):
                     final = sum(sum(wl(r["overall"])[:3]) for r in rows) > 0 and k in ("baseball", "softball")
                     label = last_label if final else label
             if rows:
-                out[k] = dict(season=label, final=final, rows=rows, source=url, updated=datetime.date.today().isoformat())
+                out[k] = dict(season=label, final=final, rows=rows, source=url, sourceName=src, updated=datetime.date.today().isoformat())
                 print(f"OK   {k}: {len(rows)} SEC teams ({label}{' final' if final else ''})")
             else:
                 print(f"SKIP {k}: no SEC standings found")
