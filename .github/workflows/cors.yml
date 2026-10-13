@@ -1,0 +1,28 @@
+name: CORS probe
+on:
+  push:
+    branches: [cors-check]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p probe/out
+          B=https://site.api.espn.com/apis/site/v2/sports
+          for p in "football/college-football/scoreboard?dates=20261010&groups=8" \
+                   "volleyball/womens-college-volleyball/scoreboard?dates=20261011" \
+                   "soccer/usa.ncaa.w.1/scoreboard?dates=20261009" \
+                   "basketball/mens-college-basketball/scoreboard?dates=20260320&groups=50&limit=400" \
+                   "football/college-football/teams/2633/schedule" \
+                   "volleyball/womens-college-volleyball/teams/2633/schedule" \
+                   "soccer/usa.ncaa.w.1/teams/2633/schedule" ; do
+            n=$(echo "$p" | tr '/?&=' '____' | cut -c1-80)
+            curl -s -D probe/out/$n.headers -H "Origin: https://www.volindex.net" "$B/$p" -o probe/out/$n.json
+            echo "$p $(wc -c < probe/out/$n.json)" >> probe/out/index.txt
+          done
+          curl -s -X OPTIONS -D probe/out/preflight.headers -H "Origin: https://www.volindex.net" -H "Access-Control-Request-Method: GET" "$B/football/college-football/scoreboard" -o /dev/null
+          git config user.name "Claude"; git config user.email "noreply@anthropic.com"
+          git add probe/out && git commit -m "probe results" && git push
