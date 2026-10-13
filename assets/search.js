@@ -223,9 +223,18 @@
     rows.sort((a, b) => a.g.date < b.g.date ? -1 : 1);
     return { title: days <= 1 ? 'Vols games today' : `Vols games in the next ${days} days`, html: rows.length ? `<table class="mini asktable"><tbody>${rows.map(({ k, g }) => `<tr><td class="num">${fmtDate(g.date)}</td><td><span class="chip">${esc(NAME[k])}</span></td><td><b>${vs(g)} ${esc(cleanOpp(g.opp))}</b></td><td class="num">${esc(g.time ? g.time + ' ET' : (g.espn && g.espn.kick) ? new Date(g.espn.kick).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ' ET' : 'TBA')}</td><td class="dim small">${esc(g.tv || (g.espn && g.espn.tv) || '')}</td></tr>`).join('')}</tbody></table>` : '<p>No games scheduled in that window.</p>', go: '#home', score: 70 };
   }
+  // site pages: About, Corrections & suggestions, Sources & credits, Contact
+  const SITE_LINKS = [['About', '#about'], ['Corrections & suggestions', '#about-fix'], ['Sources & credits', '#sources'], ['Contact', '#about-contact']];
+  const SITE_PAGES = [
+    [/\babout\b|\bwho (made|makes|built|runs|created|owns)\b|\bcreator\b|\bwho is behind\b|\bpurpose\b/, () => ({ title: 'About The Vol Index', html: '<p>A free, fan-made home for Tennessee athletics, built and run by Aj, a UT student.</p>', go: '#about', score: 70 })],
+    [/\bcorrect|\bmistake|\berrors?\b|\bwrong\b|\bsuggest|\bfeedback\b|\bidea\b|\bfix\b|\btypo\b|\bbug\b/, () => ({ title: 'Corrections & suggestions', html: '<p>See something wrong or have an idea? Send it by email or on X from the form.</p>', go: '#about-fix', score: 70 })],
+    [/\bsources?\b|\bcredits?\b|\bwhere .*data\b|\bdata from\b|\bcitations?\b/, () => ({ title: 'Sources & credits', html: '<p>Every source behind the numbers on The Vol Index, with links.</p>', go: '#sources', score: 70 })],
+    [/\bcontact\b|\bemail\b|\breach (you|out)\b|\bget in touch\b|\bdm\b/, () => ({ title: 'Contact', html: '<p>Email <a href="mailto:thevolindex@gmail.com">thevolindex@gmail.com</a> or find <a href="https://x.com/Volindex" target="_blank" rel="noopener">@Volindex</a> on X.</p>', go: '#about-contact', score: 70 })],
+  ];
   function answer(q) {
     const P = parse(q); const out = [];
     if (!P.n) return out;
+    SITE_PAGES.forEach(([re, f]) => { if (re.test(P.n)) out.push(f()); });
     if (P.rec) out.push(recordAnswer(P.rec));
     P.players.forEach(h => out.push(playerAnswer(h)));
     if (P.opp) gameAnswers(P.opp, P.sports).forEach(a => out.push(a));
@@ -286,7 +295,8 @@
     results = q.trim().length > 1 ? answer(q) : [];
     box.innerHTML = results.length ? results.map(card).join('') : q.trim().length > 1
       ? `<p class="dim">No direct answer for that yet. Try a sport plus a topic, like "soccer schedule" or "baseball roster".</p>`
-      : `<div class="askex"><span class="dim small">Try:</span>${EX.map(e => `<button class="chip click" data-ex="${esc(e)}">${esc(e)}</button>`).join('')}</div>`;
+      : `<div class="askex"><span class="dim small">Try:</span>${EX.map(e => `<button class="chip click" data-ex="${esc(e)}">${esc(e)}</button>`).join('')}</div>
+        <div class="askex asksite"><span class="dim small">Site:</span>${SITE_LINKS.map(([l, h]) => `<a class="chip click" href="${h}">${esc(l)}</a>`).join('')}</div>`;
     box.querySelectorAll('[data-ex]').forEach(b => b.addEventListener('click', () => { panel.querySelector('input').value = b.dataset.ex; draw(b.dataset.ex); }));
     box.querySelectorAll('[data-askgo]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); go(results[+b.dataset.askgo]); }));
     box.querySelectorAll('[data-askopen]').forEach(b => b.addEventListener('click', () => go(results[+b.dataset.askopen], true)));
