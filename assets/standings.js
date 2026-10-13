@@ -63,7 +63,7 @@
   const fmt = iso => iso ? new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
   const rec = gs => { const w = gs.filter(g => g.result === 'W').length, l = gs.filter(g => g.result === 'L').length, t = gs.filter(g => g.result === 'T').length; return `${w}-${l}${t ? '-' + t : ''}`; };
   // games: [{date, opp, site:'H'|'A'|'N', result:'W'|'L'|'T', us, them, attr:'data-game="…"'}]
-  window.resultsBox = function ({ games, record, sub, meta, max = 8, more }) {
+  window.resultsBox = function ({ games, record, sub, meta, max = 5, more }) {
     const shown = games.slice(-max);
     const home = games.filter(g => g.site === 'H'), away = games.filter(g => g.site === 'A');
     const subTxt = [sub, home.length ? rec(home) + ' home' : '', away.length ? rec(away) + ' away' : ''].filter(Boolean).join(' · ');

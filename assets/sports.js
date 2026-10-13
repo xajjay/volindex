@@ -471,7 +471,7 @@
           <div class="golink" style="margin-top:8px">Preview: series history, leaders, how to watch ›</div></div>` : ''}
         ${D.inSeason ? (() => { const played = D.schedule.filter(g => g.result && g.kind !== 'exh'); const sp = window.secPlace && window.secPlace(D.key);
           return window.resultsBox({ games: played.map(g => ({ date: g.date, opp: g.opp.replace(/ \(No\. \d+\)/, ''), site: g.site, result: g.result, us: g.us, them: g.them, attr: `data-sg="${D.schedule.indexOf(g)}"` })),
-            sub: sp && sp.conf && !sp.final ? sp.conf + ' SEC' : '', max: 8, more: played.length > 8 ? [window.VI_ROUTER ? window.VI_ROUTER.href(D.key + '-schedule') : '#' + D.key + '-schedule', 'Full schedule and results'] : null,
+            sub: sp && sp.conf && !sp.final ? sp.conf + ' SEC' : '', max: 5, more: played.length > 5 ? [window.VI_ROUTER ? window.VI_ROUTER.href(D.key + '-schedule') : '#' + D.key + '-schedule', 'Full schedule and results'] : null,
             meta: esc(D.header.map(h => h[1] + ': ' + h[0]).slice(0, 3).join(' · ')) }); })() : `<div class="box nextgame"><div class="eyebrow">Last season · ${esc(D.last.label)}</div>
           <div class="vs">${esc(D.last.record)}</div><div class="meta">${esc(D.last.conf)} · ${esc(D.last.finish)}</div><div class="meta">${esc(D.last.rank)}</div></div>`}
       </div>

@@ -375,6 +375,7 @@
         <div class="golink" style="margin-top:10px">Matchup preview: impact players, team numbers, series history ›</div></div>` : ''}
       ${window.resultsBox({ games: played.map(g => ({ date: g.date, opp: g.opp, site: g.site, result: g.result, us: g.us, them: g.them, attr: `data-game="${esc(g.opp)}"` })), record: t.record,
         sub: (sp => sp && sp.conf && !sp.final ? sp.conf + ' SEC' : '')(window.secPlace && window.secPlace('football')),
+        more: played.length > 5 ? [window.VI_ROUTER ? window.VI_ROUTER.href('football-schedule') : '#football-schedule', 'Full schedule and results'] : null,
         meta: `AP No. ${t.ap} · Coaches No. ${t.coaches} (${t.pollWeek}) · ${tip('FPI')} No. ${F.advanced.fpi.rank} · projected ${F.advanced.fpi.proj}` })}
     </div>
     <div class="section"><h3>Team numbers <small>per game through ${played.length} games, with national (FBS) and SEC rank</small></h3>
