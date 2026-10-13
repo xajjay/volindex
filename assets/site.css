@@ -528,3 +528,5 @@ body.asking { overflow: hidden; }
 .dpos .pn small, .dpos .pn .tags, .dpos .pn .statline, .dpos .pn .dim { font-family: var(--f-body); font-weight: 500; }
 .dpos .pn .statline { font-size: 12px; font-weight: 500; }
 .dpos .pn .dim.small { font-size: 12px; }
+.rate .mv { font-style: normal; font-size: 10px; font-weight: 700; margin-left: 3px; }
+.rate .mv.up { color: var(--win); } .rate .mv.dn { color: var(--loss); }

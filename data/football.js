@@ -688,12 +688,7 @@ window.SITE.football = {
      "ff": 0
     }
    },
-   "rating": {
-    "src": "on3",
-    "rank": 258,
-    "grade": 91,
-    "label": "On3 Top 300 · No. 258"
-   },
+   "rating": null,
    "elig": "SR/TR",
    "career": {
     "2026": {
@@ -711,7 +706,8 @@ window.SITE.football = {
     "level": "Watch",
     "note": "Consensus No. 863 (10 mocks); team leader in tackles"
    },
-   "leaving": false
+   "leaving": false,
+   "on3Dropped": "Dropped out of the On3 Top 300 in the Oct. 12 update (was No. 258)"
   },
   {
    "id": "ethan-davis",
@@ -978,9 +974,11 @@ window.SITE.football = {
    },
    "rating": {
     "src": "on3",
-    "rank": 35,
-    "grade": 97,
-    "label": "On3 Top 300 · No. 35"
+    "rank": 23,
+    "grade": 98,
+    "stars": 5,
+    "prevRank": 35,
+    "label": "On3 Top 300 · No. 23 (up 12 from No. 35, Oct. 12 update)"
    },
    "elig": "RS SO/TR",
    "career": {
@@ -1249,9 +1247,11 @@ window.SITE.football = {
    },
    "rating": {
     "src": "on3",
-    "rank": 177,
+    "rank": 187,
     "grade": 92,
-    "label": "On3 Top 300 · No. 177"
+    "stars": 4,
+    "prevRank": 177,
+    "label": "On3 Top 300 · No. 187 (down 10 from No. 177, Oct. 12 update)"
    },
    "elig": "SO",
    "career": {
@@ -2540,9 +2540,11 @@ window.SITE.football = {
    },
    "rating": {
     "src": "on3",
-    "rank": 102,
+    "rank": 103,
     "grade": 94,
-    "label": "On3 Top 300 · No. 102"
+    "stars": 4,
+    "prevRank": 102,
+    "label": "On3 Top 300 · No. 103 (down 1 from No. 102, Oct. 12 update)"
    },
    "elig": "RS JR",
    "career": {
@@ -2628,9 +2630,11 @@ window.SITE.football = {
    },
    "rating": {
     "src": "on3",
-    "rank": 134,
-    "grade": 93,
-    "label": "On3 Top 300 · No. 134"
+    "rank": 154,
+    "grade": 92,
+    "stars": 4,
+    "prevRank": 134,
+    "label": "On3 Top 300 · No. 154 (down 20 from No. 134, Oct. 12 update)"
    },
    "elig": "RS JR",
    "career": {
@@ -4744,9 +4748,11 @@ window.SITE.football = {
    "stats": {},
    "rating": {
     "src": "on3",
-    "rank": 244,
+    "rank": 265,
     "grade": 91,
-    "label": "On3 Top 300 · No. 244"
+    "stars": 4,
+    "prevRank": 244,
+    "label": "On3 Top 300 · No. 265 (down 21 from No. 244, Oct. 12 update)"
    },
    "elig": "SO",
    "career": {
@@ -7179,7 +7185,7 @@ window.SITE.football = {
   ],
   [
    "College player ratings",
-   "On3 Top 300, updated 10/05/2026",
+   "On3 Top 300, updated 10/12/2026",
    "https://www.on3.com/college/rankings/player/football/2026/"
   ],
   [

@@ -42,7 +42,7 @@
   function starStr(n) { if (!n) return ''; return '<span class="stars" aria-label="' + n + ' stars">' + '★'.repeat(n) + '<i>' + '★'.repeat(5 - n) + '</i></span>'; }
   function rateBadge(r, compact) {
     if (!r) return '<span class="rate" title="No rating listed"><span class="g">NR</span></span>';
-    if (r.src === 'on3') return `<span class="rate on3" title="On3 2026 Top 300 college players, college grade ${r.grade}"><span class="g">${r.grade}</span>${compact ? '#' + r.rank : 'On3 No. ' + r.rank}</span>`;
+    if (r.src === 'on3') { const mv = r.prevRank ? r.prevRank - r.rank : 0; return `<span class="rate on3" title="${esc(r.label || 'On3 2026 Top 300 college players')}, college grade ${r.grade}"><span class="g">${r.grade}</span>${compact ? '#' + r.rank : 'On3 No. ' + r.rank}${mv ? `<i class="mv ${mv > 0 ? 'up' : 'dn'}">${mv > 0 ? '▲' : '▼'}${Math.abs(mv)}</i>` : ''}</span>`; }
     if (r.src === '247t') return `<span class="rate tr" title="247Sports transfer rating"><span class="g">${r.grade}</span>${compact ? 'TR' : 'Transfer'}</span>`;
     return `<span class="rate" title="${esc(r.label || '247Sports composite')}"><span class="g">${r.grade}</span>${starStr(r.stars)}</span>`;
   }
@@ -805,7 +805,7 @@ ${part('next')}
       <div class="section"><h3>NFL draft outlook <small>2027 consensus big board, mock drafts and big seasons</small></h3>
         <div class="box"><ul class="list">${prospects.map(p => `<li data-player="${esc(p.name)}" class="click-li"><b class="namecol">${esc(p.name)}</b><span class="grow dim">${p.pos} · ${p.cls} · ${esc(p.draft.note)}</span><span class="chip risk-${p.draft.level}">${p.draft.level}</span></li>`).join('')}</ul></div>
         ${future.length ? `<p class="dim small" style="margin-top:10px">Future first-round buzz: ${future.map(p => `<b>${esc(p.name)}</b> (No. ${p.future.rank} on the ${p.future.year} consensus board)`).join(', ')}.</p>` : ''}</div>
-      <div class="section"><h3>On3 Top 300 college players <small>Tennessee players ranked among the nation's best (updated Oct. 5)</small></h3>
+      <div class="section"><h3>On3 Top 300 college players <small>Tennessee players ranked among the nation's best (updated Oct. 12; arrows show movement since Oct. 5)</small></h3>
         <div class="grid g3">${P.filter(p => p.rating && p.rating.src === 'on3').sort((a, b) => a.rating.rank - b.rating.rank).map(p => pcard(p)).join('')}</div></div>`;
   }
 
