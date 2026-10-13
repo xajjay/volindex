@@ -19,7 +19,7 @@
 
   const NO_REVIEW = new Set(['volleyball', 'soccer']); // last-season review tab removed for these
   function tabs(D) {
-    const t = [['overview', 'Overview'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['lineup', D.lineupTab || (D.key === 'baseball' || D.key === 'softball' ? 'Projected Lineup' : 'Projected Starters')]];
+    const t = [['overview', 'Overview'], ['schedule', 'Schedule & Standings'], ['roster', 'Roster'], ['lineup', D.lineupTab || (D.key === 'baseball' || D.key === 'softball' ? 'Projected Lineup' : 'Projected Starters')]];
     if (D.stats || D.statsAuto) t.push(['stats', 'Stats']);
     return t.concat(X(D).advanced ? [['advanced', 'Advanced']] : [['ratings', 'Rankings & Ratings']], [['recruiting', 'Recruiting'], ...(NO_REVIEW.has(D.key) ? [] : [['review', D.prevLabel + ' Review']]), ['moves', 'Roster Moves'], ['history', 'History'], ['media', 'Social & Media']]);
   }
@@ -529,12 +529,13 @@ ${rows}
   function schedule(D) {
     const n = nextGame(D);
     const conf = D.schedule.filter(g => g.kind === 'conf').length, home = D.schedule.filter(g => g.site === 'H' && g.kind !== 'exh').length;
-    return `<div class="panel-head"><div><h2>${esc(D.season)} Schedule</h2><p>${D.scheduleNote ? esc(D.scheduleNote) + ' ' : ''}Home games at ${esc(D.venue)}. Times Eastern. Click a game for its box score or preview.</p></div></div>
+    return `<div class="panel-head"><div><h2>${esc(D.season)} Schedule & Standings</h2><p>${D.scheduleNote ? esc(D.scheduleNote) + ' ' : ''}Home games at ${esc(D.venue)}. Times Eastern. Click a game for its box score or preview.${(sp => sp ? ` <a href="#standings" class="jump" onclick="event.preventDefault();document.getElementById('standings').scrollIntoView({behavior:'smooth'})">Tennessee is ${sp.text} in the SEC${sp.final ? ' (' + sp.season + ' final)' : ''}${sp.conf ? ', ' + sp.conf : ''} ›</a>` : '')(window.secPlace && window.secPlace(D.key))}</p></div></div>
       <div class="tiles four" style="margin-bottom:16px"><div class="tile"><b>${D.schedule.filter(g => g.kind !== 'exh').length}</b><span>${D.key === 'baseball' || D.key === 'softball' ? 'Dates / series listed' : 'Games'}</span></div>
         <div class="tile"><b>${conf}</b><span>SEC ${D.key === 'baseball' || D.key === 'softball' ? 'series' : 'games'}</span></div><div class="tile"><b>${home}</b><span>Home dates</span></div>
         <div class="tile"><b>${n ? fmtDate(n.date, { month: 'short', day: 'numeric' }) : '—'}</b><span>Next: ${n ? esc(n.opp) : 'TBA'}</span></div></div>
       <div class="tablewrap"><table><thead><tr><th>Date</th><th>Opponent</th><th class="hide-sm">Location</th><th>${D.inSeason ? 'Result / Time' : 'Time'}</th><th class="hide-sm">TV</th><th></th></tr></thead>
-      <tbody>${D.schedule.map((g, i) => { const link = g.result || g.date >= today(); return `<tr class="${link ? 'click ' : ''}${n && g === n ? 'me' : ''}" ${link ? `data-sg="${i}" tabindex="0"` : ''}><td class="num">${fmtDate(g.date)}</td><td><b>${vsat(g)} ${esc(g.opp)}</b> ${kindChip(g)}</td><td class="hide-sm">${esc(g.loc)}</td><td class="num">${g.result ? resStr(g) : esc(g.time ? g.time + ' ET' : g.kind === 'exh' ? '—' : 'TBA')}</td><td class="hide-sm">${esc(g.tv || '—')}</td><td class="n">${link ? `<span class="golink">${g.result ? (g.hasBox ? 'Box score ›' : 'Result ›') : 'Preview ›'}</span>` : ''}</td></tr>`; }).join('')}</tbody></table></div>`;
+      <tbody>${D.schedule.map((g, i) => { const link = g.result || g.date >= today(); return `<tr class="${link ? 'click ' : ''}${n && g === n ? 'me' : ''}" ${link ? `data-sg="${i}" tabindex="0"` : ''}><td class="num">${fmtDate(g.date)}</td><td><b>${vsat(g)} ${esc(g.opp)}</b> ${kindChip(g)}</td><td class="hide-sm">${esc(g.loc)}</td><td class="num">${g.result ? resStr(g) : esc(g.time ? g.time + ' ET' : g.kind === 'exh' ? '—' : 'TBA')}</td><td class="hide-sm">${esc(g.tv || '—')}</td><td class="n">${link ? `<span class="golink">${g.result ? (g.hasBox ? 'Box score ›' : 'Result ›') : 'Preview ›'}</span>` : ''}</td></tr>`; }).join('')}</tbody></table></div>
+      ${window.standingsHtml ? window.standingsHtml(D.key) : ''}`;
   }
 
   /* ---------- stats ---------- */

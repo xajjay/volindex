@@ -538,3 +538,10 @@ body.asking { overflow: hidden; }
 .installtip button { border: 0; background: none; color: var(--muted); font-size: 18px; cursor: pointer; }
 /* when opened as an installed app, keep content clear of the iPhone notch */
 @media (display-mode: standalone) { .topbar { padding-top: env(safe-area-inset-top); } }
+/* SEC standings */
+.panel-head .jump { display: inline-block; margin-left: 4px; font-weight: 700; color: var(--orange-ink); text-decoration: none; }
+.panel-head .jump:hover { text-decoration: underline; }
+.standings table { max-width: 720px; }
+.standings tr.me td { background: var(--orange-soft); }
+.standings tr.me td:nth-child(2) b { color: var(--orange-ink); }
+#standings { scroll-margin-top: 70px; }

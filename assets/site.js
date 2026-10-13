@@ -11,7 +11,7 @@
     { key: 'softball', name: 'Softball', ready: false },
   ];
   const TABS = [
-    ['overview', 'Overview'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['depth', 'Depth Chart'],
+    ['overview', 'Overview'], ['schedule', 'Schedule & Standings'], ['roster', 'Roster'], ['depth', 'Depth Chart'],
     ['stats', 'Stats'], ['advanced', 'Advanced'], ['recruits', 'Recruiting'], ['next', '2027 Preview'],
     ['leaders', 'Leaders & Honors'], ['history', 'History'], ['media', 'Social & Media'],
   ];
@@ -588,8 +588,9 @@ ${part('next')}
       <td class="hide-sm">${esc(g.loc)}</td><td class="num">${g.result ? `<span class="${g.result}">${g.result}</span> ${g.us}–${g.them}` : esc(kick(g))}</td><td class="hide-sm">${esc(e.tv || (g.result ? '' : 'TBA'))}</td>
       <td class="num">${g.result ? '' : esc(e.line || '—')}</td><td>${!g.result && e.win != null ? winBar(e.win) : ''}</td><td class="n"><span class="golink">${g.result ? 'Box score' : 'Preview'} ›</span></td></tr>`; }).join('');
     const n = F.schedule2027;
-    return `<div class="panel-head"><div><h2>Schedule</h2><p>Click any game: finished games open the full box score, upcoming games open a matchup preview. Lines and win chances come from ESPN (DraftKings line, ESPN FPI matchup predictor). TV networks and kickoff times are announced 6–12 days before each game.</p></div></div>
+    return `<div class="panel-head"><div><h2>Schedule & Standings</h2><p>Click any game: finished games open the full box score, upcoming games open a matchup preview. Lines and win chances come from ESPN (DraftKings line, ESPN FPI matchup predictor). TV networks and kickoff times are announced 6–12 days before each game.${(sp => sp ? ` <a href="#standings" class="jump" onclick="event.preventDefault();document.getElementById('standings').scrollIntoView({behavior:'smooth'})">Tennessee is ${sp.text} in the SEC${sp.final ? ' (' + sp.season + ' final)' : ''}${sp.conf ? ', ' + sp.conf : ''} ›</a>` : '')(window.secPlace && window.secPlace('football'))}</p></div></div>
       <div class="tablewrap"><table><thead><tr><th>Date</th><th>Opponent</th><th class="hide-sm">Location</th><th>Result / Time</th><th class="hide-sm">TV</th><th>Line</th><th>Win chance</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+      ${window.standingsHtml ? window.standingsHtml('football') : ''}
       <div class="section"><h3>2027 schedule <small>Opponents announced; SEC dates not yet released</small></h3>
         <div class="grid g2">
           <div class="box"><div class="lb"><h4>Home <span>Neyland Stadium</span></h4></div><ul class="list">${n.filter(g => g.site === 'H').map(g => `<li><span class="grow"><b>${esc(g.opp)}</b>${g.sec ? ' <span class="chip">SEC</span>' : ''}</span><span class="dim">${g.date ? fmtDate(g.date) : 'Date TBA'}</span></li>`).join('')}</ul></div>

@@ -101,6 +101,11 @@ def main():
             print(f"!! {sport} stopped: {e}")
         except Exception as e:
             print(f"!! {sport} failed: {e}")
+    # SEC standings for every sport: cheap, so refresh them every morning
+    try:
+        import update_standings; update_standings.main()
+    except Exception as e:
+        print(f"!! standings failed: {e}")
     save_stamps(stamps)
     print("updated:", ", ".join(ran) or "nothing")
 
