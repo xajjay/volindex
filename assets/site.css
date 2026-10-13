@@ -541,7 +541,18 @@ body.asking { overflow: hidden; }
 /* SEC standings */
 .panel-head .jump { display: inline-block; margin-left: 4px; font-weight: 700; color: var(--orange-ink); text-decoration: none; }
 .panel-head .jump:hover { text-decoration: underline; }
-.standings table { max-width: 720px; }
+.standings table { width: 100%; }
+.standings td.num, .standings th.n { white-space: nowrap; }
+.standings .tcell b { white-space: nowrap; }
+.standings td { vertical-align: middle; }
+.tcell { display: inline-flex; align-items: center; gap: 10px; }
+.tbadge { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; height: 22px; padding: 0 5px; border-radius: 5px; font: 700 10px/1 var(--f-mono); letter-spacing: .3px; color: #fff; }
+.tbadge.big { min-width: 52px; height: 36px; font-size: 12px; border-radius: 8px; }
+.standhead { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.standhead b { display: block; font-size: 18px; }
+.standhead span:not(.tbadge) { font-size: 13px; color: var(--muted, inherit); }
+[data-view][hidden] { display: none !important; }
+@media (max-width: 560px) { .standings th, .standings td { padding-left: 6px; padding-right: 6px; } .tbadge { min-width: 34px; font-size: 9px; } .tcell { gap: 6px; } }
 .standings tr.me td { background: var(--orange-soft); }
 .standings tr.me td:nth-child(2) b { color: var(--orange-ink); }
 #standings { scroll-margin-top: 70px; }

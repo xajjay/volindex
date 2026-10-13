@@ -64,6 +64,10 @@ def rec(stats, want):
             return s.get("displayValue") or s.get("summary")
         if want == "overall" and (t == "total" or n in ("overall", "overallrecord")):
             return s.get("displayValue") or s.get("summary")
+        if want == "home" and (t == "home" or n == "home"):
+            return s.get("displayValue") or s.get("summary")
+        if want == "away" and (t in ("road", "away") or n in ("road", "away")):
+            return s.get("displayValue") or s.get("summary")
     if want == "overall":
         g = {s.get("name"): s.get("value") for s in stats}
         if g.get("wins") is not None:
@@ -93,7 +97,7 @@ def standings(path, season):
             t = e.get("team") or {}; st = e.get("stats") or []
             conf, ov = rec(st, "conf"), rec(st, "overall")
             rows.append(dict(team=t.get("location") or t.get("displayName") or t.get("name"), name=t.get("displayName"), abbr=t.get("abbreviation"),
-                             conf=conf, overall=ov, streak=next((s.get("displayValue") for s in st if (s.get("name") or "").lower() == "streak"), None)))
+                             conf=conf, overall=ov, home=rec(st, "home"), away=rec(st, "away"), streak=next((s.get("displayValue") for s in st if (s.get("name") or "").lower() == "streak"), None)))
         rows = [r for r in rows if r["team"]]
         if not rows: continue
         rows.sort(key=lambda r: (-wl(r["conf"])[3], -wl(r["conf"])[0], -wl(r["overall"])[3], r["team"]))
@@ -128,7 +132,7 @@ def sec_site(k):
                 if team.endswith(" " + mc): team = team[: -len(mc) - 1]; break
             rec3 = lambda a: f"{r.get(a + '_wins') or 0}-{r.get(a + '_loses') or 0}" + (f"-{r.get(a + '_ties')}" if r.get(a + "_ties") else "")
             stk = f"{r.get('streak_type_label') or ''}{r.get('streak') or ''}" if r.get("streak") else None
-            rows.append(dict(team=team, name=nm, abbr=(r.get("school") or {}).get("short_name"), conf=rec3("conference"), overall=rec3("overall"), streak=stk))
+            rows.append(dict(team=team, name=nm, abbr=(r.get("school") or {}).get("short_name"), conf=rec3("conference"), overall=rec3("overall"), home=rec3("home"), away=rec3("road"), streak=stk))
         played = sum(sum(wl(x["overall"])[:3]) for x in rows)
         if rows and played:
             rows.sort(key=lambda r: (-wl(r["conf"])[3], -wl(r["conf"])[0], -wl(r["overall"])[3], r["team"]))
