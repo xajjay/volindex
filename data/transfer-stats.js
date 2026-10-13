@@ -225,5 +225,38 @@ window.SITE_AUTO.transfers = {
    "note": "Sat out 2025-26 rehabbing injuries; last season played was 2024-25 (utsports.com)"
   }
  },
- "_debug": {}
+ "_debug": {
+  "Chris Ramirez": {
+   "keys": [
+    "count",
+    "pageIndex",
+    "pageSize",
+    "pageCount",
+    "items"
+   ],
+   "items": []
+  },
+  "Blaine Brown": {
+   "keys": [
+    "count",
+    "pageIndex",
+    "pageSize",
+    "pageCount",
+    "items"
+   ],
+   "items": []
+  },
+  "Brody Trosclair": {
+   "keys": [
+    "count",
+    "pageIndex",
+    "pageSize",
+    "pageCount",
+    "items"
+   ],
+   "items": []
+  }
+ },
+ "baseball": {},
+ "_bdebug": {}
 };
