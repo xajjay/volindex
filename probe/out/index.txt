@@ -1,0 +1,7 @@
+football/college-football/scoreboard?dates=20261010&groups=8 137243
+volleyball/womens-college-volleyball/scoreboard?dates=20261011 291330
+soccer/usa.ncaa.w.1/scoreboard?dates=20261009 64084
+basketball/mens-college-basketball/scoreboard?dates=20260320&groups=50&limit=400 226108
+football/college-football/teams/2633/schedule 355714
+volleyball/womens-college-volleyball/teams/2633/schedule 218449
+soccer/usa.ncaa.w.1/teams/2633/schedule 72
