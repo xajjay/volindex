@@ -469,9 +469,10 @@
           <div class="vs">${vsat(n)} ${esc(n.opp)}</div><div class="meta">${esc(n.loc)} ${kindChip(n)}</div>
           ${(w => w ? `<div class="meta"><b>📺 How to watch: ${esc(w.net)}</b> · ${esc(w.stream)}</div>` : '<div class="meta">📺 TV: TBA (usually announced 1–2 weeks out)</div>')(window.howToWatch && window.howToWatch(n.tv))}
           <div class="golink" style="margin-top:8px">Preview: series history, leaders, how to watch ›</div></div>` : ''}
-        ${D.inSeason ? (() => { const played = D.schedule.filter(g => g.result && g.kind !== 'exh'); return `<div class="box nextgame"><div class="eyebrow">This season · ${esc(D.season)} · click for box scores</div>
-          <div class="controls">${played.slice(-6).map(g => `<span class="chip click" data-sg="${D.schedule.indexOf(g)}" tabindex="0" role="button" title="Box score">${resStr(g)} ${vsat(g) === 'at' ? '@' : 'v'} ${esc(g.opp.replace(/ \(No\. \d+\)/, ''))}</span>`).join('')}</div>
-          <div class="meta">${esc(D.header.map(h => h[1] + ': ' + h[0]).slice(0, 3).join(' · '))}</div></div>`; })() : `<div class="box nextgame"><div class="eyebrow">Last season · ${esc(D.last.label)}</div>
+        ${D.inSeason ? (() => { const played = D.schedule.filter(g => g.result && g.kind !== 'exh'); const sp = window.secPlace && window.secPlace(D.key);
+          return window.resultsBox({ games: played.map(g => ({ date: g.date, opp: g.opp.replace(/ \(No\. \d+\)/, ''), site: g.site, result: g.result, us: g.us, them: g.them, attr: `data-sg="${D.schedule.indexOf(g)}"` })),
+            sub: sp && sp.conf && !sp.final ? sp.conf + ' SEC' : '', max: 8, more: played.length > 8 ? [window.VI_ROUTER ? window.VI_ROUTER.href(D.key + '-schedule') : '#' + D.key + '-schedule', 'Full schedule and results'] : null,
+            meta: esc(D.header.map(h => h[1] + ': ' + h[0]).slice(0, 3).join(' · ')) }); })() : `<div class="box nextgame"><div class="eyebrow">Last season · ${esc(D.last.label)}</div>
           <div class="vs">${esc(D.last.record)}</div><div class="meta">${esc(D.last.conf)} · ${esc(D.last.finish)}</div><div class="meta">${esc(D.last.rank)}</div></div>`}
       </div>
       ${ptk.length ? `<div class="section"><h3>Players to know <small>Click a player for bio, honors and stats at Tennessee</small></h3>

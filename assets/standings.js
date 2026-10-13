@@ -55,3 +55,22 @@
     e.preventDefault(); window.standView(b.dataset.sv || 'standings');
   });
 })();
+
+/* "Results so far" scoreboard list, shared by football and the other sports' overview pages. */
+(function () {
+  'use strict';
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fmt = iso => iso ? new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+  const rec = gs => { const w = gs.filter(g => g.result === 'W').length, l = gs.filter(g => g.result === 'L').length, t = gs.filter(g => g.result === 'T').length; return `${w}-${l}${t ? '-' + t : ''}`; };
+  // games: [{date, opp, site:'H'|'A'|'N', result:'W'|'L'|'T', us, them, attr:'data-game="…"'}]
+  window.resultsBox = function ({ games, record, sub, meta, max = 8, more }) {
+    const shown = games.slice(-max);
+    const home = games.filter(g => g.site === 'H'), away = games.filter(g => g.site === 'A');
+    const subTxt = [sub, home.length ? rec(home) + ' home' : '', away.length ? rec(away) + ' away' : ''].filter(Boolean).join(' · ');
+    return `<div class="box rbox"><div class="eyebrow">${games.length > shown.length ? `Last ${shown.length} results` : 'Results so far'} · click a game for the box score</div>
+      <div class="rhead"><span class="big">${esc(record || rec(games))}</span><span class="dim">${esc(subTxt)}</span></div>
+      <ol class="rlist">${shown.map(g => `<li ${g.attr} tabindex="0" role="button" title="Box score"><span class="d">${fmt(g.date)}</span><span class="wl ${g.result}">${g.result}</span><span class="o">${g.site === 'A' ? 'at' : 'vs'} ${esc(g.opp)}</span><span class="sc">${g.us != null ? g.us + '-' + g.them : ''}</span><span class="go" aria-hidden="true">›</span></li>`).join('')}</ol>
+      ${more ? `<a class="golink" href="${esc(more[0])}">${esc(more[1])} ›</a>` : ''}
+      ${meta ? `<div class="meta">${meta}</div>` : ''}</div>`;
+  };
+})();

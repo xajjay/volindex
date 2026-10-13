@@ -373,9 +373,9 @@
           <div class="wp-bar" role="img" aria-label="Tennessee ${E.win}% chance to win"><i style="width:${E.win}%"></i></div>
           <div class="wp-l mono"><b class="ut">UT ${E.win.toFixed(1)}%</b><b>${esc(abbr(next.opp))} ${(100 - E.win).toFixed(1)}%</b></div></div>` : ''}
         <div class="golink" style="margin-top:10px">Matchup preview: impact players, team numbers, series history ›</div></div>` : ''}
-      <div class="box nextgame"><div class="eyebrow">Results so far · click for box scores</div>
-        <div class="controls">${played.map(g => `<span class="chip click" data-game="${esc(g.opp)}" tabindex="0" role="button" title="Box score: ${esc(g.opp)}"><span class="${g.result}">${g.result}</span> ${g.us}-${g.them} ${g.site === 'A' ? '@' : 'v'} ${esc(g.opp)}</span>`).join('')}</div>
-        <div class="meta">AP No. ${t.ap} · Coaches No. ${t.coaches} (${t.pollWeek}) · ${tip('FPI')} No. ${F.advanced.fpi.rank} · projected ${F.advanced.fpi.proj}</div></div>
+      ${window.resultsBox({ games: played.map(g => ({ date: g.date, opp: g.opp, site: g.site, result: g.result, us: g.us, them: g.them, attr: `data-game="${esc(g.opp)}"` })), record: t.record,
+        sub: (sp => sp && sp.conf && !sp.final ? sp.conf + ' SEC' : '')(window.secPlace && window.secPlace('football')),
+        meta: `AP No. ${t.ap} · Coaches No. ${t.coaches} (${t.pollWeek}) · ${tip('FPI')} No. ${F.advanced.fpi.rank} · projected ${F.advanced.fpi.proj}` })}
     </div>
     <div class="section"><h3>Team numbers <small>per game through ${played.length} games, with national (FBS) and SEC rank</small></h3>
       <div class="tiles four">

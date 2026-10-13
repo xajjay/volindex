@@ -632,28 +632,28 @@ window.SITE.football = {
    "Bill Nowling",
    "FB",
    "1940–42",
-   "Killed in World War II."
+   "Lost his life fighting for America in World War II. His jersey is retired in his honor."
   ],
   [
    49,
    "Rudy Klarer",
    "",
    "1941–42",
-   "Killed in World War II."
+   "Lost his life fighting for America in World War II. His jersey is retired in his honor."
   ],
   [
    61,
    "Willis Tucker",
    "",
    "1940",
-   "Killed in World War II."
+   "Lost his life fighting for America in World War II. His jersey is retired in his honor."
   ],
   [
    62,
    "Clyde \"Ig\" Fuson",
    "",
    "1942",
-   "Killed in World War II."
+   "Lost his life fighting for America in World War II. His jersey is retired in his honor."
   ]
  ],
  "transferClassRank": 26,

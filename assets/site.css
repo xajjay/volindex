@@ -556,3 +556,18 @@ body.asking { overflow: hidden; }
 .standings tr.me td { background: var(--orange-soft); }
 .standings tr.me td:nth-child(2) b { color: var(--orange-ink); }
 #standings { scroll-margin-top: 70px; }
+/* "Results so far" scoreboard list */
+.rbox { padding: 18px 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.rbox .meta { color: var(--muted); font-size: 14px; }
+.rhead { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.rhead .big { font-family: var(--f-display); font-weight: 800; font-size: clamp(32px, 4vw, 40px); line-height: 1; letter-spacing: -.02em; }
+.rlist { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.rlist li { display: grid; grid-template-columns: 52px 26px minmax(0, 1fr) auto 12px; gap: 10px; align-items: center; padding: 7px 2px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.rlist li:hover, .rlist li:focus-visible { background: var(--orange-soft); outline: none; }
+.rlist .d { font-size: 12px; color: var(--muted); font-family: var(--f-mono); }
+.rlist .o { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rlist .sc { font: 700 15px var(--f-mono); font-variant-numeric: tabular-nums; }
+.rlist .go { color: var(--orange-ink); font-weight: 700; }
+.wl { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 22px; border-radius: 6px; font: 800 12px var(--f-display); color: #fff; }
+.wl.W { background: var(--win); } .wl.L { background: var(--loss); } .wl.T { background: var(--muted); }
+:root[data-theme="dark"] .wl { color: #141414; }
