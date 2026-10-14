@@ -9,5 +9,7 @@ self.addEventListener('fetch', e => {
   e.respondWith(fetch(req).then(res => {
     if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
     return res;
-  }).catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || (req.mode === 'navigate' ? caches.match('./index.html') : undefined))));
+  }).catch(() => caches.match(req, { ignoreSearch: true })
+    .then(r => r || (req.mode === 'navigate' ? caches.match('./index.html') : null))
+    .then(r => r || Response.error()))); // never hand the browser "undefined" (that was the console error)
 });

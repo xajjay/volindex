@@ -1,7 +1,10 @@
 /* Installable app: registers the service worker and shows a one-time "Add to Home Screen" tip on iPhone. */
 (function () {
   if (!/^https?:$/.test(location.protocol)) return;
-  if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  var local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  // on a local preview, skip the offline cache (and remove an old one) so edits always show right away
+  if ('serviceWorker' in navigator && local) navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
+  if ('serviceWorker' in navigator && !local) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
   var standalone = window.navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
   var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !/crios|fxios|edgios/i.test(navigator.userAgent);
   var seen; try { seen = localStorage.getItem('vi-install-tip'); } catch (e) { seen = '1'; }

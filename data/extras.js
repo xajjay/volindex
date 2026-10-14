@@ -197,7 +197,7 @@ window.EXTRAS = {
     ],
   },
   baseball: {
-    playersToKnow: ['Trent Grindlinger', 'Cam Appenzeller', 'Landon Mack', 'Levi Clark', 'Blaine Brown', 'Chris Ramirez', 'Travis Sanders', 'Blake Grimmer'],
+    playersToKnow: ['Trent Grindlinger', 'Cam Appenzeller', 'Landon Mack', 'Levi Clark', 'Blaine Brown', 'Chris Ramirez', 'Wyatt Hanoian', 'Blake Grimmer'],
     ratings: [
       ['PEAR team strength (TSR)', 'No. 10', 'TSR 5.18 (8th in SEC) · projected 38-18, 15-15 SEC · expected 36.9 wins (range 27-47)', 'https://pearatings.com/cbase/d1/team-profile?team=Tennessee&season=2027'],
       ['PEAR projected PCR', 'No. 15', 'Projected end-of-season résumé rank', 'https://pearatings.com/cbase/d1/team-profile?team=Tennessee&season=2027'],
