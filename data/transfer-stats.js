@@ -226,16 +226,6 @@ window.SITE_AUTO.transfers = {
   }
  },
  "_debug": {
-  "Chris Ramirez": {
-   "keys": [
-    "count",
-    "pageIndex",
-    "pageSize",
-    "pageCount",
-    "items"
-   ],
-   "items": []
-  },
   "Blaine Brown": {
    "keys": [
     "count",
@@ -246,7 +236,17 @@ window.SITE_AUTO.transfers = {
    ],
    "items": []
   },
-  "Brody Trosclair": {
+  "Brady Frederick": {
+   "keys": [
+    "count",
+    "pageIndex",
+    "pageSize",
+    "pageCount",
+    "items"
+   ],
+   "items": []
+  },
+  "Landon Mack": {
    "keys": [
     "count",
     "pageIndex",
@@ -483,7 +483,7 @@ window.SITE_AUTO.transfers = {
   },
   "Brady Frederick": {
    "dom": "etsubucs.com",
-   "len": 1210872,
+   "len": 1210871,
    "tables": [
     [
      "#",
@@ -571,10 +571,9 @@ window.SITE_AUTO.transfers = {
     ]
    ]
   },
-  "Hayden Simmerson": "no page clemsontigers.com",
   "Landon Mack": {
    "dom": "scarletknights.com",
-   "len": 2023477,
+   "len": 2023479,
    "tables": [
     [
      "#",
@@ -624,111 +623,6 @@ window.SITE_AUTO.transfers = {
     ]
    ]
   },
-  "Tyler Myatt": "no site for Walters State CC",
-  "Jake McCoy": "no page gamecocksonline.com",
-  "Parker Detmers": {
-   "dom": "gocards.com",
-   "len": 1643304,
-   "tables": [
-    [
-     "#",
-     "Player",
-     "AVG",
-     "OPS",
-     "GP-GS",
-     "AB",
-     "r",
-     "h",
-     "2B",
-     "3b",
-     "hr",
-     "rbi"
-    ],
-    [
-     "-",
-     "Louisville",
-     "Opponents"
-    ],
-    [
-     "Date",
-     "opponent",
-     "LOC",
-     "w/l",
-     "Score",
-     "AB",
-     "R",
-     "H",
-     "RBI",
-     "2b",
-     "3b",
-     "hr"
-    ],
-    [
-     "-",
-     "HIGH",
-     "OPPONENT"
-    ],
-    [
-     "Player",
-     "2",
-     "3",
-     "4",
-     "5+",
-     "total"
-    ]
-   ]
-  },
-  "Ricky Ojeda": {
-   "dom": "ucirvinesports.com",
-   "len": 1828420,
-   "tables": [
-    [
-     "#",
-     "Player",
-     "AVG",
-     "OPS",
-     "GP-GS",
-     "AB",
-     "r",
-     "h",
-     "2B",
-     "3b",
-     "hr",
-     "rbi"
-    ],
-    [
-     "-",
-     "UC Irvine",
-     "Opponents"
-    ],
-    [
-     "Date",
-     "opponent",
-     "LOC",
-     "w/l",
-     "Score",
-     "AB",
-     "R",
-     "H",
-     "RBI",
-     "2b",
-     "3b",
-     "hr"
-    ],
-    [
-     "-",
-     "HIGH",
-     "OPPONENT"
-    ],
-    [
-     "Player",
-     "2",
-     "3",
-     "4",
-     "5+",
-     "total"
-    ]
-   ]
-  }
+  "Tyler Myatt": "no site for Walters State CC"
  }
 };
