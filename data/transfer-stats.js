@@ -483,7 +483,7 @@ window.SITE_AUTO.transfers = {
   },
   "Brady Frederick": {
    "dom": "etsubucs.com",
-   "len": 1210871,
+   "len": 1210872,
    "tables": [
     [
      "#",
@@ -573,7 +573,7 @@ window.SITE_AUTO.transfers = {
   },
   "Landon Mack": {
    "dom": "scarletknights.com",
-   "len": 2023479,
+   "len": 2023373,
    "tables": [
     [
      "#",

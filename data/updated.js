@@ -1,7 +1,7 @@
 /* Written by tools/auto_schedule.py: when each sport's data was last refreshed. */
 window.SITE_UPDATED = {
  "baseball": "2026-10-13",
- "football": "2026-10-12",
+ "football": "2026-10-15",
  "mbb": "2026-10-13",
  "soccer": "2026-10-14",
  "softball": "2026-10-14",
