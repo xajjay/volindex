@@ -6,6 +6,7 @@ name: Update data
 on:
   schedule:
     - cron: "15 11 * * *"     # 7:15 AM Eastern (6:15 AM in winter)
+    - cron: "*/30 22-23,0-5 * * *"   # every 30 min from ~6 PM to 1 AM Eastern: picks up game-day finals
   workflow_dispatch:
     inputs:
       force:

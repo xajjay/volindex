@@ -70,6 +70,7 @@ def reasons_for(sport, day, stamps, force):
     if sport not in stamps: why.append("no data yet")
     dates = game_dates(sport)
     y1, y2 = (day - datetime.timedelta(days=1)).isoformat(), (day - datetime.timedelta(days=2)).isoformat()
+    if day.isoformat() in dates: why.append("game today")      # evening runs pick up finals within ~30 min
     if y1 in dates: why.append("game yesterday")
     elif y2 in dates and day.weekday() == 0: why.append("weekend game")     # Saturday games caught again Monday
     if day.weekday() == POLL_DAY.get(sport, 0): why.append("new poll out")

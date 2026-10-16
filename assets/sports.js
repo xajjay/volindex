@@ -64,8 +64,11 @@
         const real = D.schedule.filter(g => g.result && g.kind !== 'exh');
         const rec = arr => { const w = arr.filter(g => g.result === 'W').length, l = arr.filter(g => g.result === 'L').length, t = arr.filter(g => g.result === 'T').length; return `${w}-${l}${t ? '-' + t : ''}`; };
         if (real.length) {
-          D.header = D.header.map(h => /record/i.test(h[1]) && !/^\d{4}/.test(h[1]) ? [rec(real), h[1]] : h[1] === 'SEC' ? [rec(real.filter(g => g.kind === 'conf')), 'SEC'] : h);
+          D.header = D.header.map(h => /record/i.test(h[1]) && (!/^\d{4}/.test(h[1]) || h[1].startsWith(D.season)) ? [rec(real), h[1]] : h[1] === 'SEC' ? [rec(real.filter(g => g.kind === 'conf')), 'SEC'] : h);
           D.inSeason = true;
+          // keep the overview's record sentence in step with the schedule
+          const sec = rec(real.filter(g => g.kind === 'conf'));
+          if (D.quick && D.quick[0]) D.quick = [D.quick[0].replace(/<b>\d+-\d+(?:-\d+)?<\/b>( \(\d+-\d+(?:-\d+)? SEC\))?/, `<b>${rec(real)}</b> (${sec} SEC)`)].concat(D.quick.slice(1));
         }
       }
       if (A.stats) D.statsAuto = A.stats;
