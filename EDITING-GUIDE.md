@@ -15,7 +15,7 @@ volindex.net is a free, fan-made Tennessee athletics hub: football, volleyball, 
 - `data/transfer-stats.js`: last-season stats for transfers (hand-added baseball lines inside it are kept)
 - `data/updated.js`: last-updated dates
 
-Live scores (`assets/live.js`) need no maintenance; they read ESPN during games.
+Live scores (`assets/live.js`) and the live box score window (`assets/livebox.js`) need no maintenance; they read ESPN during games.
 
 ## Files you edit by hand
 

@@ -19,7 +19,7 @@
   const etDate = (d = new Date()) => d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // YYYY-MM-DD in Eastern time
   const etHour = () => +new Date().toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false }) % 24;
   const LIVE = {}; // sport -> game state
-  window.VI_LIVE = LIVE;
+  window.VI_LIVE = LIVE; window.VI_LIVE_PATH = PATH;
 
   function schedOf(k) {
     if (k === 'football') return (window.fbData && window.fbData() || (window.SITE || {}).football || {}).schedule || [];
@@ -49,7 +49,7 @@
     const tv = ((c.broadcasts || [])[0] || {}).names ? c.broadcasts[0].names.join(', ') : ((c.geoBroadcasts || [])[0] || {}).media ? c.geoBroadcasts[0].media.shortName : '';
     const link = ((ev.links || []).find(l => /game|gamecast|boxscore/.test(l.href || '')) || (ev.links || [])[0] || {}).href || null;
     return {
-      sport: k, state: ty.state, // pre | in | post
+      sport: k, id: ev.id, state: ty.state, // pre | in | post
       detail: ty.state === 'in' ? (ty.shortDetail || ty.detail || 'Live') : ty.state === 'post' ? (ty.shortDetail || 'Final') : ty.shortDetail,
       start: ev.date, tv, link, home: us.homeAway === 'home',
       us: { name: 'Tennessee', abbr: 'TENN', score: us.score, rank: rank(us), winner: !!us.winner },
@@ -101,6 +101,7 @@
     return `<div class="eyebrow">${live ? '<span class="livedot"></span>Live' : '<span class="finalpill ' + (g.result || '') + '">' + (g.result === 'W' ? 'Win' : g.result === 'L' ? 'Loss' : 'Final') + '</span>Final'} · ${esc(live ? g.detail : g.detail === 'Final' ? new Date(g.start).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : g.detail)}${g.tv ? ' · ' + esc(g.tv) : ''}</div>
       <div class="lboard">${team(a, 'away')}<span class="lat">at</span>${team(h, 'home')}</div>
       ${live && g.extra ? `<div class="lsit">${esc(g.extra)}</div>` : ''}
+      <div class="golink"><button type="button" class="btn primary lbx-open" data-livebox="${esc(g.sport)}">${live ? 'Live box score' : 'Box score'} ›</button></div>
       <div class="golink">${live ? (g.link ? `<a href="${esc(g.link)}" target="_blank" rel="noopener">Follow on ESPN Gamecast ›</a>` : 'Updating every 20 seconds') : `Full box score posts on The Vol Index tomorrow morning${g.link ? ` · <a href="${esc(g.link)}" target="_blank" rel="noopener">ESPN box score ›</a>` : ''}`}</div>`;
   }
   function bannerHtml(games) {
@@ -170,7 +171,7 @@
     demo.split(',').forEach(pair => {
       const [k, st] = pair.split(':'); const o = OPP[k]; if (!o) return;
       const s = SC[k], fin = st === 'post';
-      LIVE[k] = { sport: k, state: st || 'in', detail: fin ? 'Final' : o[4], start: new Date().toISOString(), tv: o[3], link: 'https://www.espn.com/', home: true,
+      LIVE[k] = { sport: k, id: '1', state: st || 'in', detail: fin ? 'Final' : o[4], start: new Date().toISOString(), tv: o[3], link: 'https://www.espn.com/', home: true,
         us: { name: 'Tennessee', abbr: 'TENN', score: String(fin ? s[2] : s[0]), rank: k === 'football' ? 14 : 9, winner: fin },
         them: { name: o[0], abbr: o[1], score: String(fin ? s[3] : s[1]), rank: o[2], winner: false }, poss: o[6], extra: o[5], result: fin ? 'W' : null };
     });
