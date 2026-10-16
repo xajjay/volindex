@@ -10,7 +10,7 @@ window.LINEUP.baseball = {
   "label": "2027 projected lineup and pitching staff",
   "updated": "2026-10-16",
   "rev": 4,
-  "basedOn": "The Vol Index projected lineup and pitching staff (unofficial), built from 2026 stats and transfer additions",
+  "basedOn": "The Vol Index projected lineup and pitching staff (unofficial), built from the starting lineup of the exhibition against Lipscomb (October 16th)",
   "chart": {
     "Lineup": [
       ["C", ["Trent Grindlinger","Stone Lawless"]],
