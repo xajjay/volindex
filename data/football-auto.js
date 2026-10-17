@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-10-15. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-10-17. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-10-15",
+ "updated": "2026-10-17",
  "team": {
   "record": "5-1",
   "sec": "2-1",
@@ -133,7 +133,7 @@ window.SITE_AUTO.football = {
    ],
    "passYpg": [
     186.5,
-    111,
+    110,
     16
    ],
    "oypg": [
@@ -143,7 +143,7 @@ window.SITE_AUTO.football = {
    ],
    "oRushYpg": [
     132.5,
-    53,
+    55,
     10
    ],
    "oPassYpg": [
@@ -1362,17 +1362,17 @@ window.SITE_AUTO.football = {
    "tv": "ABC/ERADM",
    "kick": "2026-10-17T19:30Z",
    "line": "ALA -7.5",
-   "ou": 51.5,
+   "ou": 50.5,
    "ml": "+270",
    "book": "DraftKings",
-   "win": 28.4
+   "win": 28.6
   },
   "South Carolina": {
    "tv": null,
    "kick": "2026-10-24T19:30Z",
-   "line": "TENN -2.5",
+   "line": "TENN -1.5",
    "ou": 51.5,
-   "ml": "-130",
+   "ml": "-118",
    "book": "DraftKings",
    "win": 55.5
   },
@@ -1394,7 +1394,7 @@ window.SITE_AUTO.football = {
   "Vanderbilt": {
    "tv": null,
    "kick": "2026-11-28T05:00Z",
-   "win": 84.9
+   "win": 85.0
   }
  },
  "teamSheet": {
@@ -1433,7 +1433,7 @@ window.SITE_AUTO.football = {
     "Passing yards per game",
     "Passing",
     186.5,
-    111,
+    110,
     16,
     false
    ],
@@ -1460,7 +1460,7 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     9.0,
-    64,
+    65,
     11,
     false
    ],
@@ -1469,7 +1469,7 @@ window.SITE_AUTO.football = {
     "Interceptions thrown",
     "Passing",
     3.0,
-    45,
+    42,
     5,
     true
    ],
@@ -1478,7 +1478,7 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     17.0,
-    124,
+    123,
     15,
     true
    ],
@@ -1523,7 +1523,7 @@ window.SITE_AUTO.football = {
     "Yards per reception",
     "Receiving",
     11.66,
-    81,
+    82,
     10,
     false
    ],
@@ -1532,7 +1532,7 @@ window.SITE_AUTO.football = {
     "First downs per game",
     "Downs",
     23.0,
-    33,
+    32,
     6,
     false
    ],
@@ -1541,7 +1541,7 @@ window.SITE_AUTO.football = {
     "3rd down conversion %",
     "Downs",
     35.9,
-    101,
+    102,
     14,
     false
    ],
@@ -1559,7 +1559,7 @@ window.SITE_AUTO.football = {
     "Penalty yards per game",
     "Downs",
     57.0,
-    67,
+    69,
     8,
     true
    ],
@@ -1577,7 +1577,7 @@ window.SITE_AUTO.football = {
     "Turnovers lost",
     "Downs",
     8.0,
-    80,
+    78,
     9,
     true
    ],
@@ -1604,7 +1604,7 @@ window.SITE_AUTO.football = {
     "Yards per play allowed",
     "Yards allowed",
     4.71,
-    26,
+    25,
     6,
     true
    ],
@@ -1631,7 +1631,7 @@ window.SITE_AUTO.football = {
     "Opponent completion %",
     "Pass defense",
     62.9,
-    89,
+    90,
     11,
     true
    ],
@@ -1640,7 +1640,7 @@ window.SITE_AUTO.football = {
     "Interceptions",
     "Pass defense",
     5.0,
-    38,
+    39,
     6,
     false
    ],
@@ -1658,7 +1658,7 @@ window.SITE_AUTO.football = {
     "Rushing yards allowed per game",
     "Run defense",
     132.5,
-    53,
+    55,
     10,
     true
    ],
@@ -1676,7 +1676,7 @@ window.SITE_AUTO.football = {
     "Tackles for loss",
     "Run defense",
     47.0,
-    4,
+    5,
     1,
     false
    ],
@@ -1685,7 +1685,7 @@ window.SITE_AUTO.football = {
     "Takeaways",
     "Run defense",
     9.0,
-    26,
+    29,
     5,
     false
    ],
@@ -1694,7 +1694,7 @@ window.SITE_AUTO.football = {
     "Turnover margin",
     "Run defense",
     1.0,
-    53,
+    55,
     6,
     false
    ],
@@ -1703,7 +1703,7 @@ window.SITE_AUTO.football = {
     "Kick return average",
     "Returning",
     19.3,
-    76,
+    75,
     9,
     false
    ],
