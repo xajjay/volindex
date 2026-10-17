@@ -1364,7 +1364,7 @@ window.SITE_AUTO.football = {
    "line": "ALA -7.5",
    "ou": 50.5,
    "ml": "+270",
-   "book": "DraftKings",
+   "book": "Draft Kings",
    "win": 28.6
   },
   "South Carolina": {
@@ -1373,7 +1373,7 @@ window.SITE_AUTO.football = {
    "line": "TENN -1.5",
    "ou": 51.5,
    "ml": "-118",
-   "book": "DraftKings",
+   "book": "Draft Kings",
    "win": 55.5
   },
   "Kentucky": {
