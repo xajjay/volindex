@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-10-17. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-10-18. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-10-17",
+ "updated": "2026-10-18",
  "team": {
   "record": "6-1",
   "sec": "3-1",
@@ -113,42 +113,42 @@ window.SITE_AUTO.football = {
   "ranks": {
    "ppg": [
     33.4,
-    45,
-    8
+    42,
+    7
    ],
    "oppg": [
     14.7,
-    13,
+    12,
     1
    ],
    "ypg": [
     405.1,
-    62,
-    10
+    60,
+    9
    ],
    "rushYpg": [
     217.1,
-    22,
+    19,
     2
    ],
    "passYpg": [
     188.0,
-    112,
+    110,
     16
    ],
    "oypg": [
     280.6,
-    17,
+    15,
     5
    ],
    "oRushYpg": [
     121.3,
-    43,
+    42,
     10
    ],
    "oPassYpg": [
     159.3,
-    12,
+    9,
     2
    ]
   }
@@ -1412,8 +1412,8 @@ window.SITE_AUTO.football = {
     "Points per game",
     "Total offense",
     33.4,
-    45,
-    8,
+    42,
+    7,
     false
    ],
    [
@@ -1421,8 +1421,8 @@ window.SITE_AUTO.football = {
     "Total yards per game",
     "Total offense",
     405.1,
-    62,
-    10,
+    60,
+    9,
     false
    ],
    [
@@ -1430,7 +1430,7 @@ window.SITE_AUTO.football = {
     "Yards per play",
     "Total offense",
     5.84,
-    74,
+    71,
     10,
     false
    ],
@@ -1439,7 +1439,7 @@ window.SITE_AUTO.football = {
     "Passing yards per game",
     "Passing",
     188.0,
-    112,
+    110,
     16,
     false
    ],
@@ -1448,7 +1448,7 @@ window.SITE_AUTO.football = {
     "Completion %",
     "Passing",
     63.6,
-    70,
+    72,
     11,
     false
    ],
@@ -1466,7 +1466,7 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     9.0,
-    73,
+    79,
     12,
     false
    ],
@@ -1484,7 +1484,7 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     18.0,
-    124,
+    123,
     14,
     true
    ],
@@ -1493,7 +1493,7 @@ window.SITE_AUTO.football = {
     "Rushing yards per game",
     "Rushing",
     217.1,
-    22,
+    19,
     2,
     false
    ],
@@ -1502,8 +1502,8 @@ window.SITE_AUTO.football = {
     "Yards per carry",
     "Rushing",
     5.03,
-    37,
-    4,
+    35,
+    3,
     false
    ],
    [
@@ -1529,8 +1529,8 @@ window.SITE_AUTO.football = {
     "Yards per reception",
     "Receiving",
     11.25,
-    99,
-    13,
+    96,
+    12,
     false
    ],
    [
@@ -1538,7 +1538,7 @@ window.SITE_AUTO.football = {
     "First downs per game",
     "Downs",
     22.6,
-    37,
+    34,
     6,
     false
    ],
@@ -1574,8 +1574,8 @@ window.SITE_AUTO.football = {
     "Time of possession per game (min)",
     "Downs",
     30.9,
-    50,
-    7,
+    49,
+    6,
     false
    ],
    [
@@ -1583,7 +1583,7 @@ window.SITE_AUTO.football = {
     "Turnovers lost",
     "Downs",
     10.0,
-    103,
+    97,
     12,
     true
    ],
@@ -1592,7 +1592,7 @@ window.SITE_AUTO.football = {
     "Points allowed per game",
     "Points allowed",
     14.7,
-    13,
+    12,
     1,
     true
    ],
@@ -1601,7 +1601,7 @@ window.SITE_AUTO.football = {
     "Yards allowed per game",
     "Yards allowed",
     280.6,
-    17,
+    15,
     5,
     true
    ],
@@ -1610,7 +1610,7 @@ window.SITE_AUTO.football = {
     "Yards per play allowed",
     "Yards allowed",
     4.58,
-    17,
+    15,
     4,
     true
    ],
@@ -1628,7 +1628,7 @@ window.SITE_AUTO.football = {
     "Passing yards allowed per game",
     "Pass defense",
     159.3,
-    12,
+    9,
     2,
     true
    ],
@@ -1637,7 +1637,7 @@ window.SITE_AUTO.football = {
     "Opponent completion %",
     "Pass defense",
     63.2,
-    93,
+    94,
     11,
     true
    ],
@@ -1646,8 +1646,8 @@ window.SITE_AUTO.football = {
     "Interceptions",
     "Pass defense",
     7.0,
-    13,
-    3,
+    16,
+    4,
     false
    ],
    [
@@ -1664,7 +1664,7 @@ window.SITE_AUTO.football = {
     "Rushing yards allowed per game",
     "Run defense",
     121.3,
-    43,
+    42,
     10,
     true
    ],
@@ -1673,8 +1673,8 @@ window.SITE_AUTO.football = {
     "Yards per carry allowed",
     "Run defense",
     3.77,
-    53,
-    10,
+    54,
+    11,
     true
    ],
    [
@@ -1691,8 +1691,8 @@ window.SITE_AUTO.football = {
     "Takeaways",
     "Run defense",
     13.0,
-    6,
-    2,
+    9,
+    3,
     false
    ],
    [
@@ -1700,7 +1700,7 @@ window.SITE_AUTO.football = {
     "Turnover margin",
     "Run defense",
     3.0,
-    32,
+    33,
     4,
     false
    ],
@@ -1709,7 +1709,7 @@ window.SITE_AUTO.football = {
     "Kick return average",
     "Returning",
     16.2,
-    119,
+    118,
     15,
     false
    ],
@@ -1718,7 +1718,7 @@ window.SITE_AUTO.football = {
     "Punt return average",
     "Returning",
     10.5,
-    58,
+    57,
     7,
     false
    ],
@@ -11914,37 +11914,37 @@ window.SITE_AUTO.football = {
    }
   },
   "Kentucky": {
-   "record": "5-1",
+   "record": "6-1",
    "conf": "SEC",
-   "confRecord": "3-1",
+   "confRecord": "4-1",
    "compare": {
     "ppg": [
      33.4,
-     34.7
+     32.7
     ],
     "ypg": [
      405.1,
-     414.2
+     387.9
     ],
     "ypp": [
      5.84,
-     6.32
+     6.07
     ],
     "passYpg": [
      188.0,
-     232.3
+     221.7
     ],
     "cmpPct": [
      63.6,
-     66.7
+     67.8
     ],
     "ypa": [
      7.15,
-     7.74
+     7.46
     ],
     "passTD": [
      9.0,
-     11.0
+     13.0
     ],
     "intThrown": [
      4.0,
@@ -11952,15 +11952,15 @@ window.SITE_AUTO.football = {
     ],
     "sacksAllowed": [
      18.0,
-     12.0
+     15.0
     ],
     "rushYpg": [
      217.1,
-     181.8
+     166.1
     ],
     "ypc": [
      5.03,
-     5.12
+     4.87
     ],
     "rushTD": [
      18.0,
@@ -11968,31 +11968,31 @@ window.SITE_AUTO.football = {
     ],
     "recPg": [
      16.7,
-     20.0
+     20.1
     ],
     "ypr": [
      11.25,
-     11.62
+     11.01
     ],
     "fdPg": [
      22.6,
-     21.0
+     20.0
     ],
     "thirdPct": [
      36.6,
-     26.9
+     29.1
     ],
     "fourthPct": [
      72.7,
-     61.5
+     60.0
     ],
     "penYpg": [
      58.1,
-     46.5
+     44.4
     ],
     "top": [
      30.9,
-     30.0
+     29.8
     ],
     "toLost": [
      10.0,
@@ -12000,15 +12000,15 @@ window.SITE_AUTO.football = {
     ],
     "oppg": [
      14.7,
-     28.0
+     25.9
     ],
     "oypg": [
      280.6,
-     382.2
+     377.0
     ],
     "oypp": [
      4.58,
-     5.31
+     5.24
     ],
     "othirdPct": [
      30.8,
@@ -12016,43 +12016,43 @@ window.SITE_AUTO.football = {
     ],
     "oPassYpg": [
      159.3,
-     246.3
+     249.7
     ],
     "oCmpPct": [
      63.2,
-     60.0
+     59.8
     ],
     "defInt": [
      7.0,
-     7.0
+     11.0
     ],
     "sacks": [
      29.0,
-     13.0
+     18.0
     ],
     "oRushYpg": [
      121.3,
-     135.8
+     127.3
     ],
     "oYpc": [
      3.77,
-     3.94
+     3.74
     ],
     "tfl": [
      57.0,
-     30.0
+     35.0
     ],
     "takeaways": [
      13.0,
-     12.0
+     16.0
     ],
     "toMargin": [
      3.0,
-     7.0
+     11.0
     ],
     "krAvg": [
      16.2,
-     18.0
+     17.1
     ],
     "prAvg": [
      10.5,
@@ -12092,7 +12092,7 @@ window.SITE_AUTO.football = {
      "name": "Kenny Minchey",
      "pos": "QB",
      "what": "passing",
-     "line": "1394 pass yds, 11 TD, 1 INT"
+     "line": "1552 pass yds, 13 TD, 1 INT"
     },
     {
      "name": "CJ Baxter Jr.",
@@ -12104,25 +12104,25 @@ window.SITE_AUTO.football = {
      "name": "Kenny Darby",
      "pos": "WR",
      "what": "receiving",
-     "line": "401 rec yds, 29 rec, 3 TD"
+     "line": "436 rec yds, 34 rec, 3 TD"
     },
     {
      "name": "Grant Godfrey",
      "pos": "LB",
      "what": "defensive",
-     "line": "52 tackles, 3 TFL"
+     "line": "67 tackles, 3 TFL"
     },
     {
      "name": "Mi'Quise Grace",
      "pos": "DL",
      "what": "defensive",
-     "line": "2.5 sacks"
+     "line": "4 sacks"
     },
     {
      "name": "Jordan Castell",
      "pos": "DB",
      "what": "interceptions",
-     "line": "2 INT"
+     "line": "4 INT"
     }
    ],
    "utImpact": [
@@ -12827,57 +12827,57 @@ window.SITE_AUTO.football = {
    }
   },
   "Vanderbilt": {
-   "record": "3-3",
+   "record": "3-4",
    "conf": "SEC",
-   "confRecord": "0-3",
+   "confRecord": "0-4",
    "compare": {
     "ppg": [
      33.4,
-     24.0
+     23.6
     ],
     "ypg": [
      405.1,
-     348.5
+     354.4
     ],
     "ypp": [
      5.84,
-     5.36
+     5.51
     ],
     "passYpg": [
      188.0,
-     228.7
+     235.1
     ],
     "cmpPct": [
      63.6,
-     60.2
+     60.4
     ],
     "ypa": [
      7.15,
-     7.38
+     7.59
     ],
     "passTD": [
      9.0,
-     6.0
+     7.0
     ],
     "intThrown": [
      4.0,
-     6.0
+     8.0
     ],
     "sacksAllowed": [
      18.0,
-     12.0
+     13.0
     ],
     "rushYpg": [
      217.1,
-     119.8
+     119.3
     ],
     "ypc": [
      5.03,
-     3.52
+     3.58
     ],
     "rushTD": [
      18.0,
-     9.0
+     11.0
     ],
     "recPg": [
      16.7,
@@ -12885,15 +12885,15 @@ window.SITE_AUTO.football = {
     ],
     "ypr": [
      11.25,
-     12.25
+     12.56
     ],
     "fdPg": [
      22.6,
-     18.5
+     18.7
     ],
     "thirdPct": [
      36.6,
-     37.6
+     38.5
     ],
     "fourthPct": [
      72.7,
@@ -12901,39 +12901,39 @@ window.SITE_AUTO.football = {
     ],
     "penYpg": [
      58.1,
-     70.0
+     65.0
     ],
     "top": [
      30.9,
-     31.2
+     30.5
     ],
     "toLost": [
      10.0,
-     10.0
+     12.0
     ],
     "oppg": [
      14.7,
-     29.5
+     29.7
     ],
     "oypg": [
      280.6,
-     353.5
+     365.6
     ],
     "oypp": [
      4.58,
-     5.55
+     5.64
     ],
     "othirdPct": [
      30.8,
-     39.0
+     40.9
     ],
     "oPassYpg": [
      159.3,
-     214.0
+     219.3
     ],
     "oCmpPct": [
      63.2,
-     64.4
+     64.9
     ],
     "defInt": [
      7.0,
@@ -12945,15 +12945,15 @@ window.SITE_AUTO.football = {
     ],
     "oRushYpg": [
      121.3,
-     139.5
+     146.3
     ],
     "oYpc": [
      3.77,
-     4.14
+     4.21
     ],
     "tfl": [
      57.0,
-     25.0
+     28.0
     ],
     "takeaways": [
      13.0,
@@ -12961,11 +12961,11 @@ window.SITE_AUTO.football = {
     ],
     "toMargin": [
      3.0,
-     -3.0
+     -5.0
     ],
     "krAvg": [
      16.2,
-     16.3
+     18.5
     ],
     "prAvg": [
      10.5,
@@ -13005,25 +13005,25 @@ window.SITE_AUTO.football = {
      "name": "Jared Curtis",
      "pos": "QB",
      "what": "passing",
-     "line": "968 pass yds, 5 TD, 5 INT"
+     "line": "1242 pass yds, 6 TD, 7 INT"
     },
     {
      "name": "Sedrick Alexander",
      "pos": "RB",
      "what": "rushing",
-     "line": "213 rush yds, 4 TD"
+     "line": "270 rush yds, 5 TD"
     },
     {
      "name": "Junior Sherrill",
      "pos": "WR",
      "what": "receiving",
-     "line": "529 rec yds, 33 rec, 3 TD"
+     "line": "628 rec yds, 41 rec, 4 TD"
     },
     {
      "name": "C.J. Heard",
      "pos": "S",
      "what": "defensive",
-     "line": "44 tackles, 4 TFL"
+     "line": "53 tackles, 4 TFL"
     },
     {
      "name": "C.J. Heard",
