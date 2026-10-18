@@ -431,7 +431,7 @@ window.SITE_AUTO.transfers = {
  "_bbdebug": {
   "Blaine Brown": {
    "dom": "riceowls.com",
-   "len": 1692806,
+   "len": 1692788,
    "tables": [
     [
      "#",
@@ -483,7 +483,7 @@ window.SITE_AUTO.transfers = {
   },
   "Brady Frederick": {
    "dom": "etsubucs.com",
-   "len": 1210872,
+   "len": 1210871,
    "tables": [
     [
      "#",
