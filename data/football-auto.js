@@ -1381,9 +1381,9 @@ window.SITE_AUTO.football = {
    "tv": null,
    "kick": "2026-10-24T19:30Z",
    "line": "TENN -3",
-   "ou": 51.5,
+   "ou": 50.5,
    "ml": "-155",
-   "book": "Draft Kings",
+   "book": "DraftKings",
    "win": 59.9
   },
   "Kentucky": {
@@ -1578,7 +1578,7 @@ window.SITE_AUTO.football = {
     "Time of possession per game (min)",
     "Downs",
     30.9,
-    48,
+    49,
     6,
     false
    ],
@@ -1677,7 +1677,7 @@ window.SITE_AUTO.football = {
     "Yards per carry allowed",
     "Run defense",
     3.77,
-    54,
+    55,
     11,
     true
    ],
@@ -1740,15 +1740,15 @@ window.SITE_AUTO.football = {
    "kicking": [
     [
      "Field Goal Made",
-     "6"
+     "10"
     ],
     [
      "Field Goal Attempts",
-     "7"
+     "11"
     ],
     [
      "Field Goal Percentage",
-     "85.7"
+     "90.9"
     ],
     [
      "Long Field Goal Made",
@@ -1760,15 +1760,15 @@ window.SITE_AUTO.football = {
     ],
     [
      "Field Goal Attempts 20-29",
-     "0"
+     "1"
     ],
     [
      "Field Goal Attempts 30-39",
-     "3"
+     "5"
     ],
     [
      "Field Goal Attempts 40-49",
-     "3"
+     "4"
     ],
     [
      "Field Goal Attempts 50+",
@@ -1776,11 +1776,11 @@ window.SITE_AUTO.football = {
     ],
     [
      "Extra Points Made",
-     "26"
+     "28"
     ],
     [
      "Extra Point Attempts",
-     "26"
+     "28"
     ],
     [
      "Extra Point Percentage",
@@ -1792,15 +1792,15 @@ window.SITE_AUTO.football = {
     ],
     [
      "Field Goals Made 20-29",
-     "0"
+     "1"
     ],
     [
      "Field Goals Made 30-39",
-     "3"
+     "5"
     ],
     [
      "Field Goals Made 40-49",
-     "3"
+     "4"
     ],
     [
      "Field Goals Made 50+",
@@ -1808,15 +1808,15 @@ window.SITE_AUTO.football = {
     ],
     [
      "Total Kicking Points",
-     "44"
+     "58"
     ],
     [
      "Team Games Played",
-     "6"
+     "7"
     ],
     [
      "Touchback Percentage",
-     "79"
+     "80"
     ],
     [
      "Average Kickoff Return Yards",
@@ -1836,17 +1836,17 @@ window.SITE_AUTO.football = {
     ],
     [
      "FG: Good-Attempts",
-     "6-7"
+     "10-11"
     ]
    ],
    "punting": [
     [
      "Punts",
-     "25"
+     "29"
     ],
     [
      "Punt Yards",
-     "1,094"
+     "1,253"
     ],
     [
      "Long Punt",
@@ -1854,11 +1854,11 @@ window.SITE_AUTO.football = {
     ],
     [
      "Gross Average Punt Yards",
-     "43.8"
+     "43.2"
     ],
     [
      "Net Average Punt Yards",
-     "43.8"
+     "43.2"
     ],
     [
      "Punts Blocked",
@@ -1866,7 +1866,7 @@ window.SITE_AUTO.football = {
     ],
     [
      "Punts Inside 20",
-     "12"
+     "14"
     ],
     [
      "Touchbacks",
@@ -1874,11 +1874,11 @@ window.SITE_AUTO.football = {
     ],
     [
      "Fair Catches",
-     "15"
+     "16"
     ],
     [
      "Punt Returns",
-     "5"
+     "6"
     ],
     [
      "Punt Return Yards",
@@ -1890,11 +1890,11 @@ window.SITE_AUTO.football = {
     ],
     [
      "Team Games Played",
-     "6"
+     "7"
     ],
     [
      "Punt: Total Yards",
-     "25-1,094"
+     "29-1,253"
     ]
    ]
   }
@@ -11776,12 +11776,12 @@ window.SITE_AUTO.football = {
    },
    "fpi": {
     "opp": [
-     12.131,
-     28
+     11.629,
+     29
     ],
     "ut": [
-     17.219,
-     13
+     18.052,
+     12
     ]
    },
    "impact": [
@@ -12083,12 +12083,12 @@ window.SITE_AUTO.football = {
    },
    "fpi": {
     "opp": [
-     11.716,
-     30
+     12.74,
+     26
     ],
     "ut": [
-     17.219,
-     13
+     18.052,
+     12
     ]
    },
    "impact": [
@@ -12390,12 +12390,12 @@ window.SITE_AUTO.football = {
    },
    "fpi": {
     "opp": [
-     13.705,
-     21
+     13.505,
+     20
     ],
     "ut": [
-     17.219,
-     13
+     18.052,
+     12
     ]
    },
    "impact": [
@@ -12689,12 +12689,12 @@ window.SITE_AUTO.football = {
    },
    "fpi": {
     "opp": [
-     20.937,
+     22.965,
      8
     ],
     "ut": [
-     17.219,
-     13
+     18.052,
+     12
     ]
    },
    "impact": [
@@ -12996,12 +12996,12 @@ window.SITE_AUTO.football = {
    },
    "fpi": {
     "opp": [
-     1.303,
-     62
+     0.452,
+     66
     ],
     "ut": [
-     17.219,
-     13
+     18.052,
+     12
     ]
    },
    "impact": [
