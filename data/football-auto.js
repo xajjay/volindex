@@ -1,113 +1,113 @@
-/* Written by tools/update_data.py on 2026-10-18. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-10-19. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-10-18",
+ "updated": "2026-10-19",
  "team": {
   "record": "6-1",
   "sec": "3-1",
-  "pollWeek": "Week 7",
-  "coaches": 14,
-  "ap": 14,
+  "pollWeek": "Week 8",
+  "coaches": 11,
+  "ap": 11,
   "apTop25": [
    [
     1,
-    "Georgia"
-   ],
-   [
-    2,
-    "Notre Dame"
-   ],
-   [
-    3,
     "Miami"
    ],
    [
-    4,
-    "Ohio State"
-   ],
-   [
-    5,
-    "Indiana"
-   ],
-   [
-    6,
-    "Alabama"
-   ],
-   [
-    7,
-    "Texas"
-   ],
-   [
-    8,
+    2,
     "BYU"
    ],
    [
-    9,
+    3,
+    "Ohio State"
+   ],
+   [
+    4,
+    "Notre Dame"
+   ],
+   [
+    5,
+    "Georgia"
+   ],
+   [
+    6,
+    "Indiana"
+   ],
+   [
+    7,
     "Ole Miss"
    ],
    [
-    10,
+    8,
     "Texas Tech"
    ],
    [
-    11,
-    "Utah"
-   ],
-   [
-    12,
+    9,
     "UCLA"
    ],
    [
-    13,
-    "Missouri"
+    10,
+    "Utah"
    ],
    [
-    14,
+    11,
     "Tennessee"
    ],
    [
-    15,
+    12,
     "Kentucky"
    ],
    [
-    16,
-    "Mississippi State"
+    13,
+    "Alabama"
    ],
    [
-    17,
-    "Iowa"
-   ],
-   [
-    18,
-    "Oklahoma State"
-   ],
-   [
-    19,
-    "USC"
-   ],
-   [
-    20,
+    14,
     "Houston"
    ],
    [
-    21,
+    15,
+    "Iowa"
+   ],
+   [
+    16,
+    "USC"
+   ],
+   [
+    17,
     "Wake Forest"
    ],
    [
-    22,
+    18,
     "LSU"
    ],
    [
-    23,
+    19,
+    "Texas"
+   ],
+   [
+    20,
+    "Florida"
+   ],
+   [
+    21,
     "Boise State"
    ],
    [
-    24,
+    22,
+    "Missouri"
+   ],
+   [
+    23,
     "SMU"
    ],
    [
-    25,
+    24,
     "Northwestern"
+   ],
+   [
+    25,
+    "Arizona"
    ]
   ],
   "ranks": {
@@ -1378,11 +1378,11 @@ window.SITE_AUTO.football = {
    "kick": "2026-10-17T19:30Z"
   },
   "South Carolina": {
-   "tv": null,
+   "tv": "ESPN",
    "kick": "2026-10-24T19:30Z",
-   "line": "TENN -3",
+   "line": "TENN -1.5",
    "ou": 50.5,
-   "ml": "-155",
+   "ml": "-115",
    "book": "DraftKings",
    "win": 59.9
   },
