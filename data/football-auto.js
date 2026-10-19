@@ -1383,7 +1383,7 @@ window.SITE_AUTO.football = {
    "line": "SC -2.5",
    "ou": 50.5,
    "ml": "+102",
-   "book": "DraftKings",
+   "book": "Draft Kings",
    "win": 59.9
   },
   "Kentucky": {
