@@ -1380,9 +1380,9 @@ window.SITE_AUTO.football = {
   "South Carolina": {
    "tv": "ESPN",
    "kick": "2026-10-24T19:30Z",
-   "line": "TENN -1.5",
+   "line": "SC -2.5",
    "ou": 50.5,
-   "ml": "-115",
+   "ml": "+102",
    "book": "DraftKings",
    "win": 59.9
   },
