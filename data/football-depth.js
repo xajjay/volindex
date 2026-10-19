@@ -9,10 +9,10 @@
    ============================================================ */
 window.DEPTH = window.DEPTH || {};
 window.DEPTH.football = {
-  "rev": 4,
+  "rev": 5,
   "current": {
     "label": "2026 depth chart",
-    "updated": "2026-10-13",
+    "updated": "2026-10-19",
     "basedOn": "The Vol Index depth chart (unofficial)",
     "chart": {
     "Backfield": [
@@ -62,42 +62,42 @@ window.DEPTH.football = {
   },
   "next": {
     "label": "2027 projected depth chart",
-    "updated": "2026-10-13",
+    "updated": "2026-10-19",
     "basedOn": "The Vol Index 2027 projected depth chart (unofficial). Projection: 2026 chart minus 5th-year players and NFL draft risks, plus 2027 commits. Seniors are shown returning for their 5th year",
     "chart": {
     "Backfield": [
-      ["QB", ["Faizon Brandon","George MacIntyre","Ryan Staub","Derrick Baker"]],
+      ["QB", ["George MacIntyre","Faizon Brandon","Ryan Staub","Derrick Baker"]],
       ["RB", ["Daune Morris","David Gabriel Georges","Javin Gordon","Justin Baker","Asa Barnes"]]
     ],
     "Receivers": [
       ["WR-X", ["Radarious Jackson","Travis Smith Jr.","Kesean Bowman","Nathan Roberts"]],
       ["WR-Z", ["TK Keys","Dayon Cooper","Deon Hardin"]],
-      ["WR-SL", ["Tyreek King","Ian Duarte"]],
+      ["WR-SL", ["Braylon Staley","Tyreek King","Ian Duarte"]],
       ["TE", ["Ethan Davis","DaSaahn Brame","Trent Thomas","Luca Wolf","Malik Howard"]]
     ],
     "Offensive Line": [
-      ["LT", ["David Sanders Jr.","Gabriel Osenda","Niko Kampas","Jeremias Heard"]],
-      ["LG", ["Nic Moore","Ed Baker","Jeremy George-El"]],
+      ["LT", ["David Sanders Jr.","Niko Kampas","Jeremias Heard"]],
+      ["LG", ["Nic Moore","Ed Baker","Shamurad Umarov"]],
       ["C", ["Sam Pendleton","Antoni Ogumoro"]],
-      ["RG", ["Shamurad Umarov","Kamari Blair","Q'Mari Hudson"]],
-      ["RT", ["Ory Williams","Princeton Uwaifo"]]
+      ["RG", ["Jesse Perry","Kamari Blair","Q'Mari Hudson"]],
+      ["RT", ["Ory Williams","Gabriel Osenda","Princeton Uwaifo"]]
     ],
     "Defensive Line": [
-      ["DE", ["Carson Gentle","Hezekiah Harris","Breeze Carter"]],
-      ["DT", ["Christian Mays","Ethan Utley","JJ Finch"]],
-      ["DT", ["Nathan Robinson","Isaiah Campbell","Dereon Albert"]],
-      ["DE", ["Jordan Norman","Mariyon Dye","Kedric Golston II","Christian Gass"]]
+      ["DE", ["Mariyon Dye","Carson Gentle","Hezekiah Harris"]],
+      ["DT", ["Ethan Utley","JJ Finch","Christian Mays"]],
+      ["DT", ["Daevin Hobbs","Nathan Robinson","Isaiah Campbell"]],
+      ["DE", ["Tyree Weathersby","Jordan Norman","Kedric Golston II"]]
     ],
     "Linebackers": [
-      ["MIKE", ["Jeremiah Telander","TJ White","JP Peace"]],
-      ["WILL", ["Jadon Perlotte","Kenneth Simon II","Brayden Rouse"]]
+      ["MIKE", ["Amare Campbell","TJ White","JP Peace"]],
+      ["WILL", ["Jeremiah Telander","Jadon Perlotte","Kenneth Simon II","Brayden Rouse"]]
     ],
     "Secondary": [
       ["CB", ["Ty Redmond","Tim Merritt","Jamyan Theodore","Brandon Leavell"]],
-      ["CB", ["Tre Poteat III","Dylan Haley"]],
+      ["CB", ["Kayin Lee","Tre Poteat III","Dylan Haley"]],
       ["NICKEL", ["Qua Moss","Tevis Metcalf","Isaiah Hardge","Carter Jamison"]],
-      ["S", ["TJ Metcalf","Marcus Jones"]],
-      ["S", ["Sidney Walton","Jaden Butler"]]
+      ["S", ["TJ Metcalf","Joel Wyatt","Marcus Jones"]],
+      ["S", ["Edrees Farooq","Sidney Walton","Jaden Butler"]]
     ],
     "Special Teams": [
       ["PK", ["Cooper Ranvier","Ford Fehling","Grady Dangerfield"]],
