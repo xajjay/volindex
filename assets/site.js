@@ -75,6 +75,7 @@
     else if (SPORTS.find(s => s.key === sport)) { if (window.SITE && window.SITE[sport] && window.renderSport) window.renderSport(sport, tab || 'overview'); else renderComing(sport); }
     else if (sport === 'sources') renderSources();
     else if (sport === 'about' && window.renderAbout) { window.renderAbout(app, tab); return; }
+    else if (sport === 'games' && window.renderGames) window.renderGames(app, tab);
     else renderHub();
     if (!window.VI_KEEP_SCROLL) window.scrollTo(0, 0);
     window.VI_KEEP_SCROLL = false;
