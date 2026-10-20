@@ -1145,6 +1145,114 @@ window.SITE_AUTO.football = {
    }
   }
  },
+ "natRanks": {
+  "stats": [
+   "Rushing yards",
+   "Rushing TD",
+   "Passing yards",
+   "Passing TD",
+   "Receiving yards",
+   "Receiving TD",
+   "Receptions",
+   "Tackles for loss",
+   "Sacks",
+   "Tackles",
+   "Passes defended",
+   "Interceptions"
+  ],
+  "players": {
+   "Tyree Weathersby": [
+    {
+     "stat": "Sacks",
+     "rank": 10
+    },
+    {
+     "stat": "Tackles for loss",
+     "rank": 23
+    }
+   ],
+   "Xavier Gilliam": [
+    {
+     "stat": "Tackles for loss",
+     "rank": 4
+    },
+    {
+     "stat": "Sacks",
+     "rank": 17
+    }
+   ],
+   "Amare Campbell": [
+    {
+     "stat": "Tackles for loss",
+     "rank": 51
+    }
+   ],
+   "Jeremiah Telander": [
+    {
+     "stat": "Sacks",
+     "rank": 94
+    }
+   ],
+   "Mariyon Dye": [
+    {
+     "stat": "Sacks",
+     "rank": 38
+    }
+   ],
+   "Dejuan Lane": [
+    {
+     "stat": "Interceptions",
+     "rank": 8
+    },
+    {
+     "stat": "Passes defended",
+     "rank": 77
+    }
+   ],
+   "Ty Redmond": [
+    {
+     "stat": "Passes defended",
+     "rank": 14
+    }
+   ],
+   "Kayin Lee": [
+    {
+     "stat": "Interceptions",
+     "rank": 27
+    }
+   ],
+   "Faizon Brandon": [
+    {
+     "stat": "Passing TD",
+     "rank": 83
+    }
+   ],
+   "Mike Matthews": [
+    {
+     "stat": "Receiving yards",
+     "rank": 42
+    },
+    {
+     "stat": "Receptions",
+     "rank": 79
+    },
+    {
+     "stat": "Receiving TD",
+     "rank": 92
+    }
+   ],
+   "DeSean Bishop": [
+    {
+     "stat": "Rushing yards",
+     "rank": 3
+    },
+    {
+     "stat": "Rushing TD",
+     "rank": 6
+    }
+   ]
+  }
+ },
  "recruits": {
   "2027": [
    {
@@ -11762,16 +11870,16 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     9.9,
-     37,
-     28,
-     52
+     10,
+     32,
+     29,
+     48
     ],
     "ut": [
-     16.7,
-     15,
-     21,
-     23
+     17.5,
+     13,
+     24,
+     16
     ]
    },
    "fpi": {
@@ -12069,16 +12177,16 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     8,
-     46,
-     31,
-     60
+     7.8,
+     45,
+     40,
+     53
     ],
     "ut": [
-     16.7,
-     15,
-     21,
-     23
+     17.5,
+     13,
+     24,
+     16
     ]
    },
    "fpi": {
@@ -12376,16 +12484,16 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     8,
-     47,
-     50,
-     34
+     9.9,
+     33,
+     46,
+     30
     ],
     "ut": [
-     16.7,
-     15,
-     21,
-     23
+     17.5,
+     13,
+     24,
+     16
     ]
    },
    "fpi": {
@@ -12675,16 +12783,16 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     21.7,
-     9,
-     13,
-     10
+     22.6,
+     6,
+     10,
+     7
     ],
     "ut": [
-     16.7,
-     15,
-     21,
-     23
+     17.5,
+     13,
+     24,
+     16
     ]
    },
    "fpi": {
@@ -12982,16 +13090,16 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     1.2,
-     65,
-     59,
-     82
+     0.3,
+     72,
+     64,
+     86
     ],
     "ut": [
-     16.7,
-     15,
-     21,
-     23
+     17.5,
+     13,
+     24,
+     16
     ]
    },
    "fpi": {
@@ -13138,17 +13246,424 @@ window.SITE_AUTO.football = {
    }
   }
  },
+ "pear": {
+  "week": 8,
+  "ratings": [
+   [
+    "TSR",
+    "17.3",
+    12
+   ],
+   [
+    "SP+",
+    "17.5",
+    13
+   ],
+   [
+    "FPI",
+    "18.1",
+    12
+   ],
+   [
+    "FEI",
+    "0.93",
+    13
+   ],
+   [
+    "Massey",
+    "8.76",
+    11
+   ],
+   [
+    "Dokter",
+    "68.84",
+    11
+   ],
+   [
+    "Sagarin",
+    "88.19",
+    11
+   ],
+   [
+    "RQI",
+    "0.744",
+    8
+   ],
+   [
+    "SOS",
+    "10.73",
+    29
+   ]
+  ],
+  "offense": [
+   [
+    "Rating",
+    "38.30",
+    15
+   ],
+   [
+    "Success rate",
+    "0.04",
+    40
+   ],
+   [
+    "EPA/play (PPA)",
+    "0.07",
+    58
+   ],
+   [
+    "Rush PPA",
+    "0.18",
+    12
+   ],
+   [
+    "Pass PPA",
+    "-0.06",
+    98
+   ],
+   [
+    "Points per opportunity",
+    "0.62",
+    46
+   ],
+   [
+    "Drive quality",
+    "17.70",
+    19
+   ]
+  ],
+  "defense": [
+   [
+    "Rating",
+    "21.00",
+    14
+   ],
+   [
+    "Success rate",
+    "-0.06",
+    22
+   ],
+   [
+    "EPA/play (PPA)",
+    "-0.27",
+    3
+   ],
+   [
+    "Rush PPA",
+    "-0.26",
+    9
+   ],
+   [
+    "Pass PPA",
+    "-0.25",
+    14
+   ],
+   [
+    "Points per opportunity",
+    "-1.63",
+    3
+   ],
+   [
+    "Drive quality",
+    "-20.90",
+    12
+   ]
+  ],
+  "games": [
+   [
+    "South Carolina",
+    29,
+    "Tennessee -3.0",
+    "31.5-28.5",
+    58.4
+   ],
+   [
+    "Kentucky",
+    26,
+    "Tennessee -8.5",
+    "34.8-26.3",
+    72.2
+   ],
+   [
+    "Texas A&M",
+    24,
+    "Tennessee -2.0",
+    "29.7-27.7",
+    55.6
+   ],
+   [
+    "LSU",
+    6,
+    "LSU -1.8",
+    "29.7-31.5",
+    45.0
+   ],
+   [
+    "Vanderbilt",
+    62,
+    "Tennessee -13.3",
+    "35.2-21.9",
+    81.7
+   ]
+  ],
+  "played": [
+   [
+    "Furman",
+    49
+   ],
+   [
+    "Georgia Tech",
+    70
+   ],
+   [
+    "Kennesaw State",
+    114
+   ],
+   [
+    "Texas",
+    8
+   ],
+   [
+    "Auburn",
+    28
+   ],
+   [
+    "Arkansas",
+    60
+   ],
+   [
+    "Alabama",
+    7
+   ]
+  ],
+  "record": "6-1",
+  "sec": {
+   "Georgia": [
+    23.9,
+    4,
+    43.8,
+    5,
+    19.9,
+    7,
+    37
+   ],
+   "LSU": [
+    22.1,
+    6,
+    42.6,
+    6,
+    20.5,
+    10,
+    25
+   ],
+   "Alabama": [
+    21.8,
+    7,
+    44.9,
+    3,
+    23.1,
+    32,
+    5
+   ],
+   "Texas": [
+    21.6,
+    8,
+    41.4,
+    9,
+    19.8,
+    5,
+    9
+   ],
+   "Ole Miss": [
+    17.6,
+    11,
+    42.3,
+    8,
+    24.6,
+    49,
+    16
+   ],
+   "Tennessee": [
+    17.3,
+    12,
+    38.3,
+    15,
+    21.0,
+    14,
+    29
+   ],
+   "Florida": [
+    14.2,
+    17,
+    40.1,
+    11,
+    25.9,
+    65,
+    6
+   ],
+   "Missouri": [
+    12.9,
+    22,
+    35.0,
+    26,
+    22.0,
+    22,
+    24
+   ],
+   "Oklahoma": [
+    12.5,
+    23,
+    32.4,
+    38,
+    19.9,
+    8,
+    2
+   ],
+   "Texas A&M": [
+    12.3,
+    24,
+    33.9,
+    30,
+    21.6,
+    17,
+    23
+   ],
+   "Kentucky": [
+    11.8,
+    26,
+    37.3,
+    19,
+    25.6,
+    61,
+    4
+   ],
+   "Auburn": [
+    11.6,
+    28,
+    34.1,
+    29,
+    22.5,
+    27,
+    10
+   ],
+   "South Carolina": [
+    11.3,
+    29,
+    36.0,
+    24,
+    24.7,
+    51,
+    21
+   ],
+   "Mississippi State": [
+    9.4,
+    36,
+    36.8,
+    20,
+    27.4,
+    95,
+    8
+   ],
+   "Arkansas": [
+    1.8,
+    60,
+    28.5,
+    62,
+    26.7,
+    82,
+    11
+   ],
+   "Vanderbilt": [
+    1.0,
+    62,
+    28.0,
+    65,
+    26.9,
+    85,
+    18
+   ]
+  }
+ },
+ "fpi": {
+  "Arkansas": [
+   2.2,
+   58
+  ],
+  "Georgia": [
+   26.7,
+   3
+  ],
+  "Ole Miss": [
+   18.8,
+   11
+  ],
+  "Vanderbilt": [
+   0.5,
+   66
+  ],
+  "Alabama": [
+   24.2,
+   6
+  ],
+  "South Carolina": [
+   11.6,
+   29
+  ],
+  "Tennessee": [
+   18.1,
+   12
+  ],
+  "LSU": [
+   23.0,
+   8
+  ],
+  "Kentucky": [
+   12.7,
+   26
+  ],
+  "Oklahoma": [
+   13.3,
+   22
+  ],
+  "Florida": [
+   14.3,
+   19
+  ],
+  "Texas": [
+   23.6,
+   7
+  ],
+  "Missouri": [
+   12.3,
+   27
+  ],
+  "Texas A&M": [
+   13.5,
+   20
+  ],
+  "Mississippi State": [
+   9.1,
+   38
+  ],
+  "Auburn": [
+   13.4,
+   21
+  ]
+ },
  "log": [
   "OK   games, results and record",
   "OK   AP and Coaches polls",
   "OK   team per-game numbers and national/SEC ranks",
   "OK   player season stats",
+  "OK   national (FBS) ranks for Tennessee players",
   "OK   recruiting classes",
   "OK   ESPN lines, TV and win chances",
   "OK   full team stat sheet with national and SEC ranks",
   "OK   247 ratings for the full roster (HS composite + transfer) and team talent",
   "OK   box scores for finished games (ESPN)",
   "OK   matchup previews for remaining games (CFBD)",
-  "OK   season-by-season schedules and team leaders (cached after the first run)"
+  "OK   season-by-season schedules and team leaders (cached after the first run)",
+  "OK   PEAR ratings (week 8)",
+  "OK   FPI ratings and ranks for the SEC (CFBD)"
  ]
 };
