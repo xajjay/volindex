@@ -31,7 +31,8 @@
     Object.keys(PATH).forEach(k => {
       const s = schedOf(k);
       if (s.some(g => g.date === t)) out.push([k, t]);
-      else if (etHour() < 4 && s.some(g => g.date === y)) out.push([k, y]);
+      // yesterday's game: past midnight (before 4 AM), or any time until the data update has its final
+      else if (s.some(g => g.date === y && (etHour() < 4 || !g.result))) out.push([k, y]);
     });
     return out;
   }
@@ -55,7 +56,7 @@
       us: { name: 'Tennessee', abbr: 'TENN', score: us.score, rank: rank(us), winner: !!us.winner },
       them: { name: them.team.location || them.team.shortDisplayName, abbr: them.team.abbreviation, score: them.score, rank: rank(them), winner: !!them.winner },
       poss: sit.possession ? (sit.possession === us.team.id ? 'us' : 'them') : null, extra,
-      result: ty.state === 'post' ? (+us.score > +them.score ? 'W' : +us.score < +them.score ? 'L' : 'T') : null,
+      result: ty.state === 'post' && ty.completed !== false && !/CANCEL|POSTPON|SUSPEND|FORFEIT/i.test(ty.name || '') ? (+us.score > +them.score ? 'W' : +us.score < +them.score ? 'L' : 'T') : null,
     };
   }
 
@@ -67,8 +68,19 @@
       const d = await r.json();
       const ev = (d.events || []).find(e => (e.competitions || [])[0] && e.competitions[0].competitors.some(isTN));
       const g = ev && parse(k, ev);
-      if (g) LIVE[k] = g; else delete LIVE[k];
+      if (g) { g.date = date; LIVE[k] = g; } else delete LIVE[k];
+      if (g && g.state === 'post' && g.result) finalize(k, g);
     } catch (e) { /* ESPN unreachable: leave the page as it is */ }
+  }
+
+  // A final on ESPN: put the result and the new record on the page right away (the data update that
+  // brings the full box score and season stats follows within about 15-30 minutes).
+  const done = {};
+  function finalize(k, g) {
+    if (done[k + g.date]) return; done[k + g.date] = 1;
+    const changed = k === 'football' ? window.fbFinal && window.fbFinal(g.date, g.result, g.us.score, g.them.score)
+      : window.sportFinal && window.sportFinal(k, g.date, g.result, g.us.score, g.them.score);
+    if (changed && window.VI_RENDER) { window.VI_RENDER(); later(); }
   }
 
   let timer = null;
@@ -84,6 +96,7 @@
     if (games.some(g => g.state === 'in')) wait = 20e3;
     else if (games.some(g => g.state === 'pre' && new Date(g.start) - Date.now() < 15 * 60e3)) wait = 60e3;
     else if (games.length && games.every(g => g.state === 'post')) return; // all done for today
+    else if (days.every(([, d]) => d !== etDate())) return; // only yesterday's game to check: once is enough
     timer = setTimeout(poll, wait);
   }
   document.addEventListener('visibilitychange', () => { if (!document.hidden && !demo) poll(); else clearTimeout(timer); });
@@ -102,7 +115,7 @@
       <div class="lboard">${team(a, 'away')}<span class="lat">at</span>${team(h, 'home')}</div>
       ${live && g.extra ? `<div class="lsit">${esc(g.extra)}</div>` : ''}
       <div class="golink"><button type="button" class="btn primary lbx-open" data-livebox="${esc(g.sport)}">${live ? 'Live box score' : 'Box score'} ›</button></div>
-      <div class="golink">${live ? (g.link ? `<a href="${esc(g.link)}" target="_blank" rel="noopener">Follow on ESPN Gamecast ›</a>` : 'Updating every 20 seconds') : `Full box score posts on The Vol Index tomorrow morning${g.link ? ` · <a href="${esc(g.link)}" target="_blank" rel="noopener">ESPN box score ›</a>` : ''}`}</div>`;
+      <div class="golink">${live ? (g.link ? `<a href="${esc(g.link)}" target="_blank" rel="noopener">Follow on ESPN Gamecast ›</a>` : 'Updating every 20 seconds') : `Season stats and the full box score update on The Vol Index within about 30 minutes${g.link ? ` · <a href="${esc(g.link)}" target="_blank" rel="noopener">ESPN box score ›</a>` : ''}`}</div>`;
   }
   function bannerHtml(games) {
     return `<div class="livebar-in">${games.map(g => `<a class="lb-game" href="${href(g.sport)}"><span class="livedot"></span><b>LIVE</b><span class="lb-sport">${esc(NAME[g.sport])}</span>

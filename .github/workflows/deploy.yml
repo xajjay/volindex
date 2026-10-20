@@ -29,7 +29,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
+      - name: Anything new to publish?
+        id: chk
+        run: |
+          # game-night update runs fire every 15 minutes; most change nothing, so skip those deploys
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            started=$(date -d "${{ github.event.workflow_run.run_started_at }}" +%s); head=$(git log -1 --format=%ct)
+            if [ "$head" -lt "$started" ]; then echo "go=no" >> $GITHUB_OUTPUT; echo "No new commit from the update run"; exit 0; fi
+          fi
+          echo "go=yes" >> $GITHUB_OUTPUT
       - name: Package site (skip tools and caches)
+        if: steps.chk.outputs.go == 'yes'
         run: |
           mkdir _site
           cp -r index.html manifest.webmanifest sw.js assets data _site/
@@ -42,8 +52,11 @@ jobs:
           sed -i -E "s#(icons/[a-z0-9-]+\.png)\"#\1?v=$V\"#g" _site/manifest.webmanifest
           python3 tools/make_pages.py _site
       - uses: actions/configure-pages@v5
+        if: steps.chk.outputs.go == 'yes'
       - uses: actions/upload-pages-artifact@v3
+        if: steps.chk.outputs.go == 'yes'
         with:
           path: _site
       - id: deployment
+        if: steps.chk.outputs.go == 'yes'
         uses: actions/deploy-pages@v4

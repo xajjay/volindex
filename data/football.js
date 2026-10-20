@@ -155,205 +155,202 @@ window.SITE.football = {
    "ratings": [
     [
      "TSR",
-     "16.8",
-     14
+     "17.3",
+     12
     ],
     [
      "SP+",
-     "16.7",
-     15
-    ],
-    [
-     "FPI",
-     "17.2",
+     "17.5",
      13
     ],
     [
+     "FPI",
+     "18.1",
+     12
+    ],
+    [
      "FEI",
-     "0.88",
-     11
+     "0.93",
+     13
     ],
     [
      "Massey",
-     "8.48",
-     15
+     "8.76",
+     11
     ],
     [
      "Dokter",
-     "66.31",
-     14
+     "68.84",
+     11
     ],
     [
      "Sagarin",
-     "85.00",
-     15
+     "88.19",
+     11
     ],
     [
      "RQI",
-     "0.266",
-     22
+     "0.744",
+     8
     ],
     [
      "SOS",
-     "11.07",
-     49
+     "10.73",
+     29
     ]
    ],
    "offense": [
     [
      "Rating",
-     "38.70",
+     "38.30",
      15
     ],
     [
      "Success rate",
-     "0.02",
-     57
+     "0.04",
+     40
     ],
     [
      "EPA/play (PPA)",
-     "0.05",
-     66
+     "0.07",
+     58
     ],
     [
      "Rush PPA",
-     "0.19",
-     9
+     "0.18",
+     12
     ],
     [
      "Pass PPA",
-     "-0.11",
-     108
+     "-0.06",
+     98
     ],
     [
      "Points per opportunity",
-     "0.89",
-     37
+     "0.62",
+     46
     ],
     [
      "Drive quality",
-     "21.60",
-     12
+     "17.70",
+     19
     ]
    ],
    "defense": [
     [
      "Rating",
-     "21.90",
-     18
+     "21.00",
+     14
     ],
     [
      "Success rate",
-     "-0.02",
-     69
+     "-0.06",
+     22
     ],
     [
      "EPA/play (PPA)",
-     "-0.13",
-     34
+     "-0.27",
+     3
     ],
     [
      "Rush PPA",
-     "-0.01",
-     85
+     "-0.26",
+     9
     ],
     [
      "Pass PPA",
-     "-0.20",
-     37
+     "-0.25",
+     14
     ],
     [
      "Points per opportunity",
-     "-1.39",
-     4
+     "-1.63",
+     3
     ],
     [
      "Drive quality",
-     "-19.90",
-     22
+     "-20.90",
+     12
     ]
    ],
    "games": [
     [
-     "Alabama",
-     5,
-     "Alabama -5.5",
-     "30.2-35.7",
-     35.0
-    ],
-    [
      "South Carolina",
-     31,
-     "Tennessee -2.7",
-     "31.8-29.2",
-     57.5
+     29,
+     "Tennessee -3.0",
+     "31.5-28.5",
+     58.4
     ],
     [
      "Kentucky",
-     30,
-     "Tennessee -8.4",
-     "35.6-27.2",
-     72.0
+     26,
+     "Tennessee -8.5",
+     "34.8-26.3",
+     72.2
     ],
     [
      "Texas A&M",
-     25,
-     "Tennessee -1.5",
-     "30.4-28.8",
-     54.2
+     24,
+     "Tennessee -2.0",
+     "29.7-27.7",
+     55.6
     ],
     [
      "LSU",
-     8,
-     "LSU -0.5",
-     "31.0-31.4",
-     48.6
+     6,
+     "LSU -1.8",
+     "29.7-31.5",
+     45
     ],
     [
      "Vanderbilt",
-     60,
-     "Tennessee -11.3",
-     "34.8-23.5",
-     78.1
+     62,
+     "Tennessee -13.3",
+     "35.2-21.9",
+     81.7
     ]
    ],
    "played": [
     [
      "Furman",
-     58
+     49
     ],
     [
      "Georgia Tech",
-     65
+     70
     ],
     [
      "Kennesaw State",
-     111
+     114
     ],
     [
      "Texas",
-     7
+     8
     ],
     [
      "Auburn",
-     35
+     28
     ],
     [
      "Arkansas",
-     65
+     60
+    ],
+    [
+     "Alabama",
+     7
     ]
    ]
   },
   "sec": [
    [
     "Georgia",
-    28.1,
-    2,
-    47.3,
-    3,
-    19.2,
+    23.9,
     4,
-    24,
+    43.8,
+    5,
+    19.9,
+    7,
+    37,
     28.7,
     2,
     "11.8-1.1",
@@ -362,13 +359,13 @@ window.SITE.football = {
    ],
    [
     "Alabama",
-    25.3,
+    21.8,
+    7,
+    44.9,
+    3,
+    23.1,
+    32,
     5,
-    48.3,
-    1,
-    23.0,
-    27,
-    12,
     26.6,
     5,
     "10.2-2.3",
@@ -377,13 +374,13 @@ window.SITE.football = {
    ],
    [
     "Texas",
-    24.1,
-    7,
-    43.3,
-    7,
-    19.3,
-    6,
-    7,
+    21.6,
+    8,
+    41.4,
+    9,
+    19.8,
+    5,
+    9,
     25.5,
     6,
     "9.7-2.6",
@@ -392,13 +389,13 @@ window.SITE.football = {
    ],
    [
     "LSU",
-    20.3,
-    8,
-    42.2,
+    22.1,
+    6,
+    42.6,
+    6,
+    20.5,
     10,
-    22.0,
-    20,
-    35,
+    25,
     20.9,
     8,
     "7.7-4.3",
@@ -407,13 +404,13 @@ window.SITE.football = {
    ],
    [
     "Ole Miss",
-    17.0,
-    12,
-    43.2,
+    17.6,
+    11,
+    42.3,
     8,
-    26.2,
-    71,
-    28,
+    24.6,
+    49,
+    16,
     15.7,
     15,
     "7.8-4.3",
@@ -422,13 +419,13 @@ window.SITE.football = {
    ],
    [
     "Tennessee",
-    16.8,
-    14,
-    38.7,
+    17.3,
+    12,
+    38.3,
     15,
-    21.9,
-    18,
-    49,
+    21,
+    14,
+    29,
     17.2,
     13,
     "8.4-3.7",
@@ -437,13 +434,13 @@ window.SITE.football = {
    ],
    [
     "Missouri",
-    16.8,
-    14,
-    38.2,
-    20,
-    21.4,
-    15,
-    52,
+    12.9,
+    22,
+    35,
+    26,
+    22,
+    22,
+    24,
     15.1,
     17,
     "7.9-4.2",
@@ -452,11 +449,11 @@ window.SITE.football = {
    ],
    [
     "Oklahoma",
-    15.4,
-    17,
-    35.1,
-    28,
-    19.8,
+    12.5,
+    23,
+    32.4,
+    38,
+    19.9,
     8,
     2,
     15.1,
@@ -467,13 +464,13 @@ window.SITE.football = {
    ],
    [
     "Florida",
-    12.6,
-    23,
-    38.7,
-    15,
-    26.2,
-    71,
-    30,
+    14.2,
+    17,
+    40.1,
+    11,
+    25.9,
+    65,
+    6,
     12.6,
     25,
     "6.6-5.4",
@@ -482,13 +479,13 @@ window.SITE.football = {
    ],
    [
     "Mississippi State",
-    12.5,
-    24,
-    40.2,
-    12,
-    27.7,
+    9.4,
+    36,
+    36.8,
+    20,
+    27.4,
     95,
-    17,
+    8,
     12.2,
     27,
     "7.6-4.4",
@@ -498,12 +495,12 @@ window.SITE.football = {
    [
     "Texas A&M",
     12.3,
-    25,
-    35.1,
-    28,
-    22.8,
-    25,
-    15,
+    24,
+    33.9,
+    30,
+    21.6,
+    17,
+    23,
     13.7,
     21,
     "5.7-6.3",
@@ -512,13 +509,13 @@ window.SITE.football = {
    ],
    [
     "Kentucky",
-    11.4,
-    30,
-    38.3,
+    11.8,
+    26,
+    37.3,
     19,
-    26.8,
-    82,
-    5,
+    25.6,
+    61,
+    4,
     11.7,
     30,
     "7.9-4.2",
@@ -527,13 +524,13 @@ window.SITE.football = {
    ],
    [
     "South Carolina",
-    11.1,
-    31,
-    36.3,
+    11.3,
+    29,
+    36,
     24,
-    25.2,
-    57,
-    10,
+    24.7,
+    51,
+    21,
     12.1,
     28,
     "5.8-6.2",
@@ -542,13 +539,13 @@ window.SITE.football = {
    ],
    [
     "Auburn",
-    10.7,
-    35,
-    33.1,
-    35,
-    22.4,
-    22,
-    40,
+    11.6,
+    28,
+    34.1,
+    29,
+    22.5,
+    27,
+    10,
     11.4,
     31,
     "6.1-5.9",
@@ -557,13 +554,13 @@ window.SITE.football = {
    ],
    [
     "Vanderbilt",
-    2.5,
-    60,
-    29.1,
+    1,
     62,
-    26.6,
-    81,
-    11,
+    28,
+    65,
+    26.9,
+    85,
+    18,
     1.3,
     62,
     "4.4-7.6",
@@ -572,13 +569,13 @@ window.SITE.football = {
    ],
    [
     "Arkansas",
-    0.7,
-    65,
-    27.5,
-    67,
-    26.9,
-    84,
-    3,
+    1.8,
+    60,
+    28.5,
+    62,
+    26.7,
+    82,
+    11,
     1.3,
     61,
     "3.3-8.7",
@@ -587,8 +584,8 @@ window.SITE.football = {
    ]
   ],
   "fpi": {
-   "fpi": 17.2,
-   "rank": 13,
+   "fpi": 18.1,
+   "rank": 12,
    "proj": "8.4-3.7",
    "winOut": 2.4,
    "sixWins": 99.3,
@@ -2588,7 +2585,7 @@ window.SITE.football = {
    "natRanks": [
     {
      "stat": "Rushing yards",
-     "rank": 7
+     "rank": 3
     },
     {
      "stat": "Rushing TD",
@@ -2597,7 +2594,7 @@ window.SITE.football = {
    ],
    "draft": {
     "level": "Watch",
-    "note": "Consensus No. 319; No. 7 nationally in rushing yards"
+    "note": "Consensus No. 319; among the national leaders in rushing yards"
    },
    "leaving": false
   },
@@ -2612,7 +2609,9 @@ window.SITE.football = {
    "home": "Douglasville, Ga.",
    "hs": "New Manchester",
    "prev": null,
-   "honors": [],
+   "honors": [
+    "SEC Defensive Lineman of the Week — Alabama"
+   ],
    "stats": {
     "def": {
      "gp": 6,
@@ -3363,7 +3362,9 @@ window.SITE.football = {
    "home": "Lexington, Ky.",
    "hs": "Frederick Douglass",
    "prev": "Louisville",
-   "honors": [],
+   "honors": [
+    "SEC Special Teams Player of the Week — Alabama"
+   ],
    "stats": {
     "kick": [
      6,
@@ -5551,21 +5552,6 @@ window.SITE.football = {
    "committed": "2025-11-02"
   },
   {
-   "id": "christian-mays",
-   "name": "Christian Mays",
-   "pos": "DL",
-   "hs": "Northeast Mississippi C.C.",
-   "home": "Booneville, MS",
-   "ht": "6-5",
-   "wt": 340,
-   "grade": 90,
-   "stars": 4,
-   "nat": "3 (JUCO)",
-   "posRank": "1 (JUCO)",
-   "stateRank": null,
-   "committed": "2026-06-06"
-  },
-  {
    "id": "q-mari-hudson",
    "name": "Q'Mari Hudson",
    "pos": "OT",
@@ -5748,8 +5734,8 @@ window.SITE.football = {
  ],
  "recruitClass": {
   "year": 2027,
-  "commits": 19,
-  "rank247": 21
+  "commits": 18,
+  "rank247": 24
  },
  "recruits2028": [
   {

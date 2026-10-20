@@ -76,9 +76,11 @@
     else if (sport === 'sources') renderSources();
     else if (sport === 'about' && window.renderAbout) { window.renderAbout(app, tab); return; }
     else renderHub();
-    window.scrollTo(0, 0);
+    if (!window.VI_KEEP_SCROLL) window.scrollTo(0, 0);
+    window.VI_KEEP_SCROLL = false;
   }
   window.addEventListener('vi:route', route);
+  window.VI_RENDER = () => { window.VI_KEEP_SCROLL = true; route(); }; // redraw the current page in place (live finals)
 
   /* ---------- hub ---------- */
   /* Official polls only (the most-used one per sport). rank: number, 'NR' (unranked) or 'TBA' (not released yet).
@@ -253,15 +255,34 @@
         if (s2.kick) c.kick = s2.kick.slice(0, 4);
         if (Object.keys(c).length) p.career = Object.assign({}, p.career, { [String(F.season)]: c });
       });
+      // national ranks from the data update replace the hand-entered ones for the stats it covers
+      if (A.natRanks && A.natRanks.players) {
+        const auto = new Map(Object.entries(A.natRanks.players).map(([n, r]) => [norm(NAME_ALIAS[n.toLowerCase()] || n), r]));
+        F.players.forEach(p => {
+          const mine = auto.get(norm(p.name)) || [];
+          p.natRanks = mine.slice().sort((a, b) => a.rank - b.rank); // hand-entered ranks go stale, so the automatic list replaces them
+        });
+      }
       // fresh CFBD rows update matching commits; commits CFBD hasn't picked up yet (it can lag 247) are kept
       const mergeRec = (base, fresh) => fresh.map(r => { const o = (base || []).find(b => b.name === r.name) || {}; return Object.assign({}, o, Object.fromEntries(Object.entries(r).filter(([, v]) => v != null && v !== ''))); })
         .concat((base || []).filter(b => !fresh.some(r => r.name === b.name)))
         .sort((a, b) => (b.grade || 0) - (a.grade || 0));
       if (A.recruits && A.recruits['2027'] && A.recruits['2027'].length) F.recruits = mergeRec(F.recruits, A.recruits['2027']);
       if (A.recruits && A.recruits['2028'] && A.recruits['2028'].length) F.recruits2028 = mergeRec(F.recruits2028, A.recruits['2028']);
+      { const out = new Set(((window.EXTRAS || {}).football || {}).decommits || []); F.recruits = F.recruits.filter(r => !out.has(r.name)); if (F.recruits2028) F.recruits2028 = F.recruits2028.filter(r => !out.has(r.name)); }
       if (t.apTop25) F.team.apTop25 = t.apTop25;
       if (A.box) F.box = A.box;
       if (A.previews) F.previews = A.previews;
+      // PEAR Ratings and FPI from the data update (tools/pear.py, CFBD)
+      if (A.pear && A.pear.ratings && A.pear.ratings.length) {
+        const P = F.advanced.pear;
+        ['ratings', 'offense', 'defense', 'games', 'played'].forEach(k => { if (A.pear[k] && A.pear[k].length) P[k] = A.pear[k]; });
+        if (A.pear.sec) F.advanced.sec.forEach(r => { const x = A.pear.sec[r[0]]; if (x) r.splice(1, 7, ...x); });
+      }
+      if (A.fpi) {
+        F.advanced.sec.forEach(r => { const x = A.fpi[r[0]]; if (x) { r[8] = x[0]; r[9] = x[1]; } });
+        if (A.fpi.Tennessee) { F.advanced.fpi.fpi = A.fpi.Tennessee[0]; F.advanced.fpi.rank = A.fpi.Tennessee[1]; }
+      }
       if (A.teamSheet) F.teamSheet = A.teamSheet;
       if (A.talent) F.talent = A.talent;
       // 247 ratings for every rostered player: On3 Top 300 first, then the most recent 247 rating (transfer, else high school)
@@ -436,12 +457,20 @@
   }
 
   /* depth charts */
-  let editing = null, showRisk = false;
+  // 2027 preview: by default only HIGH draft-risk players are left out; "Hide draft-risk players" leaves out every level
+  let editing = null, hideRisk = !!store.get('vi-hide-risk');
   // 2027 view: draft-risk players are left out of the projection; the toggle puts them back where they sit now
   function chartFor(which) {
     const d = depthState[which];
-    if (which !== 'next' || !showRisk) return d.chart;
-    const risk = F.players.filter(p => p.draft && !p.leaving && !p.confirmed27).map(p => p.name);
+    if (which !== 'next') return d.chart;
+    const riskP = F.players.filter(p => p.draft && !p.leaving && !p.confirmed27);
+    if (hideRisk) {
+      const all = new Set(riskP.map(p => p.name));
+      return Object.fromEntries(Object.entries(d.chart).map(([side, rows]) => [side, rows.map(([pos, names]) => [pos, names.filter(n => !all.has(n))])]));
+    }
+    // bring back Medium / Watch risks at their current depth-chart spot (unless taken out by hand while editing)
+    const removed = new Set(d.removed || []);
+    const risk = riskP.filter(p => p.draft.level !== 'High' && !removed.has(p.name)).map(p => p.name);
     const out = {};
     Object.entries(d.chart).forEach(([side, rows]) => {
       const curRows = depthState.current.chart[side] || [];
@@ -480,11 +509,11 @@
     const d = depthState[which]; const isEdit = editing === which;
     const intro = which === 'current'
       ? `<h2>Depth Chart</h2><p>${esc(d.basedOn)}. Updated ${fmtDate(d.updated, { month: 'short', day: 'numeric', year: 'numeric' })}. Click a name for the player card.</p>`
-      : `<h2>2027 Preview</h2><p>${esc(d.basedOn)}. Under the new rule every player gets a 5th year, so only 5th-year players are out of eligibility. Classes shown are next season's. You can edit the preview and add anyone back, including draft risks.</p>`;
+      : `<h2>2027 Preview</h2><p>${esc(d.basedOn)}. Under the new rule every player gets a 5th year, so only 5th-year players are out of eligibility. Classes shown are next season's. Players with a <b>High</b> NFL draft risk are left out; Medium and Watch risks are shown with a tag. Tick <i>Hide NFL draft-risk players</i> to leave every draft risk out, or edit the preview to add or remove anyone.</p>`;
     const extra = which === 'next' ? nextSummary() : '';
     return `${depthState._draft ? `<div class="notice"><span><b>Unsaved edits.</b> You're seeing depth chart changes stored in this browser only. Save them to the data file to make them permanent.</span><button class="btn small" data-act="export">Save to file</button><button class="btn small" data-act="discard">Discard my edits</button></div>` : ''}
       <div class="panel-head"><div>${intro}</div>
-        <div class="controls">${which === 'next' && !isEdit ? `<label class="toggle"><input type="checkbox" id="riskTgl" ${showRisk ? 'checked' : ''}> Show NFL draft-risk players</label>` : ''}${isEdit ? '' : `<button class="btn" data-act="edit">${which === 'next' ? 'Edit preview' : 'Edit depth chart'}</button>`}</div></div>
+        <div class="controls">${which === 'next' && !isEdit ? `<label class="toggle"><input type="checkbox" id="riskTgl" ${hideRisk ? 'checked' : ''}> Hide NFL draft-risk players</label>` : ''}${isEdit ? '' : `<button class="btn" data-act="edit">${which === 'next' ? 'Edit preview' : 'Edit depth chart'}</button>`}</div></div>
       ${isEdit ? `<div class="editbar"><p>Editing. Use ↑ ↓ to reorder, ✕ to remove, and the menu under each position to add a player. Changes are kept in this browser until you save them to the file.</p>
         <button class="btn primary" data-act="done">Done</button><button class="btn" data-act="export">Save to file</button><button class="btn" data-act="reset">Reset to file version</button></div>` : ''}
       <div id="exportBox"></div>${extra}${which === 'next' ? '<div class="side-title" style="margin-top:28px">Projected depth chart</div>' : ''}
@@ -521,7 +550,7 @@
   function fileText() {
     const d = depthState;
     const chart = c => Object.entries(c).map(([side, rows]) => `    "${side}": [\n` + rows.map(([pos, ns]) => `      ["${pos}", ${JSON.stringify(ns)}]`).join(',\n') + '\n    ]').join(',\n');
-    const part = (k) => `  "${k}": {\n    "label": ${JSON.stringify(d[k].label)},\n    "updated": "${new Date().toISOString().slice(0, 10)}",\n    "basedOn": ${JSON.stringify(d[k].basedOn)},\n    "chart": {\n${chart(d[k].chart)}\n    }\n  }`;
+    const part = (k) => `  "${k}": {\n    "label": ${JSON.stringify(d[k].label)},\n    "updated": "${new Date().toISOString().slice(0, 10)}",\n    "basedOn": ${JSON.stringify(d[k].basedOn)},\n    "chart": {\n${chart(d[k].chart)}\n    }${d[k].removed && d[k].removed.length ? `,\n    "removed": ${JSON.stringify(d[k].removed)}` : ''}\n  }`;
     return `/* ============================================================
    TENNESSEE FOOTBALL DEPTH CHARTS  (this is the file you edit)
    ------------------------------------------------------------
@@ -564,10 +593,14 @@ ${part('next')}
   }
   function wireDepth(which) {
     const tab = which === 'next' ? 'next' : 'depth';
-    const tg = $('#riskTgl'); if (tg) tg.addEventListener('change', () => { showRisk = tg.checked; renderFootball('next'); });
+    const tg = $('#riskTgl'); if (tg) tg.addEventListener('change', () => { hideRisk = tg.checked; store.set('vi-hide-risk', hideRisk); renderFootball('next'); });
     app.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => {
       const a = b.dataset.act;
-      if (a === 'edit') { editing = which; renderFootball(tab); }
+      if (a === 'edit') {
+        // edit exactly what the default preview shows (Medium / Watch risks included)
+        if (which === 'next') { const h = hideRisk; hideRisk = false; depthState.next.chart = JSON.parse(JSON.stringify(chartFor('next'))); hideRisk = h; }
+        editing = which; renderFootball(tab);
+      }
       else if (a === 'done') { editing = null; renderFootball(tab); }
       else if (a === 'export') exportFile(which);
       else if (a === 'discard' || a === 'reset') { store.del(DKEY); depthState = JSON.parse(JSON.stringify(window.DEPTH.football)); depthState._draft = false; renderFootball(tab); }
@@ -576,12 +609,13 @@ ${part('next')}
       const t = b.parentElement; const rows = depthState[which].chart[t.dataset.side]; const list = rows[+t.dataset.row][1]; const i = +t.dataset.i;
       if (b.dataset.m === 'up' && i > 0) [list[i - 1], list[i]] = [list[i], list[i - 1]];
       else if (b.dataset.m === 'down' && i < list.length - 1) [list[i + 1], list[i]] = [list[i], list[i + 1]];
-      else if (b.dataset.m === 'rm') list.splice(i, 1);
+      else if (b.dataset.m === 'rm') { const [gone] = list.splice(i, 1); if (which === 'next') { const d = depthState.next; d.removed = [...new Set((d.removed || []).concat(gone))]; } }
       saveDraft(); renderFootball(tab);
     }));
     app.querySelectorAll('[data-add]').forEach(s => s.addEventListener('change', () => {
       if (!s.value) return; const [side, ri] = s.dataset.add.split('|');
       const list = depthState[which].chart[side][+ri][1]; if (!list.includes(s.value)) list.push(s.value);
+      if (which === 'next' && depthState.next.removed) depthState.next.removed = depthState.next.removed.filter(n => n !== s.value);
       saveDraft(); renderFootball(tab);
     }));
   }
@@ -990,6 +1024,17 @@ ${part('next')}
   window.fbOpenPlayer = name => { initFootball(); openPlayer(name); };
   window.fbOpenGame = opp => { initFootball(); openGame(opp); };
   window.fbData = () => { initFootball(); return F; };
+  // a final from the live scoreboard (assets/live.js): result and record update right away, before the data update lands
+  window.fbFinal = function (date, result, us, them) {
+    initFootball();
+    const g = F.schedule.find(x => x.date === date && !x.result); if (!g) return false;
+    Object.assign(g, { result, us: +us, them: +them, liveFinal: true }); delete g.time;
+    const rec = arr => { const w = arr.filter(x => x.result === 'W').length, l = arr.filter(x => x.result === 'L').length, t = arr.filter(x => x.result === 'T').length; return `${w}-${l}${t ? '-' + t : ''}`; };
+    const played = F.schedule.filter(x => x.result);
+    F.team.record = rec(played);
+    if (played.some(x => x.sec != null)) F.team.sec = rec(played.filter(x => x.sec));
+    return true;
+  };
   function openGame(opp) {
     const g = F.schedule.find(x => x.opp === opp); if (!g) return;
     if (g.result) openBox(g); else openPreview(g);
@@ -1051,6 +1096,26 @@ ${part('next')}
     if (P && P.impact && P.impact[0]) bits.push(`${esc(opp)}'s top playmaker: ${esc(P.impact[0].name)} (${esc(P.impact[0].line)}).`);
     return bits.join(' ');
   }
+  // Tennessee's impact players: the depth chart's starting QB (not just the passing leader) and the
+  // defensive linemen pinned in data/extras.js (football.impactPins) always appear.
+  function utImpact(list) {
+    list = (list || []).slice();
+    const qb = byName.get(((depthState.current.chart.Backfield || []).find(r => r[0] === 'QB') || [, []])[1][0]);
+    if (qb) {
+      const ps = qb.stats.pass, i = list.findIndex(x => x.what === 'passing');
+      const row = { name: qb.name, pos: 'QB', what: 'passing', line: ps ? `${ps[2]} pass yds, ${ps[3]} TD, ${ps[4]} INT · starter` : 'Starting quarterback' };
+      if (i >= 0) list[i] = row; else list.unshift(row);
+    }
+    const pins = (((window.EXTRAS || {}).football || {}).impactPins || []);
+    pins.forEach(n => {
+      const p = byName.get(n); if (!p || list.some(x => x.name === n)) return;
+      const d = p.stats.def || {};
+      const row = { name: p.name, pos: p.pos, what: 'dl', line: `${d.tot || 0} tackles, ${d.tfl || 0} TFL, ${d.sacks || 0} sacks` };
+      const i = list.findIndex(x => x.what === 'defensive' && /^(DL|DE|DT|EDGE)$/.test(x.pos || ''));
+      if (i >= 0) list[i] = row; else list.push(row);
+    });
+    return list;
+  }
   function openPreview(g) {
     const P = (F.previews || {})[g.opp]; const E = g.espn || {}; const w = howToWatch(E.tv);
     const head = `<div><div class="eyebrow">Matchup preview · ${fmtDate(g.date, { weekday: 'short', month: 'short', day: 'numeric' })} · ${esc(kick(g))}</div><h3>${g.site === 'A' ? 'Tennessee at ' + esc(g.opp) : esc(g.opp) + ' at Tennessee'}</h3></div>`;
@@ -1059,7 +1124,7 @@ ${part('next')}
       <div class="tile"><b style="font-size:22px">${w ? esc(w.net) : 'TBA'}</b><span>TV · ${esc(kick(g))}</span><em>${w ? esc(w.stream) : 'Network announced 6–12 days out'}</em></div>
       <div class="tile"><b style="font-size:22px">${E.line ? esc(E.line) : '—'}</b><span>Line${E.ou ? ' · O/U ' + E.ou : ''}</span><em>${E.book ? esc(E.book) + ' via ESPN' : 'Not posted yet'}</em></div>
       <div class="tile"><b style="font-size:22px">${E.win != null ? E.win.toFixed(1) + '%' : '—'}</b><span>UT win chance (${tip('FPI')})</span><em>${esc(g.loc || '')}</em></div></div>`;
-    const imp = (list, who) => list && list.length ? `<ul class="list">${list.map(x => `<li${who === 'ut' && byName.has(x.name) ? ` data-player="${esc(x.name)}" class="click-li"` : ''}><b class="namecol">${esc(x.name)}</b><span class="dim">${esc(x.pos || '')}</span><span class="grow">${esc(x.line)}</span></li>`).join('')}</ul>` : '<p class="dim small">Available after the next data update.</p>';
+    const imp = (list, who) => (list = who === 'ut' ? utImpact(list) : list) && list.length ? `<ul class="list">${list.map(x => `<li${who === 'ut' && byName.has(x.name) ? ` data-player="${esc(x.name)}" class="click-li"` : ''}><b class="namecol">${esc(x.name)}</b><span class="dim">${esc(x.pos || '')}</span><span class="grow">${esc(x.line)}</span></li>`).join('')}</ul>` : '<p class="dim small">Available after the next data update.</p>';
     const series = P && P.series ? `<div class="box" style="padding:14px"><div class="lb"><h4>Series history <span>since ${P.series.first || '—'}</span></h4></div>
         <p style="margin:6px 0 10px"><b class="num" style="font-size:26px">${P.series.w}-${P.series.l}${P.series.t ? '-' + P.series.t : ''}</b> <span class="dim">Tennessee's all-time record vs. ${esc(g.opp)}</span></p>
         <ul class="list">${P.series.last.slice().reverse().map(x => `<li><b class="num">${x[0]}</b><span class="grow">${esc(x[4])} ${x[5]}, ${esc(x[2])} ${x[3]}</span><span class="${x[1] === 'Tennessee' ? 'W' : 'L'}">${x[1] === 'Tennessee' ? 'W' : 'L'}</span></li>`).join('')}</ul></div>` : '';

@@ -230,6 +230,44 @@ def player_stats():
         if s: out[name] = s
     return out
 
+# ---------------------------------------------------------------- national (FBS) player ranks
+NAT_STATS = [  # (CFBD category, statType, label shown on the site)
+    ("rushing", "YDS", "Rushing yards"), ("rushing", "TD", "Rushing TD"),
+    ("passing", "YDS", "Passing yards"), ("passing", "TD", "Passing TD"),
+    ("receiving", "YDS", "Receiving yards"), ("receiving", "TD", "Receiving TD"), ("receiving", "REC", "Receptions"),
+    ("defensive", "TFL", "Tackles for loss"), ("defensive", "SACKS", "Sacks"), ("defensive", "TOT", "Tackles"),
+    ("defensive", "PD", "Passes defended"), ("interceptions", "INT", "Interceptions"),
+]
+@section("national (FBS) ranks for Tennessee players")
+def nat_ranks():
+    """Every Tennessee player's national rank (top 100, FBS players only) in the main stat categories."""
+    fbs = set(league()["pts"])
+    out = {}
+    for cat in sorted({c for c, _, _ in NAT_STATS}):
+        rows = cfbd("/stats/player/season", year=YEAR, category=cat)
+        vals = {}
+        for r in rows:
+            if r.get("team") not in fbs: continue
+            try: vals.setdefault(r["statType"], []).append((float(r["stat"]), r["player"], r["team"]))
+            except (TypeError, ValueError): pass
+        for c, st, label in NAT_STATS:
+            if c != cat: continue
+            L = vals.get(st, [])
+            for v, name, team in L:
+                if team != TEAM or v <= 0: continue
+                rank = 1 + sum(1 for x in L if x[0] > v)
+                if rank <= 100: out.setdefault(name, []).append(dict(stat=label, rank=rank))
+    if not out: raise RuntimeError("no national ranks returned")
+    for v in out.values(): v.sort(key=lambda r: r["rank"])
+    return dict(stats=[l for _, _, l in NAT_STATS], players=out)
+
+@section("FPI ratings and ranks for the SEC (CFBD)")
+def fpi_sec():
+    rows = cfbd("/ratings/fpi", year=YEAR) or []
+    rows = [r for r in rows if r.get("fpi") is not None]
+    rank = {r["team"]: i + 1 for i, r in enumerate(sorted(rows, key=lambda r: -r["fpi"]))}
+    return {r["team"]: [round(r["fpi"], 1), rank[r["team"]]] for r in rows if r.get("conference") == "SEC" or r["team"] == TEAM}
+
 # ---------------------------------------------------------------- recruits
 @section("recruiting classes")
 def recruits():
@@ -550,6 +588,8 @@ def run_football():
     if tr: auto["team"]["ranks"] = tr
     ps = player_stats()
     if ps: auto["playerStats"] = ps
+    nr = nat_ranks()
+    if nr: auto["natRanks"] = nr
     rc = recruits()
     if rc: auto["recruits"] = rc
     e = espn()
@@ -567,6 +607,15 @@ def run_football():
         pv = previews(g[0])
         if pv: auto["previews"] = pv
     history()
+    try:                                   # PEAR Ratings for the Advanced tab
+        import pear
+        try:
+            auto["pear"] = pear.ratings(); note(f"OK   PEAR ratings (week {auto['pear'].get('week')})")
+        except Exception as e:
+            note(f"SKIP PEAR ratings: {e}"); pear.probe(); note("     PEAR probe saved to tools/cache/pear-probe.json")
+    except Exception as e: note(f"SKIP PEAR: {e}")
+    fs = fpi_sec()
+    if fs: auto["fpi"] = fs
     auto["log"] = log
     for k, v in prev.items():            # keep last run's data for anything that failed this time
         if k not in auto: auto[k] = v

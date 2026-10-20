@@ -29,10 +29,10 @@ window.SITE.soccer = {
   ]
  ],
  "quick": [
-  "Tennessee is <b>6-3-3</b> (1-3-2 SEC).",
+  "Tennessee is <b>6-4-4</b> (1-4-3 SEC).",
   "Preseason: <b>No. 24</b> in the United Soccer Coaches poll (first preseason ranking since 2019) with TopDrawerSoccer's <b>No. 5</b> newcomer class.",
   "<b>Kylee Simmons</b> leads with 4 goals; <b>Ines Derrien</b> and <b>Shae O'Rourke</b> each have 3 goals and 3 assists. Both forwards are back from 2025 knee injuries.",
-  "Three SEC matches left, starting with <b>Kentucky on Oct. 18</b>. Top 12 teams make the SEC Tournament."
+  "Two SEC matches left: at <b>Alabama Oct. 23</b> and <b>Oklahoma Nov. 1</b>. Top 12 teams make the SEC Tournament."
  ],
  "staff": [
   [

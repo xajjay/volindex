@@ -14,6 +14,8 @@ volindex.net is a free, fan-made Tennessee athletics hub: football, volleyball, 
 - `data/standings-auto.js`: SEC standings (ESPN, secsports.com)
 - `data/transfer-stats.js`: last-season stats for transfers (hand-added baseball lines inside it are kept)
 - `data/updated.js`: last-updated dates
+- PEAR Ratings (`tools/pear.py`), FPI, and Tennessee players' national stat ranks also refresh automatically into `data/football-auto.js`
+- `tools/cache/gameday.json`: game-night bookkeeping (which finals have been picked up)
 
 Live scores (`assets/live.js`) and the live box score window (`assets/livebox.js`) need no maintenance; they read ESPN during games.
 
@@ -25,7 +27,7 @@ Live scores (`assets/live.js`) and the live box score window (`assets/livebox.js
 | `data/<sport>-lineup.js` | Projected lineups: `mbb`, `wbb`, `volleyball`, `soccer`, `baseball`, `softball` |
 | `data/football.js` | Football roster (`players`), schedule, notes, sources, retired jerseys |
 | `data/<sport>.js` | Other sports: `roster`, `schedule`, `quick` (overview bullets), `staff`, `sources` |
-| `data/extras.js` | Per sport: `playersToKnow` (overview cards, exact order), `honors`, `draft` (pro prospects), `departures`, `ratings`, `advanced`, `recruit` |
+| `data/extras.js` | Per sport: `playersToKnow` (overview cards, exact order), football `impactPins` (always in Tennessee's matchup-preview impact players) and `decommits` (kept off the commit list), `honors`, `draft` (pro prospects), `departures`, `ratings`, `advanced`, `recruit` |
 | `data/recruiting.js` | Commits, targets and recruiting notes per sport |
 | `data/ratings-bb.js` | Basketball player ratings (247Sports men, ESPN women) |
 | `data/social.js` | Social & Media tab links |

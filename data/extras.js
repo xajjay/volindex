@@ -9,6 +9,10 @@
 window.EXTRAS = {
   football: {
     playersToKnow: ['Xavier Gilliam', 'DeSean Bishop', 'Mike Matthews', 'David Sanders Jr.', 'Arion Carter', 'Ty Redmond', 'Dejuan Lane', 'George MacIntyre'],
+    // always listed in Tennessee's "Impact players" on every matchup preview (the starting QB comes from the depth chart)
+    impactPins: ['Xavier Gilliam'],
+    // decommitted: kept off the commit list even if a data source still shows them
+    decommits: ['Christian Mays'],
   },
   mbb: {
     ratings: [
@@ -126,8 +130,8 @@ window.EXTRAS = {
   },
   volleyball: {
     ratings: [
-      ['AVCA Coaches Poll', 'No. 9', 'Through games of Oct. 11 (up from No. 10)', 'https://www.ncaa.com/rankings/volleyball-women/d1/avca-coaches'],
-      ['NCAA RPI', 'No. 18', 'Through games of Oct. 11 (up from No. 19) · road 3-1, neutral 2-1, home 7-1', 'https://www.ncaa.com/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi'],
+      ['AVCA Coaches Poll', 'No. 9', 'Through games of Oct. 18 (also No. 9 the week before)', 'https://www.ncaa.com/rankings/volleyball-women/d1/avca-coaches'],
+      ['NCAA RPI', 'No. 18', 'Through games of Oct. 18 · record 14-3', 'https://www.ncaa.com/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi'],
       ['Massey Ratings', 'No. 13', 'Power No. 14 · strength of schedule No. 25 · through Oct. 11', 'https://masseyratings.com/cvol/ncaa-d1/ratings'],
       ['SEC coaches preseason poll', '5th', 'Picked fifth in the SEC (July 2026)', 'https://utsports.com/news/2026/7/29/volleyball-caroline-kerr-earns-preseason-all-sec-honors'],
       ['AVCA preseason poll', 'No. 22', 'Start of the season', 'https://www.avca.org/polls-awards/polls/'],
@@ -135,7 +139,7 @@ window.EXTRAS = {
     advanced: {
       intro: 'The NCAA RPI drives NCAA Tournament seeding; Massey adds a margin-based computer rating.',
       teams: [
-        { src: 'NCAA RPI', url: 'https://www.ncaa.com/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi', rank: 18, rating: '12-3', extra: 'Road 3-1 · neutral 2-1 · home 7-1', date: 'Through Oct. 11' },
+        { src: 'NCAA RPI', url: 'https://www.ncaa.com/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi', rank: 18, rating: '14-3', extra: 'Unchanged from the week before', date: 'Through Oct. 18' },
         { src: 'Massey Ratings', url: 'https://masseyratings.com/cvol/ncaa-d1/ratings', rank: 13, rating: '8.49', extra: 'Power No. 14 · schedule strength No. 25 · expected finish 7.8-2.2 the rest of the way', date: 'Through Oct. 11' },
       ],
       glossary: [['RPI', 'Rating Percentage Index: 25% your winning percentage, 50% your opponents\', 25% your opponents\' opponents\'. The selection committee uses it for NCAA Tournament bids.'], ['Massey', 'Computer rating that accounts for set and point margins and schedule.'], ['Hitting percentage', '(Kills − errors) ÷ attempts. Above .300 is excellent.']],
@@ -166,8 +170,8 @@ window.EXTRAS = {
   },
   soccer: {
     ratings: [
-      ['United Soccer Coaches poll', 'NR', 'Poll 8 (Oct. 6). Was No. 13 on Sept. 29 and as high as No. 8.', 'https://unitedsoccercoaches.org/rankings/college-rankings/ncaa-di-women/'],
-      ['NCAA RPI', 'No. 32', 'Through games of Oct. 11 (was No. 29) · home 5-1-1, road 1-2-2', 'https://www.ncaa.com/rankings/soccer-women/d1/ncaa-womens-soccer-rpi'],
+      ['United Soccer Coaches poll', 'NR', 'Poll 9 (Oct. 13). Was No. 13 on Sept. 29 and as high as No. 8.', 'https://unitedsoccercoaches.org/rankings/college-rankings/ncaa-di-women/'],
+      ['NCAA RPI', 'No. 47', 'Through games of Oct. 18 (was No. 43) · record 6-4-4', 'https://www.ncaa.com/rankings/soccer-women/d1/ncaa-womens-soccer-rpi'],
       ['Massey Ratings', 'No. 27', 'Power No. 22 · offense No. 38 · defense No. 17 · schedule strength No. 16', 'https://masseyratings.com/csocw/ncaa-d1/ratings'],
       ['United Soccer Coaches preseason', 'No. 24', 'August 4, 2026', 'https://unitedsoccercoaches.org/rankings/college-rankings/ncaa-di-women/'],
       ['TopDrawerSoccer newcomer class', 'No. 5', 'Incoming class ranking', 'https://www.topdrawersoccer.com/college-soccer/college-soccer-details/women/tennessee/clgid-282'],
@@ -175,7 +179,7 @@ window.EXTRAS = {
     advanced: {
       intro: 'RPI decides NCAA Tournament at-large bids; Massey adds a goal-margin computer rating split into offense and defense.',
       teams: [
-        { src: 'NCAA RPI', url: 'https://www.ncaa.com/rankings/soccer-women/d1/ncaa-womens-soccer-rpi', rank: 32, rating: '6-3-3', extra: 'Home 5-1-1 · road 1-2-2', date: 'Through Oct. 11' },
+        { src: 'NCAA RPI', url: 'https://www.ncaa.com/rankings/soccer-women/d1/ncaa-womens-soccer-rpi', rank: 47, rating: '6-4-4', extra: 'Down from No. 43 the week before', date: 'Through Oct. 18' },
         { src: 'Massey Ratings', url: 'https://masseyratings.com/csocw/ncaa-d1/ratings', rank: 27, rating: '8.38', off: ['5.12', 38], def: ['3.96', 17], extra: 'Power No. 22 · schedule strength No. 16', date: 'Through Oct. 11' },
       ],
       glossary: [['RPI', '25% your winning percentage, 50% opponents\', 25% opponents\' opponents\'. Ties count as half a win.'], ['Massey offense / defense', 'Projected goals scored / prevented against an average opponent.']],

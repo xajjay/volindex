@@ -9,10 +9,10 @@
    ============================================================ */
 window.DEPTH = window.DEPTH || {};
 window.DEPTH.football = {
-  "rev": 5,
+  "rev": 7,
   "current": {
     "label": "2026 depth chart",
-    "updated": "2026-10-19",
+    "updated": "2026-10-20",
     "basedOn": "The Vol Index depth chart (unofficial)",
     "chart": {
     "Backfield": [
@@ -20,10 +20,10 @@ window.DEPTH.football = {
       ["RB", ["DeSean Bishop","Daune Morris","Javin Gordon","Justin Baker"]]
     ],
     "Receivers": [
-      ["WR-X", ["Radarious Jackson","Travis Smith Jr.","Nathan Roberts","Ian Duarte"]],
-      ["WR-Z", ["Mike Matthews","TK Keys","Deon Hardin"]],
+      ["WR-X", ["Radarious Jackson","TK Keys","Ian Duarte"]],
+      ["WR-Z", ["Mike Matthews","Travis Smith Jr."]],
       ["WR-SL", ["Braylon Staley","Tyreek King"]],
-      ["TE", ["DaSaahn Brame","Trent Thomas","Luca Wolf","Cole Harrison"]]
+      ["TE", ["DaSaahn Brame","Trent Thomas","Luca Wolf"]]
     ],
     "Offensive Line": [
       ["LT", ["David Sanders Jr.","Gabriel Osenda","Jeremias Heard"]],
@@ -33,14 +33,14 @@ window.DEPTH.football = {
       ["RT", ["Jesse Perry","Ory Williams","Kamari Blair"]]
     ],
     "Defensive Line": [
-      ["DE", ["Tyree Weathersby","Mariyon Dye","Carson Gentle","Hezekiah Harris"]],
-      ["DT", ["Xavier Gilliam","Ethan Utley","Isaiah Campbell"]],
-      ["DT", ["Daevin Hobbs","JJ Finch","Nathan Robinson"]],
-      ["DE", ["Jeremiah Telander","Jordan Norman","Mariyon Dye","Kedric Golston II"]]
+      ["DE", ["Tyree Weathersby","Mariyon Dye","Hezekiah Harris"]],
+      ["DT", ["Xavier Gilliam","Carson Gentle","Ethan Utley"]],
+      ["DT", ["Daevin Hobbs","Nathan Robinson","JJ Finch"]],
+      ["DE", ["Jeremiah Telander","Jordan Norman","Mariyon Dye"]]
     ],
     "Linebackers": [
       ["MIKE", ["Amare Campbell","TJ White","Brayden Rouse"]],
-      ["WILL", ["Arion Carter","Edwin Spillman","Jeremiah Telander","Jadon Perlotte"]]
+      ["WILL", ["Arion Carter","Edwin Spillman","Jeremiah Telander"]]
     ],
     "Secondary": [
       ["CB", ["Ty Redmond","Tim Merritt","Jamyan Theodore"]],
@@ -62,8 +62,8 @@ window.DEPTH.football = {
   },
   "next": {
     "label": "2027 projected depth chart",
-    "updated": "2026-10-19",
-    "basedOn": "The Vol Index 2027 projected depth chart (unofficial). Projection: 2026 chart minus 5th-year players and NFL draft risks, plus 2027 commits. Seniors are shown returning for their 5th year",
+    "updated": "2026-10-20",
+    "basedOn": "The Vol Index 2027 projected depth chart (unofficial). Projection: 2026 chart minus 5th-year players and High NFL draft risks, plus 2027 commits. Seniors are shown returning for their 5th year",
     "chart": {
     "Backfield": [
       ["QB", ["George MacIntyre","Faizon Brandon","Ryan Staub","Derrick Baker"]],
@@ -84,7 +84,7 @@ window.DEPTH.football = {
     ],
     "Defensive Line": [
       ["DE", ["Mariyon Dye","Carson Gentle","Hezekiah Harris"]],
-      ["DT", ["Ethan Utley","JJ Finch","Christian Mays"]],
+      ["DT", ["Ethan Utley","JJ Finch"]],
       ["DT", ["Daevin Hobbs","Nathan Robinson","Isaiah Campbell"]],
       ["DE", ["Tyree Weathersby","Jordan Norman","Kedric Golston II"]]
     ],

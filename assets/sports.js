@@ -40,6 +40,24 @@
   const nextGame = D => D.schedule.find(g => !g.result && g.date >= today()) || null;
   window.sportNext = k => (window.SITE && window.SITE[k]) ? nextGame(applyAuto(window.SITE[k])) : null;
   const resStr = g => g.result ? `<span class="${g.result}">${g.result}</span>${g.us != null ? ' ' + g.us + '–' + g.them : ''}` : '';
+  // header record (and the overview's record sentence) from the schedule
+  function setRecord(D) {
+    const real = D.schedule.filter(g => g.result && g.kind !== 'exh');
+    const rec = arr => { const w = arr.filter(g => g.result === 'W').length, l = arr.filter(g => g.result === 'L').length, t = arr.filter(g => g.result === 'T').length; return `${w}-${l}${t ? '-' + t : ''}`; };
+    if (!real.length) return;
+    D.header = D.header.map(h => /record/i.test(h[1]) && (!/^\d{4}/.test(h[1]) || h[1].startsWith(D.season)) ? [rec(real), h[1]] : h[1] === 'SEC' ? [rec(real.filter(g => g.kind === 'conf')), 'SEC'] : h);
+    D.inSeason = true;
+    const sec = rec(real.filter(g => g.kind === 'conf'));
+    if (D.quick && D.quick[0]) D.quick = [D.quick[0].replace(/<b>\d+-\d+(?:-\d+)?<\/b>( \(\d+-\d+(?:-\d+)? SEC\))?/, `<b>${rec(real)}</b> (${sec} SEC)`)].concat(D.quick.slice(1));
+  }
+  // a final from the live scoreboard (assets/live.js): show the result and new record right away,
+  // before the data update lands. Returns true when something changed.
+  window.sportFinal = function (k, date, result, us, them) {
+    const D = applyAuto(window.SITE && window.SITE[k]); if (!D) return false;
+    const g = D.schedule.find(x => x.date === date && !x.result && x.kind !== 'event'); if (!g) return false;
+    Object.assign(g, { result, us: +us, them: +them, liveFinal: true });
+    setRecord(D); return true;
+  };
   /* ---------- auto data (data/<sport>-auto.js from tools/update_sports.py) ---------- */
   const merged = new Set();
   function applyAuto(D) {
@@ -60,16 +78,7 @@
             gid: g.id, hasBox: !!(A.box && A.box[String(g.id)]), watch: g.watch, live: g.live, event: g.tournament, note: g.note,
           });
         });
-        // header record from the live schedule
-        const real = D.schedule.filter(g => g.result && g.kind !== 'exh');
-        const rec = arr => { const w = arr.filter(g => g.result === 'W').length, l = arr.filter(g => g.result === 'L').length, t = arr.filter(g => g.result === 'T').length; return `${w}-${l}${t ? '-' + t : ''}`; };
-        if (real.length) {
-          D.header = D.header.map(h => /record/i.test(h[1]) && (!/^\d{4}/.test(h[1]) || h[1].startsWith(D.season)) ? [rec(real), h[1]] : h[1] === 'SEC' ? [rec(real.filter(g => g.kind === 'conf')), 'SEC'] : h);
-          D.inSeason = true;
-          // keep the overview's record sentence in step with the schedule
-          const sec = rec(real.filter(g => g.kind === 'conf'));
-          if (D.quick && D.quick[0]) D.quick = [D.quick[0].replace(/<b>\d+-\d+(?:-\d+)?<\/b>( \(\d+-\d+(?:-\d+)? SEC\))?/, `<b>${rec(real)}</b> (${sec} SEC)`)].concat(D.quick.slice(1));
-        }
+        setRecord(D);
       }
       if (A.stats) D.statsAuto = A.stats;
       if (A.box) D.box = A.box;
