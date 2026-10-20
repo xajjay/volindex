@@ -1,0 +1,70 @@
+# utsports.com women's basketball season stats (online stats start 2015-16; that season is partial). name|pos|home state|school before UT|gp,pts,reb,ast,stl,blk,3pm,fg%
+#2015-16|15-5, 6-2
+Diamond DeShields|G|Ga|North Carolina|20,313,100,54,36,18,27,0.407
+Bashaara Graves|F|Tenn||17,183,159,22,17,7,,0.535
+Te'a Cooper|G|Ga||20,208,45,52,32,,18,0.407
+Mercedes Russell|C|Ore||20,198,170,16,10,46,,0.543
+#2016-17|20-12, 10-6
+Diamond DeShields|G|Ga|North Carolina|29,504,186,110,41,29,27,0.423
+Mercedes Russell|C|Ore||32,514,309,38,23,45,,0.562
+Jaime Nared|G/F|Ore||32,500,220,53,37,11,37,0.423
+Alexa Middleton|G|Tenn||32,253,74,64,30,7,42,0.395
+Jordan Reynolds|G|Ore||31,218,160,138,38,12,12,0.347
+#2017-18|25-8, 11-5
+Jaime Nared|G/F|Ore||33,550,245,84,73,20,27,0.391
+Mercedes Russell|C|Ore||33,504,303,27,39,44,,0.583
+Rennia Davis|G/F|Fla||33,396,250,57,35,11,25,0.483
+Anastasia Hayes|G|Tenn||33,307,84,114,44,2,10,0.42
+Evina Westbrook|G|Ore||33,276,92,143,30,23,27,0.39
+Meme Jackson|G/F|Tenn||33,272,133,74,34,13,50,0.381
+#2018-19|19-13, 7-9
+Evina Westbrook|G|Ore||31,463,113,163,49,3,38,0.419
+Rennia Davis|G/F|Fla||31,463,240,44,41,10,34,0.456
+Meme Jackson|G/F|Tenn||30,324,88,70,48,4,54,0.406
+Zaay Green|G|Texas||32,307,128,72,30,13,22,0.393
+Cheridene Green|F|England||32,288,244,31,31,16,,0.548
+#2019-20|21-10, 10-6
+Rennia Davis|G/F|Fla||30,541,245,74,28,15,34,0.469
+Rae Burrell|G/F|Nev||31,326,171,44,23,16,21,0.41
+Jordan Horston|G|Ohio||31,313,170,143,39,25,27,0.394
+Tamari Key|C|N.C||31,226,145,21,10,86,,0.561
+Jazmine Massengill|G|Tenn||31,203,145,128,27,23,15,0.399
+#2020-21|17-8, 9-4
+Rennia Davis|G/F|Fla||24,415,212,56,20,8,20,0.48
+Rae Burrell|G/F|Nev||25,419,114,46,24,10,39,0.458
+Tamari Key|C|N.C||25,223,141,12,12,72,,0.628
+Jordan Horston|G|Ohio||25,215,98,104,36,23,14,0.35
+#2021-22|25-9, 11-5
+Jordan Horston|G|Ohio||23,372,216,91,33,23,16,0.379
+Tamari Key|C|N.C||34,356,277,33,16,119,,0.581
+Alexus Dye|F|Ala|Troy|34,347,262,32,20,13,,0.43
+Rae Burrell|G/F|Nev||22,270,85,35,14,6,26,0.364
+Jordan Walker|G|Mich|Western Michigan|34,260,141,115,38,7,22,0.341
+Sara Puckett|G/F|Ala||34,219,118,39,16,6,23,0.433
+#2022-23|25-12, 13-3
+Rickea Jackson|F|Mich|Mississippi State|35,671,215,50,27,17,16,0.548
+Jordan Horston|G|Ohio||35,545,247,117,55,38,20,0.438
+Tess Darby|G/F|Tenn||37,272,109,30,27,,70,0.419
+Jillian Hollingshead|F|Ga|Georgia|36,222,157,21,11,15,2,0.486
+Jordan Walker|G|Mich|Western Michigan|37,210,144,119,49,3,16,0.372
+#2023-24|20-13, 10-6
+Rickea Jackson|F|Mich|Mississippi State|25,505,204,58,17,6,22,0.485
+Jewel Spear|G|Texas|Wake Forest|33,432,146,71,18,4,69,0.429
+Sara Puckett|G/F|Ala||33,326,162,49,20,6,38,0.447
+Jasmine Powell|G|Mich|Minnesota|32,299,151,136,29,4,22,0.384
+Karoline Striplin|F|Ala||33,236,103,22,10,14,18,0.491
+Tamari Key|C|N.C||32,159,118,17,11,52,,0.574
+#2024-25|24-10, 8-8
+Talaysia Cooper|G|S.C|South Carolina|34,563,191,108,105,25,36,0.447
+Jewel Spear|G|Texas|Wake Forest|32,400,89,56,29,5,77,0.409
+Zee Spearman|F|Ga|Miami|34,399,204,27,24,23,24,0.515
+Ruby Whitehorn|G|Mich|Clemson|34,395,137,58,31,12,25,0.463
+Samara Spencer|G|Fla|Arkansas|34,362,127,158,45,3,66,0.409
+Tess Darby|G/F|Tenn||33,212,60,20,20,3,58,0.368
+#2025-26|16-14, 8-8
+Talaysia Cooper|G|S.C|South Carolina|29,464,137,104,78,9,61,0.429
+Janiah Barker|F|Ga|Texas A&M / UCLA|27,385,179,33,30,23,38,0.465
+Zee Spearman|F|Ga|Miami|30,306,174,29,25,38,24,0.384
+Mia Pauldo|G|N.J||27,280,67,67,29,1,47,0.356
+Nya Robertson|G|Texas|George Washington / SMU|30,255,71,39,19,4,57,0.361
+Jaida Civil|G|Fla||30,192,121,45,20,5,17,0.415

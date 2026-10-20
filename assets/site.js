@@ -68,14 +68,14 @@
   /* ---------- router ---------- */
   function route() {
     const h = window.VI_ROUTER ? window.VI_ROUTER.key() : ((location.hash || '#home').slice(1));
-    const [sport, tab] = h.split('-');
+    const [sport, tab, sub] = h.split('-');
     const d = document.getElementById('playerDlg'); if (d && d.open) d.close();
     document.querySelectorAll('.sportnav a').forEach(a => a.setAttribute('aria-current', a.dataset.sport === sport ? 'page' : 'false'));
     if (sport === 'football') renderFootball(tab || 'overview');
     else if (SPORTS.find(s => s.key === sport)) { if (window.SITE && window.SITE[sport] && window.renderSport) window.renderSport(sport, tab || 'overview'); else renderComing(sport); }
     else if (sport === 'sources') renderSources();
     else if (sport === 'about' && window.renderAbout) { window.renderAbout(app, tab); return; }
-    else if (sport === 'games' && window.renderGames) window.renderGames(app, tab);
+    else if (sport === 'games' && window.renderGames) window.renderGames(app, tab, sub);
     else renderHub();
     if (!window.VI_KEEP_SCROLL) window.scrollTo(0, 0);
     window.VI_KEEP_SCROLL = false;
@@ -314,7 +314,7 @@
         <div><b>${t.ap}</b><small>AP poll</small></div>
         <div class="hide-sm"><b>${F.advanced.fpi.rank}</b><small>${tip('FPI')}</small></div>
       </div>
-      <nav class="tabs" aria-label="Football sections">${TABS.map(([k, l]) => `<a href="#football-${k}" aria-current="${k === tab ? 'page' : 'false'}">${l}</a>`).join('')}</nav>
+      <nav class="tabs" aria-label="Football sections">${TABS.map(([k, l]) => `<a href="#football-${k}" aria-current="${k === tab ? 'page' : 'false'}">${l}</a>`).join('')}<a href="#games-football">Games</a></nav>
     </div></div><div class="checker" aria-hidden="true"></div>`;
   }
   function renderFootball(tab) {

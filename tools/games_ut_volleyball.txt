@@ -1,0 +1,105 @@
+# utsports.com volleyball season stats. name|pos|home state|school before UT|sets,kills,assists,digs,blocks,aces,hit%
+#2006|19-12, 10-10
+Sarah Blum||||114,359,3,50,209,9,0.338
+Kelsey Fautsch||||106,350,18,215,43,9,0.197
+Yuliya Stoyanova|OH/RS|Bulgaria||84,343,22,232,60,13,0.228
+Chelsea Noble|S|||117,70,1377,345,68,15,0.193
+#2007|11-18, 6-14
+Farren Powe|MB|Ala||113,327,75,230,100,24,0.198
+Mindy Flynn|RS/MB|Ky||97,245,9,59,128,10,0.258
+#2008|22-10, 15-5
+Deedee Harrison|MB|Tenn||64,250,11,172,44,5,0.242
+Mindy Flynn|MB|Ky||117,210,12,161,70,7,0.197
+Kelsey Mahoney|S|Texas||113,18,341,317,3,27,0.348
+#2009|24-8, 16-4
+Nikki Fowler|OH|Texas||101,272,19,194,82,13,0.234
+DeeDee Harrison|MB|Tenn||68,246,18,219,68,12,0.235
+Leah Hinkey|MB|Colo||121,170,321,109,90,12,0.284
+#2010|25-7, 15-5
+Nikki Fowler|OH|Texas||112,393,36,324,61,21,0.306
+Kayla Jeter|OH|Ohio||114,340,10,184,76,7,0.304
+DeeDee Harrison|MB|Tenn||114,240,4,25,102,,0.323
+Leah Hinkey|MB|Colo||114,218,16,46,131,18,0.367
+Emily Steinbeck|S|Ill||114,,685,164,,13
+#2011|28-4, 19-1
+Kelsey Robinson|OH|Ill||124,561,58,391,54,44,0.255
+DeeDee Harrison|MB|Tenn||119,288,1,22,136,,0.31
+Leslie Cikra|OH/MB|Ohio||98,272,4,32,63,,0.313
+Mary Pollmiller|S|Colo||124,74,1480,260,49,10,0.254
+Ellen Mullins|L/DS|Tenn||124,1,65,471,,21
+#2012|22-8, 15-5
+Kelsey Robinson|OH|Ill||109,460,47,382,73,21,0.231
+Tiffany Baker|OH|Texas||99,292,8,147,50,10,0.266
+Leslie Cikra|RSH|Ohio||107,268,4,49,86,,0.27
+Mary Pollmiller|S|Colo||119,66,1260,294,40,8,0.228
+Ellen Mullins|L/DS|Tenn||119,2,71,541,,16
+#2013|9-23, 1-17
+Ashley Mariani|MB|Texas||114,292,4,121,41,5,0.134
+Jamie Lea|OH|N.C||94,287,4,94,59,2,0.154
+Lexi Dempsey|S|Calif|Portland|113,31,987,291,14,20,0.169
+Ellen Mullins|L/DS|Tenn||114,1,52,639,,13
+#2014|8-24, 1-17
+Kendra Turner|OH|La||82,222,4,40,33,2,0.194
+Lexi Dempsey|S|Calif|Portland|102,38,819,185,23,7,0.209
+Bridgette Villano|DS|Fla||109,1,43,328,,12
+#2015|21-12, 7-11
+Kanisha Jimenez|OH/RS|Puerto Rico||113,326,17,273,81,19,0.185
+Bri Holmes|OH|Calif|UC Riverside|104,276,2,62,37,,0.225
+Erica Treiber|MH|Mich||115,246,5,53,131,17,0.352
+Lexi Dempsey|S|Calif|Portland|116,62,1177,276,46,9,0.182
+Bridgette Villano|DS|Fla||94,1,63,418,1,14
+#2016|17-14, 7-11
+Tessa Grubbs|OH|S.C||89,320,1,73,46,14,0.275
+Bri Holmes|OH|Calif|UC Riverside|91,269,5,78,25,6,0.217
+Erica Treiber|MH|Mich||101,261,7,63,107,21,0.348
+Sedona Hansen|S|Calif||101,47,1130,298,40,11,0.261
+Brooke Schumacher|DS|Wis||108,3,51,353,,16
+#2017|12-15, 5-13
+Erica Treiber|MH|Mich||101,226,9,56,131,20,0.325
+Tessa Grubbs|OH|S.C||72,202,1,45,37,1,0.241
+Alyssa Andreno|MH|Va||104,183,3,20,117,,0.304
+Brooke Schumacher|DS/L|Wis||101,2,80,463,,15
+#2018|26-6, 16-2
+Tessa Grubbs|OH|S.C||108,453,5,56,45,2,0.276
+Erica Treiber|MB|Mich||125,363,8,96,138,46,0.392
+Lily Felts|OH|Tenn||100,253,25,232,31,14,0.15
+Addisyn Rowe|MB|Tenn|Marshall|125,248,7,25,114,,0.324
+Sedona Hansen|S|Calif||123,18,887,292,11,13,0.245
+Madison Coulter|DS/L|Tenn||103,9,73,369,,6
+#2019|15-13, 9-9
+Tessa Grubbs|OH|S.C||108,438,4,42,41,7,0.264
+Danielle Mahaffey|OH/RS|Ohio||101,230,7,102,70,10,0.24
+Lily Felts|OH|Tenn||108,224,18,211,33,24,0.212
+Sedona Hansen|S|Calif||108,38,955,257,17,22,0.237
+Madison Coulter|DS/L|Tenn||108,1,86,429,,19
+#2020|12-8, 12-8
+Lily Felts|OH|Tenn||75,242,22,198,20,11,0.236
+Natalie Hayward|S|Wash|DePaul|75,43,715,187,31,11,0.321
+#2021|20-10, 11-7
+Breana Runnels|OH|Calif|Colorado State|105,394,8,270,44,15,0.224
+Morgahn Fingall|RS|Va||105,338,18,187,100,16,0.25
+Lily Felts|OH|Tenn||109,285,54,297,63,17,0.23
+Natalie Hayward|S|Wash|DePaul|109,105,1162,296,81,23,0.394
+Danielle Mahaffey|MB|Ohio||101,183,3,27,139,,0.38
+#2022|17-14, 11-7
+Morgahn Fingall|RS|Va||110,483,12,224,75,38,0.301
+Erykah Lovett|OH|Ga|Long Beach State|116,379,53,312,30,20,0.209
+Keondreya Granberry|MB|Fla||114,149,4,22,103,,0.332
+Natalie Hayward|S|Wash|DePaul|116,115,1138,274,75,30,0.363
+#2023|26-5, 15-3
+Morgahn Fingall|RS|Va||106,457,16,193,84,30,0.321
+Jenaisya Moore|OH|Md|Ohio State|106,394,19,150,44,8,0.302
+Erykah Lovett|OH|Ga|Long Beach State|97,239,31,296,40,15,0.206
+Caroline Kerr|S|Ill||106,70,1245,210,40,33,0.32
+Yelianiz Torres|L|Puerto Rico|Bowling Green|103,2,102,403,,31
+#2024|15-12, 8-8
+Nina Cajic|OH|Serbia|Towson|104,448,19,204,42,41,0.279
+Paityn Chapman|OH|Colo||97,225,5,45,69,12,0.268
+Hayden Kubik|OH|Iowa|Nebraska|101,210,26,246,19,17,0.151
+Keondreya Granberry|MB|Fla||98,189,6,26,91,,0.455
+Caroline Kerr|S|Ill||104,86,1069,234,48,26,0.451
+#2025|20-8, 10-5
+Hayden Kubik|OH|Iowa|Nebraska|93,390,26,209,31,24,0.265
+Chelsea Sutton|MB|Fla||100,215,4,23,116,4,0.362
+Caroline Kerr|S|Ill||96,70,945,217,54,12,0.371
+Gulce Guctekin|L/DS|Turkey|Wisconsin|103,2,129,408,,25

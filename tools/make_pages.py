@@ -19,7 +19,12 @@ for s in SPORTS:
     for t in TABS: write(os.path.join(s, t)); n += 1
 write("sources"); n += 1
 write("about"); write(os.path.join("about", "fix")); write(os.path.join("about", "contact")); n += 3
-for g in ["", "run", "guesser", "grid", "career", "rankings"]:  # games hub + each game (keep in sync with assets/games.js)
-    write(os.path.join("games", g) if g else "games"); n += 1
+# games hub, each sport's games page and each game (keep in sync with assets/games.js)
+write("games"); n += 1
+GAMES = {"football": ["run", "guesser", "grid", "career", "rankings", "duel", "trivia"]}
+for sp in ["mens-basketball", "womens-basketball", "baseball", "softball", "volleyball", "soccer"]: GAMES[sp] = ["guesser", "rankings", "duel", "trivia"]
+for s, games in GAMES.items():
+    write(os.path.join("games", s)); n += 1
+    for g in games: write(os.path.join("games", s, g)); n += 1
 open(os.path.join(site, "404.html"), "w", encoding="utf-8").write(html)
 print(f"wrote {n} page folders + 404.html")

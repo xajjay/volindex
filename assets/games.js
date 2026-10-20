@@ -1,17 +1,21 @@
 /* The Vol Index — Games.
-   Five games built on Tennessee football history (data/games-data.js, written by tools/build_games.py):
-     · Checkerboard Run   spin an era, draft a 10-man roster of Vols, play a 12-game season, the SEC title game and the 12-team playoff
+   Football (data/games-data.js, written by tools/build_games.py):
+     · 16-0               draft ten Vols, play a 12-game season, the SEC title game and the 12-team playoff (assets/games-run.js)
      · Vol Guesser        find the mystery Vol from position, era, coach, honors and draft clues
      · Power T Grid       fill a 3x3 grid with Vols who fit the row and the column
-     · VFL Career         name the Vol from the NFL teams he played for
+     · VFL Career         name the Vol from his college path and NFL teams
      · Rocky Top Rankings put five Vol seasons in order of a stat
-   Each game has a daily challenge (same for everyone, new at midnight Eastern) and free play.
+     · Vol Trivia         ten questions, easy / medium / hard
+   Beta sports (data/games-<sport>.js): Guesser, Rankings and Trivia for basketball, baseball and softball;
+   Rankings and Trivia for volleyball and soccer.
+   Every game has a daily challenge (same for everyone, new at midnight Eastern) and free play with era filters.
    Results stay in this browser (localStorage). Nothing is sent anywhere. */
 (function () {
   'use strict';
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const etDate = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
   const SITE = 'volindex.net/games';
+  const reduceMotion = () => !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   /* ---------- seeded random ---------- */
   function hashStr(str) { let h = 1779033703 ^ str.length; for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; } return () => { h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); return (h ^= h >>> 16) >>> 0; }; }
@@ -20,6 +24,11 @@
   const pick = (r, arr) => arr[Math.floor(r() * arr.length)];
   function shuffle(r, arr) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   function gauss(r) { let u = 0, v = 0; while (!u) u = r(); while (!v) v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+  function wpick(r, arr, w) { const ws = arr.map(w), t = ws.reduce((a, b) => a + b, 0); let x = r() * t; for (let i = 0; i < arr.length; i++) { x -= ws[i]; if (x <= 0) return arr[i]; } return arr[arr.length - 1]; }
+  function wsample(r, arr, n, w) { const pool = arr.slice(), out = []; while (out.length < n && pool.length) { const p = wpick(r, pool, w); out.push(p); pool.splice(pool.indexOf(p), 1); } return out; }
+  // newer eras get a light boost: 2020s x1.25, 2010s x1.12
+  const ERA_BOOST = d => d >= 2020 ? 1.25 : d >= 2010 ? 1.12 : 1;
+  const decOf = y => Math.floor(y / 10) * 10;
 
   /* ---------- storage (per browser) ---------- */
   const store = {
@@ -31,25 +40,87 @@
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, () => window.prompt('Copy your result:', t));
     else window.prompt('Copy your result:', t);
   }
+  // two-tap confirm instead of a browser dialog
+  function twoTap(btn, label, fn) {
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      if (btn.dataset.armed) return fn();
+      btn.dataset.armed = '1'; const o = btn.textContent; btn.textContent = label;
+      setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.textContent = o; } }, 3000);
+    });
+  }
+
+  /* ---------- sports + games ---------- */
+  const SPORTS = [
+    { key: 'football', name: 'Football', icon: '🏈', file: 'data/games-data.js', games: ['run', 'guesser', 'grid', 'career', 'rankings', 'duel', 'trivia'] },
+    { key: 'mbb', name: "Men's Basketball", icon: '🏀', beta: true, file: 'data/games-mbb.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
+    { key: 'wbb', name: "Women's Basketball", icon: '🏀', beta: true, file: 'data/games-wbb.js', games: ['guesser', 'rankings', 'duel', 'trivia'], lady: true },
+    { key: 'baseball', name: 'Baseball', icon: '⚾', beta: true, file: 'data/games-baseball.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
+    { key: 'softball', name: 'Softball', icon: '🥎', beta: true, file: 'data/games-softball.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
+    { key: 'volleyball', name: 'Volleyball', icon: '🏐', beta: true, file: 'data/games-volleyball.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
+    { key: 'soccer', name: 'Soccer', icon: '⚽', beta: true, file: 'data/games-soccer.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
+  ];
+  const SP = k => SPORTS.find(s => s.key === k);
+  const GAME_ICON = { run: '🏈', guesser: '🔎', grid: '🟧', career: '🏟️', rankings: '📊', duel: '↕️', trivia: '❓' };
+  function gameName(sport, g) {
+    const v = SP(sport).lady ? 'Lady Vol' : 'Vol';
+    return { run: '16-0', guesser: v + ' Guesser', grid: 'Power T Grid', career: 'VFL Career', rankings: 'Rocky Top Rankings', duel: 'Higher or Lower', trivia: v + ' Trivia' }[g];
+  }
+  function gameBlurb(sport, g) {
+    const fb = sport === 'football';
+    return {
+      run: 'Spin an era, draft five Vols on offense and five on defense at their best, then play 12 games against all-time great teams. Win the SEC and run the 12-team playoff.',
+      guesser: fb ? 'Find the mystery Vol. Every guess shows how close you are on position, prime season, head coach, honors and NFL draft.'
+        : 'Find the mystery player. Every guess shows how close you are on position, best season, coach, hometown and a key stat.',
+      grid: 'Fill a 3×3 grid with Vols who fit both the row and the column. Nine guesses, no repeats.',
+      career: 'Name the Vol for Life from his path: where he started, Tennessee, then every NFL team he played for.',
+      rankings: 'Put five Tennessee seasons in order of a stat. Correct spots lock in orange. Three tries.',
+      duel: 'Two Tennessee seasons, one stat. Did the second player finish higher or lower? Build the longest streak you can.',
+      trivia: 'Ten questions on Tennessee ' + (fb ? 'football' : SP(sport).name.toLowerCase()) + '. Pick easy, medium, hard or a mix.',
+    }[g];
+  }
+  // daily keys: football keeps the short form, other sports are prefixed
+  const dkey = (sport, g, date) => (sport === 'football' ? '' : sport + '-') + g + '-daily-' + (date || etDate());
+  const dailyDone = (sport, g) => { const sv = store.get(dkey(sport, g), null); return !!(sv && (sv.final || (sv.state && sv.state.done))); };
 
   /* ---------- data ---------- */
-  let D = null, ALL = [], POOL = [], BYNAME = {};
-  function loadData(cb) {
-    if (window.VI_GAMES_DATA) return cb();
-    let s = document.getElementById('viGamesData');
-    if (!s) { s = document.createElement('script'); s.id = 'viGamesData'; s.src = 'data/games-data.js'; document.head.appendChild(s); }
+  let D = null, ALL = [], POOL = [], STARS = [], BYNAME = {};
+  const SDATA = {};
+  function loadScript(src, ready, cb, fail) {
+    if (ready()) return cb();
+    let s = document.querySelector(`script[data-g="${src}"]`);
+    if (!s) { s = document.createElement('script'); s.src = src; s.dataset.g = src; document.head.appendChild(s); }
     s.addEventListener('load', cb, { once: true });
+    s.addEventListener('error', fail, { once: true });
   }
-  function initData() {
+  function initFootball() {
     if (D) return; D = window.VI_GAMES_DATA;
-    ALL = D.players; POOL = ALL.filter(p => p.pool);
-    ALL.forEach(p => { BYNAME[p.n.toLowerCase()] = p; p.dec = Math.floor(p.y / 10) * 10; });
+    ALL = D.players; POOL = ALL.filter(p => p.pool); STARS = ALL.filter(p => p.star);
+    ALL.forEach(p => { BYNAME[p.n.toLowerCase()] = p; p.dec = decOf(p.y); });
   }
-  const SLOTS = ['QB', 'RB', 'WR', 'WR', 'TE', 'DL', 'EDGE', 'LB', 'CB', 'S'];
+  function initSport(k) {
+    if (SDATA[k]) return SDATA[k];
+    const S = window.VI_GAMES_SPORT[k];
+    S.by = {}; S.players.forEach(p => { S.by[p.n.toLowerCase()] = p; p.dec = decOf(p.y); });
+    S.rows.forEach(r => { r.dec = decOf(r.y); });
+    return (SDATA[k] = S);
+  }
+  const FB_ERAS = [1980, 1990, 2000, 2010, 2020];
+  function sportEras(k) {
+    if (k === 'football') return FB_ERAS;
+    const S = SDATA[k]; return Array.from(new Set(S.rows.map(r => r.dec))).sort();
+  }
+  const SET = store.get('settings', {});
+  function getEras(k) { const all = sportEras(k), s = (SET[k] && SET[k].eras || []).filter(e => all.includes(e)); return s.length ? s : all.slice(); }
+  function setEras(k, eras) { SET[k] = Object.assign({}, SET[k], { eras }); store.set('settings', SET); }
+  function getDiff(k) { return (SET[k] && SET[k].diff) || 'mix'; }
+  function setDiff(k, d) { SET[k] = Object.assign({}, SET[k], { diff: d }); store.set('settings', SET); }
+  const eraKey = k => getEras(k).join(',');
+
+  /* ---------- football helpers ---------- */
   const SLOT_NAME = { QB: 'Quarterback', RB: 'Running back', WR: 'Wide receiver', TE: 'Tight end', DL: 'Defensive tackle', EDGE: 'Edge rusher', LB: 'Linebacker', CB: 'Cornerback', S: 'Safety' };
-  const ERAS = [1980, 1990, 2000, 2010, 2020];
-  const eraLabel = d => d + 's';
-  const HON_LABEL = { AAu: 'Unanimous All-American', AAc: 'Consensus All-American', AA1: 'All-American', AA2: 'All-America 2nd/3rd team', SEC: 'First-team All-SEC', POY: 'SEC Player of the Year', OPOY: 'SEC Offensive POY', DPOY: 'SEC Defensive POY', H2: 'Heisman runner-up', H5: 'Heisman top 5', H8: 'Heisman top 10' };
+  const posLabel = s => s === 'DL' ? 'DT' : s;
+  const HON_LABEL = { AAu: 'Unanimous All-American', AAc: 'Consensus All-American', AA1: 'All-American', AA2: 'All-America 2nd/3rd team', SEC: 'First-team All-SEC', SEC2: 'Second-team All-SEC', POY: 'SEC Player of the Year', OPOY: 'SEC Offensive POY', DPOY: 'SEC Defensive POY', H2: 'Heisman runner-up', H5: 'Heisman top 5', H8: 'Heisman top 10' };
   const honText = h => h.startsWith('W:') ? h.slice(2) + ' Award' : h.startsWith('F:') ? h.slice(2) + ' finalist' : (HON_LABEL[h] || h);
   const fmt = n => (typeof n === 'number' ? (Number.isInteger(n) ? n.toLocaleString('en-US') : String(n)) : n);
   function statLine(p) {
@@ -61,8 +132,26 @@
     else { add(s.tot, 'tackles'); if (s.tfl) add(s.tfl, 'TFL'); if (s.sk) add(s.sk, 'sacks'); if (s.ints) add(s.ints, 'INT'); if (s.pd) add(s.pd, 'PBU'); }
     return out.length ? out.join(' · ') : 'Stats not fully tracked that year';
   }
+  function honRank(h) { const i = ['AAu', 'AAc', 'W:', 'AA1', 'H2', 'POY', 'OPOY', 'DPOY', 'H5', 'AA2', 'SEC', 'F:', 'H8', 'SEC2'].findIndex(x => h.startsWith(x)); return i < 0 ? 99 : i; }
   const honorChips = (h, max = 3) => (h || []).slice().sort((a, b) => honRank(a) - honRank(b)).slice(0, max).map(x => `<span class="chip honor">${esc(honText(x))}</span>`).join('');
-  function honRank(h) { return ['AAu', 'AAc', 'W:', 'AA1', 'H2', 'POY', 'OPOY', 'DPOY', 'H5', 'AA2', 'SEC', 'F:', 'H8'].findIndex(x => h.startsWith(x)); }
+  const initials = n => n.replace(/ (Jr\.|Sr\.|II|III|IV)$/, '').split(/[ -]/).filter(Boolean).map(w => w[0]).join('.') + '.';
+
+  /* ---------- sport helpers ---------- */
+  const f3 = v => (v == null ? '—' : Number(v).toFixed(3).replace(/^0/, ''));
+  const f2 = v => (v == null ? '—' : Number(v).toFixed(2));
+  function keyStat(sport, p) {
+    const s = p.st || {};
+    if (sport === 'mbb' || sport === 'wbb') return { l: 'PPG', v: +((s.pts || 0) / (s.gp || 1)).toFixed(1), k: 'X' };
+    if (sport === 'baseball' || sport === 'softball') return p.k === 'H' ? { l: 'AVG', v: s.avg, txt: f3(s.avg), k: 'H' } : { l: 'ERA', v: s.era, txt: f2(s.era), k: 'P', low: true };
+    if (sport === 'volleyball') return { l: 'Kills/set', v: +((s.k || 0) / (s.sp || 1)).toFixed(2), k: 'X' };
+    return p.k === 'GK' ? { l: 'GAA', v: s.gaa, txt: f2(s.gaa), k: 'GK', low: true } : { l: 'Points', v: s.pts || 0, k: 'F' };
+  }
+  const isPitcher = pos => /(^|\/)(R|L)?HP$|(^|\/)P$/.test(pos || '');
+  function posNear(sport, a, b) {
+    if (sport === 'baseball' || sport === 'softball') return isPitcher(a) === isPitcher(b);
+    const ta = (a || '').split('/'), tb = (b || '').split('/');
+    return ta.some(x => tb.includes(x));
+  }
 
   /* ---------- autocomplete search box ---------- */
   function searchBox(el, names, onPick, placeholder) {
@@ -72,7 +161,7 @@
     const draw = () => { ul.innerHTML = hits.map((h, i) => `<li role="option" data-i="${i}" class="${i === sel ? 'on' : ''}">${esc(h)}</li>`).join(''); ul.hidden = !hits.length; };
     inp.addEventListener('input', () => {
       const q = norm(inp.value.trim());
-      hits = q.length < 2 ? [] : names.filter(n => norm(n).split(' ').some(w => w.startsWith(q)) || norm(n).startsWith(q) || norm(n).includes(q)).slice(0, 8);
+      hits = q.length < 2 ? [] : names.filter(n => { const m = norm(n); return m.split(' ').some(w => w.startsWith(q)) || m.startsWith(q) || m.includes(q); }).slice(0, 8);
       sel = 0; draw();
     });
     inp.addEventListener('keydown', e => {
@@ -85,538 +174,399 @@
     ul.hidden = true;
     return inp;
   }
+  const refocus = () => { const i = document.querySelector('#gsrch input'); if (i) i.focus({ preventScroll: true }); };
 
   /* ---------- shared page frame ---------- */
-  const GAMES = [
-    { key: 'run', name: 'Checkerboard Run', icon: '🏈', blurb: 'Spin an era, draft ten Vols at their best, then play 12 games against all-time great teams. Win the SEC and run the 12-team playoff.' },
-    { key: 'guesser', name: 'Vol Guesser', icon: '🔎', blurb: 'Find the mystery Vol. Every guess shows how close you are on position, prime season, head coach, honors and NFL draft.' },
-    { key: 'grid', name: 'Power T Grid', icon: '🟧', blurb: 'Fill a 3×3 grid with Vols who fit both the row and the column. Nine guesses, no repeats.' },
-    { key: 'career', name: 'VFL Career', icon: '🏟️', blurb: 'Name the Vol for Life from the NFL teams he played for. Wrong guesses unlock more clues.' },
-    { key: 'rankings', name: 'Rocky Top Rankings', icon: '📊', blurb: 'Put five Vol seasons in order of a stat. Correct spots lock in orange. Three tries.' },
-  ];
-  function frame(app, g, inner, sub) {
+  function betaNote(sport) {
+    const s = SP(sport);
+    return s.beta ? `<div class="gbeta-note"><span class="gbeta">Beta</span> ${esc(s.name)} games are a work in progress. Expect rough edges while we add more seasons and more games. More are coming soon.</div>` : '';
+  }
+  function frame(app, sport, g, sub) {
+    const s = SP(sport);
     app.innerHTML = `<div class="wrap games">
-      <nav class="gcrumb"><a href="#games">Games</a> <span aria-hidden="true">›</span> <b>${esc(g.name)}</b></nav>
-      <header class="ghead"><h1><span aria-hidden="true">${g.icon}</span> ${esc(g.name)}</h1>${sub ? `<p>${sub}</p>` : ''}</header>
-      <div id="gbody">${inner || ''}</div></div>`;
+      <nav class="gcrumb"><a href="#games">Games</a> <span aria-hidden="true">›</span> <a href="#games-${sport}">${esc(s.name)}</a> <span aria-hidden="true">›</span> <b>${esc(gameName(sport, g))}</b></nav>
+      <header class="ghead"><h1><span aria-hidden="true">${GAME_ICON[g]}</span> ${esc(gameName(sport, g))}${s.beta ? ' <span class="gbeta">Beta</span>' : ''}</h1>${sub ? `<p>${sub}</p>` : ''}</header>
+      <div id="gbody"></div></div>`;
     return app.querySelector('#gbody');
   }
-  function modeBar(mode, dailyDone) {
+  function modeBar(mode, done) {
     return `<div class="gmode" role="tablist" aria-label="Game mode">
-      <button role="tab" data-mode="daily" aria-selected="${mode === 'daily'}">Daily challenge${dailyDone ? ' ✓' : ''}</button>
+      <button role="tab" data-mode="daily" aria-selected="${mode === 'daily'}">Daily challenge${done ? ' ✓' : ''}</button>
       <button role="tab" data-mode="free" aria-selected="${mode === 'free'}">Free play</button></div>`;
   }
   function bindMode(root, cb) { root.querySelectorAll('.gmode [data-mode]').forEach(b => b.addEventListener('click', () => cb(b.dataset.mode))); }
+  // era chips for free play (daily always uses every era)
+  function eraChips(sport, extra) {
+    const all = sportEras(sport), sel = getEras(sport);
+    return `<div class="gfree"><div class="gfree-row"><span class="glabel">Eras</span><div class="gchips">
+      ${all.map(e => `<button data-era="${e}" aria-pressed="${sel.includes(e)}">${e}s</button>`).join('')}
+      ${sel.length < all.length ? '<button class="glink" data-era-all>All eras</button>' : ''}</div></div>${extra || ''}</div>`;
+  }
+  function bindEras(root, sport, onChange) {
+    root.querySelectorAll('[data-era]').forEach(b => b.addEventListener('click', () => {
+      const e = +b.dataset.era, sel = getEras(sport);
+      const next = sel.includes(e) ? sel.filter(x => x !== e) : sel.concat(e).sort();
+      if (!next.length) return;            // keep at least one era
+      setEras(sport, next); onChange();
+    }));
+    const a = root.querySelector('[data-era-all]'); if (a) a.addEventListener('click', () => { setEras(sport, sportEras(sport).slice()); onChange(); });
+  }
+  // per game state: { mode, st }. make(r, eras) builds a fresh game.
+  const GST = {};
+  function gameState(sport, g, make) {
+    const key = sport + '|' + g, G = GST[key] || (GST[key] = { mode: 'daily', st: null }), today = etDate();
+    const saved = store.get(dkey(sport, g, today), null);
+    const stale = !G.st || G.st.mode !== G.mode || (G.mode === 'daily' && G.st.date !== today) || (G.mode === 'free' && G.st.eraKey !== eraKey(sport));
+    if (stale) {
+      if (G.mode === 'daily' && saved && saved.state) G.st = saved.state;
+      else {
+        const daily = G.mode === 'daily', eras = daily ? sportEras(sport) : getEras(sport);
+        const r = rngFrom(daily ? sport + '-' + g + '-' + today : freeSeed());
+        G.st = Object.assign({ mode: G.mode, date: today, eraKey: daily ? 'all' : eraKey(sport), eras }, make(r, eras, daily));
+      }
+    }
+    return { G, st: G.st, saved };
+  }
+  function saveDaily(sport, g, st) { if (st.mode === 'daily') store.set(dkey(sport, g, st.date), { state: st, share: st.share }); }
+  function topBar(body, sport, G, saved, extra) {
+    return `${modeBar(G.mode, !!(saved && saved.state && saved.state.done))}${G.mode === 'free' ? eraChips(sport, extra) : ''}`;
+  }
+  function bindTop(body, sport, G) {
+    bindMode(body, m => { G.mode = m; G.st = null; rerender(); });
+    bindEras(body, sport, () => { G.st = null; rerender(); });
+  }
 
   /* =====================================================================================
-     HUB
+     HUBS
      ===================================================================================== */
-  function renderHub(app) {
+  function renderHome(app) {
     const today = etDate();
     app.innerHTML = `<div class="wrap hub-hero games-hero"><div class="eyebrow">Play</div><h1>Vol <span>Games</span></h1>
-      <p>Trivia and sim games built on Tennessee football history, from Reggie White to Jalin Hyatt. Each one has a daily challenge that everyone gets the same, plus free play. New dailies drop at midnight Eastern.</p></div>
-      <div class="wrap grid g3 gcards">${GAMES.map(g => {
-        const sv = store.get(g.key + '-daily-' + today, null), done = sv && (sv.final || (sv.state && sv.state.done));
-        return `<a class="box gcard" href="#games-${g.key}"><div class="gcard-top"><span class="gicon" aria-hidden="true">${g.icon}</span>${done ? '<span class="chip new">Today ✓</span>' : '<span class="chip">Daily</span>'}</div>
-          <h3>${esc(g.name)}</h3><p>${esc(g.blurb)}</p><span class="btn primary">Play</span></a>`;
+      <p>Daily games built on Tennessee history. Pick a sport. Every game has a daily challenge that everyone gets the same, plus free play with era filters. New dailies drop at midnight Eastern.</p></div>
+      <div class="wrap gsports">${SPORTS.map(s => {
+        const done = s.games.filter(g => dailyDone(s.key, g)).length;
+        return `<a class="box gsport ${s.key === 'football' ? 'lead' : ''}" href="#games-${s.key}">
+          <span class="gicon" aria-hidden="true">${s.icon}</span>
+          <span class="gsport-t"><b>${esc(s.name)}</b><span class="dim">${s.games.length} games${done ? ` · ${done} done today` : ''}</span></span>
+          ${s.beta ? '<span class="gbeta">Beta</span>' : '<span class="chip new">Full</span>'}</a>`;
       }).join('')}</div>
       <div class="wrap gfoot"><button class="btn" id="gShareAll">Copy today's results</button>
-        <p class="dim">Stats come from the Tennessee football record book, ESPN and CollegeFootballData.com. Each Vol appears at his best season at Tennessee. Spotted a mistake? Email <a href="mailto:thevolindex@gmail.com">thevolindex@gmail.com</a>.</p></div>`;
+        <p class="dim">Football games use the Tennessee record book, utsports.com, ESPN and CollegeFootballData.com. Basketball, baseball, softball, volleyball and soccer games are in beta and use utsports.com season stats; more games for every sport are coming soon. Spotted a mistake? Email <a href="mailto:thevolindex@gmail.com">thevolindex@gmail.com</a>.</p></div>`;
     app.querySelector('#gShareAll').addEventListener('click', e => {
-      const lines = GAMES.map(g => { const r = store.get(g.key + '-daily-' + today, null); return r && r.share ? r.share.split('\n')[0] : null; }).filter(Boolean);
+      const lines = [];
+      SPORTS.forEach(s => s.games.forEach(g => { const r = store.get(dkey(s.key, g, today), null); if (r && r.share) lines.push(r.share.split('\n')[0]); }));
       copyText(lines.length ? `Vol Index games · ${today}\n${lines.join('\n')}\n${SITE}` : `No daily games finished yet today. ${SITE}`, e.currentTarget);
     });
   }
-
-  /* =====================================================================================
-     CHECKERBOARD RUN — roster builder + season sim
-     ===================================================================================== */
-  const RUN = { settings: { side: 'both', eras: ERAS.slice() }, mode: 'daily', st: null };
-  const RUN_REROLLS = 2;
-  function runSlots(side) { return side === 'off' ? SLOTS.slice(0, 5) : side === 'def' ? SLOTS.slice(5) : SLOTS.slice(); }
-
-  function renderRun(app) {
-    const g = GAMES[0], today = etDate();
-    const daily = store.get('run-daily-' + today, null);
-    const body = frame(app, g, '', 'Spin an era, draft Vols at their best season, then try to run the table: 12 games, the SEC Championship and the 12-team College Football Playoff.');
-    const st = RUN.st;
-    if (RUN.mode === 'daily' && daily && daily.final) { RUN.st = daily.final; return runResults(body, true); }
-    if (!st) return runSetup(body, daily);
-    if (st.phase === 'draft') return runDraft(body);
-    if (st.phase === 'season') return runSeason(body);
-    return runResults(body, false);
-  }
-  function runSetup(body, daily) {
-    const s = RUN.settings, isDaily = RUN.mode === 'daily';
-    body.innerHTML = `${modeBar(RUN.mode, !!(daily && daily.final))}
-      <div class="box gsetup">
-        <h3>Set up your run</h3>
-        ${isDaily ? `<p class="dim">Today's challenge: everyone gets the same spins and the same schedule. Both sides of the ball, every era. One try per day.</p>` : `
-        <div class="gfield"><div class="glabel">Roster</div><div class="gseg" data-k="side">
-          ${[['both', 'Both sides'], ['off', 'Offense only'], ['def', 'Defense only']].map(([v, l]) => `<button data-v="${v}" aria-pressed="${s.side === v}">${l}</button>`).join('')}</div></div>
-        <div class="gfield"><div class="glabel">Eras <button class="glink" id="eraAll">${s.eras.length === ERAS.length ? 'Clear all' : 'Select all'}</button></div><div class="gchips">
-          ${ERAS.map(e => `<button data-era="${e}" aria-pressed="${s.eras.includes(e)}">${eraLabel(e)}</button>`).join('')}</div>
-          <p class="dim small">1980s-2003 stat lines come from the UT record book (season leaders) and honors; 2004 on are full box-score stats.</p></div>`}
-        <div class="gnote"><b>Prime seasons only.</b> Every Vol shows his single best season at Tennessee, rated on production with a bonus for All-America, All-SEC and national awards.</div>
-        <div class="grow"><button class="btn primary big" id="runStart" ${!isDaily && !s.eras.length ? 'disabled' : ''}>Start ${isDaily ? "today's run" : 'free play'}</button></div>
-      </div>
-      ${howRun()}`;
-    bindMode(body, m => { RUN.mode = m; RUN.st = null; VI_RENDER_GAMES(); });
-    body.querySelectorAll('[data-k="side"] button').forEach(b => b.addEventListener('click', () => { s.side = b.dataset.v; VI_RENDER_GAMES(); }));
-    body.querySelectorAll('[data-era]').forEach(b => b.addEventListener('click', () => { const e = +b.dataset.era; s.eras = s.eras.includes(e) ? s.eras.filter(x => x !== e) : s.eras.concat(e).sort(); VI_RENDER_GAMES(); }));
-    const ea = body.querySelector('#eraAll'); if (ea) ea.addEventListener('click', () => { s.eras = s.eras.length === ERAS.length ? [] : ERAS.slice(); VI_RENDER_GAMES(); });
-    body.querySelector('#runStart').addEventListener('click', () => {
-      const daily = RUN.mode === 'daily';
-      const side = daily ? 'both' : s.side, eras = daily ? ERAS.slice() : s.eras.slice();
-      RUN.st = { phase: 'draft', daily, date: etDate(), seed: daily ? 'run-' + etDate() : freeSeed(), side, eras, slots: runSlots(side).map(p => ({ pos: p, p: null })), spin: 0, rerolls: RUN_REROLLS, offer: null };
-      runSpin(); VI_RENDER_GAMES();
-    });
-  }
-  function howRun() {
-    return `<details class="box ghow"><summary>How it works</summary>
-      <ol><li><b>Spin.</b> Each spin lands on an era and shows up to five Vols from it who fit your open spots.</li>
-      <li><b>Draft.</b> Pick one per spin until your roster is full: QB, RB, two WRs, TE on offense; DT, edge, LB, CB and safety on defense. Two re-spins per run.</li>
-      <li><b>Play.</b> Your offense and defense ratings are the average of your starters. You play 9 SEC games and 3 non-conference games against great teams from the last 30 seasons (2019 LSU, 2001 Miami, 2022 Georgia...).</li>
-      <li><b>Postseason.</b> Finish in the SEC's top two for the SEC Championship. The 12-team playoff takes the five best conference champions plus seven at-large teams, seeded 1-12; seeds 1-4 get a bye. A perfect run is 16-0 or 17-0.</li></ol></details>`;
-  }
-  function openSlots(st) { return st.slots.filter(s => !s.p).map(s => s.pos); }
-  function runSpin() {
-    const st = RUN.st, r = rngFrom(st.seed + '|spin' + st.spin + '|' + (RUN_REROLLS - st.rerolls));
-    const open = openSlots(st), taken = new Set(st.slots.filter(s => s.p).map(s => s.p.n));
-    const elig = POOL.filter(p => st.eras.includes(p.dec) && open.includes(p.slot) && !taken.has(p.n));
-    const eras = st.eras.filter(e => elig.some(p => p.dec === e));
-    if (!eras.length) { st.offer = { era: null, ids: [] }; return; }
-    const era = pick(r, eras);
-    // favor variety of positions: one card per open position first, then fill
-    const inEra = shuffle(r, elig.filter(p => p.dec === era)), ids = [], seenPos = new Set();
-    inEra.forEach(p => { if (ids.length < 5 && !seenPos.has(p.slot)) { ids.push(p.n); seenPos.add(p.slot); } });
-    inEra.forEach(p => { if (ids.length < 5 && !ids.includes(p.n)) ids.push(p.n); });
-    st.offer = { era, ids };
-  }
-  function slotBoard(st, compact) {
-    const cell = (s, i) => `<div class="gslot ${s.p ? 'full' : ''}" data-i="${i}"><span class="gslot-pos">${s.pos === 'DL' ? 'DT' : s.pos}</span>${s.p ? `<b>${esc(s.p.n)}</b><span class="dim">${s.p.y} · ${s.p.ovr}</span>` : '<span class="dim">Open</span>'}</div>`;
-    const off = st.slots.map((s, i) => [s, i]).filter(([s]) => ['QB', 'RB', 'WR', 'TE'].includes(s.pos));
-    const def = st.slots.map((s, i) => [s, i]).filter(([s]) => !['QB', 'RB', 'WR', 'TE'].includes(s.pos));
-    return `<div class="gboard ${compact ? 'compact' : ''}">${off.length ? `<div><div class="glabel">Offense</div><div class="gslots">${off.map(([s, i]) => cell(s, i)).join('')}</div></div>` : ''}
-      ${def.length ? `<div><div class="glabel">Defense</div><div class="gslots">${def.map(([s, i]) => cell(s, i)).join('')}</div></div>` : ''}</div>`;
-  }
-  function playerCard(p, extra) {
-    return `<button class="gpcard" data-n="${esc(p.n)}"><span class="gpc-top"><span class="gpos">${p.slot === 'DL' ? 'DT' : p.slot}</span><span class="govr" title="Rating for this season">${p.ovr}</span></span>
-      <b class="gpc-name">${esc(p.n)}</b><span class="gpc-yr">${p.y} · ${esc(p.coach)}</span>
-      <span class="gpc-line">${esc(statLine(p))}</span><span class="gpc-hon">${honorChips(p.hon, 2)}</span>${extra || ''}</button>`;
-  }
-  function runDraft(body) {
-    const st = RUN.st, open = openSlots(st);
-    const offer = st.offer || { ids: [] };
-    const cards = offer.ids.map(n => BYNAME[n.toLowerCase()]).filter(Boolean);
-    body.innerHTML = `${st.daily ? '<div class="gtag">Daily challenge · ' + esc(st.date) + '</div>' : ''}
-      ${slotBoard(st)}
-      <div class="box gspin">
-        <div class="gspin-head"><div><div class="eyebrow">Spin ${st.spin + 1} of ${st.slots.length}</div><h3 id="spinEra">${offer.era ? eraLabel(offer.era) + ' Vols' : 'No Vols left in these eras'}</h3></div>
-          <button class="btn" id="reroll" ${st.rerolls ? '' : 'disabled'}>Re-spin (${st.rerolls} left)</button></div>
-        <p class="dim">Pick one. He fills an open ${open.length > 1 ? 'spot' : esc(SLOT_NAME[open[0]] || 'spot').toLowerCase()} on your roster.</p>
-        <div class="gcards-row">${cards.map(p => playerCard(p)).join('') || '<p>Nobody fits your open spots in these eras. Use a re-spin or start over with more eras.</p>'}</div>
-      </div>
-      <div class="grow"><button class="glink" id="runQuit">Start over</button></div>`;
-    const era = body.querySelector('#spinEra');
-    if (era && offer.era && !st.animated) { st.animated = true; spinAnim(era, offer.era); }
-    body.querySelectorAll('.gpcard').forEach(b => b.addEventListener('click', () => {
-      const p = BYNAME[b.dataset.n.toLowerCase()], slot = st.slots.find(s => !s.p && s.pos === p.slot);
-      if (!slot) return; slot.p = p; st.spin++; st.animated = false;
-      if (st.slots.every(s => s.p)) { st.phase = 'season'; buildSeason(); } else runSpin();
-      VI_RENDER_GAMES();
-    }));
-    const rr = body.querySelector('#reroll'); rr.addEventListener('click', () => { if (!st.rerolls) return; st.rerolls--; st.animated = false; runSpin(); VI_RENDER_GAMES(); });
-    body.querySelector('#runQuit').addEventListener('click', () => { if (st.daily && !confirm("Start over? Today's daily spins stay the same.")) return; RUN.st = null; VI_RENDER_GAMES(); });
-  }
-  function spinAnim(el, era) {
-    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const final = el.textContent; let i = 0; el.classList.add('spinning');
-    const t = setInterval(() => { el.textContent = eraLabel(ERAS[i++ % ERAS.length]) + ' Vols'; if (i > 9) { clearInterval(t); el.textContent = final; el.classList.remove('spinning'); } }, 55);
-  }
-
-  // ---- season ----
-  function teamRatings(st) {
-    const avg = arr => arr.length ? arr.reduce((a, p) => a + p.ovr, 0) / arr.length : null;
-    const off = avg(st.slots.filter(s => ['QB', 'RB', 'WR', 'TE'].includes(s.pos)).map(s => s.p));
-    const def = avg(st.slots.filter(s => !['QB', 'RB', 'WR', 'TE'].includes(s.pos)).map(s => s.p));
-    return { off: off == null ? 84 : off, def: def == null ? 84 : def, genericOff: off == null, genericDef: def == null };
-  }
-  function buildSeason() {
-    const st = RUN.st, r = rngFrom(st.seed + '|schedule');
-    const sec = shuffle(r, D.opponents.filter(o => o.sec)), non = shuffle(r, D.opponents.filter(o => !o.sec));
-    const games = sec.slice(0, 9).map(o => ({ o: o.id, conf: true })).concat(non.slice(0, 3).map(o => ({ o: o.id, conf: false })));
-    const order = shuffle(r, games);
-    order.forEach((g, i) => { g.home = i % 2 === 0; g.wk = i + 1; });
-    st.games = order; st.played = 0; st.post = []; st.used = order.map(g => g.o);
-  }
-  const OPP = id => D.opponents.find(o => o.id === id);
-  function playGame(seedKey, me, o, site) {
-    // site: 1 home, 0 neutral, -1 away. Opponent ratings are squeezed toward 78 so they sit on the same scale as
-    // single-season Vol ratings; each point of edge on a side of the ball is worth 1.1 points on the scoreboard.
-    // Calibration (12-game regular season): roster 87 ≈ 6 wins, 90 ≈ 8, 93 ≈ 10, 95 ≈ 11 (about 3 in 10 go 12-0).
-    const r = rngFrom(seedKey);
-    const sq = v => 78 + (v - 78) * 0.7, oo = sq(o.off), od = sq(o.deff);
-    const edge = (x, y) => (x - y) * 1.1, hfa = site * 1.6;
-    let us = 27 + edge(me.off, od) + hfa + gauss(r) * 9;
-    let them = 27 + edge(oo, me.def) - hfa + gauss(r) * 9;
-    const score = v => { v = Math.max(0, Math.round(v)); if ([1, 2, 4, 5].includes(v)) v = v <= 2 ? 3 : v === 4 ? 3 : 6; return v; };
-    us = score(us); them = score(them); let ot = false;
-    if (us === them) { ot = true; const pUs = 0.5 + (edge(me.off, od) - edge(oo, me.def)) / 60; if (r() < pUs) us += r() < .6 ? 7 : 3; else them += r() < .6 ? 7 : 3; }
-    return { us, them, w: us > them, ot };
-  }
-  function runSeason(body) {
-    const st = RUN.st, me = teamRatings(st);
-    const wins = st.games.slice(0, st.played).filter(g => g.res.w).length, losses = st.played - wins;
-    const confG = st.games.slice(0, st.played).filter(g => g.conf), cw = confG.filter(g => g.res.w).length;
-    body.innerHTML = `${st.daily ? '<div class="gtag">Daily challenge · ' + esc(st.date) + '</div>' : ''}
-      <div class="grid g2"><div class="box gteam"><div class="eyebrow">Your Vols</div>
-        <div class="grat"><div><span>${Math.round(me.off)}</span>Offense${me.genericOff ? ' <i class="dim">(stock)</i>' : ''}</div><div><span>${Math.round(me.def)}</span>Defense${me.genericDef ? ' <i class="dim">(stock)</i>' : ''}</div><div><span>${wins}-${losses}</span>Record</div><div><span>${cw}-${confG.length - cw}</span>SEC</div></div>
-        ${slotBoard(st, true)}</div>
-      <div class="box gsched"><div class="gsched-head"><h3>Regular season</h3>${st.played < st.games.length ? `<div><button class="btn" id="simOne">Play week ${st.played + 1}</button> <button class="btn primary" id="simAll">Sim the rest</button></div>` : ''}</div>
-        <ol class="glist">${st.games.map((g, i) => gameRow(g, i < st.played)).join('')}</ol>
-        ${st.played >= st.games.length ? `<div class="grow"><button class="btn primary big" id="toPost">Postseason →</button></div>` : ''}</div></div>`;
-    const step = n => { for (let k = 0; k < n && st.played < st.games.length; k++) { const g = st.games[st.played]; g.res = playGame(st.seed + '|' + rosterKey(st) + '|g' + g.wk, me, OPP(g.o), g.home ? 1 : -1); st.played++; } VI_RENDER_GAMES(); };
-    const a = body.querySelector('#simOne'); if (a) a.addEventListener('click', () => step(1));
-    const b = body.querySelector('#simAll'); if (b) b.addEventListener('click', () => step(99));
-    const c = body.querySelector('#toPost'); if (c) c.addEventListener('click', () => { runPostseason(); VI_RENDER_GAMES(); });
-  }
-  const rosterKey = st => st.slots.map(s => s.p ? s.p.n : '-').join(',');
-  function gameRow(g, done, label) {
-    const o = OPP(g.o);
-    const where = g.site === 0 || g.neutral ? 'vs.' : g.home ? 'vs.' : 'at';
-    const SHORT = { 'SEC Championship': 'SEC title', 'CFP first round': 'CFP 1st rd', 'CFP quarterfinal': 'CFP QF', 'CFP semifinal': 'CFP semi', 'National championship': 'Title game' };
-    return `<li class="${done ? (g.res.w ? 'w' : 'l') : ''}"><span class="gwk">${esc(label ? SHORT[label] || label : 'Wk ' + g.wk)}</span>
-      <span class="gopp"><b>${where} ${o.y} ${esc(o.team)}</b> <span class="dim">(${esc(o.rec)})${g.conf ? ' · SEC' : ''}</span><span class="gstars">${esc(o.stars.join(', '))}</span></span>
-      <span class="gres">${done ? `<b>${g.res.w ? 'W' : 'L'}</b> ${g.res.us}-${g.res.them}${g.res.ot ? ' OT' : ''}` : ''}</span></li>`;
-  }
-  function runPostseason() {
-    const st = RUN.st, me = teamRatings(st), r = rngFrom(st.seed + '|' + rosterKey(st) + '|post');
-    const losses = st.games.filter(g => !g.res.w).length, confL = st.games.filter(g => g.conf && !g.res.w).length;
-    const unused = shuffle(r, D.opponents.filter(o => !st.used.includes(o.id)));
-    const take = pred => { const i = unused.findIndex(pred); return i < 0 ? unused.shift() : unused.splice(i, 1)[0]; };
-    st.notes = [];
-    // SEC title game: top two in the 16-team SEC
-    let secChamp = false, inSCG = confL <= 1 || (confL === 2 && r() < .35);
-    if (confL === 2) st.notes.push(inSCG ? 'Tied at 7-2 and won the tiebreaker for a spot in Atlanta.' : 'Tied at 7-2 but lost the tiebreaker. No trip to Atlanta.');
-    if (inSCG) {
-      const o = take(x => x.sec); const g = { o: o.id, conf: false, neutral: true, label: 'SEC Championship' };
-      g.res = playGame(st.seed + '|' + rosterKey(st) + '|scg', me, o, 0); st.post.push(g); secChamp = g.res.w;
-    }
-    const totalL = losses + (inSCG && !secChamp ? 1 : 0);
-    // committee seed (straight seeding; five best conference champions are in)
-    let seed = null;
-    if (totalL === 0) seed = 1;
-    else if (totalL === 1) seed = secChamp ? 1 + Math.floor(r() * 2) : 3 + Math.floor(r() * 4);
-    else if (totalL === 2) seed = secChamp ? 4 + Math.floor(r() * 3) : 6 + Math.floor(r() * 4);
-    else if (totalL === 3) seed = secChamp ? 9 + Math.floor(r() * 2) : (r() < .6 ? 10 + Math.floor(r() * 3) : null);
-    else if (secChamp) seed = 12;
-    st.seed12 = seed;
-    if (!seed) { st.notes.push(totalL >= 4 ? 'Four losses against this schedule is still four losses. Left out of the playoff.' : 'The committee left you just outside the 12-team field.'); st.phase = 'done'; return finishRun(); }
-    const rounds = [];
-    if (seed > 4) rounds.push({ label: 'CFP first round', site: seed <= 8 ? 1 : -1 });
-    rounds.push({ label: 'CFP quarterfinal', site: 0 }, { label: 'CFP semifinal', site: 0 }, { label: 'National championship', site: 0 });
-    for (const rd of rounds) {
-      const o = take(() => true); const g = { o: o.id, neutral: rd.site === 0, home: rd.site === 1, label: rd.label };
-      g.res = playGame(st.seed + '|' + rosterKey(st) + '|' + rd.label, me, o, rd.site); st.post.push(g);
-      if (!g.res.w) break;
-    }
-    st.phase = 'done'; finishRun();
-  }
-  const TIERS = [
-    [w => w.perfect, 'Neyland Immortals', 'Perfect season. National champions. Nobody touched you.'],
-    [w => w.title, 'National Champions', 'Hoist it. The trophy is coming to Knoxville.'],
-    [w => w.reached === 'National championship', 'Title game', 'One win from a national title.'],
-    [w => w.reached === 'CFP semifinal', 'Final Four', 'A semifinal run against the best teams of the era.'],
-    [w => w.reached && w.reached.startsWith('CFP'), 'Playoff team', 'You made the 12-team field.'],
-    [w => w.wins >= 9, 'Bowl bound', 'A winning season against an all-time schedule.'],
-    [w => w.wins >= 6, 'Bowl eligible', 'Six wins against legends is no small thing.'],
-    [() => true, 'Rebuilding', 'This schedule is brutal. Spin again.'],
-  ];
-  function summary(st) {
-    const all = st.games.concat(st.post || []);
-    const wins = all.filter(g => g.res.w).length, losses = all.length - wins;
-    const last = (st.post || []).slice(-1)[0];
-    const title = !!(last && last.label === 'National championship' && last.res.w);
-    const cfp = (st.post || []).filter(g => g.label.startsWith('CFP') || g.label === 'National championship');
-    const reached = cfp.length ? cfp[cfp.length - 1].label : null;
-    const secChamp = (st.post || []).some(g => g.label === 'SEC Championship' && g.res.w);
-    const w = { wins, losses, title, perfect: title && losses === 0, reached, secChamp };
-    const tier = TIERS.find(t => t[0](w)); w.tier = tier[1]; w.tierText = tier[2];
-    return w;
-  }
-  function finishRun() {
-    const st = RUN.st, s = summary(st), me = teamRatings(st);
-    const sq = st.games.map(g => g.res.w ? '🟧' : '⬛').join('') + (st.post.length ? ' ' + st.post.map(g => g.res.w ? '🟧' : '⬛').join('') : '');
-    st.share = `🏈 Checkerboard Run${st.daily ? ' ' + st.date : ''}: ${s.wins}-${s.losses} · ${s.tier}\n${sq}\nOFF ${Math.round(me.off)} · DEF ${Math.round(me.def)}\n${SITE}`;
-    if (st.daily) store.set('run-daily-' + st.date, { final: JSON.parse(JSON.stringify(st)), share: st.share });
-    const hist = store.get('run-stats', { played: 0, titles: 0, perfect: 0, best: null });
-    hist.played++; if (s.title) hist.titles++; if (s.perfect) hist.perfect++;
-    if (!hist.best || s.wins - s.losses > hist.best.w - hist.best.l) hist.best = { w: s.wins, l: s.losses, tier: s.tier };
-    store.set('run-stats', hist);
-  }
-  function runResults(body, fromSave) {
-    const st = RUN.st;
-    // saved runs come back as plain JSON: re-link players
-    st.slots.forEach(s => { if (s.p && !s.p.st) s.p = BYNAME[s.p.n.toLowerCase()] || s.p; });
-    const s = summary(st), me = teamRatings(st), hist = store.get('run-stats', { played: 0, titles: 0, perfect: 0 });
-    const dsv = store.get('run-daily-' + etDate(), null);
-    body.innerHTML = `${modeBar(RUN.mode, !!(dsv && dsv.final))}
-      <div class="box gfinal ${s.title ? 'champ' : ''}"><div class="eyebrow">${st.daily ? 'Daily challenge · ' + esc(st.date) : 'Free play'}</div>
-        <h2>${s.wins}-${s.losses}</h2><div class="gtier">${esc(s.tier)}</div><p>${esc(s.tierText)}</p>
-        ${(st.notes || []).map(n => `<p class="dim">${esc(n)}</p>`).join('')}
-        ${st.seed12 ? `<p class="dim">Playoff seed: No. ${st.seed12}${s.secChamp ? ' · SEC champions' : ''}</p>` : ''}
-        <div class="grow"><button class="btn primary" id="runShare">Copy result</button> <button class="btn" id="runAgain">${st.daily ? 'Free play' : 'Play again'}</button></div>
-        <p class="dim small">Your runs: ${hist.played} played · ${hist.titles} titles · ${hist.perfect} perfect</p></div>
-      <div class="grid g2"><div class="box gteam"><div class="eyebrow">Your Vols · OFF ${Math.round(me.off)} · DEF ${Math.round(me.def)}</div>${slotBoard(st, true)}</div>
-        <div class="box gsched"><h3>Season</h3><ol class="glist">${st.games.map(g => gameRow(g, true)).join('')}${(st.post || []).map(g => gameRow(g, true, g.label)).join('')}</ol></div></div>`;
-    bindMode(body, m => { RUN.mode = m; RUN.st = null; VI_RENDER_GAMES(); });
-    body.querySelector('#runShare').addEventListener('click', e => copyText(st.share || '', e.currentTarget));
-    body.querySelector('#runAgain').addEventListener('click', () => { RUN.mode = 'free'; RUN.st = null; VI_RENDER_GAMES(); });
+  const COVERAGE = {
+    football: 'Every Vol from 1980 to today appears at his best season. 1980s and early 1990s stats come from the UT record book; 1995 on use full season stats from utsports.com, ESPN and CollegeFootballData.com.',
+    mbb: 'Season stats from utsports.com, 2000-01 to 2025-26 (top players each season).',
+    wbb: 'Season stats from utsports.com start in 2015-16, so Lady Vols legends like Chamique Holdsclaw and Candace Parker show up in Trivia for now.',
+    baseball: 'Season stats from utsports.com, 2017 to 2026 (no 2020 season). Older seasons are coming.',
+    softball: 'Season stats from utsports.com, 2006 to 2026 (no 2020 season).',
+    volleyball: 'Season stats from utsports.com, 2006 to 2025.',
+    soccer: 'Season stats from utsports.com, 2001 to 2025.',
+  };
+  function renderSportHub(app, sport) {
+    const s = SP(sport);
+    app.innerHTML = `<div class="wrap games">
+      <nav class="gcrumb"><a href="#games">Games</a> <span aria-hidden="true">›</span> <b>${esc(s.name)}</b></nav>
+      <header class="ghead"><h1><span aria-hidden="true">${s.icon}</span> ${esc(s.name)} games${s.beta ? ' <span class="gbeta">Beta</span>' : ''}</h1>
+        <p>${esc(COVERAGE[sport])}</p></header>
+      ${betaNote(sport)}
+      <div class="grid g3 gcards">${s.games.map(g => `<a class="box gcard" href="#games-${sport}-${g}"><div class="gcard-top"><span class="gicon" aria-hidden="true">${GAME_ICON[g]}</span>${dailyDone(sport, g) ? '<span class="chip new">Today ✓</span>' : '<span class="chip">Daily</span>'}</div>
+          <h3>${esc(gameName(sport, g))}</h3><p>${esc(gameBlurb(sport, g))}</p><span class="btn primary">Play</span></a>`).join('')}
+        ${s.beta ? `<div class="box gcard soon"><div class="gcard-top"><span class="gicon" aria-hidden="true">🔜</span><span class="chip">Soon</span></div><h3>More games</h3><p>Grids, career paths and sims for ${esc(s.name.toLowerCase())} are on the way.</p></div>` : ''}</div>
+      <p class="gfoot dim"><a href="#games">← All sports</a></p></div>`;
   }
 
   /* =====================================================================================
-     VOL GUESSER
+     GUESSER (football + basketball / baseball / softball)
      ===================================================================================== */
   const GUESS_MAX = 8;
-  const GS = { mode: 'daily', st: null };
   const draftRd = p => p.draft ? (p.draft[1] === 0 ? 'UDFA' : 'Rd ' + p.draft[1]) : '—';
   const honLevel = p => { const h = p.honAll || []; return h.some(x => /^AA[uc1]$/.test(x)) ? 3 : h.includes('AA2') ? 2 : h.includes('SEC') ? 1 : 0; };
   const HON_LV = ['None', 'All-SEC', 'All-America (2nd/3rd)', 'All-American'];
   const POS_SIDE = s => ['QB', 'RB', 'WR', 'TE'].includes(s) ? 'O' : 'D';
-  function renderGuesser(app) {
-    const g = GAMES[1], today = etDate();
-    const body = frame(app, g, '', 'Guess any Vol. Each guess shows how close you are. Orange is a match, light orange is close, arrows point to the answer.');
-    const saved = store.get('guesser-daily-' + today, null);
-    if (!GS.st || GS.st.mode !== GS.mode || (GS.mode === 'daily' && GS.st.date !== today)) {
-      if (GS.mode === 'daily' && saved) GS.st = saved.state;
-      else {
-        const r = rngFrom(GS.mode === 'daily' ? 'guess-' + today : freeSeed());
-        const cands = POOL.filter(p => p.ovr >= 82 || honLevel(p) >= 1);
-        GS.st = { mode: GS.mode, date: today, ans: pick(r, cands).n, guesses: [], done: false };
-      }
-    }
-    const st = GS.st, ans = BYNAME[st.ans.toLowerCase()];
-    const cmpRow = p => {
-      const c = (ok, near) => ok ? 'hit' : near ? 'near' : '';
-      const arrow = (a, b) => a === b ? '' : (b > a ? ' ↑' : ' ↓');
-      const dA = ans.draft ? (ans.draft[1] || 8) : 9, dP = p.draft ? (p.draft[1] || 8) : 9;
-      return `<tr><th scope="row" class="${p.n === ans.n ? 'hit' : ''}">${esc(p.n)}</th>
-        <td class="${c(p.slot === ans.slot, POS_SIDE(p.slot) === POS_SIDE(ans.slot))}">${p.slot === 'DL' ? 'DT' : p.slot}</td>
-        <td class="${c(p.y === ans.y, Math.abs(p.y - ans.y) <= 3)}">${p.y}${arrow(p.y, ans.y)}</td>
-        <td class="${c(p.coach === ans.coach, false)}">${esc(p.coach.split(' ').pop())}</td>
-        <td class="${c(honLevel(p) === honLevel(ans), Math.abs(honLevel(p) - honLevel(ans)) === 1)}">${HON_LV[honLevel(p)]}${arrow(honLevel(p), honLevel(ans))}</td>
-        <td class="${c(dP === dA, Math.abs(dP - dA) === 1)}">${draftRd(p)}${dP === dA ? '' : (dA < dP ? ' ↑' : ' ↓')}</td></tr>`;
+  const arrow = (a, b) => a === b ? '' : (b > a ? ' ↑' : ' ↓');
+  const cls = (ok, near) => ok ? 'hit' : near ? 'near' : '';
+  function guessAdapter(sport) {
+    if (sport === 'football') return {
+      cands: eras => STARS.filter(p => eras.includes(p.dec)),
+      all: () => ALL.map(p => p.n), get: n => BYNAME[n.toLowerCase()], weight: p => ERA_BOOST(p.dec),
+      head: ['Pos', 'Prime', 'Coach', 'Honors', 'Draft'],
+      cells: (p, a) => {
+        const dA = a.draft ? (a.draft[1] || 8) : 9, dP = p.draft ? (p.draft[1] || 8) : 9;
+        return [
+          [cls(p.slot === a.slot, POS_SIDE(p.slot) === POS_SIDE(a.slot)), posLabel(p.slot)],
+          [cls(p.y === a.y, Math.abs(p.y - a.y) <= 3), p.y + arrow(p.y, a.y)],
+          [cls(p.coach === a.coach, false), p.coach.split(' ').pop()],
+          [cls(honLevel(p) === honLevel(a), Math.abs(honLevel(p) - honLevel(a)) === 1), HON_LV[honLevel(p)] + arrow(honLevel(p), honLevel(a))],
+          [cls(dP === dA, Math.abs(dP - dA) === 1), draftRd(p) + (dP === dA ? '' : (dA < dP ? ' ↑' : ' ↓'))],
+        ];
+      },
+      hints: a => [['Years at UT', a.ut], ['Best season', a.y + ': ' + statLine(a)], ['Initials', initials(a.n)]],
+      reveal: a => `${SLOT_NAME[a.slot]} · best season ${a.y} · ${statLine(a)}`,
+      chips: a => honorChips(a.honAll, 4),
+      foot: 'Prime = his best season at Tennessee. Coach = head coach that season. Draft arrows point toward the answer\'s round (↑ earlier).',
+      any: 'Any Vol from 1980 to today',
     };
-    const won = st.guesses.includes(ans.n);
-    body.innerHTML = `${modeBar(GS.mode, !!(saved && saved.state.done))}
+    const S = SDATA[sport];
+    return {
+      cands: eras => { const ps = S.players.filter(p => eras.includes(p.dec)); const cut = ps.slice().sort((a, b) => b.ovr - a.ovr); return cut.slice(0, Math.max(12, Math.ceil(cut.length * .7))); },
+      all: () => S.players.map(p => p.n), get: n => S.by[n.toLowerCase()], weight: p => ERA_BOOST(p.dec),
+      head: ['Pos', 'Best season', 'Coach', 'Home', 'Transfer', 'Stat'],
+      cells: (p, a) => {
+        const kp = keyStat(sport, p), ka = keyStat(sport, a), same = kp.k === ka.k;
+        let statCls = '', statTxt = (kp.txt || kp.v) + ' ' + kp.l;
+        if (same && kp.v != null && ka.v != null) {
+          if (kp.v === ka.v) statCls = 'hit';
+          else { statCls = Math.abs(kp.v - ka.v) <= Math.abs(ka.v) * 0.12 ? 'near' : ''; statTxt += (ka.v > kp.v ? ' ↑' : ' ↓'); }
+        }
+        return [
+          [cls(p.pos === a.pos, posNear(sport, p.pos, a.pos)), p.pos || '—'],
+          [cls(p.y === a.y, Math.abs(p.y - a.y) <= 2), p.s + arrow(p.y, a.y)],
+          [cls(p.coach === a.coach, false), (p.coach || '—').split(' ').pop()],
+          [cls(!!p.home && p.home === a.home, false), p.home || '—'],
+          [cls(!!p.prev === !!a.prev, false), p.prev ? 'Yes' : 'No'],
+          [statCls, statTxt],
+        ];
+      },
+      hints: a => [['Seasons at UT', a.seasons.join(', ')], ['Best season', a.s + ': ' + a.line], ['Initials', initials(a.n)]],
+      reveal: a => `${a.pos} · best season ${a.s} · ${a.line}${a.prev ? ' · transferred from ' + a.prev : ''}`,
+      chips: () => '',
+      foot: 'Best season = the player\'s top season at Tennessee in our data. Home = home state or country. Transfer = came from another four-year school or junior college. Stat arrows only show when both players are the same type (hitter vs. pitcher).',
+      any: 'Any player in our ' + SP(sport).name.toLowerCase() + ' data (' + S.first + ' to ' + S.last + ')',
+    };
+  }
+  function renderGuesser(app, sport) {
+    const A = guessAdapter(sport);
+    const body = frame(app, sport, 'guesser', 'Guess any player. Each guess shows how close you are: orange is a match, light orange is close, arrows point to the answer. A new hint unlocks every two misses.');
+    const { G, st, saved } = gameState(sport, 'guesser', (r, eras) => {
+      let c = A.cands(eras); if (!c.length) c = A.cands(sportEras(sport));
+      return { ans: wpick(r, c, A.weight).n, guesses: [], done: false, pool: c.length };
+    });
+    const ans = A.get(st.ans);
+    const won = st.guesses.includes(ans.n), misses = st.guesses.filter(n => n !== ans.n).length;
+    const hints = A.hints(ans), shown = st.done ? hints.length : Math.min(hints.length, Math.floor(misses / 2));
+    const row = p => `<tr><th scope="row" class="${p.n === ans.n ? 'hit' : ''}">${esc(p.n)}</th>${A.cells(p, ans).map(([c, t]) => `<td class="${c}">${esc(t)}</td>`).join('')}</tr>`;
+    body.innerHTML = `${topBar(body, sport, G, saved)}
       <div class="box gguess">
-        <div class="gguess-top"><div class="eyebrow">Guess ${Math.min(st.guesses.length + 1, GUESS_MAX)} of ${GUESS_MAX}</div>
+        <div class="gguess-top"><div class="eyebrow">Guess ${Math.min(st.guesses.length + 1, GUESS_MAX)} of ${GUESS_MAX} · ${st.pool || ''} possible answers</div>
           ${st.done ? '' : '<div id="gsrch"></div>'}</div>
-        ${st.done ? `<div class="greveal ${won ? 'win' : ''}"><div class="eyebrow">${won ? 'Got him in ' + st.guesses.length : 'The answer'}</div><h3>${esc(ans.n)}</h3>
-          <p>${esc(SLOT_NAME[ans.slot])} · best season ${ans.y} · ${esc(statLine(ans))}</p><p>${honorChips(ans.honAll, 4)}</p>
+        ${st.done ? `<div class="greveal ${won ? 'win' : ''}"><div class="eyebrow">${won ? 'Got it in ' + st.guesses.length : st.gaveUp ? 'You gave up. The answer' : 'The answer'}</div><h3>${esc(ans.n)}</h3>
+          <p>${esc(A.reveal(ans))}</p><p>${A.chips(ans)}</p>
           <div class="grow"><button class="btn primary" id="gShare">Copy result</button> <button class="btn" id="gNew">New player (free play)</button></div></div>` : ''}
-        <div class="gtable-wrap"><table class="gtable"><thead><tr><th>Player</th><th>Pos</th><th>Prime</th><th>Coach</th><th>Honors</th><th>Draft</th></tr></thead>
-          <tbody>${st.guesses.slice().reverse().map(n => cmpRow(BYNAME[n.toLowerCase()])).join('') || '<tr><td colspan="6" class="dim">Start typing a name. Any Vol from 1980 to today.</td></tr>'}</tbody></table></div>
-        ${!st.done && st.guesses.length >= 5 ? `<p class="ghint">Hint: his initials are <b>${esc(ans.n.split(' ').map(w => w[0]).join('.'))}.</b></p>` : ''}
+        <div class="ghints">${hints.map((h, i) => i < shown ? `<div class="ghint on"><b>${esc(h[0])}</b> ${esc(h[1])}</div>` : `<div class="ghint"><b>${esc(h[0])}</b> <span class="dim">after ${(i + 1) * 2} misses</span></div>`).join('')}</div>
+        <div class="gtable-wrap"><table class="gtable"><thead><tr><th>Player</th>${A.head.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+          <tbody>${st.guesses.slice().reverse().map(n => row(A.get(n))).join('') || `<tr><td colspan="${A.head.length + 1}" class="dim">Start typing a name. ${esc(A.any)}.</td></tr>`}</tbody></table></div>
+        ${!st.done ? '<div class="grow"><button class="glink" id="gGive">Give up</button></div>' : ''}
       </div>
-      <p class="dim small">Prime = the player's best season at Tennessee. Coach = head coach that season. Draft arrows point toward the answer's round (↑ earlier).</p>`;
-    bindMode(body, m => { GS.mode = m; GS.st = null; VI_RENDER_GAMES(); });
-    if (!st.done) searchBox(body.querySelector('#gsrch'), ALL.map(p => p.n).filter(n => !st.guesses.includes(n)).sort(), n => {
+      <p class="dim small">${esc(A.foot)}</p>`;
+    bindTop(body, sport, G);
+    const finish = (gaveUp) => {
+      st.done = true; st.gaveUp = !!gaveUp; const w = st.guesses.includes(ans.n);
+      st.share = `${GAME_ICON.guesser} ${gameName(sport, 'guesser')}${st.mode === 'daily' ? ' ' + st.date : ''}: ${w ? st.guesses.length + '/' + GUESS_MAX : 'X/' + GUESS_MAX}\n${st.guesses.map(x => x === ans.n ? '🟧' : '⬛').join('')}\n${SITE}`;
+    };
+    if (!st.done) searchBox(body.querySelector('#gsrch'), A.all().filter(n => !st.guesses.includes(n)).sort(), n => {
       st.guesses.push(n);
-      if (n === ans.n || st.guesses.length >= GUESS_MAX) {
-        st.done = true;
-        const won = n === ans.n;
-        st.share = `🔎 Vol Guesser${st.mode === 'daily' ? ' ' + st.date : ''}: ${won ? st.guesses.length + '/' + GUESS_MAX : 'X/' + GUESS_MAX}\n${st.guesses.map(x => x === ans.n ? '🟧' : '⬛').join('')}\n${SITE}`;
-      }
-      if (st.mode === 'daily') store.set('guesser-daily-' + st.date, { state: st, share: st.share });
-      VI_RENDER_GAMES();
-      const i = document.querySelector('#gsrch input'); if (i) i.focus();
-    }, 'Guess a Vol');
+      if (n === ans.n || st.guesses.length >= GUESS_MAX) finish(false);
+      saveDaily(sport, 'guesser', st); rerender(); refocus();
+    }, 'Guess a player');
+    twoTap(body.querySelector('#gGive'), 'Tap again to reveal', () => { finish(true); saveDaily(sport, 'guesser', st); rerender(); });
     const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyText(st.share, e.currentTarget));
-    const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { GS.mode = 'free'; GS.st = null; VI_RENDER_GAMES(); });
+    const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { G.mode = 'free'; G.st = null; rerender(); });
   }
 
   /* =====================================================================================
-     POWER T GRID
+     POWER T GRID (football)
      ===================================================================================== */
   const CAT = {
     QB: { l: 'Quarterback', f: p => p.slot === 'QB', t: 'pos' }, RB: { l: 'Running back', f: p => p.slot === 'RB', t: 'pos' },
     WRTE: { l: 'Receiver (WR/TE)', f: p => p.slot === 'WR' || p.slot === 'TE', t: 'pos' }, DLINE: { l: 'Defensive line', f: p => p.slot === 'DL' || p.slot === 'EDGE', t: 'pos' },
     LB: { l: 'Linebacker', f: p => p.slot === 'LB', t: 'pos' }, DB: { l: 'Defensive back', f: p => p.slot === 'CB' || p.slot === 'S', t: 'pos' },
-    E80: { l: 'Played in the 1980s', f: p => p.yrs.some(y => y < 1990), t: 'era' }, E90: { l: 'Played in the 1990s', f: p => p.yrs.some(y => y >= 1990 && y < 2000), t: 'era' },
-    E00: { l: 'Played in the 2000s', f: p => p.yrs.some(y => y >= 2000 && y < 2010), t: 'era' }, E10: { l: 'Played in the 2010s', f: p => p.yrs.some(y => y >= 2010 && y < 2020), t: 'era' },
-    E20: { l: 'Played in the 2020s', f: p => p.yrs.some(y => y >= 2020), t: 'era' },
-    MAJ: { l: 'Played for Johnny Majors', f: p => p.yrs.some(y => y <= 1992), t: 'era' }, FUL: { l: 'Played for Phillip Fulmer', f: p => p.yrs.some(y => y >= 1993 && y <= 2008), t: 'era' },
-    BJ: { l: 'Played for Butch Jones', f: p => p.yrs.some(y => y >= 2013 && y <= 2017), t: 'era' }, HEU: { l: 'Played for Josh Heupel', f: p => p.yrs.some(y => y >= 2021), t: 'era' },
+    E80: { l: 'Played in the 1980s', f: p => p.yrs.some(y => y < 1990), t: 'era', e: [1980] }, E90: { l: 'Played in the 1990s', f: p => p.yrs.some(y => y >= 1990 && y < 2000), t: 'era', e: [1990] },
+    E00: { l: 'Played in the 2000s', f: p => p.yrs.some(y => y >= 2000 && y < 2010), t: 'era', e: [2000] }, E10: { l: 'Played in the 2010s', f: p => p.yrs.some(y => y >= 2010 && y < 2020), t: 'era', e: [2010] },
+    E20: { l: 'Played in the 2020s', f: p => p.yrs.some(y => y >= 2020), t: 'era', e: [2020] },
+    MAJ: { l: 'Played for Johnny Majors', f: p => p.yrs.some(y => y <= 1992), t: 'era', e: [1980, 1990] }, FUL: { l: 'Played for Phillip Fulmer', f: p => p.yrs.some(y => y >= 1993 && y <= 2008), t: 'era', e: [1990, 2000] },
+    BJ: { l: 'Played for Butch Jones', f: p => p.yrs.some(y => y >= 2013 && y <= 2017), t: 'era', e: [2010] }, HEU: { l: 'Played for Josh Heupel', f: p => p.yrs.some(y => y >= 2021), t: 'era', e: [2020] },
     AA: { l: 'First-team All-American', f: p => p.fl.includes('aa'), t: 'ach' }, SEC: { l: 'First-team All-SEC', f: p => p.fl.includes('sec'), t: 'ach' },
     R1: { l: 'NFL first-round pick', f: p => p.fl.includes('r1'), t: 'ach' }, DR: { l: 'Drafted into the NFL', f: p => p.fl.includes('drafted'), t: 'ach' },
     K1: { l: '1,000-yard season', f: p => p.fl.includes('k1000'), t: 'ach' }, TD12: { l: '12+ rush/rec TD season', f: p => p.fl.includes('td12'), t: 'ach' },
     T100: { l: '100-tackle season', f: p => p.fl.includes('t100'), t: 'ach' }, S10: { l: '10-sack season', f: p => p.fl.includes('s10'), t: 'ach' },
     I5: { l: '5-INT season', f: p => p.fl.includes('i5'), t: 'ach' },
   };
-  const GR = { mode: 'daily', st: null };
-  function makeGrid(r) {
-    const keys = Object.keys(CAT);
-    for (let tries = 0; tries < 4000; tries++) {
+  function gridPlayers(eras) { return ALL.filter(p => p.yrs.some(y => eras.includes(decOf(y)))); }
+  function makeGrid(r, eras) {
+    const players = gridPlayers(eras);
+    const keys = Object.keys(CAT).filter(k => !CAT[k].e || CAT[k].e.some(e => eras.includes(e)));
+    const fits = (a, b) => players.filter(p => CAT[a].f(p) && CAT[b].f(p)).length;
+    for (let tries = 0; tries < 5000; tries++) {
       const rows = shuffle(r, keys.filter(k => CAT[k].t !== 'era')).slice(0, 3);
       const cols = shuffle(r, keys.filter(k => CAT[k].t !== 'pos' && !rows.includes(k))).slice(0, 3);
-      if (rows.filter(k => CAT[k].t === 'pos').length < 1 || cols.filter(k => CAT[k].t === 'era').length < 1) continue;
-      const cells = []; let ok = true;
-      for (const a of rows) for (const b of cols) { const n = ALL.filter(p => CAT[a].f(p) && CAT[b].f(p)).length; if (n < 2) { ok = false; break; } cells.push(n); if (!ok) break; }
+      if (rows.filter(k => CAT[k].t === 'pos').length < 1) continue;
+      if (eras.length > 1 && cols.filter(k => CAT[k].t === 'era').length < 1) continue;
+      let ok = true;
+      for (const a of rows) { for (const b of cols) if (fits(a, b) < 2) { ok = false; break; } if (!ok) break; }
       if (ok) return { rows, cols };
     }
-    return { rows: ['QB', 'RB', 'WRTE'], cols: ['E90', 'E00', 'SEC'] };
+    return { rows: ['QB', 'RB', 'WRTE'], cols: ['SEC', 'DR', 'K1'] };
   }
   function renderGrid(app) {
-    const g = GAMES[2], today = etDate();
-    const body = frame(app, g, '', 'Pick a square, then name a Vol who fits both its row and its column. Nine guesses. Each player counts once.');
-    const saved = store.get('grid-daily-' + today, null);
-    if (!GR.st || GR.st.mode !== GR.mode || (GR.mode === 'daily' && GR.st.date !== today)) {
-      if (GR.mode === 'daily' && saved) GR.st = saved.state;
-      else { const r = rngFrom(GR.mode === 'daily' ? 'grid-' + today : freeSeed()); GR.st = Object.assign({ mode: GR.mode, date: today, cells: Array(9).fill(null), left: 9, used: [], sel: null, done: false }, makeGrid(r)); }
-    }
-    const st = GR.st;
+    const sport = 'football';
+    const body = frame(app, sport, 'grid', 'Pick a square, then name a Vol who fits both its row and its column. Nine guesses. Each player counts once.');
+    const { G, st, saved } = gameState(sport, 'grid', (r, eras) => Object.assign({ cells: Array(9).fill(null), left: 9, used: [], sel: null, done: false }, makeGrid(r, eras)));
+    const players = gridPlayers(st.eras || FB_ERAS);
+    const answers = i => players.filter(p => CAT[st.rows[Math.floor(i / 3)]].f(p) && CAT[st.cols[i % 3]].f(p) && !st.used.includes(p.n)).map(p => p.n);
     const head = k => `<div class="gt-h">${esc(CAT[k].l)}</div>`;
-    const cell = (i) => {
+    const cell = i => {
       const v = st.cells[i], row = Math.floor(i / 3), col = i % 3, t = row === 0 || col === 1;
       if (v) return `<div class="gt-c ok ${t ? 't' : ''}"><b>${esc(v)}</b></div>`;
       if (st.done) { const a = answers(i); return `<div class="gt-c miss ${t ? 't' : ''}"><span class="dim small">${a.length} possible${a.length ? ': ' + esc(a.slice(0, 2).join(', ')) : ''}</span></div>`; }
       return `<button class="gt-c ${t ? 't' : ''} ${st.sel === i ? 'sel' : ''}" data-i="${i}" aria-label="${esc(CAT[st.rows[row]].l + ' and ' + CAT[st.cols[col]].l)}"></button>`;
     };
-    const answers = i => ALL.filter(p => CAT[st.rows[Math.floor(i / 3)]].f(p) && CAT[st.cols[i % 3]].f(p) && !st.used.includes(p.n)).map(p => p.n);
     const score = st.cells.filter(Boolean).length;
-    body.innerHTML = `${modeBar(GR.mode, !!(saved && saved.state.done))}
+    body.innerHTML = `${topBar(body, sport, G, saved)}
       <div class="box ggrid-box">
         <div class="ggrid-top"><div class="eyebrow">${st.done ? 'Final: ' + score + '/9' : 'Guesses left: ' + st.left}</div>${!st.done ? '<button class="glink" id="gGive">Give up</button>' : ''}</div>
         <div class="ggrid"><div class="gt-corner" aria-hidden="true"><span>T</span></div>${st.cols.map(head).join('')}
           ${[0, 1, 2].map(r => head(st.rows[r]) + [0, 1, 2].map(c => cell(r * 3 + c)).join('')).join('')}</div>
         ${!st.done ? `<div class="ggrid-in">${st.sel === null ? '<p class="dim">Tap a square to start.</p>' : `<p><b>${esc(CAT[st.rows[Math.floor(st.sel / 3)]].l)}</b> + <b>${esc(CAT[st.cols[st.sel % 3]].l)}</b></p><div id="gsrch"></div><p class="gmsg" id="gmsg" role="status"></p>`}</div>` : `<div class="grow"><button class="btn primary" id="gShare">Copy result</button> <button class="btn" id="gNew">New grid (free play)</button></div>`}
       </div>
-      <p class="dim small">"Played in" and coach squares count every season we have for a player. Honors and draft come from the UT record book.</p>`;
-    bindMode(body, m => { GR.mode = m; GR.st = null; VI_RENDER_GAMES(); });
-    body.querySelectorAll('button.gt-c').forEach(b => b.addEventListener('click', () => { st.sel = +b.dataset.i; VI_RENDER_GAMES(); const i = document.querySelector('#gsrch input'); if (i) i.focus(); }));
-    const save = () => { if (st.mode === 'daily') store.set('grid-daily-' + st.date, { state: st, share: st.share }); };
+      <p class="dim small">"Played in" and coach squares count every season we have for a player.${G.mode === 'free' && st.eras.length < FB_ERAS.length ? ' Only Vols from your selected eras count.' : ''} Honors and draft come from the UT record book.</p>`;
+    bindTop(body, sport, G);
+    body.querySelectorAll('button.gt-c').forEach(b => b.addEventListener('click', () => { st.sel = +b.dataset.i; rerender(); refocus(); }));
     const finish = () => {
       st.done = true; st.sel = null;
       const sq = [0, 1, 2].map(r => [0, 1, 2].map(c => st.cells[r * 3 + c] ? '🟧' : '⬜').join('')).join('\n');
-      st.share = `🟧 Power T Grid${st.mode === 'daily' ? ' ' + st.date : ''}: ${st.cells.filter(Boolean).length}/9\n${sq}\n${SITE}`; save();
+      st.share = `🟧 Power T Grid${st.mode === 'daily' ? ' ' + st.date : ''}: ${st.cells.filter(Boolean).length}/9\n${sq}\n${SITE}`; saveDaily(sport, 'grid', st);
     };
     if (st.sel !== null && !st.done) searchBox(body.querySelector('#gsrch'), ALL.map(p => p.n).filter(n => !st.used.includes(n)).sort(), n => {
-      const p = BYNAME[n.toLowerCase()], i = st.sel, ok = CAT[st.rows[Math.floor(i / 3)]].f(p) && CAT[st.cols[i % 3]].f(p);
+      const p = BYNAME[n.toLowerCase()], i = st.sel, ok = players.includes(p) && CAT[st.rows[Math.floor(i / 3)]].f(p) && CAT[st.cols[i % 3]].f(p);
       st.left--;
       if (ok) { st.cells[i] = p.n; st.used.push(p.n); st.sel = null; }
-      if (!st.left || st.cells.every(Boolean)) finish(); else save();
-      VI_RENDER_GAMES();
-      if (!ok && !st.done) { const m = document.getElementById('gmsg'); if (m) m.textContent = `${n} doesn't fit that square. ${st.left} guesses left.`; const inp = document.querySelector('#gsrch input'); if (inp) inp.focus(); }
+      if (!st.left || st.cells.every(Boolean)) finish(); else saveDaily(sport, 'grid', st);
+      rerender();
+      if (!ok && !st.done) { const m = document.getElementById('gmsg'); if (m) m.textContent = `${n} doesn't fit that square. ${st.left} guesses left.`; refocus(); }
     }, 'Name a Vol');
-    const gv = body.querySelector('#gGive'); if (gv) gv.addEventListener('click', () => { if (confirm('End this grid and see the answers?')) { finish(); VI_RENDER_GAMES(); } });
+    twoTap(body.querySelector('#gGive'), 'Tap again to end', () => { finish(); rerender(); });
     const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyText(st.share, e.currentTarget));
-    const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { GR.mode = 'free'; GR.st = null; VI_RENDER_GAMES(); });
+    const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { G.mode = 'free'; G.st = null; rerender(); });
   }
 
   /* =====================================================================================
-     VFL CAREER
+     VFL CAREER (football)
      ===================================================================================== */
-  const CR = { mode: 'daily', st: null };
   const CAREER_MAX = 6;
+  function careerEnd(c) { const m = /^(\d{4})(?:-(\d{2}))?/.exec(c.ut || ''); if (!m) return 2000; return m[2] ? +(m[1].slice(0, 2) + m[2]) : +m[1]; }
   function renderCareer(app) {
-    const g = GAMES[3], today = etDate();
-    const body = frame(app, g, '', 'Vol for Life. Name the former Vol from the NFL teams he played for, in order. Each wrong guess unlocks a clue.');
-    const saved = store.get('career-daily-' + today, null);
-    if (!CR.st || CR.st.mode !== CR.mode || (CR.mode === 'daily' && CR.st.date !== today)) {
-      if (CR.mode === 'daily' && saved) CR.st = saved.state;
-      else { const r = rngFrom(CR.mode === 'daily' ? 'career-' + today : freeSeed()); CR.st = { mode: CR.mode, date: today, ans: pick(r, D.careers).n, guesses: [], done: false }; }
-    }
-    const st = CR.st, c = D.careers.find(x => x.n === st.ans), p = BYNAME[c.n.toLowerCase()];
-    const posName = { QB: 'Quarterback', RB: 'Running back', WR: 'Wide receiver', TE: 'Tight end', OL: 'Offensive line', DL: 'Defensive tackle', EDGE: 'Defensive end', LB: 'Linebacker', CB: 'Cornerback', S: 'Safety' }[c.pos];
+    const sport = 'football';
+    const body = frame(app, sport, 'career', 'Vol for Life. Name the former Vol from his path: where he started, Tennessee, then every NFL team he played for. Each wrong guess unlocks a clue.');
+    const { G, st, saved } = gameState(sport, 'career', (r, eras) => {
+      const notable = D.careers.filter(c => c.notable);
+      let c = notable.filter(x => eras.includes(decOf(careerEnd(x)))); if (!c.length) c = notable;
+      return { ans: wpick(r, c, x => ERA_BOOST(decOf(careerEnd(x)))).n, guesses: [], done: false, pool: c.length };
+    });
+    const c = D.careers.find(x => x.n === st.ans), p = BYNAME[c.n.toLowerCase()];
+    const posName = { QB: 'Quarterback', RB: 'Running back', WR: 'Wide receiver', TE: 'Tight end', OL: 'Offensive line', DL: 'Defensive tackle', EDGE: 'Defensive end', LB: 'Linebacker', CB: 'Cornerback', S: 'Safety' }[c.pos] || c.pos;
     const dr = c.draft.rd === 0 ? `Undrafted free agent (${c.draft.y})` : `${c.draft.y} NFL Draft, round ${c.draft.rd}${c.draft.pick ? ', pick ' + c.draft.pick : ''}`;
-    const clues = [
-      ['At Tennessee', c.ut],
-      ['Position', posName],
-      ['NFL Draft', dr],
-      ['Best UT season', p ? `${p.y}: ${statLine(p)}` : 'Lineman, no stat line'],
-      ['Initials', c.n.split(' ').map(w => w[0]).join('.') + '.'],
-    ];
+    const clues = [['At Tennessee', c.ut], ['Position', posName], ['NFL Draft', dr], ['Best UT season', p ? `${p.y}: ${statLine(p)}` : 'Lineman, no stat line'], ['Initials', initials(c.n)]];
     const misses = st.guesses.filter(x => x !== c.n).length, won = st.guesses.includes(c.n);
     const shown = st.done ? clues.length : Math.min(misses, clues.length);
-    body.innerHTML = `${modeBar(CR.mode, !!(saved && saved.state.done))}
+    const path = (c.from ? c.from.split(' → ').map(t => `<span class="gteam-chip col">${esc(t)}</span>`).join('<span class="garr" aria-hidden="true">→</span>') + '<span class="garr" aria-hidden="true">→</span>' : '')
+      + '<span class="gteam-chip ut">Tennessee</span><span class="garr" aria-hidden="true">→</span>'
+      + c.teams.map((t, i) => `<span class="gteam-chip"><i>${i + 1}</i>${esc(t)}</span>`).join('<span class="garr" aria-hidden="true">→</span>');
+    body.innerHTML = `${topBar(body, sport, G, saved)}
       <div class="box gcareer">
-        <div class="eyebrow">NFL career${c.teams.length > 1 ? ' · ' + c.teams.length + ' teams' : ''}</div>
-        <div class="gteams">${c.teams.map((t, i) => `<span class="gteam-chip"><i>${i + 1}</i>${esc(t)}</span>`).join('<span class="garr" aria-hidden="true">→</span>')}</div>
+        <div class="eyebrow">Career path${c.teams.length > 1 ? ' · ' + c.teams.length + ' NFL teams' : ''} · ${st.pool || ''} notable VFLs in this pool</div>
+        <div class="gteams">${path}</div>
         <dl class="gclues">${clues.map((cl, i) => i < shown ? `<div><dt>${esc(cl[0])}</dt><dd>${esc(cl[1])}</dd></div>` : `<div class="locked"><dt>${esc(cl[0])}</dt><dd>Unlocks after ${i + 1} miss${i ? 'es' : ''}</dd></div>`).join('')}</dl>
-        ${st.done ? `<div class="greveal ${won ? 'win' : ''}"><div class="eyebrow">${won ? 'Correct in ' + st.guesses.length : 'The answer'}</div><h3>${esc(c.n)}</h3>
+        ${st.done ? `<div class="greveal ${won ? 'win' : ''}"><div class="eyebrow">${won ? 'Correct in ' + st.guesses.length : st.gaveUp ? 'You gave up. The answer' : 'The answer'}</div><h3>${esc(c.n)}</h3>
           <div class="grow"><button class="btn primary" id="gShare">Copy result</button> <button class="btn" id="gNew">Another career (free play)</button></div></div>`
-        : `<div class="eyebrow">Guess ${st.guesses.length + 1} of ${CAREER_MAX}</div><div id="gsrch"></div>`}
+        : `<div class="eyebrow">Guess ${st.guesses.length + 1} of ${CAREER_MAX}</div><div id="gsrch"></div><div class="grow"><button class="glink" id="gGive">Give up</button></div>`}
         ${st.guesses.length ? `<ul class="gmisses">${st.guesses.map(x => `<li class="${x === c.n ? 'hit' : ''}">${esc(x)}</li>`).join('')}</ul>` : ''}
       </div>
-      <p class="dim small">NFL teams from the UT record book's "Vols in Pro Football", using today's team names (Washington is listed as the Commanders).</p>`;
-    bindMode(body, m => { CR.mode = m; CR.st = null; VI_RENDER_GAMES(); });
+      <p class="dim small">NFL teams from the UT record book's "Vols in Pro Football", using today's team names (Washington is listed as the Commanders). Schools before Tennessee are shown for transfers and junior college players.</p>`;
+    bindTop(body, sport, G);
+    const finish = gaveUp => {
+      st.done = true; st.gaveUp = !!gaveUp; const w = st.guesses.includes(c.n);
+      st.share = `🏟️ VFL Career${st.mode === 'daily' ? ' ' + st.date : ''}: ${w ? st.guesses.length + '/' + CAREER_MAX : 'X/' + CAREER_MAX}\n${st.guesses.map(x => x === c.n ? '🟧' : '⬛').join('')}\n${SITE}`;
+    };
     const names = Array.from(new Set(D.careers.map(x => x.n).concat(ALL.map(x => x.n)))).sort();
     if (!st.done) searchBox(body.querySelector('#gsrch'), names.filter(n => !st.guesses.includes(n)), n => {
       st.guesses.push(n);
-      if (n === c.n || st.guesses.length >= CAREER_MAX) {
-        st.done = true; const w = n === c.n;
-        st.share = `🏟️ VFL Career${st.mode === 'daily' ? ' ' + st.date : ''}: ${w ? st.guesses.length + '/' + CAREER_MAX : 'X/' + CAREER_MAX}\n${st.guesses.map(x => x === c.n ? '🟧' : '⬛').join('')}\n${SITE}`;
-      }
-      if (st.mode === 'daily') store.set('career-daily-' + st.date, { state: st, share: st.share });
-      VI_RENDER_GAMES(); const i = document.querySelector('#gsrch input'); if (i) i.focus();
+      if (n === c.n || st.guesses.length >= CAREER_MAX) finish(false);
+      saveDaily(sport, 'career', st); rerender(); refocus();
     }, 'Name the VFL');
+    twoTap(body.querySelector('#gGive'), 'Tap again to reveal', () => { finish(true); saveDaily(sport, 'career', st); rerender(); });
     const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyText(st.share, e.currentTarget));
-    const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { CR.mode = 'free'; CR.st = null; VI_RENDER_GAMES(); });
+    const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { G.mode = 'free'; G.st = null; rerender(); });
   }
 
   /* =====================================================================================
-     ROCKY TOP RANKINGS
+     ROCKY TOP RANKINGS (every sport)
      ===================================================================================== */
-  const RK_CATS = [
-    { k: 'yds', l: 'Passing yards', slots: ['QB'] }, { k: 'td', l: 'Passing touchdowns', slots: ['QB'] },
-    { k: 'ryds', l: 'Rushing yards', slots: ['RB', 'QB'] }, { k: 'rtd', l: 'Rushing touchdowns', slots: ['RB', 'QB'] },
-    { k: 'cyds', l: 'Receiving yards', slots: ['WR', 'TE', 'RB'] }, { k: 'rec', l: 'Receptions', slots: ['WR', 'TE', 'RB'] },
-    { k: 'ctd', l: 'Receiving touchdowns', slots: ['WR', 'TE'] }, { k: 'tot', l: 'Tackles', slots: ['LB', 'S', 'CB', 'DL', 'EDGE'] },
-    { k: 'sk', l: 'Sacks', slots: ['EDGE', 'DL', 'LB'] }, { k: 'ints', l: 'Interceptions', slots: ['S', 'CB', 'LB'] },
+  const RK_FB = [
+    { k: 'yds', l: 'Passing yards', slots: ['QB'], min: 1200 }, { k: 'td', l: 'Passing touchdowns', slots: ['QB'], min: 8 },
+    { k: 'ryds', l: 'Rushing yards', slots: ['RB', 'QB'], min: 400 }, { k: 'rtd', l: 'Rushing touchdowns', slots: ['RB', 'QB'], min: 4 },
+    { k: 'cyds', l: 'Receiving yards', slots: ['WR', 'TE', 'RB'], min: 350 }, { k: 'rec', l: 'Receptions', slots: ['WR', 'TE', 'RB'], min: 25 },
+    { k: 'ctd', l: 'Receiving touchdowns', slots: ['WR', 'TE'], min: 3 }, { k: 'tot', l: 'Tackles', slots: ['LB', 'S', 'CB', 'DL', 'EDGE'], min: 50 },
+    { k: 'sk', l: 'Sacks', slots: ['EDGE', 'DL', 'LB'], min: 3 }, { k: 'ints', l: 'Interceptions', slots: ['S', 'CB', 'LB'], min: 2 },
+    { k: 'tfl', l: 'Tackles for loss', slots: ['EDGE', 'DL', 'LB'], min: 6 },
   ];
-  const RK_TRIES = 3;
-  const RK = { mode: 'daily', st: null };
-  function makeRanking(r) {
-    for (let t = 0; t < 500; t++) {
-      const cat = pick(r, RK_CATS);
-      const minv = { yds: 1200, td: 8, ryds: 400, rtd: 4, cyds: 350, rec: 25, ctd: 3, tot: 50, sk: 3, ints: 2 }[cat.k];
-      const rows = shuffle(r, D.seasons.filter(s => cat.slots.includes(s.slot) && (s.st[cat.k] || 0) >= minv));
-      const chosen = [], vals = new Set();
-      for (const s of rows) { const v = s.st[cat.k]; if (vals.has(v) || chosen.some(c => c.n === s.n)) continue; chosen.push(s); vals.add(v); if (chosen.length === 5) break; }
-      if (chosen.length === 5) return { cat: cat.k, items: chosen.map(s => ({ n: s.n, y: s.y, slot: s.slot, v: s.st[cat.k] })) };
-    }
+  const RK_SPORT = {
+    hoops: [{ k: 'pts', l: 'Points', min: 200 }, { k: 'reb', l: 'Rebounds', min: 100 }, { k: 'ast', l: 'Assists', min: 60 }, { k: 'tpm', l: '3-pointers made', min: 25 }, { k: 'blk', l: 'Blocks', min: 15 }, { k: 'stl', l: 'Steals', min: 25 }],
+    diamond: [{ k: 'h', l: 'Hits', kind: 'H', min: 40 }, { k: 'hr', l: 'Home runs', kind: 'H', min: 3 }, { k: 'rbi', l: 'RBI', kind: 'H', min: 20 }, { k: 'sb', l: 'Stolen bases', kind: 'H', min: 5 },
+      { k: 'avg', l: 'Batting average', kind: 'H', min: .2, fmt: f3, need: s => (s.ab || 0) >= 100 }, { k: 'so', l: 'Strikeouts (pitching)', kind: 'P', min: 40 }, { k: 'w', l: 'Wins (pitching)', kind: 'P', min: 4 },
+      { k: 'era', l: 'ERA', kind: 'P', min: .1, asc: true, fmt: f2, need: s => (s.ip || 0) >= 50 }, { k: 'ip', l: 'Innings pitched', kind: 'P', min: 40 }],
+    volleyball: [{ k: 'k', l: 'Kills', min: 150 }, { k: 'a', l: 'Assists', min: 500 }, { k: 'd', l: 'Digs', min: 150 }, { k: 'b', l: 'Blocks', min: 50 }, { k: 'sa', l: 'Service aces', min: 15 }],
+    soccer: [{ k: 'g', l: 'Goals', kind: 'F', min: 4 }, { k: 'a', l: 'Assists', kind: 'F', min: 3 }, { k: 'pts', l: 'Points', kind: 'F', min: 10 }, { k: 'sv', l: 'Saves (keepers)', kind: 'GK', min: 40 }, { k: 'sho', l: 'Shutouts (keepers)', kind: 'GK', min: 4 }],
+  };
+  const rkCats = sport => sport === 'football' ? RK_FB : RK_SPORT[sport === 'mbb' || sport === 'wbb' ? 'hoops' : sport === 'baseball' || sport === 'softball' ? 'diamond' : sport];
+  function rkRows(sport, cat, eras) {
+    if (sport === 'football') return D.seasons.filter(s => cat.slots.includes(s.slot) && (s.st[cat.k] || 0) >= cat.min && eras.includes(decOf(s.y))).map(s => ({ n: s.n, y: s.y, s: String(s.y), pos: posLabel(s.slot), v: s.st[cat.k] }));
+    return SDATA[sport].rows.filter(r => (!cat.kind || r.k === cat.kind) && r.st[cat.k] != null && r.st[cat.k] >= cat.min && (!cat.need || cat.need(r.st)) && eras.includes(r.dec))
+      .map(r => ({ n: r.n, y: r.y, s: r.s, pos: r.pos, v: r.st[cat.k] }));
   }
-  function renderRankings(app) {
-    const g = GAMES[4], today = etDate();
-    const body = frame(app, g, '', 'Order these five Tennessee seasons from most to least. Use the arrows to move a row. Correct spots lock in orange.');
-    const saved = store.get('rankings-daily-' + today, null);
-    if (!RK.st || RK.st.mode !== RK.mode || (RK.mode === 'daily' && RK.st.date !== today)) {
-      if (RK.mode === 'daily' && saved) RK.st = saved.state;
-      else { const r = rngFrom(RK.mode === 'daily' ? 'rank-' + today : freeSeed()); const z = makeRanking(r); RK.st = { mode: RK.mode, date: today, cat: z.cat, items: z.items, order: shuffle(r, [0, 1, 2, 3, 4]), locked: [], tries: 0, done: false, hist: [] }; }
+  const RK_TRIES = 3;
+  function makeRanking(r, sport, eras) {
+    for (let t = 0; t < 600; t++) {
+      const cat = pick(r, rkCats(sport));
+      const rows = shuffle(r, rkRows(sport, cat, eras));
+      const chosen = [], vals = new Set();
+      for (const s of rows) { if (vals.has(s.v) || chosen.some(c => c.n === s.n)) continue; chosen.push(s); vals.add(s.v); if (chosen.length === 5) break; }
+      if (chosen.length === 5) return { cat: cat.k + (cat.kind ? ':' + cat.kind : ''), items: chosen };
     }
-    const st = RK.st, cat = RK_CATS.find(c => c.k === st.cat);
-    const correct = st.items.map((x, i) => i).sort((a, b) => st.items[b].v - st.items[a].v);
-    body.innerHTML = `${modeBar(RK.mode, !!(saved && saved.state.done))}
+    return null;
+  }
+  function renderRankings(app, sport) {
+    const body = frame(app, sport, 'rankings', 'Order these five Tennessee seasons from best to worst. Use the arrows to move a row. Correct spots lock in orange.');
+    const { G, st, saved } = gameState(sport, 'rankings', (r, eras) => {
+      const z = makeRanking(r, sport, eras) || makeRanking(r, sport, sportEras(sport));
+      return { cat: z.cat, items: z.items, order: shuffle(r, [0, 1, 2, 3, 4]), locked: [], tries: 0, done: false, hist: [] };
+    });
+    const [ck, kind] = st.cat.split(':'), cat = rkCats(sport).find(c => c.k === ck && (c.kind || '') === (kind || ''));
+    const fmtV = v => cat.fmt ? cat.fmt(v) : fmt(v);
+    const correct = st.items.map((x, i) => i).sort((a, b) => cat.asc ? st.items[a].v - st.items[b].v : st.items[b].v - st.items[a].v);
+    body.innerHTML = `${topBar(body, sport, G, saved)}
       <div class="box grank">
-        <div class="grank-top"><div><div class="eyebrow">Most to least</div><h3>${esc(cat.l)} in a season</h3></div><div class="eyebrow">Try ${Math.min(st.tries + 1, RK_TRIES)} of ${RK_TRIES}</div></div>
+        <div class="grank-top"><div><div class="eyebrow">${cat.asc ? 'Lowest to highest' : 'Most to least'}</div><h3>${esc(cat.l)} in a season</h3></div><div class="eyebrow">Try ${Math.min(st.tries + 1, RK_TRIES)} of ${RK_TRIES}</div></div>
         <ol class="grank-list">${st.order.map((idx, pos) => {
-          const it = st.items[idx], lock = st.locked.includes(pos) || st.done, right = correct[pos] === idx;
-          return `<li class="${st.done ? (st.solved ? 'ok' : 'rev') : lock && right ? 'ok' : ''}"><span class="grank-n">${pos + 1}</span><span class="grank-p"><b>${esc(it.n)}</b><span class="dim">${it.y} · ${it.slot === 'DL' ? 'DT' : it.slot}</span></span>
-            ${st.done ? `<span class="grank-v">${fmt(it.v)}</span>` : (st.locked.includes(pos) ? '<span class="grank-v">🔒</span>' : `<span class="grank-mv"><button data-mv="${pos}" data-d="-1" aria-label="Move up" ${pos === 0 ? 'disabled' : ''}>▲</button><button data-mv="${pos}" data-d="1" aria-label="Move down" ${pos === 4 ? 'disabled' : ''}>▼</button></span>`)}</li>`;
+          const it = st.items[idx], right = correct[pos] === idx;
+          return `<li class="${st.done ? (st.solved ? 'ok' : 'rev') : st.locked.includes(pos) && right ? 'ok' : ''}"><span class="grank-n">${pos + 1}</span><span class="grank-p"><b>${esc(it.n)}</b><span class="dim">${esc(it.s)} · ${esc(it.pos || '')}</span></span>
+            ${st.done ? `<span class="grank-v">${fmtV(it.v)}</span>` : (st.locked.includes(pos) ? '<span class="grank-v">🔒</span>' : `<span class="grank-mv"><button data-mv="${pos}" data-d="-1" aria-label="Move up" ${pos === 0 ? 'disabled' : ''}>▲</button><button data-mv="${pos}" data-d="1" aria-label="Move down" ${pos === 4 ? 'disabled' : ''}>▼</button></span>`)}</li>`;
         }).join('')}</ol>
         ${st.done ? `<p class="gtier">${st.solved ? (st.tries === 1 ? 'Perfect on the first try.' : 'Solved in ' + st.tries + '.') : 'Out of tries. Here is the right order.'}</p>
           <div class="grow"><button class="btn primary" id="gShare">Copy result</button> <button class="btn" id="gNew">New ranking (free play)</button></div>`
         : `<div class="grow"><button class="btn primary big" id="rkGo">Lock it in</button></div>`}
       </div>
-      <p class="dim small">Seasons 2004 on use full box-score stats; earlier seasons come from the UT record book's year-by-year leaders.</p>`;
-    bindMode(body, m => { RK.mode = m; RK.st = null; VI_RENDER_GAMES(); });
+      <p class="dim small">${sport === 'football' ? 'Seasons from 1995 on use full season stats; earlier seasons come from the UT record book\'s year-by-year leaders.' : 'Season totals from utsports.com.'}</p>`;
+    bindTop(body, sport, G);
     body.querySelectorAll('[data-mv]').forEach(b => b.addEventListener('click', () => {
       const a = +b.dataset.mv; let t = a + (+b.dataset.d);
-      while (t >= 0 && t < 5 && st.locked.includes(t)) t += +b.dataset.d;   // skip over locked rows
+      while (t >= 0 && t < 5 && st.locked.includes(t)) t += +b.dataset.d;
       if (t < 0 || t > 4) return;
-      [st.order[a], st.order[t]] = [st.order[t], st.order[a]]; VI_RENDER_GAMES();
+      [st.order[a], st.order[t]] = [st.order[t], st.order[a]]; rerender();
     }));
     const go = body.querySelector('#rkGo');
     if (go) go.addEventListener('click', () => {
@@ -625,32 +575,174 @@
       st.locked = row.map((ok, i) => ok ? i : -1).filter(i => i >= 0);
       st.hist.push(row.map(ok => ok ? '🟧' : '⬛').join(''));
       if (st.locked.length === 5 || st.tries >= RK_TRIES) {
-        st.done = true;
-        st.share = `📊 Rocky Top Rankings${st.mode === 'daily' ? ' ' + st.date : ''}: ${st.locked.length === 5 ? st.tries + '/' + RK_TRIES : 'X/' + RK_TRIES} · ${cat.l}\n${st.hist.join('\n')}\n${SITE}`;
-        st.solved = st.locked.length === 5; st.order = correct.slice();
+        st.done = true; st.solved = st.locked.length === 5; st.order = correct.slice();
+        st.share = `📊 Rocky Top Rankings${sport === 'football' ? '' : ' (' + SP(sport).name + ')'}${st.mode === 'daily' ? ' ' + st.date : ''}: ${st.solved ? st.tries + '/' + RK_TRIES : 'X/' + RK_TRIES} · ${cat.l}\n${st.hist.join('\n')}\n${SITE}`;
       }
-      if (st.mode === 'daily') store.set('rankings-daily-' + st.date, { state: st, share: st.share });
-      VI_RENDER_GAMES();
+      saveDaily(sport, 'rankings', st); rerender();
     });
     const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyText(st.share, e.currentTarget));
-    const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { RK.mode = 'free'; RK.st = null; VI_RENDER_GAMES(); });
+    const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { G.mode = 'free'; G.st = null; rerender(); });
+  }
+
+  /* =====================================================================================
+     HIGHER OR LOWER (every sport)
+     ===================================================================================== */
+  const DUEL_DAILY = 10;
+  function duelPair(r, sport, eras) {
+    for (let t = 0; t < 400; t++) {
+      const cat = pick(r, rkCats(sport)), rows = rkRows(sport, cat, eras);
+      if (rows.length < 6) continue;
+      const a = pick(r, rows), b = pick(r, rows.filter(x => x.n !== a.n && x.v !== a.v));
+      if (b) return { cat: cat.k + (cat.kind ? ':' + cat.kind : ''), a, b };
+    }
+    return null;
+  }
+  function renderDuel(app, sport) {
+    const body = frame(app, sport, 'duel', 'One stat, two seasons. The first value is shown. Did the second player finish higher or lower? Daily is ten rounds; free play runs until you miss.');
+    const { G, st, saved } = gameState(sport, 'duel', (r, eras, daily) => {
+      const rounds = []; const n = daily ? DUEL_DAILY : 1;
+      for (let i = 0; i < n; i++) rounds.push(duelPair(r, sport, eras) || duelPair(r, sport, sportEras(sport)));
+      return { rounds, i: 0, picks: [], done: false, endless: !daily };
+    });
+    const best = store.get('duel-best-' + sport, 0);
+    const rd = st.rounds[st.i], [ck, kind] = rd.cat.split(':'), cat = rkCats(sport).find(c => c.k === ck && (c.kind || '') === (kind || ''));
+    const fmtV = v => cat.fmt ? cat.fmt(v) : fmt(v);
+    const answered = st.picks.length > st.i;
+    const truth = x => x.b.v > x.a.v ? 'higher' : 'lower';   // numeric, even for ERA-style stats
+    const right = st.picks.filter((p, i) => p === truth(st.rounds[i])).length;
+    const side = (x, show) => `<div class="dside ${show ? 'show' : ''}"><span class="eyebrow">${esc(x.s)} · ${esc(x.pos || '')}</span><b>${esc(x.n)}</b><span class="dval">${show ? fmtV(x.v) : '?'}</span></div>`;
+    const ok = answered && st.picks[st.i] === truth(rd);
+    body.innerHTML = `${topBar(body, sport, G, saved)}
+      <div class="box gduel">
+        <div class="gtriv-top"><div class="eyebrow">${st.endless ? 'Streak: ' + right + ' · best ' + best : 'Round ' + Math.min(st.i + 1, st.rounds.length) + ' of ' + st.rounds.length + ' · ' + right + ' right'}</div></div>
+        ${st.done ? `<div class="greveal ${right >= 7 || (st.endless && right >= 5) ? 'win' : ''}"><div class="eyebrow">${st.mode === 'daily' ? 'Daily · ' + esc(st.date) : 'Free play'}</div><h3>${st.endless ? 'Streak of ' + right : right + ' / ' + st.rounds.length}</h3>
+            <div class="grow"><button class="btn primary" id="gShare">Copy result</button> <button class="btn" id="gNew">${st.mode === 'daily' ? 'Free play (endless)' : 'Play again'}</button></div></div>` : ''}
+        <h3 class="dq">${esc(cat.l)}${cat.asc ? ' (lower is better)' : ''} in a season</h3>
+        <div class="dduel">${side(rd.a, true)}<div class="dvs">vs.</div>${side(rd.b, answered)}</div>
+        ${!answered && !st.done ? `<div class="grow dbtns"><button class="btn primary big" data-hl="higher">${cat.asc ? '▲ Higher (worse)' : '▲ Higher'}</button><button class="btn big" data-hl="lower">${cat.asc ? '▼ Lower (better)' : '▼ Lower'}</button></div>` : ''}
+        ${answered && !st.done ? `<p class="tfb ${ok ? 'ok' : 'no'}" role="status">${ok ? 'Correct!' : 'Nope.'} ${esc(rd.b.n)}: ${fmtV(rd.b.v)} vs. ${esc(rd.a.n)}: ${fmtV(rd.a.v)}.</p><div class="grow"><button class="btn primary" id="dNext">${st.endless ? (ok ? 'Next →' : 'See streak') : st.i + 1 < st.rounds.length ? 'Next →' : 'See results'}</button></div>` : ''}
+      </div>
+      <p class="dim small">${sport === 'football' ? 'Football seasons from 1980 on; early seasons come from the UT record book.' : esc(COVERAGE[sport])}</p>`;
+    bindTop(body, sport, G);
+    body.querySelectorAll('[data-hl]').forEach(b => b.addEventListener('click', () => { st.picks.push(b.dataset.hl); saveDaily(sport, 'duel', st); rerender(); }));
+    const nx = body.querySelector('#dNext');
+    if (nx) nx.addEventListener('click', () => {
+      const wasOk = st.picks[st.i] === truth(rd);
+      if (st.endless) {
+        if (wasOk) { const r = rngFrom(freeSeed()); st.rounds.push(duelPair(r, sport, st.eras) || duelPair(r, sport, sportEras(sport))); st.i++; }
+        else st.done = true;
+      } else if (st.i + 1 < st.rounds.length) st.i++; else st.done = true;
+      if (st.done) {
+        const sc = st.picks.filter((p, i) => p === truth(st.rounds[i])).length;
+        if (st.endless && sc > best) store.set('duel-best-' + sport, sc);
+        st.share = `↕️ Higher or Lower${sport === 'football' ? '' : ' (' + SP(sport).name + ')'}${st.mode === 'daily' ? ' ' + st.date + ': ' + sc + '/' + st.rounds.length : ': streak of ' + sc}\n${st.picks.map((p, i) => p === truth(st.rounds[i]) ? '🟧' : '⬛').join('')}\n${SITE}`;
+      }
+      saveDaily(sport, 'duel', st); rerender();
+    });
+    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyText(st.share, e.currentTarget));
+    const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { G.mode = 'free'; G.st = null; rerender(); });
+  }
+
+  /* =====================================================================================
+     TRIVIA (every sport)
+     ===================================================================================== */
+  const TRIVIA_N = 10;
+  const DIFFS = [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard'], ['mix', 'Mix']];
+  function triviaBank(sport) { return sport === 'football' ? D.trivia : SDATA[sport].trivia; }
+  function makeTrivia(r, sport, eras, diff) {
+    const all = sportEras(sport), allEras = eras.length === all.length;
+    const bank = triviaBank(sport).filter(q => q.y == null || allEras || eras.includes(decOf(q.y)) || (q.y < all[0] && eras.includes(all[0])));
+    const by = d => shuffle(r, bank.filter(q => q.d === d));
+    let plan;
+    if (diff === 'mix') plan = [['easy', 4], ['medium', 4], ['hard', 2]];
+    else plan = [[diff, TRIVIA_N]];
+    const out = [], usedA = new Set(), usedQ = new Set();
+    const take = (list, n) => { for (const q of list) { if (n <= 0) break; if (usedA.has(q.a) || usedQ.has(q.q)) continue; out.push(q); usedA.add(q.a); usedQ.add(q.q); n--; } return n; };
+    plan.forEach(([d, n]) => {
+      let left = take(by(d), n);
+      const order = d === 'easy' ? ['medium', 'hard'] : d === 'hard' ? ['medium', 'easy'] : ['easy', 'hard'];
+      for (const o of order) if (left > 0) left = take(by(o), left);
+    });
+    // curated questions first within each difficulty feel more like trivia; keep a light mix
+    const qs = out.slice(0, TRIVIA_N).map(q => ({ q: q.q, a: q.a, d: q.d, opts: shuffle(r, [q.a].concat(q.w.slice(0, 3))) }));
+    return { qs, i: 0, picks: [], done: false, diff };
+  }
+  function renderTrivia(app, sport) {
+    const body = frame(app, sport, 'trivia', 'Ten questions. Daily is a mix (four easy, four medium, two hard). In free play, pick a difficulty and the eras you want.');
+    const diffNow = getDiff(sport);
+    const { G, st, saved } = gameState(sport, 'trivia', (r, eras, daily) => makeTrivia(r, sport, eras, daily ? 'mix' : diffNow));
+    if (G.mode === 'free' && st.diff !== diffNow && !st.picks.length) { G.st = null; return renderTrivia(app, sport); }
+    const extra = `<div class="gfree-row"><span class="glabel">Difficulty</span><div class="gchips">${DIFFS.map(([k, l]) => `<button data-diff="${k}" aria-pressed="${diffNow === k}">${l}</button>`).join('')}</div></div>`;
+    const q = st.qs[st.i], answered = st.picks.length > st.i;
+    const score = st.picks.filter((p, i) => p === st.qs[i].a).length;
+    const dots = st.qs.map((x, i) => `<span class="tdot ${i < st.picks.length ? (st.picks[i] === x.a ? 'ok' : 'no') : i === st.i ? 'cur' : ''}"></span>`).join('');
+    body.innerHTML = `${topBar(body, sport, G, saved, extra)}
+      <div class="box gtrivia">
+        <div class="gtriv-top"><div class="tdots" aria-label="Progress">${dots}</div><div class="eyebrow">${st.done ? 'Final' : 'Question ' + (st.i + 1) + ' of ' + st.qs.length} · ${score} right</div></div>
+        ${st.done ? `<div class="greveal ${score >= 7 ? 'win' : ''}"><div class="eyebrow">${st.mode === 'daily' ? 'Daily trivia · ' + esc(st.date) : 'Free play · ' + esc((DIFFS.find(d => d[0] === st.diff) || [0, 'Mix'])[1])}</div>
+            <h3>${score} / ${st.qs.length}</h3><p>${score === st.qs.length ? 'Perfect. You know your Vols.' : score >= 8 ? 'Excellent. Rocky Top approves.' : score >= 6 ? 'Solid showing.' : score >= 4 ? 'Not bad. Run it back.' : 'Tough set. Try easy mode.'}</p>
+            <div class="grow"><button class="btn primary" id="gShare">Copy result</button> <button class="btn" id="gNew">${st.mode === 'daily' ? 'Free play' : 'Play again'}</button></div></div>
+          <ol class="trev">${st.qs.map((x, i) => `<li class="${st.picks[i] === x.a ? 'ok' : 'no'}"><span class="tdiff ${x.d}">${x.d}</span> ${esc(x.q)} <b>${esc(x.a)}</b>${st.picks[i] !== x.a ? ` <span class="dim">(you: ${esc(st.picks[i])})</span>` : ''}</li>`).join('')}</ol>`
+        : `<div class="tq" ${answered ? '' : 'data-anim="1"'}><span class="tdiff ${q.d}">${q.d}</span><h3>${esc(q.q)}</h3>
+            <div class="topts">${q.opts.map((o, k) => { const c = answered ? (o === q.a ? 'ok' : o === st.picks[st.i] ? 'no' : 'off') : ''; return `<button class="topt ${c}" data-o="${k}" ${answered ? 'disabled' : ''}>${esc(o)}</button>`; }).join('')}</div>
+            ${answered ? `<p class="tfb ${st.picks[st.i] === q.a ? 'ok' : 'no'}" role="status">${st.picks[st.i] === q.a ? 'Correct!' : 'Not quite. The answer is <b>' + esc(q.a) + '</b>.'}</p><div class="grow"><button class="btn primary" id="tNext">${st.i + 1 < st.qs.length ? 'Next question →' : 'See results'}</button></div>` : ''}</div>`}
+      </div>
+      <p class="dim small">Questions come from the record books and from season stats in our data. Some stat questions describe a player's best season.${sport === 'football' ? '' : ' ' + esc(COVERAGE[sport])}</p>`;
+    bindTop(body, sport, G);
+    body.querySelectorAll('[data-diff]').forEach(b => b.addEventListener('click', () => { setDiff(sport, b.dataset.diff); G.st = null; rerender(); }));
+    body.querySelectorAll('.topt').forEach(b => b.addEventListener('click', () => {
+      if (answered) return;
+      st.picks.push(q.opts[+b.dataset.o]); saveDaily(sport, 'trivia', st); rerender();
+      const nx = document.getElementById('tNext'); if (nx) nx.focus({ preventScroll: true });
+    }));
+    const nx = body.querySelector('#tNext');
+    if (nx) nx.addEventListener('click', () => {
+      if (st.i + 1 < st.qs.length) st.i++;
+      else {
+        st.done = true; const sc = st.picks.filter((p, i) => p === st.qs[i].a).length;
+        const lab = st.mode === 'daily' ? ' ' + st.date : ' (' + ((DIFFS.find(d => d[0] === st.diff) || [0, 'Mix'])[1]) + ')';
+        st.share = `❓ ${gameName(sport, 'trivia')}${sport === 'football' || SP(sport).lady ? '' : ' · ' + SP(sport).name}${lab}: ${sc}/${st.qs.length}\n${st.qs.map((x, i) => st.picks[i] === x.a ? '🟧' : '⬛').join('')}\n${SITE}`;
+      }
+      saveDaily(sport, 'trivia', st); rerender();
+    });
+    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyText(st.share, e.currentTarget));
+    const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { G.mode = 'free'; G.st = null; rerender(); });
   }
 
   /* ---------- entry ---------- */
-  let lastApp = null, lastTab = null;
-  function VI_RENDER_GAMES() { if (lastApp) render(lastApp, lastTab, true); }
-  function render(app, tab, keepScroll) {
-    lastApp = app; lastTab = tab;
+  let last = null;
+  function rerender() { if (last) render(last.app, last.sport, last.game, true); }
+  function loading(app, msg) { app.innerHTML = `<div class="wrap hub-hero"><div class="eyebrow">Games</div><h1>${esc(msg || 'Loading…')}</h1></div>`; }
+  function render(app, sport, game, keepScroll) {
+    last = { app, sport, game };
     const y = window.scrollY;
-    if (!window.VI_GAMES_DATA) { app.innerHTML = '<div class="wrap hub-hero"><div class="eyebrow">Games</div><h1>Loading…</h1></div>'; return loadData(() => render(app, tab)); }
-    initData();
-    if (tab === 'run') renderRun(app);
-    else if (tab === 'guesser') renderGuesser(app);
-    else if (tab === 'grid') renderGrid(app);
-    else if (tab === 'career') renderCareer(app);
-    else if (tab === 'rankings') renderRankings(app);
-    else renderHub(app);
+    if (!sport) return renderHome(app);
+    const s = SP(sport);
+    if (!s) return renderHome(app);
+    if (game && !s.games.includes(game)) game = null;
+    // football data is needed for every football game; beta sports load their own file
+    const ready = sport === 'football' ? () => !!window.VI_GAMES_DATA : () => !!(window.VI_GAMES_SPORT && window.VI_GAMES_SPORT[sport]);
+    if (!ready()) { loading(app); return loadScript(s.file, ready, () => render(app, sport, game), () => loading(app, 'Could not load the games data. Refresh to try again.')); }
+    if (sport === 'football') initFootball(); else initSport(sport);
+    if (!game) renderSportHub(app, sport);
+    else if (game === 'run') window.VI_RUN ? window.VI_RUN.render(app) : loading(app);
+    else if (game === 'guesser') renderGuesser(app, sport);
+    else if (game === 'grid') renderGrid(app);
+    else if (game === 'career') renderCareer(app);
+    else if (game === 'rankings') renderRankings(app, sport);
+    else if (game === 'duel') renderDuel(app, sport);
+    else if (game === 'trivia') renderTrivia(app, sport);
     if (keepScroll) window.scrollTo(0, y);
   }
-  window.renderGames = (app, tab) => render(app, tab, false);
+  // route: #games · #games-<sport> · #games-<sport>-<game> · legacy #games-<game> (football)
+  window.renderGames = (app, a, b) => {
+    if (a && !SP(a) && GAME_ICON[a]) { b = a; a = 'football'; }
+    render(app, a || null, b || null, false);
+  };
+  // shared helpers for assets/games-run.js
+  window.VIG = {
+    esc, etDate, SITE, reduceMotion, rngFrom, freeSeed, pick, shuffle, gauss, wpick, wsample, ERA_BOOST, decOf, store, copyText, twoTap,
+    frame, modeBar, bindMode, dkey, FB_ERAS, SLOT_NAME, posLabel, statLine, honorChips, getEras, setEras, eraChips, bindEras,
+    data: () => ({ D, ALL, POOL, BYNAME }), rerender, initFootball,
+  };
 })();

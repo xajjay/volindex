@@ -13,7 +13,7 @@
   var SPORT_BACK = {}, TAB_BACK = {};
   Object.keys(SPORT).forEach(function (k) { SPORT_BACK[SPORT[k]] = k; });
   Object.keys(TAB).forEach(function (k) { if (k !== 'recruits' && k !== 'ratings') TAB_BACK[TAB[k]] = k; });
-  var KEY_RE = /^(home|sources|about|games|football|volleyball|soccer|mbb|wbb|baseball|softball)(-[a-z0-9]+)?$/;
+  var KEY_RE = /^(games(-[a-z0-9]+){0,2}|home|sources|about|football|volleyball|soccer|mbb|wbb|baseball|softball)(-[a-z0-9]+)?$/;
 
   var host = location.hostname, BASE = null;
   if (/^https?:$/.test(location.protocol)) {
@@ -27,6 +27,7 @@
   function pathOf(key) {
     if (!key || key === 'home') return BASE;
     if (key === 'sources') return BASE + 'sources';
+    if (/^games(-|$)/.test(key)) { var g = key.split('-'); return BASE + 'games' + (g[1] ? '/' + (SPORT[g[1]] || g[1]) : '') + (g[2] ? '/' + g[2] : ''); }
     var i = key.indexOf('-'), s = i < 0 ? key : key.slice(0, i), t = i < 0 ? '' : key.slice(i + 1);
     var p = BASE + (SPORT[s] || s);
     if (t && t !== 'overview') p += '/' + (TAB[t] || t);
@@ -37,6 +38,7 @@
     var parts = rest.replace(/\/+$/, '').replace(/\/index\.html$/, '').split('/').filter(Boolean);
     if (!parts.length || parts[0] === 'index.html') return 'home';
     if (parts[0] === 'sources') return 'sources';
+    if (parts[0] === 'games') return ['games'].concat(parts[1] ? [SPORT_BACK[parts[1]] || parts[1]] : [], parts[2] ? [parts[2]] : []).join('-');
     var s = SPORT_BACK[parts[0]] || parts[0];
     if (!parts[1]) return s;
     var t = TAB_BACK[parts[1]] || parts[1];

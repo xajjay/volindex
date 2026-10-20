@@ -1,0 +1,185 @@
+# utsports.com cumulative season stats (Sidearm), 1995-2008. Bowl games are not included before 2002 (NCAA rule).
+# name|roster pos|home state|school before UT|cmp,att,yds,td,int,car,ryds,rtd,rec,cyds,ctd,tot,tfl,sk,ints,pd,ff,hur
+#1995|10-1, 6-1
+Jay Graham|RB|NC||,,,,,272,1438,12,19,160,1,1
+Peyton Manning|QB|LA||243,380,2954,22,4,41,6,5,,,,1
+Marcus Nash|WR|OK||1,1,28,,,1,6,,43,512,4
+DeRon Jenkins|DB|MO||,,,,,1,,,,,,48,3,,4,3
+Joey Kent|WR|AL||,,,,,1,-9,,69,1055,9
+Maurice Staley|WR|NC||,,,,,,,,25,307,1
+Greg Kyler|WR|MD||,,,,,,,,21,287,1,1
+Scott Galyon|LB|||,,,,,,,,,,,67,10,1,2,,1
+Raymond Austin|DB|OK||,,,,,,,,,,,58,1,1,3,2
+Leonard Little|DE|NC|Coffeyville CC|,,,,,,,,,,,57,12,13,,2,4,1
+Tyrone Hines|LB|||,,,,,,,,,,,56,5,,1,1
+Terry Fair|DB|AZ||,,,,,,,,,,,43,1,,2,4,1
+Steve White|LB|||,,,,,,,,,,,30,6,9,,3,2
+Shane Burton|TE/DE|NC||,,,,,,,,,,,28,1,4,1,1,,1
+Jonathan Brown|DE|OK||,,,,,,,,,,,18,1,3,,,1
+#1996|9-2, 6-1
+Jay Graham|RB|NC||,,,,,179,797,11,12,73,1
+Jermaine Copeland|QB/WR|||10,15,85,,,17,72,2,16,191
+Peerless Price|WR|OH||,,,,,2,66,1,27,560,3
+Joey Kent|WR|AL||,,,,,1,3,,68,1080,7,2
+Dustin Moore|DE|||,,,,,2,3,,18,201
+Terry Fair|DB|AZ||,,,,,1,1,,,,,33,,1,4,3
+Peyton Manning|QB|LA||243,380,3287,20,12,42,-131,3,,,,1
+Marcus Nash|WR|OK||,,,,,,,,53,688,3,1
+Andy McCullough|WR|OH||,,,,,,,,24,352,4
+Tyrone Hines|LB|||,,,,,,,,,,,79,10.5,1.5,2,4,1
+Al Wilson|LB|Tenn||,,,,,,,,,,,49,11,1
+Jason Parker|DB|TX||,,,,,,,,,,,44,,,1,5
+Raymond Austin|DB|OK||,,,,,,,,,,,40,4,,4,9,1
+Ron Green|DT|MD||,,,,,,,,,,,37,4
+Nick Jester|LB|FL||,,,,,,,,,,,35,4
+Tori Noel|DB|||,,,,,,,,,,,35,3,1,,6,1
+Leonard Little|DE|NC|Coffeyville CC|,,,,,,,,,,,28,11,7.5,,,3
+Jonathan Brown|DE|OK||,,,,,,,,,,,27,8,5,,,1
+Dwayne Goodrich|DB|IL||,,,,,,,,,,,10,,,2
+#1997|11-1, 8-1
+Jamal Lewis|RB|GA||1,1,10,,,232,1364,7,23,266,2
+Shawn Bryson|RB|NC||,,,,,36,146,2,29,307,,2
+Peerless Price|WR|OH||,,,,,2,31,,48,698,6,1
+Peyton Manning|QB|LA||287,477,3819,36,11,49,-30,3,1,10
+Jermaine Copeland|QB/WR|||2,2,65,,,,,,58,732,9,1
+Marcus Nash|WR|OK||,,,,,,,,76,1170,13,1
+Andy McCullough|WR|OH||,,,,,,,,22,425,3
+Al Wilson|LB|Tenn||,,,,,,,,2,15,,61,8,3,,4,1
+Tori Noel|DB|||,,,,,,,,,,,71,3.5,3,,2
+Cory Gaines|DB|LA||,,,,,,,,,,,59,2,,1,4,1
+Leonard Little|DE|NC|Coffeyville CC|,,,,,,,,,,,53,7,7,,4,1
+Corey Terry|DE|NC|Garden City CC|,,,,,,,,,,,39,7,3,,,1
+Jonathan Brown|DE|OK||,,,,,,,,,,,35,4.5,14,,1,2
+Terry Fair|DB|AZ||,,,,,,,,,,,35,,,6,7
+Dwayne Goodrich|DB|IL||,,,,,,,,,,,32,1,,4,4
+Shaun Ellis|DE|SC||,,,,,,,,,,,18,8,3,,2,1
+Bill Duff|DT|NJ||,,,,,,,,,,,17,3,4,,1
+#1998|11-0, 7-0
+Travis Henry|RB|FL||,1,,,,170,957,7,4,31
+Travis Stephens|RB|||,,,,,104,467,4,2,3
+Tee Martin|QB|Ala||148,253,2096,19,6,98,304,7
+Shawn Bryson|RB|NC||,,,,,19,197,4,18,164,1
+Peerless Price|WR|OH||,,,,,3,25,,59,910,10
+Cedrick Wilson|WR|||,,,,,,,,33,558,6,3
+Jermaine Copeland|QB/WR|||,,,,,,,,27,383,1,1
+Raynoch Thompson|LB|LA||,,,,,,,,,,,63,9,2,,3
+Al Wilson|LB|Tenn||,,,,,,,,,,,51,9,3,1,1,3
+Eric Westmoreland|LB|||,,,,,,,,,,,45,11,,,1,1
+Fred White|DB|GA||,,,,,,,,,,,41,2,1,1,3
+Deon Grant|DB|GA||,,,,,,,,,,,40,1,,5,5
+Corey Terry|DE|NC|Garden City CC|,,,,,,,,,,,39,9,5,,1,1
+Darwin Walker|DE|SC||,,,,,,,,,,,30,6,5,,2,1
+Dwayne Goodrich|DB|IL||,,,,,,,,,,,27,1,,3,8
+#1999|9-3, 6-2
+Jamal Lewis|RB|GA||,,,,,190,835,7,15,193,1,2
+Travis Henry|RB|FL||,,,,,135,821,9,3,3
+Tee Martin|QB|Ala||184,339,2540,13,11,89,311,9,,,,1
+Donte' Stallworth|WR|CA||,,,,,1,6,,31,515,3
+Cedrick Wilson|WR|||1,1,44,1,,,,,64,902,4
+Eric Parker|WR|IL||,,,,,,,,33,443,1,1
+Deon Grant|DB|GA||,,,,,,,,1,-4,,74,2,,9,7,1
+Raynoch Thompson|LB|LA||,,,,,,,,,,,76,9,1.5,3,4,,2
+Fred White|DB|GA||,,,,,,,,,,,66,,,,3
+Dominique Stevenson|LB|SC||,,,,,,,,,,,61,9,1.5,,2,1,1
+Eric Westmoreland|LB|||,,,,,,,,,,,52,10,1,,3,,1
+Will Overstreet|DE|MS||,,,,,,,,,,,48,11.5,8.5,,1,2,1
+Andre Lott|DB|||,,,,,,,,,,,43,1,,1,9
+Mikki Allen|DB|||,,,,,,,,,,,40,4,2.5,3,1
+John Henderson|DT|Tenn||,,,,,,,,,,,40,4,4,,2,,2
+Shaun Ellis|DE|SC||,,,,,,,,,,,39,15,7.5,,1,2,2
+Darwin Walker|DT|SC||,,,,,,,,,,,39,9.5,5.5,,,,3
+Dwayne Goodrich|DB|IL||,,,,,,,,,,,38,,,3,6
+Anthony Sessions|DB|GA|Copiah-Lincoln JC|,,,,,,,,,,,28,3,4,,,,1
+#2000|8-4, 5-3
+Travis Henry|RB|FL||,,,,,270,1494,12,14,76,,1
+Travis Stephens|RB|||,,,,,81,359,7,6,28
+Donte' Stallworth|WR|CA||,,,,,2,13,,35,519,2,1
+Casey Clausen|QB|Calif||128,219,1593,16,9,45,-43
+Cedrick Wilson|WR|||,1,,,1,,,,65,735,12
+Eric Parker|WR|IL||,,,,,,,,24,360,2
+Anthony Sessions|LB|GA|Copiah-Lincoln JC|,,,,,,,,,,,82,17,8.5,,,1,5
+Eric Westmoreland|LB|||,,,,,,,,,,,77,16,5,1,4,1,4
+John Henderson|DT|Tenn||,,,,,,,,,,,71,12,10,,3,3,3
+Dominique Stevenson|LB|SC||,,,,,,,,,,,64,7,4,1,4,1,1
+Andre Lott|DB|||,,,,,,,,,,,60,1,1,1,7
+Will Overstreet|DE|MS||,,,,,,,,,,,44,10,4.5,1,4,,11
+Willie Miles|DB|TX||,,,,,,,,,,,39,3,,,9,1
+Steven Marsh|DB|NC||,,,,,,,,,,,30,,,2,3
+Albert Haynesworth|DT|SC||,,,,,,,,,,,18,5,3.5,,,1,2
+#2001|11-2, 7-2
+Travis Stephens|RB|||,,,,,307,1502,11,20,188,1,1
+Donte' Stallworth|WR|CA||,,,,,3,55,,49,940,10,1,,,,,1
+Casey Clausen|QB|Calif||253,388,3362,25,9,73,-50,5,,,,1
+Kelley Washington|WR|VA||1,1,13,,,,,,70,1080,7,1
+Jason Witten|TE|Tenn||,,,,,,,,34,418,3,3
+Eddie Moore|LB|||,,,,,,,,,,,82,5,2,1,6,2,3
+Dominique Stevenson|LB|SC||,,,,,,,,,,,78,4,2,1,2,,2
+Rashad Baker|DB|NJ||,,,,,,,,,,,74,,,4,10
+Julian Battle|DB|FL|Los Angeles Valley College|,,,,,,,,,,,64,2,,2,10,2
+Keyon Whiteside|LB|NC||,,,,,,,,,,,57,4,2,,,1,1
+Kevin Burnett|LB|CA||,,,,,,,,,,,55,4,4.5,,3,1,1
+John Henderson|DT|Tenn||,,,,,,,,,,,54,5,5.5,,3,,12
+Bernard Jackson|DE|KY||,,,,,,,,,,,42,2,3,,1,,12
+Jabari Greer|DB|||,,,,,,,,,,,40,,1.5,2,13
+Albert Haynesworth|DT|SC||,,,,,,,,,,,39,13,1.5,,7,,20
+Will Overstreet|DE|MS||,,,,,,,,,,,36,4,5,,,,11
+Constantin Ritzmann|DE|Germany||,,,,,,,,,,,34,4,4,,1,,4
+Demetrin Veal|DE|CA|Cerritos CC|,,,,,,,,,,,16,3,4,,,,3
+#2002|8-5, 4-3
+Cedric Houston|RB|AR||,,,,,153,779,6,9,55,,1
+Jabari Davis|RB|GA||,,,,,125,569,10,4,42
+Casey Clausen|QB|Calif||194,310,2297,11,7,61,-7,1,,,,1
+Kelley Washington|WR|VA||,,,,,1,10,,23,443,1,1
+Tony Brown|WR|FL||,,,,,1,-1,,39,477,1
+Jason Witten|TE|Tenn||,,,,,,,,39,493,5,8
+Keyon Whiteside|LB|NC||,,,,,,,,,,,119,9.5,5,2,7
+Eddie Moore|LB|||,,,,,,,,,,,101,7.5,3,,6,,3
+Gibril Wilson|DB|CA|City College of San Francisco|,,,,,,,,,,,82,5.5,2.5,,5,1,2
+Julian Battle|DB|FL|Los Angeles Valley College|,,,,,,,,,,,72,5,2,1,4,1
+Omari Hand|DE|FL||,,,,,,,,,,,68,5,2,,1,,17
+Rashad Baker|DB|NJ||,,,,,,,,,,,60,,,5,7,2
+Aubrayo Franklin|DT||Itawamba CC|,,,,,,,,,,,56,5,2,,1,1,10
+Jabari Greer|DB|||,,,,,,,,,,,28,1,1,1,14,1
+#2003|10-3, 5-2
+Cedric Houston|RB|AR||,,,,,149,744,2,14,134,,6
+Jabari Davis|RB|GA||,,,,,124,565,8,4,-1
+James Banks|WR|IN||,,,,,2,15,1,42,621,6
+Casey Clausen|QB|Calif||233,412,2968,27,9,64,-45,2,,,,1
+Chris Hannon|WR|FL||,,,,,,,,21,319,7,2
+Kevin Simon|LB|CA||,,,,,,,,,,,115,6,4.5,1,2,1,8
+Gibril Wilson|DB|CA|City College of San Francisco|,,,,,,,,,,,114,8,3,3,12,1
+Robert Peace|LB|LA||,,,,,,,,,,,103,12.5,2,,2,1,3
+Kevin Burnett|LB|CA||,,,,,,,,,,,90,7.5,1.5,,3,1,8
+Rashad Baker|DB|NJ||,,,,,,,,,,,71,2,,1,5
+Jabari Greer|DB|||,,,,,,,,,,,58,6,1,,3,,1
+Jason Allen|DB|AL||,,,,,,,,,,,57,1,,2,11,1
+Constantin Ritzmann|DE|Germany||,,,,,,,,,,,52,5.5,3.5,,1,,8
+Parys Haralson|DE|Miss||,,,,,,,,,,,44,14.5,4.5,,1,,10
+#2004|10-3, 8-2
+Jason Allen|DB|AL||,,,,,,,,,,,123,3,2,2,5,3,1
+Kevin Burnett|LB|CA||,,,,,,,,,,,120,6,1,1,1,1,1
+Omar Gaither|LB|NC||,,,,,,,,,,,92,12.5,2,2,1,1,3
+Jonathan Hefney|DB|SC||,,,,,,,,,,,65,2.5,0.5,1,10,,1
+Parys Haralson|DE|Miss||,,,,,,,,,,,43,13.5,7,,,2,19
+Jesse Mahelona|DT|Hawaii|Orange Coast College|,,,,,,,,,,,42,18.5,5,,,,7
+Roshaun Fellows|DB|AR||,,,,,,,,,,,39,2,,3,11
+Turk McBride|DE|NJ||,,,,,,,,,,,36,8,3,,1,2,6
+Corey Campbell|DB|TX||,,,,,,,,,,,21,,,4,1
+#2005|5-6, 3-5
+Kevin Simon|LB|CA||,,,,,,,,,,,88,4.5,1,,5,1,6
+Omar Gaither|LB|NC||,,,,,,,,,,,78,7.5,4,,1,4,5
+Jonathan Hefney|DB|SC||,,,,,,,,,,,65,3.5,,3,3
+Jason Hall|DE|GA||,,,,,,,,,,,51,13,7,,3,1,5
+Parys Haralson|DE|MS||,,,,,,,,,,,45,16.5,8.5,,1,3,12
+Justin Harrell|DT|||,,,,,,,,,,,39,7.5,2.5,2,3,1,8
+Jesse Mahelona|DT|HI|Orange Coast CC|,,,,,,,,,,,35,8,2,,,1,9
+#2007|10-4, 6-2
+Jerod Mayo|LB|VA||,,,,,,,,,,,140,8.5,1.5,1,3,1,5
+Rico McCoy|LB|DC||,,,,,,,,,,,106,4.5,1,1,4,1,1
+Eric Berry|DB|Ga||,,,,,,,,,,,85,2,,5,4,1
+Robert Ayers|DE|SC||,,,,,,,,,,,34,12,4,,2,,3
+#2008|5-7, 3-5
+Eric Berry|DB|Ga||,,,,,7,37,,1,3,,72,8.5,3,7,6
+Nevin McKenzie|LB|Texas|Trinity Valley CC|,,,,,,,,,,,53,10,5,1,5,,1
+Robert Ayers|DE|S.C||,,,,,,,,,,,49,15.5,3,1,,,6
+Dan Williams|DT|Tenn||,,,,,,,,,,,48,8.5,1.5,,1,,8

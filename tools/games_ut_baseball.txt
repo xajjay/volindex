@@ -1,0 +1,104 @@
+# utsports.com baseball season stats (online stats start 2017). name|pos|home state|school before UT|gp,ab,h,hr,rbi,r,sb,avg,app,w,l,era,ip,so,sv
+#2017|27-25, 7-21
+Jordan Rodgers|INF|Tenn||51,205,66,9,35,39,8,0.322
+Jeff Moberg|INF|Calif||51,209,65,9,33,32,5,0.311
+Andre Lipcius|INF|Va||52,193,53,1,26,32,9,0.275
+Benito Santiago|C|Fla||33,120,30,3,20,20,5,0.25
+Hunter Martin|RHP|Tenn||,,,,,,,,14,5,7,3.59,92.2,89
+Garrett Stallings|RHP|Va||,,,,,,,,20,3,4,3.47,70,39
+Zach Linginfelter|RHP|Tenn||,,,,,,,,22,3,4,3.67,56.1,61,3
+#2018|29-27, 12-18
+Andre Lipcius|INF|Va||56,203,64,7,42,39,2,0.315
+Jay Charleston|OF/INF|Fla||56,228,65,4,26,42,21,0.285
+Justin Ammons|OF|Tenn||55,212,58,3,22,34,6,0.274
+Benito Santiago|C|Fla||54,203,53,7,34,30,2,0.261
+Sean Hunley|RHP|Tenn||,,,,,,,,15,7,3,2.64,75,53
+Will Neely|RHP|Tenn||,,,,,,,,14,4,2,4.09,83.2,52
+Garrett Crochet|LHP|Miss||,,,,,,,,17,5,6,5.51,63.2,62,1
+Zach Linginfelter|RHP|Tenn||,,,,,,,,18,3,4,3.93,55,71,2
+#2019|40-21, 14-16
+Alerick Soularie|OF|Texas||60,196,70,11,46,52,8,0.357
+Andre Lipcius|INF|Va||61,237,73,17,58,51,10,0.308
+Ricky Martinez|INF|Texas|Grayson College|61,222,62,1,28,36,11,0.279
+Jake Rucker|INF|Tenn||61,183,50,,28,26,3,0.273
+Justin Ammons|OF|Tenn||59,213,54,3,19,45,20,0.254
+Jay Charleston|OF/INF|Fla||61,232,51,,22,44,41,0.22
+Garrett Stallings|RHP|Va||,,,,,,,,16,8,5,3.33,102.2,106
+Garrett Crochet|LHP|Miss||,,,,,,,,18,5,3,4.02,65,81,3
+Redmond Walsh|LHP|Tenn||,,,,,,,,27,2,2,1.38,45.2,48,9
+Camden Sewell|RHP|Tenn||,,,,,,,,20,4,1,2.18,45.1,43,1
+#2021|50-18, 20-10
+Liam Spence|INF|Australia||65,244,82,5,36,63,5,0.336
+Jake Rucker|INF|Tenn||67,273,90,9,55,48,7,0.33
+Drew Gilbert|OF/LHP|Minn||68,270,74,10,62,41,10,0.274
+Jordan Beck|OF|Ala||67,258,70,15,64,42,8,0.271
+Max Ferguson|INF/OF|Fla||67,245,62,12,46,46,15,0.253
+Luc Lipcius|1B|Va||67,225,54,15,42,48,6,0.24
+Evan Russell|OF|Tenn||63,206,49,14,43,41,3,0.238
+Sean Hunley|RHP|Tenn||,,,,,,,,35,7,5,3.36,72.1,77,9
+Blade Tidwell|RHP|Tenn||,,,,,,,,18,10,3,3.74,98.2,90
+Chad Dallas|RHP|Texas||,,,,,,,,17,11,2,4.19,103,122
+Will Heflin|LHP|Tenn||,,,,,,,,18,3,3,4.07,79.2,77
+Redmond Walsh|LHP|Tenn||,,,,,,,,28,5,1,2.52,39.1,40,5
+#2022|57-9, 25-5
+Drew Gilbert|OF/LHP|Minn||58,199,72,11,70,60,4,0.362
+Trey Lipscomb|INF|Md||66,251,89,22,84,68,4,0.355
+Seth Stephenson|INF/OF|Texas|Temple College|59,183,62,4,28,46,25,0.339
+Jorel Ortega|INF|Puerto Rico||66,235,76,18,61,57,3,0.323
+Luc Lipcius|1B|Va||65,198,62,19,44,70,14,0.313
+Jordan Beck|OF|Ala||66,252,75,18,61,70,6,0.298
+Evan Russell|C/OF|Tenn||57,201,58,14,45,40,7,0.289
+Cortland Lawson|INF|Va||65,201,54,12,45,42,2,0.269
+Chase Dollander|RHP|Ga|Georgia Southern|,,,,,,,,16,10,,2.39,79,108
+Drew Beam|RHP|Tenn||,,,,,,,,16,8,1,2.72,76,62
+Chase Burns|RHP|Tenn||,,,,,,,,17,8,2,2.91,80.1,103
+Ben Joyce|RHP|Tenn|Walters State CC|,,,,,,,,27,2,1,2.23,32.1,53
+Redmond Walsh|LHP|Tenn||,,,,,,,,27,4,1,2.52,39.1,40,7
+Camden Sewell|RHP|Tenn||,,,,,,,,26,7,1,2.52,50,42,1
+#2023|44-22, 16-14
+Jared Dickey|OF/C|Tenn||63,244,80,12,52,55,7,0.328
+Maui Ahuna|INF|Hawaii|Kansas|53,205,64,8,42,43,4,0.312
+Griffin Merritt|OF|Ohio|Cincinnati|61,193,60,18,48,42,2,0.311
+Christian Moore|INF|N.Y||63,214,65,17,50,66,16,0.304
+Blake Burke|1B|Calif||65,243,68,16,43,48,4,0.28
+Zane Denton|INF|Tenn|Alabama|66,212,57,16,59,43,1,0.269
+Andrew Lindsey|RHP|Tenn|Charlotte|,,,,,,,,21,3,4,2.9,71.1,73
+Drew Beam|RHP|Tenn||,,,,,,,,17,9,5,3.63,84.1,88
+Chase Burns|RHP|Tenn||,,,,,,,,18,5,3,4.25,72,114,2
+Chase Dollander|RHP|Ga|Georgia Southern|,,,,,,,,17,7,6,4.75,89,120
+AJ Russell|RHP|Tenn||,,,,,,,,24,2,,0.89,30.1,47
+#2024|60-13, 22-8
+Blake Burke|1B|Calif||72,285,108,20,61,74,11,0.379
+Christian Moore|INF|N.Y||72,296,111,34,74,83,5,0.375
+Dylan Dreiling|OF|Kan||71,246,84,23,75,72,4,0.341
+Kavares Tears|OF|Tenn||71,244,79,20,62,73,4,0.324
+Billy Amick|INF|S.C|Clemson|65,255,78,23,65,67,3,0.306
+Hunter Ensley|OF|Tenn||68,216,64,12,48,45,4,0.296
+Dean Curley|INF|Calif||67,221,63,12,50,51,9,0.285
+Cal Stark|C|Tenn|Weatherford College|53,137,29,11,30,35,1,0.212
+Nate Snead|RHP|Wisc|Wichita State|,,,,,,,,29,10,2,3.11,75.1,61,6
+Zander Sechrist|LHP|Ga||,,,,,,,,20,6,1,3.12,78,76
+Drew Beam|RHP|Tenn||,,,,,,,,19,9,2,4.22,102.1,99
+AJ Causey|RHP|Ala|Jacksonville State|,,,,,,,,19,13,3,4.43,91.1,125,1
+Aaron Combs|RHP|Fla|College of Central Florida|,,,,,,,,24,3,1,3.35,45.2,66,6
+Kirby Connell|LHP|Tenn||,,,,,,,,36,4,1,3.67,49,49,4
+#2025|46-19, 16-14
+Gavin Kilen|INF|Wis|Louisville|53,210,75,15,46,60,6,0.357
+Andrew Fischer|INF|N.J|Duke / Ole Miss|65,217,74,25,65,70,4,0.341
+Hunter Ensley|OF|Tenn||64,241,81,10,62,46,7,0.336
+Dean Curley|INF|Calif||65,241,76,14,51,67,8,0.315
+Reese Chapman|OF|Colo||64,216,59,13,53,44,4,0.273
+Dalton Bargo|UTL|Neb|Missouri|63,202,55,14,40,47,3,0.272
+Liam Doyle|LHP|N.H|Coastal Carolina / Ole Miss|,,,,,,,,19,10,4,3.2,95.2,164,1
+Marcus Phillips|RHP|S.D|Iowa Western CC|,,,,,,,,17,4,5,3.9,83,98
+Nate Snead|RHP|Wisc|Wichita State|,,,,,,,,23,4,2,4.53,49.2,42,5
+#2026|38-22, 15-15
+Garrett Wright|C/OF|Ohio|Bowling Green|49,187,65,9,30,41,3,0.348
+Reese Chapman|OF|Colo||57,205,65,11,46,52,7,0.317
+Henry Ford|INF/OF|Va|Virginia|58,242,71,20,57,51,3,0.293
+Manny Marin|INF|Fla||55,196,57,9,43,35,5,0.291
+Blake Grimmer|UTL|Mich||48,184,52,13,36,45,1,0.283
+Trent Grindlinger|C|Calif||43,145,50,8,29,26,1,0.345
+Tegan Kuhns|RHP|Pa||,,,,,,,,15,5,5,3.56,81,106
+Evan Blanco|LHP|Mass|Virginia|,,,,,,,,16,7,4,4.65,89,101
+Landon Mack|RHP|N.J|Rutgers|,,,,,,,,12,4,4,4.67,61.2,77

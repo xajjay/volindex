@@ -345,3 +345,89 @@ OPPONENTS = [
     (2014, 'Oregon', '13-2', False, 97, 82, ['Marcus Mariota', 'Royce Freeman', 'DeForest Buckner'], 'Pac-12 champions'),
     (2006, 'Boise State', '13-0', False, 88, 82, ['Ian Johnson', 'Jared Zabransky', 'Marty Tadman'], 'Fiesta Bowl champions'),
 ]
+
+# ---------------------------------------------------------------------------------------------
+# More 1980-1993 seasons from the record book's career-leader tables (season-by-season lines).
+# ---------------------------------------------------------------------------------------------
+EARLY += [
+    ('Steve Alatorre', 'QB', 1981, dict(cmp=81, att=154, yds=1171, td=8, int=10)),
+    ('Alan Cockrell', 'QB', 1983, dict(cmp=128, att=243, yds=1683, td=13, int=10)),
+    ('Tony Robinson', 'QB', 1985, dict(cmp=91, att=143, yds=1246, td=8, int=7)),
+    ('Jeff Francis', 'QB', 1986, dict(cmp=150, att=233, yds=1946, td=9, int=6)),
+    ('Jeff Francis', 'QB', 1987, dict(cmp=121, att=201, yds=1512, td=8, int=8)),
+    ('Andy Kelly', 'QB', 1989, dict(cmp=92, att=156, yds=1299, td=7, int=9)),
+    ('Heath Shuler', 'QB', 1992, dict(cmp=130, att=224, yds=1712, td=10, int=4, ryds=286)),
+    ('James Berry', 'RB', 1980, dict(car=131, ryds=543, rtd=7)),
+    ('Johnnie Jones', 'RB', 1982, dict(car=93, ryds=421, rtd=4)),
+    ('Keith Davis', 'RB', 1985, dict(car=141, ryds=684, rtd=2)),
+    ('Reggie Cobb', 'RB', 1988, dict(car=118, ryds=547, rtd=3)),
+    ('James Stewart', 'RB', 1991, dict(car=190, ryds=939, rtd=8)),
+    ('Charlie Garner', 'RB', 1992, dict(car=154, ryds=928, rtd=2)),
+    ('Aaron Hayden', 'RB', 1991, dict()),
+    ('Anthony Hancock', 'WR', 1980, dict(rec=33, cyds=580, ctd=2)),
+    ('Anthony Hancock', 'WR', 1981, dict(rec=32, cyds=437, ctd=5)),
+    ('Tim McGee', 'WR', 1984, dict(rec=54, cyds=809, ctd=6)),
+    ('Joey Clinkscales', 'WR', 1986, dict(rec=37, cyds=511, ctd=3)),
+    ('Thomas Woods', 'WR', 1989, dict(rec=34, cyds=511, ctd=2)),
+    ('Alvin Harper', 'WR', 1990, dict()),
+    ('Anthony Miller', 'WR', 1986, dict()),
+    ('Craig Faulkner', 'WR', 1993, dict(rec=40, cyds=680, ctd=6)),
+    ('Joey Kent', 'WR', 1994, dict(rec=36, cyds=470, ctd=4)),
+    ('Mike Cofer', 'EDGE', 1982, dict()),
+    ('Bill Bates', 'S', 1981, dict(ints=4)),
+    ('Charles Davis', 'CB', 1983, dict(ints=4)),
+    ('Kelly Ziegler', 'LB', 1985, dict(tot=101)),
+    ('Kelly Ziegler', 'LB', 1987, dict(ints=3)),
+    ('Dale Jones', 'LB', 1986, dict()),
+    ('Ben Talley', 'LB', 1993, dict(tot=87)),
+    ('Jason Parker', 'CB', 1993, dict()),
+    ('James Wilson', 'EDGE', 1993, dict()),
+    ('Todd Kelly', 'EDGE', 1990, dict(sk=5)),
+]
+# All-SEC second team (record book), 1980-2024 skill and defensive players
+SEC2 = [
+    ('Anthony Hancock', 1980), ('Reggie Harper', 1980), ('Bill Bates', 1981), ('Anthony Hancock', 1981), ('Mike Cofer', 1982),
+    ('Alvin Toles', 1983), ('Tim McGee', 1984), ('Dale Jones', 1986), ('William Howard', 1986), ('Reggie Cobb', 1987),
+    ('Keith DeLong', 1987), ('Kelly Ziegler', 1987), ('Jeff Francis', 1988), ('Preston Warren', 1988), ('Thomas Woods', 1988),
+    ('Preston Warren', 1989), ('Thomas Woods', 1989), ('Earnest Fields', 1990), ('Alvin Harper', 1990), ('Andy Kelly', 1990),
+    ('Darryl Hardy', 1991), ('Andy Kelly', 1991), ('Cory Fleming', 1993), ('Charlie Garner', 1993), ('Jason Parker', 1993),
+    ('Ben Talley', 1993), ('James Wilson', 1993), ('Jason Parker', 1994), ('James Stewart', 1994), ('Ben Talley', 1994),
+    ('Jay Graham', 1995), ('Scott Galyon', 1995), ('Leonard Little', 1995), ('Peyton Manning', 1995), ('Terry Fair', 1996),
+    ('Jay Graham', 1996), ('Peyton Manning', 1996), ('Jonathan Brown', 1997), ('Terry Fair', 1997), ('Jamal Lewis', 1997),
+    ('Leonard Little', 1997), ('Marcus Nash', 1997), ('Al Wilson', 1997), ('Dwayne Goodrich', 1998), ('Peerless Price', 1998),
+    ('Darwin Walker', 1998), ('Dwayne Goodrich', 1999), ('Jamal Lewis', 1999), ('Cedrick Wilson', 1999), ('Andre Lott', 2000),
+    ('Eric Westmoreland', 2000), ('Cedrick Wilson', 2000), ('Albert Haynesworth', 2001), ('Will Overstreet', 2001),
+    ('Donte\' Stallworth', 2001), ('Kelley Washington', 2001), ('Rashad Baker', 2002), ('Julian Battle', 2002), ('Eddie Moore', 2002),
+    ('Rashad Baker', 2003), ('Kevin Burnett', 2003), ('Cedric Houston', 2003), ('Kevin Simon', 2003), ('Gibril Wilson', 2003),
+    ('Jason Allen', 2004), ('Omar Gaither', 2004), ('Parys Haralson', 2004), ('Cedric Houston', 2004), ('Jesse Mahelona', 2004),
+    ('Jason Hall', 2005), ('Omar Gaither', 2005), ('Parys Haralson', 2005), ('Justin Harrell', 2005), ('Kevin Simon', 2005),
+    ('Jonathan Hefney', 2006), ('Jonathan Wade', 2006), ('Eric Berry', 2007), ('Arian Foster', 2007), ('Rico McCoy', 2007),
+    ('Lucas Taylor', 2007), ('Robert Ayers', 2008), ('Rico McCoy', 2008), ('Montario Hardesty', 2009), ('Rico McCoy', 2009),
+    ('Dan Williams', 2009), ('Janzen Jackson', 2010), ('Malik Jackson', 2010), ('Prentiss Waggner', 2010), ('Malik Jackson', 2011),
+    ('Da\'Rick Rogers', 2011), ('Justin Hunter', 2012), ('A.J. Johnson', 2012), ('Mychal Rivera', 2012), ('Derek Barnett', 2014),
+    ('Curt Maggitt', 2014), ('Derek Barnett', 2015), ('Jalen Hurd', 2015), ('Jalen Reeves-Maybin', 2015), ('Joshua Dobbs', 2016),
+    ('Daniel Bituli', 2019), ('Nigel Warrior', 2019), ('Henry To\'o To\'o', 2020), ('Theo Jackson', 2021), ('Byron Young', 2022),
+    ('Jaylen Wright', 2023), ('Jermod McCoy', 2024), ('James Pearce Jr.', 2024),
+]
+for _n, _y in SEC2:
+    HONORS.setdefault((_n, _y), [])
+    if 'SEC' not in HONORS[(_n, _y)] and 'SEC2' not in HONORS[(_n, _y)]: HONORS[(_n, _y)].append('SEC2')
+
+# Notable NFL careers for VFL Career, with the school before Tennessee for transfers (JUCO included).
+VFL_NOTABLE = {
+    'Peyton Manning', 'Heath Shuler', 'Tee Martin', 'Joshua Dobbs', 'Hendon Hooker', 'Reggie Cobb', 'Charlie Garner', 'James Stewart',
+    'Jamal Lewis', 'Travis Henry', 'Arian Foster', 'Alvin Kamara', 'Willie Gault', 'Tim McGee', 'Anthony Miller', 'Alvin Harper',
+    'Carl Pickens', 'Peerless Price', 'Donte\' Stallworth', 'Kelley Washington', 'Robert Meachem', 'Cordarrelle Patterson',
+    'Jauan Jennings', 'Jalin Hyatt', 'Cedric Tillman', 'Velus Jones Jr.', 'Jason Witten', 'Chad Clifton', 'Trey Smith', 'Darnell Wright',
+    'Reggie White', 'John Henderson', 'Albert Haynesworth', 'Malik Jackson', 'Chuck Smith', 'Leonard Little', 'Shaun Ellis',
+    'Robert Ayers', 'Derek Barnett', 'Darrell Taylor', 'Byron Young', 'Al Wilson', 'Jerod Mayo', 'Kevin Burnett', 'Dale Carter',
+    'Terry Fair', 'Jabari Greer', 'Jason Allen', 'Cameron Sutton', 'Alontae Taylor', 'Deon Grant', 'Gibril Wilson', 'Eric Berry',
+    'Josh Palmer', 'Ja\'Wuan James', 'Keith DeLong',
+}
+BEFORE_UT = {   # verified transfers / junior college stops before Tennessee
+    'Hendon Hooker': 'Virginia Tech', 'Velus Jones Jr.': 'USC', 'Malik Jackson': 'USC', 'Alvin Kamara': 'Alabama → Hutchinson CC',
+    'Cordarrelle Patterson': 'Hutchinson CC', 'Leonard Little': 'Coffeyville CC', 'Charlie Garner': 'Scottsdale CC',
+    'Chuck Smith': 'Northeastern Oklahoma A&M', 'Byron Young': 'Georgia Military College',
+    'Joe Milton': 'Michigan', 'Joey Aguilar': 'Appalachian State', 'Bru McCoy': 'USC', 'Chris Brazzell II': 'Tulane',
+    'Jermod McCoy': 'Oregon State', 'Omarr Norman-Lott': 'Arizona State', 'Miles Kitselman': 'Alabama',
+}

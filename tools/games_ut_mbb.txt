@@ -1,0 +1,187 @@
+# utsports.com men's basketball season stats. name|pos|home state|school before UT|gp,pts,reb,ast,stl,blk,3pm,fg%
+#2000-01|22-11
+Vincent Yarbrough|F|TN||33,459,244,83,55,44,43,0.443
+Ron Slay|F|Tenn||33,426,176,33,11,9,16,0.502
+Isiah Victor|F|Ky||33,423,219,30,19,34,4,0.543
+Tony Harris|G|TN||31,352,63,119,32,1,55,0.358
+Jon Higgins|G|Ohio||33,213,116,80,34,5,53,0.467
+Marcus Haislip|F|TN||33,193,83,17,9,51,14,0.516
+Charles Hathaway|C|TN||31,157,148,16,12,44,,0.649
+#2001-02|15-16, 7-9
+Vincent Yarbrough|F|TN||31,560,234,87,58,25,60,0.425
+Marcus Haislip|F|TN||25,417,167,24,11,44,15,0.518
+Ron Slay|F|Tenn||14,207,91,29,4,,11,0.49
+Jon Higgins|G|Ohio||31,236,139,122,31,2,50,0.391
+Brandon Crump|C|Texas||30,214,126,28,13,17,1,0.594
+Thaydeus Holden|G|Texas|Seward County CC|31,204,76,44,22,4,34,0.363
+Jenis Grindstaff|G|N.C|Virginia Tech|29,184,76,86,28,3,15,0.438
+#2002-03|17-12, 9-7
+Ron Slay|F|Tenn||29,616,226,61,21,4,43,0.486
+Brandon Crump|F|Texas||29,318,171,33,22,30,,0.564
+C.J. Watson|G|Nev||29,263,121,160,36,6,24,0.426
+Jon Higgins|G|Ohio||27,239,84,79,31,3,53,0.438
+Thaydeus Holden|G|Texas|Seward County CC|29,246,72,43,18,7,48,0.395
+#2003-04|15-14, 7-9
+Scooter McFadgon|G|TN|Memphis|28,493,123,56,16,,65,0.394
+Brandon Crump|F|Texas||29,429,198,35,23,37,8,0.566
+C.J. Watson|G|Nev||29,334,123,145,45,3,44,0.418
+Jemere Hendrix|F|Ga||29,198,180,13,10,13,1,0.525
+John Winchester|G|Conn||29,157,57,45,17,,25,0.359
+Stanley Asumnu|G/F|Texas||29,152,71,42,24,3,1,0.456
+#2004-05|14-17, 6-10
+Scooter McFadgon|G|TN|Memphis|26,372,105,49,18,6,45,0.392
+Chris Lofton|G|Ky||31,410,111,46,40,2,93,0.481
+C.J. Watson|G|Nev||31,369,101,155,58,1,48,0.41
+Brandon Crump|F|Texas||27,306,157,22,18,23,10,0.554
+Andre Patterson|F|Calif||31,229,191,37,24,32,1,0.568
+Major Wingate|C|S.C||30,150,91,14,12,20,,0.505
+#2005-06|22-8, 12-4
+Chris Lofton|G|Ky||30,517,106,56,60,3,114,0.466
+C.J. Watson|G|Nev||30,458,93,117,59,4,49,0.467
+Major Wingate|C|S.C||30,317,121,31,13,32,1,0.556
+JaJuan Smith|G|Tenn||30,284,92,57,40,3,61,0.397
+Andre Patterson|F|Calif||30,283,201,49,37,34,1,0.479
+Stanley Asumnu|G/F|Texas||30,239,95,45,26,8,1,0.505
+Dane Bradshaw|G|Tenn||30,213,162,116,56,11,20,0.41
+#2006-07|24-11, 10-7
+Chris Lofton|G|Ky||31,645,95,54,45,4,106,0.479
+JaJuan Smith|G|Tenn||35,533,159,46,73,8,89,0.455
+Ramar Smith|G|Mich||35,376,117,108,40,9,18,0.437
+Wayne Chism|F|Tenn||35,317,183,32,21,21,26,0.441
+Duke Crews|F|Ill||35,294,177,21,22,32,,0.518
+Ryan Childress|F|Ohio||35,197,140,28,22,14,24,0.457
+Dane Bradshaw|G|Tenn||35,194,141,165,67,14,20,0.348
+#2007-08|31-5, 14-2
+Chris Lofton|G|Ky||36,559,115,64,48,3,118,0.399
+JaJuan Smith|G|Tenn||36,519,134,81,61,1,93,0.462
+Tyler Smith|F|Tenn|Iowa|36,489,242,122,50,20,14,0.536
+Wayne Chism|F|Tenn||36,357,208,41,33,49,29,0.47
+J.P. Prince|G|Tenn|Arizona|27,217,87,49,26,14,2,0.497
+Ramar Smith|G|Mich||36,267,84,116,40,1,5,0.436
+Jordan Howell|G|Ala||35,151,52,76,18,3,38,0.326
+#2008-09|21-13, 10-6
+Tyler Smith|F|Tenn|Iowa|34,590,196,114,25,7,28,0.439
+Wayne Chism|F|Tenn||34,467,273,42,26,34,41,0.466
+J.P. Prince|G|Tenn|Arizona|31,307,130,97,47,20,3,0.572
+Scotty Hopson|G|Ky||34,312,93,49,21,9,46,0.428
+Bobby Maze|G|Md|Hutchinson CC|34,279,83,109,34,5,29,0.426
+Cameron Tatum|G/F|Ga||34,257,76,30,17,6,43,0.419
+Brian Williams|C|N.Y||34,170,189,24,18,20,3,0.538
+#2009-10|28-9, 11-5
+Wayne Chism|F/C|Tenn||37,467,266,40,41,48,35,0.466
+Scotty Hopson|G|Ky||37,450,124,44,36,7,52,0.445
+J.P. Prince|G|Tenn|Arizona|37,365,138,113,57,18,11,0.53
+Bobby Maze|G|Md|Hutchinson CC|37,349,89,118,28,4,27,0.404
+Cameron Tatum|G|Ga||29,216,63,31,16,3,28,0.481
+Brian Williams|C|N.Y||27,151,173,21,10,20,,0.504
+Melvin Goins|G|Calif|Mt. San Jacinto College|31,165,59,57,32,,16,0.387
+#2010-11|19-15, 8-8
+Scotty Hopson|G|Ky||32,543,107,41,26,5,53,0.452
+Tobias Harris|F|N.Y||34,521,247,44,24,29,23,0.46
+Cameron Tatum|G|Ga||34,298,105,78,30,12,34,0.375
+Melvin Goins|G|Calif|Mt. San Jacinto College|33,262,102,93,57,2,24,0.376
+Brian Williams|C|N.Y||32,219,238,46,18,22,1,0.509
+#2011-12|19-15, 10-5
+Trae Golden|G|Ga||34,462,102,154,27,3,50,0.439
+Jeronne Maymon|F|Wis|Marquette|33,419,267,39,32,10,,0.558
+Jarnell Stokes|F|Tenn||17,163,126,12,16,23,,0.534
+Jordan McRae|F|Ga||34,293,99,52,20,26,39,0.377
+Cameron Tatum|G|Ga||34,277,141,87,26,4,47,0.352
+Skylar McBee|G|Tenn||34,223,44,25,22,1,63,0.372
+#2012-13|20-13, 11-7
+Jordan McRae|G|Ga||33,518,136,66,26,29,60,0.423
+Jarnell Stokes|F|Tenn||33,408,318,42,23,37,,0.528
+Trae Golden|G|Ga||31,376,89,121,8,,28,0.383
+Josh Richardson|G|Okla||33,261,143,51,35,23,9,0.469
+Skylar McBee|G|Tenn||33,182,40,17,11,,51,0.316
+#2013-14|24-13, 11-7
+Jordan McRae|G|Ga||37,692,128,91,25,38,79,0.436
+Jarnell Stokes|F|Tenn||37,558,392,75,26,34,,0.531
+Josh Richardson|G|Okla||37,381,106,56,27,30,34,0.474
+Jeronne Maymon|F|Wis|Marquette|37,360,300,39,25,15,,0.533
+Antonio Barton|G|Md|Memphis|37,279,81,76,22,4,51,0.373
+#2014-15|16-16, 7-11
+Josh Richardson|G|Okla||32,513,143,115,67,16,46,0.461
+Armani Moore|F|Ga||32,330,216,69,46,39,6,0.445
+Kevin Punter|G|N.Y|State Fair CC|32,328,67,60,51,6,43,0.419
+Robert Hubbs III|G|Tenn||32,231,93,28,16,4,31,0.409
+Derek Reese|F|Fla||32,192,170,28,21,10,20,0.406
+#2015-16|15-19, 6-12
+Kevin Punter|G|N.Y|State Fair CC|26,577,90,91,36,6,58,0.46
+Armani Moore|F|Ga||33,403,251,134,39,54,18,0.414
+Robert Hubbs III|G|Tenn||30,318,117,38,13,1,11,0.452
+Devon Baulkman|G|Ga|Gulf Coast State College|34,324,117,60,35,13,62,0.373
+Detrick Mostella|G|Ala||34,287,74,40,9,6,47,0.363
+Admiral Schofield|F|Ill||32,244,129,29,12,10,25,0.444
+#2016-17|16-16, 8-10
+Grant Williams|F|N.C||32,402,189,36,26,61,12,0.504
+Lamonte Turner|G|Ala||32,263,81,86,19,7,41,0.355
+Admiral Schofield|F|Ill||28,230,124,21,9,5,21,0.453
+Jordan Bowden|G|Tenn||30,238,87,40,27,5,35,0.371
+Shembari Phillips|G|Ga||31,192,95,52,19,4,18,0.384
+Jordan Bone|G|Tenn||23,166,39,66,12,,14,0.372
+#2017-18|26-9, 13-5
+Grant Williams|F|N.C||35,531,211,66,21,44,3,0.473
+Admiral Schofield|F|Ill||35,486,224,52,34,15,64,0.447
+Lamonte Turner|G|Ala||35,381,111,78,24,2,70,0.399
+Jordan Bowden|G|Tenn||35,320,125,66,39,11,51,0.394
+Jordan Bone|G|Tenn||35,257,72,124,26,2,27,0.391
+Kyle Alexander|F|Canada||34,192,189,11,19,57,1,0.681
+James Daniel III|G|Va|Howard|35,195,50,97,28,4,45,0.366
+#2018-19|31-6, 15-3
+Grant Williams|F|N.C||37,696,278,117,42,55,15,0.565
+Admiral Schofield|G|Ill||37,610,227,75,33,17,74,0.474
+Jordan Bone|G|Tenn||37,498,118,215,26,4,50,0.465
+Lamonte Turner|G|Ala||28,307,77,105,35,3,49,0.422
+Jordan Bowden|G|Tenn||36,383,125,70,31,11,51,0.459
+Kyle Alexander|F|Canada||37,271,246,19,17,64,3,0.614
+#2019-20|17-14, 9-9
+Jordan Bowden|G|Tenn||31,424,125,85,30,10,49,0.383
+John Fulkerson|F|Tenn||31,426,183,39,33,27,1,0.612
+Yves Pons|G/F|France||31,336,166,33,13,73,30,0.489
+Santiago Vescovi|G|Uruguay||19,204,62,70,23,3,36,0.373
+Josiah-Jordan James|G|S.C||27,200,149,79,23,23,29,0.37
+#2020-21|18-9, 10-7
+Jaden Springer|G|N.C||25,313,88,73,30,11,20,0.467
+Keon Johnson|G|Tenn||27,306,95,67,30,12,13,0.449
+Victor Bailey Jr.|G|Texas|Oregon|27,294,55,44,15,4,47,0.402
+John Fulkerson|F|Tenn||25,237,138,42,13,15,,0.527
+Yves Pons|G/F|France||26,227,137,19,17,47,17,0.466
+Santiago Vescovi|G|Uruguay||27,235,101,84,32,1,53,0.388
+Josiah-Jordan James|G|S.C||25,201,162,51,36,25,28,0.39
+#2021-22|27-8, 14-4
+Kennedy Chandler|G|Tenn||34,473,110,161,74,8,49,0.464
+Santiago Vescovi|G|Uruguay||35,465,154,111,59,8,102,0.413
+Josiah-Jordan James|G|S.C||32,328,191,55,46,34,56,0.388
+Zakai Zeigler|G|N.Y||35,307,66,93,60,3,44,0.381
+John Fulkerson|F|Tenn||33,246,154,47,13,31,,0.523
+Olivier Nkamhoua|F|Finland||22,189,124,27,10,25,13,0.497
+#2022-23|25-11, 11-7
+Santiago Vescovi|G|Uruguay||33,414,153,102,60,3,91,0.396
+Olivier Nkamhoua|F|Finland||36,390,180,73,16,22,18,0.513
+Zakai Zeigler|G|N.Y||30,321,82,161,59,6,51,0.375
+Julian Phillips|F|S.C||32,266,150,46,20,17,11,0.411
+Tyreke Key|G|Tenn|Indiana State|33,271,84,44,22,1,47,0.34
+Josiah-Jordan James|G|S.C||24,239,113,44,29,3,40,0.372
+Jonas Aidoo|F|N.C||35,178,171,33,17,44,5,0.507
+#2023-24|27-9, 14-4
+Dalton Knecht|G|Colo|Northern Colorado|36,780,176,65,25,23,93,0.458
+Zakai Zeigler|G|N.Y||36,424,101,218,62,3,72,0.393
+Jonas Aidoo|F|N.C||36,411,263,35,26,66,3,0.515
+Josiah-Jordan James|G|S.C||36,302,229,68,49,23,43,0.402
+Jordan Gainey|G|Ariz|USC Upstate|36,246,62,44,31,7,39,0.359
+Santiago Vescovi|G|Uruguay||35,222,128,86,38,1,43,0.368
+#2024-25|30-8, 12-6
+Chaz Lanier|G|Tenn|North Florida|38,684,148,40,34,5,123,0.431
+Zakai Zeigler|G|N.Y||37,504,107,275,70,9,64,0.404
+Jordan Gainey|G|Ariz|USC Upstate|38,440,126,72,39,14,49,0.405
+Igor Milicic Jr.|F|Croatia||37,349,247,71,26,25,38,0.472
+Felix Okpara|F|Nigeria|Ohio State|38,271,244,12,9,64,1,0.589
+Jahmai Mashack|G|Calif||38,228,161,57,64,20,20,0.454
+#2025-26|25-12, 11-7
+Ja'Kobi Gillespie|G|Tenn|Maryland / Belmont|37,681,105,201,79,8,103,0.41
+Nate Ament|F|Va||35,584,222,82,34,22,46,0.399
+J.P. Estrella|F|Maine||33,329,178,27,9,12,4,0.596
+Felix Okpara|F|Nigeria|Ohio State|35,279,222,17,15,52,4,0.597
+Jaylen Carey|F|Fla|Vanderbilt / James Madison|37,274,222,49,11,2,,0.487
+Bishop Boswell|G|N.C||34,212,149,106,41,4,30,0.427

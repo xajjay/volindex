@@ -27,7 +27,7 @@
     return `<div class="teamhead"><div class="wrap">
       <div><div class="eyebrow">Tennessee Volunteers · SEC · ${esc(D.season)}</div><h1>${esc(D.name)}</h1></div>
       <div class="scoreline" aria-label="Snapshot">${D.header.map(h => `<div><b>${esc(h[0])}</b><small>${esc(h[1])}</small></div>`).join('')}</div>
-      <nav class="tabs" aria-label="${esc(D.name)} sections">${tabs(D).map(([k, l]) => `<a href="#${D.key}-${k}" aria-current="${k === tab ? 'page' : 'false'}">${esc(l)}</a>`).join('')}</nav>
+      <nav class="tabs" aria-label="${esc(D.name)} sections">${tabs(D).map(([k, l]) => `<a href="#${D.key}-${k}" aria-current="${k === tab ? 'page' : 'false'}">${esc(l)}</a>`).join('')}<a href="#games-${D.key}">Games</a></nav>
     </div></div><div class="checker" aria-hidden="true"></div>`;
   }
   function footer(D) {
