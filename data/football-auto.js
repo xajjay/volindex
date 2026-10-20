@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-10-19. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-10-20. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-10-19",
+ "updated": "2026-10-20",
  "team": {
   "record": "6-1",
   "sec": "3-1",
@@ -1382,8 +1382,8 @@ window.SITE_AUTO.football = {
    "kick": "2026-10-24T19:30Z",
    "line": "SC -2.5",
    "ou": 50.5,
-   "ml": "+102",
-   "book": "Draft Kings",
+   "ml": "+114",
+   "book": "DraftKings",
    "win": 59.9
   },
   "Kentucky": {
@@ -1903,7 +1903,7 @@ window.SITE_AUTO.football = {
   "Drake Martinez": {
    "pos": "TE",
    "num": 44,
-   "year": 4,
+   "year": 1,
    "hs": {
     "grade": 83.04,
     "stars": 3,
@@ -1922,7 +1922,7 @@ window.SITE_AUTO.football = {
   "DJ Burks": {
    "pos": "DB",
    "num": 42,
-   "year": 4,
+   "year": 1,
    "hs": {
     "grade": 84.44,
     "stars": 3,
@@ -1941,7 +1941,7 @@ window.SITE_AUTO.football = {
   "Ethan Davis": {
    "pos": "TE",
    "num": 0,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 94.01,
     "stars": 4,
@@ -1954,7 +1954,7 @@ window.SITE_AUTO.football = {
   "Isaiah Hardge": {
    "pos": "DB",
    "num": 29,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 85.97,
     "stars": 3,
@@ -1973,7 +1973,7 @@ window.SITE_AUTO.football = {
   "TJ Metcalf": {
    "pos": "DB",
    "num": 1,
-   "year": 4,
+   "year": 1,
    "hs": {
     "grade": 88.42,
     "stars": 3,
@@ -1992,7 +1992,7 @@ window.SITE_AUTO.football = {
   "Kayin Lee": {
    "pos": "DB",
    "num": 14,
-   "year": 4,
+   "year": 1,
    "hs": {
     "grade": 93.86,
     "stars": 4,
@@ -2011,7 +2011,7 @@ window.SITE_AUTO.football = {
   "Ryan Staub": {
    "pos": "QB",
    "num": 8,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 87.44,
     "stars": 3,
@@ -2030,7 +2030,7 @@ window.SITE_AUTO.football = {
   "Shamurad Umarov": {
    "pos": "OL",
    "num": 74,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 90.31,
     "stars": 4,
@@ -2043,7 +2043,7 @@ window.SITE_AUTO.football = {
   "Sam Pendleton": {
    "pos": "OL",
    "num": 56,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 89.33,
     "stars": 4,
@@ -2062,7 +2062,7 @@ window.SITE_AUTO.football = {
   "Nathan Robinson": {
    "pos": "DL",
    "num": 19,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 88.28,
     "stars": 3,
@@ -2075,7 +2075,7 @@ window.SITE_AUTO.football = {
   "DeSean Bishop": {
    "pos": "RB",
    "num": 18,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 85.33,
     "stars": 3,
@@ -2088,7 +2088,7 @@ window.SITE_AUTO.football = {
   "Jeremiah Telander": {
    "pos": "LB",
    "num": 22,
-   "year": 4,
+   "year": 1,
    "hs": {
     "grade": 87.96,
     "stars": 3,
@@ -2101,7 +2101,7 @@ window.SITE_AUTO.football = {
   "Daevin Hobbs": {
    "pos": "DL",
    "num": 5,
-   "year": 4,
+   "year": 1,
    "hs": {
     "grade": 97.41,
     "stars": 4,
@@ -2114,7 +2114,7 @@ window.SITE_AUTO.football = {
   "Tyree Weathersby": {
    "pos": "DL",
    "num": 18,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 90.47,
     "stars": 4,
@@ -2127,7 +2127,7 @@ window.SITE_AUTO.football = {
   "Dejuan Lane": {
    "pos": "DB",
    "num": 10,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 90.41,
     "stars": 4,
@@ -2146,7 +2146,7 @@ window.SITE_AUTO.football = {
   "Mike Matthews": {
    "pos": "WR",
    "num": 4,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 98.82,
     "stars": 5,
@@ -2159,7 +2159,7 @@ window.SITE_AUTO.football = {
   "Edwin Spillman": {
    "pos": "LB",
    "num": 13,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 90.0,
     "stars": 4,
@@ -2172,7 +2172,7 @@ window.SITE_AUTO.football = {
   "Ory Williams": {
    "pos": "OL",
    "num": 77,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 89.35,
     "stars": 4,
@@ -2191,22 +2191,22 @@ window.SITE_AUTO.football = {
   "Hunter Barnes": {
    "pos": "RB",
    "num": 24,
-   "year": 4
+   "year": 1
   },
   "Bennett Brady": {
    "pos": "LS",
    "num": 48,
-   "year": 4
+   "year": 1
   },
   "Josh Turbyville": {
    "pos": "PK",
    "num": 94,
-   "year": 4
+   "year": 1
   },
   "Arion Carter": {
    "pos": "LB",
    "num": 7,
-   "year": 4,
+   "year": 1,
    "hs": {
     "grade": 94.39,
     "stars": 4,
@@ -2219,7 +2219,7 @@ window.SITE_AUTO.football = {
   "Carson Gentle": {
    "pos": "DL",
    "num": 35,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 86.97,
     "stars": 3,
@@ -2232,7 +2232,7 @@ window.SITE_AUTO.football = {
   "Donovan Haslam": {
    "pos": "OL",
    "num": 69,
-   "year": 4,
+   "year": 1,
    "transfer": {
     "grade": 86.0,
     "stars": 3,
@@ -2243,7 +2243,7 @@ window.SITE_AUTO.football = {
   "Wendell Moe Jr.": {
    "pos": "OL",
    "num": 75,
-   "year": 4,
+   "year": 1,
    "hs": {
     "grade": 82.56,
     "stars": 3,
@@ -2262,7 +2262,7 @@ window.SITE_AUTO.football = {
   "Jadais Richard": {
    "pos": "DB",
    "num": 8,
-   "year": 4,
+   "year": 1,
    "hs": {
     "grade": 89.59,
     "stars": 4,
@@ -2281,7 +2281,7 @@ window.SITE_AUTO.football = {
   "Amare Campbell": {
    "pos": "LB",
    "num": 0,
-   "year": 4,
+   "year": 1,
    "hs": {
     "grade": 85.42,
     "stars": 3,
@@ -2300,7 +2300,7 @@ window.SITE_AUTO.football = {
   "Edrees Farooq": {
    "pos": "DB",
    "num": 15,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 88.33,
     "stars": 3,
@@ -2313,7 +2313,7 @@ window.SITE_AUTO.football = {
   "Jackson Ross": {
    "pos": "P",
    "num": 98,
-   "year": 4,
+   "year": 1,
    "hs": {
     "grade": 78.94,
     "stars": 2,
@@ -2326,7 +2326,7 @@ window.SITE_AUTO.football = {
   "Trent Thomas": {
    "pos": "TE",
    "num": 82,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 84.37,
     "stars": 3,
@@ -2345,7 +2345,7 @@ window.SITE_AUTO.football = {
   "Jordan Norman": {
    "pos": "DL",
    "num": 33,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 82.96,
     "stars": 3,
@@ -2364,7 +2364,7 @@ window.SITE_AUTO.football = {
   "Braylon Staley": {
    "pos": "WR",
    "num": 14,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 95.01,
     "stars": 4,
@@ -2377,7 +2377,7 @@ window.SITE_AUTO.football = {
   "Gage Ginther": {
    "pos": "OL",
    "num": 78,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 88.17,
     "stars": 3,
@@ -2390,7 +2390,7 @@ window.SITE_AUTO.football = {
   "Jesse Perry": {
    "pos": "OL",
    "num": 72,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 87.39,
     "stars": 3,
@@ -2403,7 +2403,7 @@ window.SITE_AUTO.football = {
   "Justin Baker": {
    "pos": "RB",
    "num": 2,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 88.11,
     "stars": 3,
@@ -2416,7 +2416,7 @@ window.SITE_AUTO.football = {
   "DaSaahn Brame": {
    "pos": "TE",
    "num": 7,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 96.82,
     "stars": 4,
@@ -2429,7 +2429,7 @@ window.SITE_AUTO.football = {
   "Isaiah Campbell": {
    "pos": "DL",
    "num": 47,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 98.32,
     "stars": 4,
@@ -2442,7 +2442,7 @@ window.SITE_AUTO.football = {
   "Jaedon Harmon": {
    "pos": "LB",
    "num": 12,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 93.1,
     "stars": 4,
@@ -2468,7 +2468,7 @@ window.SITE_AUTO.football = {
   "Jadon Perlotte": {
    "pos": "LB",
    "num": 27,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 89.43,
     "stars": 4,
@@ -2481,7 +2481,7 @@ window.SITE_AUTO.football = {
   "Daune Morris": {
    "pos": "RB",
    "num": 17,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 89.42,
     "stars": 4,
@@ -2494,7 +2494,7 @@ window.SITE_AUTO.football = {
   "Tre Poteat III": {
    "pos": "DB",
    "num": 3,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 89.5,
     "stars": 4,
@@ -2507,7 +2507,7 @@ window.SITE_AUTO.football = {
   "Ty Redmond": {
    "pos": "DB",
    "num": 4,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 87.81,
     "stars": 3,
@@ -2520,7 +2520,7 @@ window.SITE_AUTO.football = {
   "David Sanders Jr.": {
    "pos": "OL",
    "num": 70,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 99.73,
     "stars": 5,
@@ -2533,7 +2533,7 @@ window.SITE_AUTO.football = {
   "Ethan Utley": {
    "pos": "DL",
    "num": 17,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 91.99,
     "stars": 4,
@@ -2546,7 +2546,7 @@ window.SITE_AUTO.football = {
   "Jeremias Heard": {
    "pos": "OL",
    "num": 51,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 88.19,
     "stars": 3,
@@ -2559,7 +2559,7 @@ window.SITE_AUTO.football = {
   "Tevis Metcalf": {
    "pos": "DB",
    "num": 20,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 88.42,
     "stars": 3,
@@ -2578,7 +2578,7 @@ window.SITE_AUTO.football = {
   "Xavier Gilliam": {
    "pos": "DL",
    "num": 2,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 87.58,
     "stars": 3,
@@ -2597,7 +2597,7 @@ window.SITE_AUTO.football = {
   "Jordan Burns": {
    "pos": "LB",
    "num": 11,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 89.5,
     "stars": 4,
@@ -2610,7 +2610,7 @@ window.SITE_AUTO.football = {
   "Ian Duarte": {
    "pos": "WR",
    "num": 81,
-   "year": 3,
+   "year": 1,
    "hs": {
     "grade": 84.0,
     "stars": 3,
@@ -2681,7 +2681,7 @@ window.SITE_AUTO.football = {
   "Nathan Roberts": {
    "pos": "WR",
    "num": 36,
-   "year": 3
+   "year": 1
   },
   "Zach Groves": {
    "pos": "DL",
@@ -2738,7 +2738,7 @@ window.SITE_AUTO.football = {
   "Tim Merritt": {
    "pos": "DB",
    "num": 25,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 88.83,
     "stars": 3,
@@ -2751,7 +2751,7 @@ window.SITE_AUTO.football = {
   "Dylan Lewis": {
    "pos": "DB",
    "num": 24,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 87.78,
     "stars": 3,
@@ -2764,7 +2764,7 @@ window.SITE_AUTO.football = {
   "Mariyon Dye": {
    "pos": "DL",
    "num": 9,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 96.05,
     "stars": 4,
@@ -2777,7 +2777,7 @@ window.SITE_AUTO.football = {
   "Travis Smith Jr.": {
    "pos": "WR",
    "num": 1,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 95.51,
     "stars": 4,
@@ -2790,12 +2790,12 @@ window.SITE_AUTO.football = {
   "Jack-Henry Jakobik": {
    "pos": "WR",
    "num": 29,
-   "year": 3
+   "year": 1
   },
   "Cooper Ranvier": {
    "pos": "PK",
    "num": 28,
-   "year": 2,
+   "year": 1,
    "transfer": {
     "grade": null,
     "stars": null,
@@ -2806,7 +2806,7 @@ window.SITE_AUTO.football = {
   "Cole Harrison": {
    "pos": "TE",
    "num": 80,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 86.42,
     "stars": 3,
@@ -2832,7 +2832,7 @@ window.SITE_AUTO.football = {
   "Radarious Jackson": {
    "pos": "WR",
    "num": 3,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 91.11,
     "stars": 4,
@@ -2858,7 +2858,7 @@ window.SITE_AUTO.football = {
   "Sidney Walton": {
    "pos": "DB",
    "num": 23,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 87.86,
     "stars": 3,
@@ -2988,7 +2988,7 @@ window.SITE_AUTO.football = {
   "Antoni Ogumoro": {
    "pos": "OL",
    "num": 55,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 88.36,
     "stars": 3,
@@ -3001,7 +3001,7 @@ window.SITE_AUTO.football = {
   "Jackson Mathews": {
    "pos": "DB",
    "num": 43,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 80.0,
     "stars": 3,
@@ -3014,22 +3014,22 @@ window.SITE_AUTO.football = {
   "Ryan Scott": {
    "pos": "LB",
    "num": 50,
-   "year": 2
+   "year": 1
   },
   "Grier Short": {
    "pos": "LB",
    "num": 57,
-   "year": 2
+   "year": 1
   },
   "Mike Bethea II": {
    "pos": "DL",
    "num": 55,
-   "year": 4
+   "year": 1
   },
   "Qua Moss": {
    "pos": "DB",
    "num": 6,
-   "year": 4,
+   "year": 1,
    "transfer": {
     "grade": 86.0,
     "stars": 3,
@@ -3040,17 +3040,17 @@ window.SITE_AUTO.football = {
   "Doren Sacha": {
    "pos": "WR",
    "num": 26,
-   "year": 3
+   "year": 1
   },
   "Michael Kostantonov": {
    "pos": "OL",
    "num": 65,
-   "year": 2
+   "year": 1
   },
   "Blake Howard": {
    "pos": "LS",
    "num": 53,
-   "year": 3,
+   "year": 1,
    "transfer": {
     "grade": null,
     "stars": null,
@@ -3201,7 +3201,7 @@ window.SITE_AUTO.football = {
   "Deon Hardin": {
    "pos": "WR",
    "num": 88,
-   "year": 4
+   "year": 1
   },
   "Grady Dangerfield": {
    "pos": "PK",
@@ -3211,7 +3211,7 @@ window.SITE_AUTO.football = {
   "Javin Gordon": {
    "pos": "RB",
    "num": 6,
-   "year": 2,
+   "year": 1,
    "hs": {
     "grade": 86.33,
     "stars": 3,
