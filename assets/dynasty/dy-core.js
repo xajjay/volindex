@@ -80,11 +80,11 @@
   DY.makeAttrs = (pos, target, archName) => {
     const arch = (DY.ARCH[pos].find(a => a[0] === archName) || pick(DY.ARCH[pos]));
     const w = DY.W[pos], at = {};
-    for (const k in w) at[k] = target + (arch[1][k] || 0) + gauss() * 3.4 + (k === 'spd' ? (DY.SPD_ADJ[pos] || 0) : 0);
+    for (const k in w) at[k] = target + (arch[1][k] || 0) + gauss() * 3.4 + (k === 'spd' ? (DY.SPD_ADJ[pos] || 0) : 0) + (k === 'mcv' ? -4 : 0);
     const p = { pos, at };
     for (let it = 0; it < 4; it++) {
       let s = 0; for (const k in w) s += w[k] * at[k];
-      const d = target - s; for (const k in w) at[k] = clamp(at[k] + d, 20, 99);
+      const d = target - s; for (const k in w) at[k] = clamp(at[k] + d * (k === 'mcv' ? 0.4 : 1.12), 20, 99);
     }
     for (const [k, off] of DY.EXTRA[pos] || []) at[k] = clamp(target + off + (arch[1][k] || 0) + gauss() * 4, 15, 95);
     if (!at.spd) at.spd = clamp(target - 25 + gauss() * 4, 25, 80);
@@ -102,7 +102,7 @@
   // scouts see the ceiling with some error: sometimes a grade too high (bust risk) or too low (a gem)
   DY.scoutGrade = ceil => { let i = DY.gradeIdx(DY.gradeOf(ceil)); const r = rnd(); if (r < .13) i--; else if (r < .26) i++; return DY.GRADES[clamp(i, 0, DY.GRADES.length - 1)][0]; };
   DY.setCeil = (p, grade) => {
-    const yrsLeft = Math.max(0, p.el - 1) + (p.rsAvail ? 0.6 : 0);
+    const yrsLeft = Math.min(3.6, Math.max(0, p.el - 1) * 0.9);
     const per = 3.7 + clamp((grade - 80) / 7, -0.8, 2.7);
     p.ceil = Math.round(clamp(p.ovr + yrsLeft * per + gauss() * 3.6, p.ovr, 99));
     p.potG = DY.scoutGrade(p.ceil);
@@ -110,7 +110,7 @@
 
   /* ---------- personality (Burger Town-style traits that explain what happens on the field) ---------- */
   DY.TRAITS = { disc: 'Discipline', clutch: 'Clutch', cons: 'Consistency', ego: 'Ego', lead: 'Leadership', work: 'Work ethic', tough: 'Toughness', loyal: 'Loyalty' };
-  DY.makeTraits = () => { const t = {}; for (const k in DY.TRAITS) t[k] = Math.round(clamp(58 + gauss() * 17, 10, 99)); return t; };
+  DY.makeTraits = () => { const t = {}; for (const k in DY.TRAITS) t[k] = Math.round(clamp(64 + gauss() * 15, 15, 99)); return t; };
   DY.persLabel = p => {
     const t = p.tr;
     if (t.ego >= 80 && t.disc <= 45) return ['Hot Head', 'Plays with an edge that can boil over: personal fouls and taunting flags follow him.'];
@@ -153,7 +153,7 @@
     const ho = opts.home ? { st: opts.st, home: opts.home } : DY.makeHome(opts.st);
     const p = {
       id: opts.tmp ? opts.tmp : DY.newId(), n: opts.n || DY.makeName(), pos, t: opts.t == null ? null : opts.t,
-      yr: opts.yr || 1, el: opts.el == null ? 4 : opts.el, rsAvail: opts.rsAvail == null ? true : opts.rsAvail, rs: !!opts.rs,
+      yr: opts.yr || 1, el: opts.el == null ? 5 : opts.el,
       num: opts.num == null ? ri(NUMS[pos][0], NUMS[pos][1]) : opts.num,
       ht: opts.ht || Math.round(b[0] + gauss() * b[1]), wt: opts.wt || Math.round(b[2] + gauss() * b[3] / 1.5),
       home: ho.home, st: ho.st, hs: opts.hs || DY.makeHS(ho.home), at, arch, ovr: 0, tr: DY.makeTraits(),
@@ -188,6 +188,8 @@
     if (t.abbr === 'TTU') b += 6e6;
     return Math.round(b / 1e5) * 1e5;
   };
+  // NIL for a signee, from his composite (On3-style: 5-stars around $400K-$900K, top 4-stars $150K-$300K, 3-stars $20K-$60K)
+  DY.recruitNil = p => { const c = p.rec && p.rec.c || 0.84; const v = 25000 * Math.exp((c - 0.85) * 24) * Math.sqrt(DY.NIL_POS[p.pos] || 1); return Math.round(clamp(v, 5000, 1500000) / 5000) * 5000; };
   DY.money = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(v >= 1e7 ? 1 : 2).replace(/\.?0+$/, '') + 'M' : v >= 1000 ? '$' + Math.round(v / 1000) + 'K' : '$' + Math.round(v);
 
   /* ---------- scouting report text ---------- */
@@ -262,23 +264,48 @@
     if (pos === 'EDGE') return rp.wt >= 265 ? 'Power Rusher' : 'Speed Rusher';
     return null;
   }
+  // AJ's corrections to the real roster (class, role, ratings); 5-in-5 eligibility: Fr, So, Jr, Sr, 5th
+  DY.UT_FIX = {
+    'George MacIntyre': { yr: 2 }, 'DeSean Bishop': { yr: 4, walkon: true }, 'Braylon Staley': { yr: 3 }, 'Jesse Perry': { yr: 3, at: { rbk: 85, pbk: 75 }, note: 'A natural guard playing tackle.' },
+    'Sam Pendleton': { yr: 4 }, 'Nic Moore': { yr: 2 }, 'Tyree Weathersby': { yr: 4, ovr: 87 }, 'Jordan Norman': { yr: 4 }, 'Christian Gass': { yr: 2 },
+    'Xavier Gilliam': { yr: 3, ovr: 95 }, 'Carson Gentle': { yr: 3 }, 'Nathan Robinson': { yr: 4 }, 'Edwin Spillman': { yr: 3 }, 'Tevis Metcalf': { yr: 4 },
+    'Daune Morris': { ovr: 82, arch: 'Elusive Back' }, 'Javin Gordon': { ovr: 75 }, 'David Sanders Jr.': { ovr: 92, arch: 'Pass Protector' },
+    'JJ Finch': { ovr: 75 }, 'Ethan Utley': { ovr: 75 }, 'Jeremiah Telander': { pos: 'EDGE', tr: { lead: 96 }, note: 'Hybrid edge/linebacker.' },
+    'Arion Carter': { ovr: 88, tr: { lead: 99, work: 92, clutch: 88, disc: 90, tough: 92, loyal: 92 }, captain: true },
+    'Amare Campbell': { ovr: 87, at: { tak: 91, pur: 90 } }, 'Ty Redmond': { ovr: 87, at: { mcv: 88, awr: 86, tak: 82 } },
+    'Dejuan Lane': { ovr: 90, at: { zcv: 92, awr: 90, tak: 88 }, tr: { lead: 90 } }, 'Edrees Farooq': { ovr: 85 },
+  };
+  DY.UT_CUTS = ['Mason Phillips', 'Will Rajecki', 'Cole Harrison', 'Charlie Powell III', 'Thomas Storm', 'Michael Kostantonov', 'CJ Edwards', 'Nuk Simmons', 'Darryl Rivers',
+    'Grier Short', 'Ryan Scott', 'Grady Dangerfield', 'Javonte Smith', 'Jackson Mathews', 'Isaiah Hardge', 'Luke Thompson', 'Lane Cope'];
+  DY.WR_KEEP = 8;
+  // hold some attributes and move the rest until the overall lands on a target
+  DY.fitOvr = (p, target, fixed) => {
+    const w = DY.W[p.pos]; fixed = fixed || {};
+    for (let it = 0; it < 8; it++) {
+      const o = DY.calcOvr(p); const d = target - o; if (Math.abs(d) < 0.5) break;
+      const free = Object.keys(w).filter(k => fixed[k] == null);
+      const wsum = free.reduce((s, k) => s + w[k], 0) || 1;
+      free.forEach(k => { p.at[k] = Math.round(clamp(p.at[k] + d / wsum * 1, 20, 99)); });
+    }
+    DY.setOvr(p);
+  };
   DY.importTennessee = (team) => {
     const F = root.SITE && root.SITE.football, depth = root.DEPTH && root.DEPTH.football && root.DEPTH.football.current.chart;
+    const HS = (root.SITE_AUTO && root.SITE_AUTO.football && root.SITE_AUTO.football.ratings) || {};
     if (!F) throw new Error('Tennessee roster data is missing.');
     const slots = slotsOf(depth || {}), ids = [];
     F.players.forEach(rp => {
-      const pos = realPos(rp, slots);
-      const el0 = /(FR|SO|JR|SR|GR)/.exec((rp.elig || '').toUpperCase());
-      const eligClass = el0 ? ELIG[el0[1]] : Math.min(4, CLS[rp.cls] || 2);
-      const rsUsed = /RS/.test(rp.elig || '') || rp.cls === '5th';
-      let el = 5 - eligClass;
-      if (rp.leaving) el = 1;
-      if (rp.confirmed27) el = Math.max(el, 2);
-      const yr = CLS[rp.cls] || eligClass;
-      const g = rp.rating ? rp.rating.grade : (rp.honors && rp.honors.length ? 80 : 70);
+      if (DY.UT_CUTS.includes(rp.name)) return;
+      const fx = DY.UT_FIX[rp.name] || {};
+      const pos = fx.pos || realPos(rp, slots);
+      const yr = fx.yr || Math.min(5, CLS[rp.cls] || 2);
+      let el = 6 - yr;
+      if (rp.leaving && yr >= 5) el = 1;
+      const hr = HS[rp.name] || {}, hs = hr.hs, tr = hr.transfer;
+      const walkon = fx.walkon || (!hs && !(rp.rating && rp.rating.src === '247') && !(tr && tr.stars));
+      const g = hs ? hs.grade : rp.rating && rp.rating.src === '247' ? rp.rating.grade : tr && tr.grade ? tr.grade - 1 : 72;
       const yrsIn = Math.max(0, yr - 1);
-      let base = 61.5 + (g - 80) * 0.7 + yrsIn * 3.1;
-      if (rp.rating && rp.rating.src === '247t') base = 61 + (g - 80) * 0.85 + yrsIn * 2.4;
+      let base = 61.5 + (g - 80) * 0.7 + yrsIn * 2.9;
       let bonus = prodScore(rp, pos);
       const sl = slots[rp.name] || [];
       const starter = sl.some(x => x.i === 0 && !/KO|^H$|KR|PR/.test(x.slot)), second = sl.some(x => x.i === 1 && !/KO|^H$|KR|PR/.test(x.slot));
@@ -289,25 +316,36 @@
       if (rp.rating && rp.rating.src === 'on3' && rp.rating.rank) bonus += rp.rating.rank <= 50 ? 4 : rp.rating.rank <= 150 ? 2.5 : 1.5;
       let ovr = base + soft(bonus);
       if (starter) ovr = Math.max(ovr, 77);
-      ovr = Math.round(clamp(ovr, 50, 94));
-      const stars = rp.rating ? rp.rating.stars : (g >= 80 ? 2 : 0);
-      let comp = rp.rating ? clamp(0.70 + (g - 70) * 0.01, 0.7, 0.9999) : null;
-      if (comp && stars >= 5) comp = Math.max(comp, 0.9845); else if (comp && stars === 4) comp = clamp(comp, 0.8905, 0.9833);
+      ovr = Math.round(clamp(fx.ovr || ovr, 50, 96));
+      const stars = walkon ? 0 : hs ? hs.stars : tr && tr.stars ? tr.stars : rp.rating ? rp.rating.stars : 3;
+      const comp = walkon ? null : hs ? Math.round(hs.grade * 100) / 1e4 : clamp(0.70 + (g - 70) * 0.01, 0.7, 0.9999);
       const hm = /,\s*([A-Za-z.]+)$/.exec(rp.home || '');
       const p = DY.makePlayer(pos, ovr, {
-        n: rp.name, t: team.id, yr, el, rsAvail: !rsUsed && yr <= 2, rs: rsUsed, num: rp.num, ht: htIn(rp.ht) || undefined, wt: rp.wt || undefined,
-        home: rp.home || 'Knoxville, TN', st: hm ? stAbbr(hm[1]) : 'TN', hs: rp.hs || '', arch: realArch(pos, rp), grade: g,
-        rec: comp ? { c: comp, stars: stars || DY.starsOf(comp), g, src: rp.rating.src } : null,
+        n: rp.name, t: team.id, yr, el, num: rp.num, ht: htIn(rp.ht) || undefined, wt: rp.wt || undefined,
+        home: rp.home || 'Knoxville, TN', st: hm ? stAbbr(hm[1]) : 'TN', hs: rp.hs || '', arch: fx.arch || realArch(pos, rp), grade: walkon ? 74 : g,
+        rec: walkon ? { walkon: true, stars: 0 } : { c: comp, stars, g, nat: hs ? hs.nat : null, cls: hs ? hs.cls : null, src: hs ? '247 Composite' : 'rating' },
       });
-      p.real = rp.id; p.prev = rp.prev || null; p.honReal = rp.honors || [];
+      // real players carry a stronger culture: personality shifted up
+      for (const k in p.tr) p.tr[k] = Math.round(clamp(p.tr[k] + 7, 20, k === 'lead' ? 94 : 99));
+      if (fx.tr) Object.assign(p.tr, fx.tr);
+      if (fx.at) Object.assign(p.at, fx.at);
+      DY.fitOvr(p, ovr, fx.at);
+      if (p.ceil < p.ovr) p.ceil = p.ovr;
+      if (fx.ovr && p.ceil < p.ovr + 2 && p.el > 1) { p.ceil = p.ovr + Math.max(2, (p.el - 1) * 2); p.potG = DY.scoutGrade(p.ceil); }
+      p.real = rp.id; p.prev = rp.prev || null; p.honReal = rp.honors || []; if (fx.note) p.note = fx.note; if (fx.captain) p.captain = true;
+      if (tr && tr.origin) p.prev = p.prev || tr.origin;
       if (rp.draft) p.draftNote = rp.draft.note;
       if (rp.career) p.realCar = rp.career;
       ids.push(p.id); DY.G.P[p.id] = p;
     });
-    team.roster = ids;
-    // depth chart from the real chart, then everyone else by overall
-    team.depth = DY.autoDepth(team, depth ? realDepthOrder(depth, ids) : null);
-    return ids;
+    // receivers: keep the top eight
+    const wrs = ids.map(id => DY.G.P[id]).filter(p => p.pos === 'WR').sort((a, b) => b.ovr - a.ovr);
+    const cutWr = new Set(wrs.slice(DY.WR_KEEP).map(p => p.id));
+    cutWr.forEach(id => delete DY.G.P[id]);
+    team.roster = ids.filter(id => !cutWr.has(id));
+    team.depth = DY.autoDepth(team, depth ? realDepthOrder(depth, team.roster) : null);
+    DY.G.rosterMax = team.roster.length;
+    return team.roster;
   };
   const ST_FULL = { 'Tenn.': 'TN', 'Ga.': 'GA', 'Fla.': 'FL', 'Ala.': 'AL', 'Va.': 'VA', 'Md.': 'MD', 'N.C.': 'NC', 'S.C.': 'SC', 'Ky.': 'KY', 'Miss.': 'MS', 'La.': 'LA',
     'Texas': 'TX', 'Ohio': 'OH', 'Calif.': 'CA', 'Wis.': 'WI', 'Ill.': 'IL', 'Mich.': 'MI', 'Pa.': 'PA', 'N.J.': 'NJ', 'Ariz.': 'AZ', 'Mo.': 'MO', 'Ind.': 'IN', 'Okla.': 'OK',
@@ -328,6 +366,27 @@
     }
     return out;
   }
+
+  /* ---------- position changes ---------- */
+  // natural moves keep most of a player's value; a defensive tackle at safety does not
+  DY.COMPAT = { QB: ['RB', 'WR'], RB: ['WR', 'S', 'LB'], WR: ['RB', 'CB', 'TE'], TE: ['WR', 'OT', 'IOL', 'EDGE', 'LB'], OT: ['IOL', 'TE'], IOL: ['OT', 'DT'],
+    EDGE: ['DT', 'LB', 'TE'], DT: ['EDGE', 'IOL'], LB: ['EDGE', 'S', 'RB'], CB: ['S', 'WR'], S: ['CB', 'LB', 'RB'], K: ['P'], P: ['K'], LS: [] };
+  DY.posFit = (p, pos) => { const home = p.pos0 || p.pos; return pos === home ? 'natural' : (DY.COMPAT[home] || []).includes(pos) ? 'ok' : 'poor'; };
+  DY.ovrAt = (p, pos) => {
+    const home = p.pos0 || p.pos, base = p.at0 || p.at, fit = pos === home ? 0 : (DY.COMPAT[home] || []).includes(pos) ? 6 : 20;
+    const at = Object.assign({}, base);
+    for (const k in DY.W[pos]) if (at[k] == null) at[k] = Math.round(clamp((p.ovr0 || p.ovr) - 8 - fit + gauss() * 0, 20, 90));
+    // body: big men lose speed-based value at skill spots, small men lose strength at the line
+    let sum = 0; for (const k in DY.W[pos]) sum += DY.W[pos][k] * at[k];
+    return { ovr: Math.round(clamp(sum - (pos === home ? 0 : fit * 0.25), 25, 99)), at };
+  };
+  DY.changePos = (p, pos) => {
+    if (!DY.W[pos] || pos === p.pos) return;
+    if (!p.pos0) { p.pos0 = p.pos; p.at0 = Object.assign({}, p.at); p.ovr0 = p.ovr; }
+    if (pos === p.pos0) { p.pos = pos; p.at = p.at0; delete p.pos0; delete p.at0; delete p.ovr0; DY.setOvr(p); return; }
+    const r = DY.ovrAt(p, pos); p.pos = pos; p.at = r.at; DY.setOvr(p);
+    if (p.ceil < p.ovr) p.ceil = p.ovr;
+  };
 
   /* ---------- depth chart ---------- */
   DY.STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OT: 2, IOL: 3, EDGE: 2, DT: 2, LB: 2, CB: 2, S: 2, K: 1, P: 1 };
@@ -390,18 +449,17 @@
   /* ---------- CPU rosters ---------- */
   DY.ROSTER_MIX = { QB: 3, RB: 4, WR: 7, TE: 3, OT: 4, IOL: 6, EDGE: 5, DT: 5, LB: 5, CB: 6, S: 4, K: 1, P: 1 };
   DY.teamMu = pr => 52 + pr * 0.36;
-  const CLASS_DIST = [[1, .30], [2, .26], [3, .22], [4, .16], [5, .06]];
+  const CLASS_DIST = [[1, .27], [2, .24], [3, .21], [4, .17], [5, .11]];
   const CLASS_ADJ = { 1: -13, 2: -5.5, 3: -1.5, 4: 1.5, 5: 2.5 };
   DY.genPlayerFor = (team, pos, yr, opts) => {
     opts = opts || {};
     const mu = team.fcsMu ? 61 + team.prestige * 0.25 : DY.teamMu(team.prestige);
     const ovr = Math.round(clamp(mu + CLASS_ADJ[yr] + gauss() * 4.6 + (opts.bump || 0), 42, 95));
-    const rsUsed = yr >= 2 && chance(yr === 5 ? 1 : 0.35);
-    const el = yr === 5 ? 1 : Math.max(1, (rsUsed ? 5 : 4) - (yr - 1));
+    const el = 6 - yr;
     const g = clamp(80 + (team.prestige - 50) / 3.2 + gauss() * 4.5, 70, 99.9);
     const comp = clamp(0.70 + (g - 70) * 0.01, 0.7, 0.9999);
     const st = chance(0.55) ? team.st : undefined;
-    return DY.makePlayer(pos, ovr, Object.assign({ t: team.id, yr, el, rsAvail: !rsUsed && yr <= 2, rs: rsUsed, grade: g, st, rec: { c: comp, stars: DY.starsOf(comp), g } }, opts));
+    return DY.makePlayer(pos, ovr, Object.assign({ t: team.id, yr, el, grade: g, st, rec: { c: comp, stars: DY.starsOf(comp), g } }, opts));
   };
   DY.genRoster = (team, tmpPrefix) => {
     const ids = [];

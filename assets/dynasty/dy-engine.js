@@ -33,8 +33,15 @@
     GM.opening = other(toss); GM.kicker = toss; GM.tossWinner = toss;
     // per-game form (consistency trait) for everyone dressed
     for (const s of ['h', 'a']) GM.T[s].roster.forEach(id => { const p = DY.P(id); if (p) GM.form[id] = gauss() * (100 - p.tr.cons) / 22; });
-    GM.style = { h: DY.STYLES[home.style || 'spread'], a: DY.STYLES[away.style || 'spread'] };
+    GM.style = { h: DY.STYLES[home.style || 'spread'] || DY.STYLES.spread, a: DY.STYLES[away.style || 'spread'] || DY.STYLES.spread };
     GM.aggr = { h: home.aggr || 0.55, a: away.aggr || 0.55 };
+    // game plans (CPU picks its own; you pick yours on the scouting report), halftime adjustments, captains
+    GM.plan = { h: DY.aiPlan(GM, 'h'), a: DY.aiPlan(GM, 'a') };
+    GM.adj = { h: { o: 'none', d: 'none' }, a: { o: 'none', d: 'none' } };
+    GM.planSet = !GM.user || GM.coach === 'watch';
+    GM.cap = {};
+    for (const s of ['h', 'a']) { const caps = GM.T[s].roster.map(DY.P).filter(p => p && p.captain); const lead = caps.length ? avg(caps.map(p => p.tr.lead)) : 70; GM.cap[s] = clamp((lead - 75) / 14, 0, 1.4); }
+    GM.wiped = null;
     return GM;
   };
   DY.teamLine = () => ({ plays: 0, yds: 0, ry: 0, ra: 0, py: 0, pa: 0, pc: 0, fd: 0, pen: 0, peny: 0, to: 0, top: 0, c3: 0, a3: 0, c4: 0, a4: 0, sk: 0, pn: 0 });
@@ -58,6 +65,7 @@
       DL: [rot(L.EDGE, 0, garbage ? .8 : .22), rot(L.DT, 0, garbage ? .8 : .28), rot(L.DT, 1, garbage ? .8 : .28), rot(L.EDGE, 1, garbage ? .8 : .22)],
       LB: [garbage ? at(L.LB, 2) : L.LB[0], at(L.LB, 1)], CB: [garbage ? at(L.CB, 2) : L.CB[0], at(L.CB, 1)], NB: L.NB, S: [garbage ? at(L.S, 2) : L.S[0], at(L.S, 1)],
       K: L.K[0], P: L.P[0], KR: L.KR, PR: L.PR,
+      TE2: at(L.TE, 1), WR4: at(L.WR, 3), WR5: at(L.WR, 4), FB: L.RB[1] || L.TE[1] || L.RB[0],
     };
     if (garbage && L.OT.length > 2) P.OL[0] = L.OT[2];
     if (garbage && L.IOL.length > 3) P.OL[2] = L.IOL[3];
@@ -75,13 +83,13 @@
     v = 78 + (v - 78) * DY.SENS;
     v += (GM.form[p.id] || 0) + (GM.hot[p.id] || 0);
     const m = side === 'h' ? GM.mom : -GM.mom; v += m * 1.6;
-    if (side === 'a' && GM.crowd > 0 && GM.poss === 'a') v -= GM.crowd * 1.8 * (1 - (GM.L.a.QB[0] ? (GM.L.a.QB[0].tr.lead - 50) / 120 : 0));
-    if (bigMoment(GM) || (GM.down >= 3 && GM.q >= 3 && Math.abs(GM.score.h - GM.score.a) <= 8)) v += (p.tr.clutch - 55) / 9;
-    if (DY.G && DY.G.settings && DY.G.settings.diffBoost && GM.T[side] && !GM.T[side].user && GM.user) v += DY.G.settings.diffBoost;
+    if (side === 'a' && GM.crowd > 0 && GM.poss === 'a') v -= GM.crowd * 1.8 * (1 - (GM.L.a.QB[0] ? (GM.L.a.QB[0].tr.lead - 50) / 120 : 0)) * (1 - (GM.cap ? GM.cap.a * 0.25 : 0));
+    if (bigMoment(GM) || (GM.down >= 3 && GM.q >= 3 && Math.abs(GM.score.h - GM.score.a) <= 8)) v += (p.tr.clutch - 55) / 9 + (GM.cap ? GM.cap[side] || 0 : 0);
+    if (DY.G && DY.G.settings && DY.G.settings.diffBoost && GM.T[side] && !GM.T[side].user && (GM.T.h.user || GM.T.a.user)) v += DY.G.settings.diffBoost;
     return v;
   }
   const avg = a => a.reduce((s, x) => s + x, 0) / Math.max(1, a.length);
-  DY.SENS = 0.72;
+  DY.SENS = 0.6;
 
   /* ---------- the CPU coordinators ---------- */
   function predPass(GM, offSide) {
@@ -108,6 +116,43 @@
     const dirs = GM.tend[offSide].dir, tot = dirs.L + dirs.M + dirs.R;
     const lean = chance(0.55) ? wpick(['L', 'M', 'R'], x => dirs[x] / tot) : pick(['L', 'M', 'R']);
     return { d, lean, read: repeat ? lc[lc.length - 1] : null };
+  };
+  // modifiers from the game plan and halftime adjustments for one side
+  const NOMOD = {};
+  function MOD(GM, s) {
+    const m = {};
+    const addm = o => { for (const k in o) m[k] = (m[k] || 0) + o[k]; };
+    addm((DY.PLANS[GM.plan && GM.plan[s]] || DY.PLANS.bal).mod);
+    if (GM.adj) { addm((DY.ADJ_O[GM.adj[s].o] || DY.ADJ_O.none).mod); addm((DY.ADJ_D[GM.adj[s].d] || DY.ADJ_D.none).mod); }
+    return m;
+  }
+  DY.MOD = MOD;
+  DY.aiPlan = (GM, s) => {
+    const me = GM.ovr[s], them = GM.ovr[other(s)], st = GM.style[s];
+    if (st.pass <= 0.45 && chance(0.6)) return 'run';
+    if (st.pass >= 0.55 && chance(0.5)) return 'air';
+    if (me.def > them.off + 3 && chance(0.4)) return 'pressure';
+    if (them.off > me.def + 4 && chance(0.4)) return 'bend';
+    return 'bal';
+  };
+  // halftime: the CPU reads the first half
+  DY.aiAdjust = (GM, s) => {
+    const T = GM.ts[s], O = GM.ts[other(s)];
+    const oppYpc = O.ra ? O.ry / O.ra : 4, oppYpa = O.pa ? O.py / O.pa : 6, myYpc = T.ra ? T.ry / T.ra : 4;
+    const d = oppYpc > 5.2 ? 'box' : oppYpa > 8 ? 'deep' : O.sk < 1 && chance(0.5) ? 'pressure' : 'none';
+    const o = T.sk >= 3 ? 'protect' : myYpc > 5 ? 'run' : T.pa && T.pc / T.pa < 0.55 ? 'quick' : 'none';
+    return { o, d };
+  };
+  // formation for a call: the team's identity, the situation and the call
+  DY.aiForm = (GM, s, call) => {
+    const st = GM.style[s];
+    if (GM.ball >= 97 && GM.togo <= 3 && call.k === 'run') return 'goal';
+    if (GM.togo <= 1 && GM.down >= 3 && call.k === 'run' && chance(0.6)) return chance(0.5) ? 'goal' : 'iform';
+    if (call.k === 'pass' && GM.down >= 3 && GM.togo >= 8) return wpick(['spread', 'trips', 'empty', 'doubles'], f => ({ spread: 3, trips: 3, empty: 1.5, doubles: 1.5 })[f]);
+    if (call.k === 'pass' && call.t === 'pa') return wpick(['ace12', 'pistol', 'iform', 'trips'], f => (st.forms[f] || 0.05) + (f === 'ace12' || f === 'iform' ? 0.15 : 0));
+    if (call.k === 'pass' && call.t === 'screen') return wpick(['trips', 'doubles', 'spread'], f => st.forms[f] || 0.1);
+    const fs = Object.keys(st.forms);
+    return wpick(fs, f => st.forms[f] * (call.k === 'run' ? 1 + (DY.FORMS[f].run || 0) * 0.6 : 1 + (DY.FORMS[f].sep || 0) * 2));
   };
   DY.fgRange = k => 40 + ((k ? k.at.kpw : 70) - 60) * 0.5;
   DY.fgProb = (GM, k, dist) => {
@@ -160,6 +205,7 @@
     const dt = GM.dtend[other(s)], dTot = Object.values(dt).reduce((a, b) => a + b, 0) || 1;
     const blitzy = ((dt.blitz || 0) + (dt.c0 || 0) + (dt.c1f || 0)) / dTot, boxy = ((dt.bear || 0) + (dt.c3b || 0)) / dTot;
     pp += boxy * 0.06;
+    pp += (MOD(GM, s).pass || 0);
     pp = clamp(pp, 0.08, 0.96);
     const st = GM.style[s];
     if (chance(pp) && !(st === DY.STYLES.option && chance(0.5))) {
@@ -208,6 +254,8 @@
   // call: offense call for the user's side when it is on offense; dcall: defensive call for the user's side on defense.
   DY.needs = GM => {
     if (GM.over) return 'final';
+    if (GM.user && GM.coach !== 'watch' && !GM.planSet) return 'plan';
+    if (GM.user && GM.coach !== 'watch' && GM.halftime) return 'half';
     if (GM.next === 'pat') return GM.user === GM.poss && GM.coach !== 'watch' ? 'pat' : null;
     if (GM.next !== 'scrim') return null;
     if (GM.user === GM.poss && GM.coach !== 'watch') return 'off';
@@ -217,13 +265,19 @@
   DY.step = (GM, uc) => {
     uc = uc || {};
     if (GM.over) return null;
+    if (!GM.planSet) { if (GM.user && uc.plan && DY.PLANS[uc.plan]) GM.plan[GM.user] = uc.plan; GM.planSet = true; }
+    if (GM.halftime) {
+      for (const sd of ['h', 'a']) GM.adj[sd] = sd === GM.user && uc.adj ? Object.assign({ o: 'none', d: 'none' }, uc.adj) : DY.aiAdjust(GM, sd);
+      GM.halftime = false;
+    }
     let res;
+    const di0 = GM.drives.length - 1;
     if (GM.next === 'kick') res = kickoff(GM, false);
     else if (GM.next === 'free') res = kickoff(GM, true);
     else if (GM.next === 'pat') res = pat(GM, uc.pat);
     else if (GM.next === 'ot') res = otStart(GM);
     else res = scrimmage(GM, uc);
-    if (res) { res.q = res.q || GM.q; GM.plays.push(res); if (GM.plays.length > 400) GM.plays.shift(); }
+    if (res) { res.di = res.type === 'kick' ? GM.drives.length - 1 : di0; res.q = res.q || GM.q; GM.plays.push(res); if (GM.plays.length > 400) GM.plays.shift(); }
     return res;
   };
 
@@ -440,9 +494,17 @@
     const d = other(s), O = pers(GM, s), D = pers(GM, d), def = DY.DEFS[dc.d] || DY.DEFS.c3;
     markSnap(GM, O); markDef(GM, D);
     const read = dc.read && dc.read === call.k + (call.t || '') + (call.dir || '') ? 1 : 0;
-    const playName = pick(DY.PLAYS[call.k === 'run' ? call.t : call.t === 'quick' ? 'quick' : call.t]) + (call.k === 'run' && call.dir ? ' ' + { L: 'Left', M: 'Middle', R: 'Right' }[call.dir] : '');
-    const r = call.k === 'run' ? runPlay(GM, s, O, D, call, dc, def, read) : passPlay(GM, s, O, D, call, dc, def, read);
-    r.play = playName; r.cov = def.name; r.call = call; r.dcall = dc;
+    const fk = call.f && DY.FORMS[call.f] ? call.f : DY.aiForm(GM, s, call);
+    const F = DY.FORMS[fk], book = DY.BOOK[call.t] || DY.BOOK.in;
+    const pl = (call.play && book.find(b => b.n === call.play)) || pick(book);
+    let pm = pl.beats.includes(dc.d) ? 1 : pl.weak.includes(dc.d) ? -1 : 0;
+    if (pl.counter && dc.lean && dc.lean === call.dir) pm = 1.2;
+    const ctx = { F, fk, pl, pm, dp: DY.DPERS[F.dpers], mo: MOD(GM, s), md: MOD(GM, d) };
+    const playName = pl.n + (call.k === 'run' && call.dir ? ' ' + { L: 'Left', M: 'Middle', R: 'Right' }[call.dir] : '');
+    const r = call.k === 'run' ? runPlay(GM, s, O, D, call, dc, def, read, ctx) : passPlay(GM, s, O, D, call, dc, def, read, ctx);
+    r.play = playName; r.form = F.name; r.cov = def.name + ' · ' + ctx.dp.name; r.call = call; r.dcall = dc; r.pm = pm;
+    r.anim = Object.assign(r.anim || {}, { f: fk });
+    if (pm > 0 && chance(0.35)) r.events.push(`${pl.n} was the right call against ${def.name}.`);
     if (read && chance(0.5)) r.events.push(`${GM.T[d].abbr} saw it coming — they have been sitting on that call.`);
     return r;
   }
@@ -455,16 +517,20 @@
     if (kind === 'short') pool = r < 0.6 ? [...D.CB, D.NB, ...D.S] : lbs;
     return weighted(pool, p => (p.at.tak || 50) + (p.at.pur || 50) - 60);
   }
-  function runPlay(GM, s, O, D, call, dc, def, read) {
+  function runPlay(GM, s, O, D, call, dc, def, read, ctx) {
+    ctx = ctx || { F: DY.FORMS.trips, pm: 0, dp: DY.DPERS.nickel, mo: NOMOD, md: NOMOD };
     const t = call.t, dir = call.dir || 'M', ev = [];
     const car = t === 'qb' ? O.QB : O.RB;
     const ol = O.OL, te = O.TE;
     const blk = dir === 'L' ? [ol[0], ol[1]] : dir === 'R' ? [ol[3], ol[4], te] : [ol[1], ol[2], ol[3]];
     const fr = dir === 'L' ? [D.DL[3], D.DL[2]] : dir === 'R' ? [D.DL[1], D.DL[0]] : [D.DL[1], D.DL[2]];
-    const olv = avg(blk.map(p => E(GM, p, 'rbk', s) * 0.72 + E(GM, p, 'str', s) * 0.28));
+    if (ctx.F.te >= 2 && dir !== 'L') blk.push(O.TE2);
+    if (ctx.F.rb >= 2) blk.push(O.FB);
+    const olv = avg(blk.filter(Boolean).map(p => E(GM, p, 'rbk', s) * 0.72 + E(GM, p, 'str', s) * 0.28)) + ctx.F.run * 1.8 + (ctx.mo.run || 0) * 1.2;
     const dlv = avg(fr.map(p => E(GM, p, 'bsh', other(s)) * 0.55 + E(GM, p, 'str', other(s)) * 0.25 + E(GM, p, 'tak', other(s)) * 0.2));
     const lbv = avg(D.LB.map(p => E(GM, p, 'tak', other(s)) * 0.4 + E(GM, p, 'prc', other(s)) * 0.35 + E(GM, p, 'pur', other(s)) * 0.25));
-    let box = def.box + (dc.lean === dir ? 0.7 : 0) - (dc.lean && dc.lean !== dir && dc.lean !== 'M' ? 0.25 : 0) + read * 0.8;
+    let box = def.box + (dc.lean === dir ? 0.7 : 0) - (dc.lean && dc.lean !== dir && dc.lean !== 'M' ? 0.25 : 0) + read * 0.8 + ctx.dp.box + (ctx.md.box || 0) - ctx.pm * 0.55;
+    if (t === 'qb') box -= (ctx.md.qbrun || 0) * 0.5;
     const ballSec = E(GM, car, 'car', s);
     let win, y;
     if (t === 'out') {
@@ -498,14 +564,25 @@
     const text0 = `${last(car)} ${t === 'qb' ? (dir === 'M' ? 'keeps it up the middle' : 'keeps it ' + (dir === 'L' ? 'left' : 'right')) : t === 'out' ? 'runs wide ' + (dir === 'L' ? 'left' : 'right') : 'runs ' + ({ L: 'left', M: 'up the middle', R: 'right' }[dir])}`;
     return { kind: 'run', t, dir, carrier: car, tackler, yards: y, fum, oob, broke, big, events: ev, text0, time: Math.round(5 + Math.abs(y) / 6 + rnd() * 2), anim: { kind: 'run', t, dir, broke } };
   }
-  function pickTarget(GM, s, O, D, t, def, hurried) {
-    const routes = [
+  function pickTarget(GM, s, O, D, t, def, hurried, ctx) {
+    ctx = ctx || { F: DY.FORMS.trips, pm: 0, dp: DY.DPERS.nickel, mo: NOMOD, md: NOMOD };
+    const F = ctx.F, deepish = t === 'deep' || t === 'pa';
+    const routes = F.wr >= 3 || F.te >= 2 ? [
       { p: O.WR[0], role: 'WR1', cov: D.CB[0], depth: t === 'deep' ? 'd' : t === 'quick' ? 's' : t === 'pa' ? 'd' : 'm', w: 1.15 },
       { p: O.WR[1], role: 'WR2', cov: D.CB[1], depth: t === 'deep' ? 'd' : t === 'quick' ? 's' : 'm', w: 1.0 },
       { p: O.WR[2], role: 'WR3', cov: D.NB, depth: t === 'quick' ? 's' : t === 'deep' ? 'm' : t === 'pa' ? 'm' : 'm', w: 0.95 },
       { p: O.TE, role: 'TE', cov: D.LB[0], depth: t === 'quick' ? 's' : 'm', w: 0.75 },
       { p: O.RB, role: 'RB', cov: D.LB[1], depth: 's', w: t === 'deep' || t === 'pa' ? 0.25 : 0.5 },
-    ].filter(x => x.p && x.cov);
+    ] : [];
+    // personnel changes who is out on routes
+    if (F.wr < 3) { routes.splice(2, 1); if (F.te >= 2) routes.push({ p: O.TE2, role: 'TE2', cov: D.S[1], depth: deepish ? 'm' : 's', w: 0.7 }); }
+    if (F.te === 0) { const i = routes.findIndex(r => r.role === 'TE'); if (i >= 0) routes.splice(i, 1); }
+    if (F.wr >= 4) routes.push({ p: O.WR4, role: 'WR4', cov: D.S[1], depth: deepish ? 'd' : 'm', w: 0.85 });
+    if (F.rb === 0) { const i = routes.findIndex(r => r.role === 'RB'); if (i >= 0) routes.splice(i, 1); }
+    if (F.rb >= 2) routes.push({ p: O.FB, role: 'FB', cov: D.LB[1], depth: 's', w: 0.3 });
+    if (!routes.length) routes.push({ p: O.WR[0], role: 'WR1', cov: D.CB[0], depth: 's', w: 1 });
+    const red = GM.ball >= 80, sticks = GM.down >= 3 ? GM.togo : 0;
+    routes.forEach(x => { if (!x.p) x.p = O.WR[0]; if (!x.cov) x.cov = D.CB[0]; });
     const qb = O.QB, noise = (100 - E(GM, qb, 'awr', s)) / 26 + (hurried ? 0.8 : 0);
     routes.forEach(rt => {
       const p = rt.p, c = rt.cov, man = def.man;
@@ -516,20 +593,30 @@
       if (rt.depth === 'd') sep -= def.deep * 0.62; else if (rt.depth === 's') sep -= def.short * 0.5; else sep -= (def.short + def.deep) * 0.22;
       if (rt.depth === 'd' && man && p.at.spd > c.at.spd + 3) sep += 0.45;
       if (def.blitz && rt.depth !== 'd') sep += 0.35;
-      if (rt.role === 'RB') sep += 0.9;
-      rt.sep = sep; rt.view = sep + gauss() * noise + Math.log(rt.w);
+      if (rt.role === 'RB' || rt.role === 'FB') sep += 0.9;
+      // the play call against the coverage, personnel, the plan, and a compressed red zone
+      sep += ctx.pm * 0.45 + F.sep + (ctx.mo.sep || 0) + (rt.depth === 's' ? (ctx.mo.sepS || 0) - (ctx.md.short || 0) * 0.4 : 0) + (rt.depth === 'd' ? (ctx.mo.sepD || 0) - (ctx.md.deep || 0) * 0.5 : 0) - ctx.dp.cov;
+      if (t === 'pa') sep += (F.pa || 0) * 0.5 + (ctx.mo.pa || 0);
+      if (red && rt.depth === 'd') sep -= 0.45; if (GM.ball >= 92) sep -= 0.3;
+      const depthYds = rt.depth === 'd' ? 20 : rt.depth === 'm' ? 11 : 4;
+      rt.sep = sep; rt.view = sep + gauss() * noise + Math.log(rt.w) + (sticks && depthYds >= sticks ? 0.6 : sticks ? -0.4 : 0);
     });
     if (hurried) routes.forEach(r => { if (r.depth !== 's') r.view -= 0.9; });
     return routes.sort((a, b) => b.view - a.view)[0];
   }
-  function passPlay(GM, s, O, D, call, dc, def, read) {
+  function passPlay(GM, s, O, D, call, dc, def, read, ctx) {
+    ctx = ctx || { F: DY.FORMS.trips, pm: 0, dp: DY.DPERS.nickel, mo: NOMOD, md: NOMOD };
     const t = call.t, ev = [], qb = O.QB, ds = other(s);
     // protection vs rush
-    const pro = avg(O.OL.map(p => E(GM, p, 'pbk', s) * 0.7 + E(GM, p, 'agi', s) * 0.15 + E(GM, p, 'awr', s) * 0.15)) + (t === 'deep' || t === 'pa' ? 1.2 : 0);
+    // the weakest link matters: the tackles against the edge rushers
+    const pb = p => E(GM, p, 'pbk', s) * 0.7 + E(GM, p, 'agi', s) * 0.15 + E(GM, p, 'awr', s) * 0.15;
+    const er = p => Math.max(E(GM, p, 'pmv', ds), E(GM, p, 'fmv', ds)) * 0.6 + E(GM, p, 'spd', ds) * 0.25 + E(GM, p, 'awr', ds) * 0.15;
+    const edgeGap = Math.min(pb(O.OL[0]) - er(D.DL[3]), pb(O.OL[4]) - er(D.DL[0]));
+    const pro = avg(O.OL.map(pb)) + (t === 'deep' || t === 'pa' ? 1.2 : 0) + ctx.F.pro * 2 + (ctx.mo.pro || 0) * 1.2 + Math.min(0, edgeGap) * 0.25;
     const rushers = D.DL.map((p, i) => ({ p, v: i === 0 || i === 3 ? Math.max(E(GM, p, 'pmv', ds), E(GM, p, 'fmv', ds)) * 0.6 + E(GM, p, 'spd', ds) * 0.25 + E(GM, p, 'awr', ds) * 0.15 : E(GM, p, 'pmv', ds) * 0.6 + E(GM, p, 'str', ds) * 0.25 + E(GM, p, 'fmv', ds) * 0.15 })).sort((a, b) => b.v - a.v);
     if (def.blitz) rushers.push({ p: D.LB[0], v: (E(GM, D.LB[0], 'pmv', ds) || 60) * 0.5 + E(GM, D.LB[0], 'spd', ds) * 0.5 });
     const rush = rushers[0].v * 0.45 + rushers[1].v * 0.3 + rushers[2].v * 0.25;
-    const time = 2.75 + (pro - rush) / 23 + gauss() * 0.7 - def.rush * 0.33 + (read && def.blitz ? -0.3 : 0);
+    const time = 2.75 + (pro - rush) / 23 + gauss() * 0.7 - (def.rush + (ctx.md.rush || 0)) * 0.33 + (read && def.blitz ? -0.3 : 0);
     let need = { quick: 1.5, med: 2.5, deep: 3.15, screen: 1.0, pa: 2.95 }[t];
     if (t === 'pa' && def.box > 0.5) need -= 0.35;
     const margin = time - need;
@@ -539,7 +626,7 @@
       const tgt = chance(0.55) ? O.RB : chance(0.5) ? O.WR[2] : O.WR[0];
       const blockers = avg([O.OL[1], O.OL[2], O.OL[3]].map(p => E(GM, p, 'rbk', s)));
       const pursuit = avg(D.LB.map(p => E(GM, p, 'pur', ds) * 0.6 + E(GM, p, 'spd', ds) * 0.4));
-      const sniff = (def.blitz ? -1.4 : def.box > 0.5 ? -0.4 : 0.6) + read * 1.2 + (dc.d === 'c2' || dc.d === 't2' ? 0.5 : 0);
+      const sniff = (def.blitz ? -1.4 : def.box > 0.5 ? -0.4 : 0.6) + read * 1.2 + (dc.d === 'c2' || dc.d === 't2' ? 0.5 : 0) - ctx.pm * 0.6;
       if (chance(clamp(0.1 + sniff * 0.08, 0.04, 0.3))) {
         const pd = chance(0.6) ? D.DL[1] : D.LB[0];
         if (chance(0.06)) return interception(GM, s, O, D, qb, tgt, pd, t, ev, `${last(pd)} reads the screen all the way`);
@@ -575,7 +662,7 @@
       }
     }
     const hurried = margin < 0;
-    const rt = pickTarget(GM, s, O, D, t, def, hurried);
+    const rt = pickTarget(GM, s, O, D, t, def, hurried, ctx);
     const tgt = rt.p, cov = rt.cov;
     // crowd noise: route miscommunication for the road offense
     if (s === 'a' && GM.crowd > 0.5 && chance(GM.crowd * 0.022)) {
@@ -600,7 +687,7 @@
       let y = Math.round(Math.min(toGoal, air + Math.max(0, yac)));
       if (air >= toGoal) y = toGoal;
       if (bigMoment(GM) && tgt.tr.clutch >= 80 && chance(0.5)) ev.push(`${last(tgt)} — Ice Water — comes up big again.`);
-      return complete(GM, s, qb, tgt, tk, y, Math.min(air, toGoal), t, ev, rt.depth !== 'd' && chance(0.22), { kind: 'pass', t, role: rt.role, air: Math.min(air, toGoal) });
+      return complete(GM, s, qb, tgt, tk, y, Math.min(air, toGoal), t, ev, rt.depth !== 'd' && chance(in2min(GM) && GM.score[s] <= GM.score[ds] ? 0.5 : 0.22), { kind: 'pass', t, role: rt.role, air: Math.min(air, toGoal) });
     }
     // incomplete: interception, drop, pass breakup, interference
     let pint = { s: 0.013, m: 0.022, d: 0.036 }[rt.depth] * (1 + Math.max(0, 1 - rt.sep) * 0.3) * (1 + (80 - E(GM, qb, 'awr', s)) / 70) * ((cov.at.cth || 55) / 68) * (hurried ? 1.6 : 1);
@@ -719,7 +806,7 @@
           if (r.tackler) { line(GM, r.tackler).tk--; }
           y = -Math.min(10, Math.floor(GM.ball / 2)); r.fum = false;
           GM.ball += y; GM.togo -= y;
-          text = `${r.text0}, but ${pen.text}`; GM.ts[s].pen++; GM.ts[s].peny += -y; stop = true;
+          text = `${r.text0}, but ${pen.text}`; GM.ts[s].pen++; GM.ts[s].peny += -y; stop = true; var wiped = { yards: r.yards, kind: r.kind }; tag = 'FLAG';
         } else {
           if (r.kind === 'dpi') { y = r.yards; GM.ts[d].pen++; GM.ts[d].peny += y; }
           // fumbles
@@ -828,7 +915,7 @@
     const shake = GM.big && GM.crowd > 0.7 && c.startDown === 3 && s === 'a';
     return {
       type: 'play', text: (c.toText || '') + text, head, events: ev, s, tag, big, td, turnover, firstDown, shake,
-      anim: Object.assign({ los: c.startBall, end: td ? 100 : (GM.poss === s ? GM.ball : 100 - GM.ball), yards: r.yards || 0 }, r.anim || {}),
+      anim: Object.assign({ los: c.startBall, end: typeof wiped !== 'undefined' && wiped ? c.startBall + (wiped.yards || 0) : td ? 100 : (GM.poss === s ? GM.ball : 100 - GM.ball), yards: r.yards || 0, wiped: typeof wiped !== 'undefined' && !!wiped }, r.anim || {}),
       play: r.play, cov: r.cov, call: c.ocall, dcall: c.dcall, r,
     };
   }
@@ -866,7 +953,7 @@
     GM.running = false;
     if (q === 1 || q === 3) { GM.q++; GM.clock = 900; return { type: 'q', text: pre + `End of the ${q === 1 ? '1st' : '3rd'} quarter.`, anim: { kind: 'none' }, s: GM.poss, tag: 'END OF Q' + q }; }
     if (q === 2) {
-      endDrive(GM, 'Half'); GM.q = 3; GM.clock = 900; GM.to = { h: 3, a: 3 }; GM.next = 'kick'; GM.kicker = GM.opening; GM.hurry = { h: false, a: false };
+      endDrive(GM, 'Half'); GM.q = 3; GM.clock = 900; GM.to = { h: 3, a: 3 }; GM.next = 'kick'; GM.kicker = GM.opening; GM.hurry = { h: false, a: false }; GM.halftime = true;
       return { type: 'q', text: pre + `HALFTIME: ${GM.T.a.name} ${GM.score.a}, ${GM.T.h.name} ${GM.score.h}.`, anim: { kind: 'none' }, s: GM.poss, tag: 'HALFTIME', half: true };
     }
     endDrive(GM, 'End of game');

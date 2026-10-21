@@ -36,7 +36,7 @@
     o = o || {};
     const g = c * 100;
     const ovr = Math.round(clamp(61.5 + (g - 80) * 0.7 - 1 + gauss() * 3, 45, 82));
-    const p = DY.makePlayer(pos, ovr, Object.assign({ t: null, yr: 1, el: 4, rsAvail: true, grade: g, rec: { c, stars: DY.starsOf(c), g } }, o));
+    const p = DY.makePlayer(pos, ovr, Object.assign({ t: null, yr: 1, el: 5, grade: g, rec: { c, stars: DY.starsOf(c), g } }, o));
     p.pros = true; p.interest = {}; p.commit = null; p.pref = prefs(); p.scout = 0; p.acts = {}; p.offer = false; p.visit = null; p.nilOffer = 0;
     // gems and busts: the composite misses on some players
     const exp = ovr + 14 + (g - 85) * 0.35;
@@ -111,16 +111,19 @@
     const g = G(), year = g.season + 1;
     const list = DY.genClass(year, withReal);
     const pool = {}; list.forEach(p => { pool[p.id] = p; });
-    g.recruit = { year, pool, board: [], hours: DY.HOURS(), log: [], classRank: null, signed: false };
-    // pre-committed real players start on your board
-    list.filter(p => p.commit === g.user).forEach(p => g.recruit.board.push(p.id));
+    // year one: the real class is locked in (with NIL promises sized to each player's market value)
+    const locked = !!withReal && year === (g.startSeason || 2026) + 1;
+    g.recruit = { year, pool, board: [], hours: DY.HOURS(), log: [], classRank: null, signed: false, locked };
+    const ut = DY.userT();
+    list.filter(p => p.commit === g.user).forEach(p => { g.recruit.board.push(p.id); p.nilOffer = DY.recruitNil(p); p.nilLocked = true; });
     DY.rankClasses();
   };
-  DY.boardAdd = id => { const R = G().recruit; if (R.board.includes(id)) return null; if (R.board.length >= DY.BOARD_MAX) return 'Your board is full (30). Remove someone first.'; R.board.push(id); const p = DY.RP(id); if (p.interest[G().user] == null) p.interest[G().user] = 0; return null; };
+  DY.boardAdd = id => { const R = G().recruit; if (R.locked) return 'Recruiting is locked in year one: the real 2027 class.'; if (R.board.includes(id)) return null; if (R.board.length >= DY.BOARD_MAX) return 'Your board is full (30). Remove someone first.'; R.board.push(id); const p = DY.RP(id); if (p.interest[G().user] == null) p.interest[G().user] = 0; return null; };
   DY.boardRemove = id => { const R = G().recruit; R.board = R.board.filter(x => x !== id); };
   DY.hoursUsed = () => { const R = G().recruit; let h = 0; R.board.forEach(id => { const p = DY.RP(id); for (const a in p.acts) h += DY.ACTIONS[a].hrs; }); return h; };
   DY.setAct = (id, act, on) => {
     const p = DY.RP(id); if (!p) return 'Not found.';
+    if (G().recruit.locked) return 'Recruiting is locked in year one: the real 2027 class.';
     if (p.commit && p.commit !== G().user && p.firm) return `${p.n} is locked in with ${DY.T(p.commit).name}.`;
     if (on) {
       if (act === 'coach' && Object.values(G().recruit.pool).filter(x => x.acts.coach).length >= 4) return 'You can make 4 head coach visits a week.';
@@ -131,8 +134,8 @@
     } else delete p.acts[act];
     return null;
   };
-  DY.offer = id => { const p = DY.RP(id); if (p.offer) return null; const R = G().recruit; const n = Object.values(R.pool).filter(x => x.offer && !x.real).length; if (n >= 40) return 'You have 40 scholarship offers out.'; p.offer = true; p.interest[G().user] = (p.interest[G().user] || 0) + 10; return null; };
-  DY.setNil = (id, amt) => { const p = DY.RP(id); p.nilOffer = Math.max(0, Math.round(amt / 5000) * 5000); return null; };
+  DY.offer = id => { const p = DY.RP(id); if (p.offer) return null; const R = G().recruit; if (R.locked) return 'Recruiting is locked in year one: the real 2027 class.'; const n = Object.values(R.pool).filter(x => x.offer && !x.real).length; if (n >= 40) return 'You have 40 scholarship offers out.'; p.offer = true; p.interest[G().user] = (p.interest[G().user] || 0) + 10; return null; };
+  DY.setNil = (id, amt) => { const p = DY.RP(id); if (p.nilLocked) return 'That NIL promise is locked.'; p.nilOffer = Math.max(0, Math.round(amt / 5000) * 5000); return null; };
   DY.setVisit = (id, wk) => {
     const g = G(), p = DY.RP(id);
     const games = DY.userGames(wk).filter(x => x.h === g.user && !x.res);
@@ -144,9 +147,10 @@
   // the user's week: hours turn into interest, scaled by how well Tennessee fits what he wants
   DY.recruitWeek = w => {
     const g = G(), R = g.recruit; if (!R || R.signed) return;
-    const ut = DY.userT(), mode = g.settings.recruiting;
+    const ut = DY.userT(), mode = R.locked ? 'off' : g.settings.recruiting;
     if (mode === 'auto') DY.autoRecruit();
     const logs = [];
+    const full = DY.myCommits().length >= DY.CAP.hs;
     if (mode !== 'off') R.board.forEach(id => {
       const p = DY.RP(id); if (!p) return;
       let pts = 0;
@@ -176,8 +180,9 @@
       const order = Object.entries(p.interest).sort((a, b) => b[1] - a[1]);
       if (!order.length) return;
       const [lead, lv] = order[0], second = order[1] ? order[1][1] : 0;
-      const need = 140 + p.rec.stars * 15 + (w <= 4 ? 40 : 0);
-      if (!p.commit && lv >= need && lv >= second * 1.2 && (!g.teams[lead].user || p.offer)) {
+      // the bar to commit drops as the season goes (most of a class is done by the early signing period)
+      const need = (140 + p.rec.stars * 15 + (w <= 4 ? 40 : 0)) * (1 - Math.min(w, 14) / 24);
+      if (!p.commit && lv >= need && lv >= second * (w >= 10 ? 1.08 : 1.2) && (!g.teams[lead].user || (p.offer && !full))) {
         p.commit = +lead;
         if (g.teams[lead].user) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos} from ${p.home}, commits to Tennessee!`); DY.news('commit', `${p.rec.stars}-star ${DY.POS_NAME[p.pos].toLowerCase()} ${p.n} commits to Tennessee`, `No. ${p.rec.nat} nationally (${p.rec.c.toFixed(4)} composite). ${p.home}, ${p.hs}.`, { rid: p.id }); }
         else if (p.rec.nat <= 50 && R.board.includes(p.id)) logs.push(`${p.n} (No. ${p.rec.nat}) commits to ${g.teams[lead].name}.`);
@@ -203,10 +208,11 @@
   // CPU recruiting for Tennessee: keep a board of the best fits at positions of need and spread the hours
   DY.autoRecruit = () => {
     const g = G(), R = g.recruit, ut = DY.userT();
+    if (R.locked) return;
     const needs = DY.teamNeeds(ut);
     const cand = Object.values(R.pool).filter(p => !p.commit || p.commit === ut.id).filter(p => !p.real || p.commit === ut.id);
     cand.forEach(p => { p._s = p.rec.c * 100 + (needs[p.pos] || 0) * 3 + DY.fitScore(ut, p) * 12 + (p.interest[ut.id] || 0) / 20; });
-    const room = Math.max(0, 26 - DY.myCommits().length);
+    const room = Math.max(0, DY.CAP.hs - DY.myCommits().length);
     const want = cand.filter(p => p.commit !== ut.id).sort((a, b) => b._s - a._s).slice(0, Math.min(DY.BOARD_MAX - Math.min(18, DY.myCommits().length), room + 6));
     R.board = DY.myCommits().map(p => p.id).concat(want.map(p => p.id)).slice(0, DY.BOARD_MAX);
     let hrs = DY.HOURS(), coach = 4;
@@ -225,8 +231,11 @@
   };
 
   /* ---------- the offseason ---------- */
-  DY.OFF_LABEL = { recap: 'Season recap', nil: 'NIL & budget', portal: 'Transfer portal', signing: 'Signing day', draft: 'NFL Draft', progress: 'Progression', schedule: 'Non-conference schedule' };
-  DY.OFF_ORDER = ['recap', 'nil', 'portal', 'signing', 'draft', 'progress', 'schedule'];
+  DY.OFF_LABEL = { recap: 'Season recap', nil: 'NIL & budget', portal: 'Transfer portal', signing: 'Signing day', draft: 'NFL Draft', progress: 'Progression', cuts: 'Roster cut-down', schedule: 'Non-conference schedule' };
+  DY.OFF_ORDER = ['recap', 'nil', 'portal', 'signing', 'draft', 'progress', 'cuts', 'schedule'];
+  // limits per offseason (AJ): 30 newcomers (20 high school, 20 transfers), 30 departures, 15 transfers out, 15 NFL entries
+  DY.CAP = { newcomers: 30, hs: 20, tin: 20, out: 30, tout: 15, nfl: 15 };
+  DY.rosterMax = () => G().rosterMax || 88;
   DY.startOffseason = () => {
     const g = G();
     g.off = { stage: 'recap', leaving: [], portal: null, draft: null, prog: [], nilAsk: [], season: g.season };
@@ -236,23 +245,39 @@
         const p = DY.P(id), s = p.s || { gp: 0 };
         if (p.s) { p.car[g.season] = Object.assign({ t: t.abbr }, p.s); }
         p.lastGp = s.gp || 0; p.lastScore = DY.awardScore(p, t);
-        if (p.rsAvail && (s.gp || 0) <= 4 && p.el > 1) { p.rs = true; p.rsAvail = false; p.rsYear = g.season; }
-        else { p.el--; if (p.yr >= 2) p.rsAvail = false; }
+        p.el--;
         p.s = null; p.inj = p.inj && p.inj.wks >= 12 ? { wks: 3, what: p.inj.what } : null;
         if (p.el <= 0) p.leave = 'grad';
-        else if (p.yr >= 3 && t.id !== -1) {
+        else if (p.yr >= 3) {
           const dg = DY.draftGrade(p);
-          const pr = dg >= 90 ? 0.9 : dg >= 86 ? 0.6 : dg >= 83 ? 0.22 : dg >= 80 ? 0.06 : 0;
-          if (chance(pr * (p.tr.ego > 70 ? 1.15 : 1) * (p.tr.loyal > 85 ? 0.7 : 1))) p.leave = 'nfl';
+          const pr = dg >= 91 ? 0.85 : dg >= 87 ? 0.55 : dg >= 84 ? 0.2 : dg >= 81 ? 0.05 : 0;
+          if (chance(pr * (p.tr.ego > 75 ? 1.15 : 1) * (p.tr.loyal > 85 ? 0.7 : 1))) { p.leave = 'nfl'; p.dg = dg; }
         }
       });
+      // never more than 15 early entries from one school
+      const nfl = t.roster.map(DY.P).filter(p => p.leave === 'nfl').sort((a, b) => b.dg - a.dg);
+      nfl.slice(DY.CAP.nfl).forEach(p => { p.leave = null; });
     });
     const ut = DY.userT();
     g.off.leaving = ut.roster.filter(id => DY.P(id).leave).map(id => ({ id, why: DY.P(id).leave }));
+    g.off.pitched = {};
     DY.updateLegacy();
     DY.coachSeason();
   };
   DY.draftGrade = p => p.ovr + ({ QB: 3, EDGE: 2.5, OT: 2, CB: 2, WR: 1.5, DT: 1, S: 0.5, LB: 0, RB: -0.5, IOL: 0, TE: -0.5, K: -12, P: -12, LS: -20 }[p.pos] || 0) + (p.at.spd >= 90 ? 1 : 0) + p.aw.filter(a => /AA1|HEIS/.test(a.a)).length * 1.5;
+  // talk an early entrant into one more year: an NIL raise and his loyalty against his draft stock
+  DY.persuade = (id, raise) => {
+    const g = G(), o = g.off, p = DY.P(id), ut = DY.userT();
+    if (o.pitched[id] != null) return 'You already made your pitch.';
+    if (DY.payroll(ut) + raise > ut.budget * 1.02) return `That raise would put you over your NIL budget (${DY.money(ut.budget - DY.payroll(ut))} open).`;
+    const dg = p.dg || DY.draftGrade(p);
+    const ch = clamp(0.55 - (dg - 82) * 0.06 + (p.tr.loyal - 60) / 140 + raise / Math.max(100000, p.nilV || DY.nilValue(p, ut)) * 0.3, 0.02, 0.85);
+    const ok = chance(ch);
+    o.pitched[id] = ok;
+    if (ok) { p.leave = null; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); DY.addLog(p, `Returned for another season (NIL now ${DY.money(p.nil)}).`); DY.news('nil', `${p.n} is coming back to Tennessee`, `He had declared for the NFL Draft.`, { pid: p.id }); }
+    return ok ? `${p.n} is coming back!` : `${p.n} is staying in the draft.`;
+  };
+  DY.persuadeChance = (p, raise) => { const dg = p.dg || DY.draftGrade(p); return clamp(0.55 - (dg - 82) * 0.06 + (p.tr.loyal - 60) / 140 + (raise || 0) / Math.max(100000, p.nilV || DY.nilValue(p, DY.userT())) * 0.3, 0.02, 0.85); };
   DY.offNext = () => {
     const g = G(), o = g.off, i = DY.OFF_ORDER.indexOf(o.stage);
     leaveStage(o.stage);
@@ -266,7 +291,8 @@
       // seniors and draft entrants leave everyone's roster (kept in the player table for history)
       g.teams.forEach(t => { t.roster = t.roster.filter(id => { const p = DY.P(id); if (p.leave) { p.t0 = t.id; p.gone = g.season; p.t = null; return false; } return true; }); });
     }
-    if (st === 'nil') { if (g.settings.nil === 'auto' || g.settings.nil === 'manual') DY.resolveNilAsks(); }
+    if (st === 'nil') DY.resolveNilAsks();
+    if (st === 'cuts') DY.autoCuts(true);
     if (st === 'portal') DY.resolvePortal(true);
     if (st === 'progress') { /* already applied on entering */ }
   }
@@ -277,6 +303,7 @@
     if (st === 'signing') DY.signingDay();
     if (st === 'draft') DY.runDraft();
     if (st === 'progress') DY.progressAll();
+    if (st === 'cuts') DY.autoCuts(false);
     if (st === 'schedule') { g.nonconfPick = g.nonconfPick || {}; if (!g.nonconfPick[g.season + 1]) g.nonconfPick[g.season + 1] = DY.UT_NONCONF_REAL[g.season + 1] ? DY.UT_NONCONF_REAL[g.season + 1].map(x => ({ o: DY.byName(x[0]).id, home: x[1] === 'H', wk: DY.weekOfDate(g.season + 1, x[2]) })) : DY.autoNonconf(g.season + 1); }
   }
 
@@ -288,13 +315,35 @@
     const champ = g.post && g.post.champ === ut.id ? 1.08 : 1;
     const losing = ut.w < ut.l ? 0.96 : 1;
     ut.budget = Math.round(ut.budget * (bump > 1 ? 1.015 : 1) * (deep > 1 ? 1.02 : 1) * (champ > 1 ? 1.03 : 1) * (losing < 1 ? 0.97 : 1) * 1.03 / 1e5) * 1e5;
-    g.off.nilAsk = [];
-    ut.roster.map(DY.P).forEach(p => { p.nilV = DY.nilValue(p, ut); if (p.nilV > p.nil * 1.35 && p.nilV - p.nil >= 40000) g.off.nilAsk.push({ id: p.id, ask: Math.round(p.nilV / 5000) * 5000, ans: null }); });
+    g.off.nilAsk = []; g.off.nilAdj = {};
+    ut.roster.map(DY.P).forEach(p => {
+      p.nilV = DY.nilValue(p, ut);
+      const want = p.nilV * (1 + (p.tr.ego - 60) / 300);
+      if ((want > p.nil * 1.15 && want - p.nil >= 15000) || (p.tr.ego >= 80 && p.ovr >= 80 && chance(0.5))) g.off.nilAsk.push({ id: p.id, ask: Math.round(Math.max(want, p.nil * 1.15) / 5000) * 5000, ans: null });
+    });
     g.off.nilAsk.sort((a, b) => b.ask - a.ask);
   };
   DY.answerNil = (id, yes) => { const a = G().off.nilAsk.find(x => x.id === id); if (a) a.ans = yes; };
+  // how likely a player is to be unhappy (and test the portal) at a given salary
+  DY.nilRisk = (p, amt) => {
+    const v = p.nilV || DY.nilValue(p, DY.userT()), r = amt / Math.max(10000, v);
+    let risk = r >= 1 ? 0.03 : r >= 0.85 ? 0.12 : r >= 0.65 ? 0.3 : 0.55;
+    if (amt < (p.nil0 != null ? p.nil0 : p.nil)) risk += 0.2;
+    risk *= 1 + (p.tr.ego - 60) / 120; risk *= 1 - (p.tr.loyal - 60) / 160;
+    return clamp(risk, 0.01, 0.9);
+  };
+  DY.riskLabel = r => r < 0.1 ? 'Low' : r < 0.3 ? 'Medium' : 'High';
+  DY.adjustNil = (id, amt) => {
+    const g = G(), p = DY.P(id), ut = DY.userT();
+    amt = Math.max(0, Math.round(amt / 5000) * 5000);
+    if (DY.payroll(ut) - p.nil + amt > ut.budget * 1.02) return `Over budget: ${DY.money(ut.budget - DY.payroll(ut))} open.`;
+    if (p.nil0 == null) p.nil0 = p.nil;
+    p.nil = amt; g.off.nilAdj[id] = amt; return null;
+  };
   DY.resolveNilAsks = () => {
     const g = G(), ut = DY.userT();
+    // salary changes you made: a cut can sour him
+    Object.keys(g.off.nilAdj || {}).forEach(id => { const p = DY.P(+id); if (p.nil0 != null && p.nil < p.nil0) { if (chance(DY.nilRisk(p, p.nil))) { p.unhappy = true; DY.addLog(p, `Took an NIL cut to ${DY.money(p.nil)} and was not happy about it.`); } } delete p.nil0; });
     g.off.nilAsk.forEach(a => {
       const p = DY.P(a.id);
       let yes = a.ans;
@@ -323,13 +372,13 @@
     const g = G(), pool = [];
     const userOff = g.settings.portal === 'off';
     g.teams.forEach(t => {
-      t.roster.slice().forEach(id => {
-        const p = DY.P(id);
-        if (t.user && userOff) return;
-        if (chance(DY.portalChance(p, t) * (t.user ? 1 : 0.8))) {
-          p.portal = { from: t.id, offers: {}, why: portalWhy(p, t), round: 0 };
-          pool.push(p.id);
-        }
+      if (t.user && userOff) return;
+      const gone = g.off && t.user ? g.off.leaving.length : 0;
+      const ent = t.roster.map(DY.P).filter(p => chance(DY.portalChance(p, t) * (t.user ? 1 : 0.8)));
+      // caps: 15 transfers out, 30 departures in all
+      ent.sort((a, b) => DY.portalChance(b, t) - DY.portalChance(a, t)).slice(0, Math.max(0, Math.min(DY.CAP.tout, DY.CAP.out - gone))).forEach(p => {
+        p.portal = { from: t.id, offers: {}, why: portalWhy(p, t), round: 0 };
+        pool.push(p.id);
       });
     });
     g.off.portal = { pool, round: 1, rounds: 2, mine: {}, log: [], retain: {} };
@@ -350,7 +399,9 @@
     const g = G(), p = DY.P(id), ut = DY.userT(), P = g.off.portal;
     const committed = Object.values(P.mine).reduce((s, v) => s + v, 0) - (P.mine[id] || 0);
     if (DY.payroll(ut) + committed + amt > ut.budget * 1.05) return `That offer puts you over your NIL budget (${DY.money(ut.budget - DY.payroll(ut) - committed)} left).`;
-    if (DY.rosterRoom() <= 0 && !P.mine[id]) return 'Your roster is full: 105 players counting signees and transfer offers.';
+    if (DY.rosterRoom() <= 0 && !P.mine[id]) return `Your roster is full: ${DY.rosterMax()} players counting signees and transfer offers.`;
+    if (!P.mine[id] && DY.transfersIn() >= DY.CAP.tin) return `That is ${DY.CAP.tin} transfer offers already (the limit).`;
+    if (!P.mine[id] && DY.newcomers() >= DY.CAP.newcomers) return `That is ${DY.CAP.newcomers} newcomers already (signees plus transfers).`;
     P.mine[id] = Math.max(0, Math.round(amt / 5000) * 5000); return null;
   };
   // each round: CPU teams make offers, players pick the best mix of money, role, brand and home
@@ -379,7 +430,7 @@
         const best = offers.sort((a, b) => val(b) - val(a))[0];
         if (final || chance(0.55) || +best[0] === ut.id && chance(0.3)) {
           const t = g.teams[best[0]];
-          p.t = t.id; p.nil = best[1]; t.roster.push(p.id); p.prevT = p.portal.from; DY.addLog(p, `Transferred from ${g.teams[p.portal.from].name} to ${t.name}.`);
+          p.t = t.id; p.nil = best[1]; t.roster.push(p.id); p.prevT = p.portal.from; p.tin = g.season; DY.addLog(p, `Transferred from ${g.teams[p.portal.from].name} to ${t.name}.`);
           if (t.user) { P.log.unshift(`${p.n} (${p.pos}, ${p.ovr}) commits to Tennessee from ${g.teams[p.portal.from].name}.`); DY.news('portal', `Transfer: ${p.n} picks Tennessee`, `${p.pos}, ${p.ovr} OVR, from ${g.teams[p.portal.from].name}.`, { pid: p.id }); }
           else if (p.portal.from === ut.id) P.log.unshift(`${p.n} transfers to ${t.name}.`);
           delete P.mine[id];
@@ -401,11 +452,14 @@
     let n = 0;
     P.pool.map(DY.P).filter(p => p.portal && p.portal.from !== ut.id).sort((a, b) => b.ovr - a.ovr).forEach(p => {
       const L = DY.lineup(ut), st = (L[p.pos] || []).slice(0, DY.STARTERS[p.pos] || 1), worst = st[st.length - 1];
-      if (DY.rosterRoom() <= 0 || n >= 6) return;
-      if ((needs[p.pos] > 1 && p.ovr >= 74) || (worst && p.ovr >= worst.ovr + 2)) { n++; const amt = Math.round(DY.nilValue(p, ut) * 1.05 / 5000) * 5000; if (amt < room * 0.4) { P.mine[p.id] = amt; room -= amt; } }
+      const short = DY.rosterRoom() > 10;
+      if (DY.rosterRoom() <= 0 || n >= (short ? 12 : 6) || DY.newcomers() >= DY.CAP.newcomers) return;
+      if ((needs[p.pos] > (short ? 0 : 1) && p.ovr >= (short ? 70 : 74)) || (worst && p.ovr >= worst.ovr + 2)) { n++; const amt = Math.round(DY.nilValue(p, ut) * 1.05 / 5000) * 5000; if (amt < room * 0.4) { P.mine[p.id] = amt; room -= amt; } }
     });
   }
-  DY.rosterRoom = () => { const g = G(), ut = DY.userT(), P = g.off && g.off.portal; const commits = g.recruit && !g.recruit.signed ? DY.myCommits().length : 0; return 105 - ut.roster.length - commits - (P ? Object.keys(P.mine).length : 0); };
+  DY.transfersIn = () => { const g = G(), P = g.off && g.off.portal; return (P ? Object.keys(P.mine).length : 0) + DY.userT().roster.map(DY.P).filter(p => p.prevT != null && p.tin === g.season).length; };
+  DY.newcomers = () => { const g = G(); const commits = g.recruit && !g.recruit.signed ? Math.min(DY.CAP.hs, DY.myCommits().length) : DY.userT().roster.map(DY.P).filter(p => p.firstY === g.season + 1).length; return commits + DY.transfersIn(); };
+  DY.rosterRoom = () => { const g = G(), ut = DY.userT(), P = g.off && g.off.portal; const commits = g.recruit && !g.recruit.signed ? DY.myCommits().length : 0; return DY.rosterMax() + 4 - ut.roster.length - commits - (P ? Object.keys(P.mine).length : 0); };
   DY.portalPlayers = () => { const P = G().off.portal; return P ? P.pool.map(DY.P).filter(p => p && p.portal) : []; };
 
   /* signing day: commits sign, uncommitted players pick their leader, everyone fills out a class */
@@ -413,10 +467,10 @@
     const g = G(), R = g.recruit, ut = DY.userT();
     const userOff = g.settings.recruiting === 'off';
     const counts = {}; g.teams.forEach(t => counts[t.id] = 0);
-    const cap = t => t.user ? Math.max(0, 105 - t.roster.length) : Math.max(0, 54 - t.roster.length);
+    const cap = t => t.user ? Math.max(0, Math.min(DY.CAP.hs, DY.CAP.newcomers - DY.transfersIn(), DY.rosterMax() + 6 - t.roster.length)) : Math.max(0, 54 - t.roster.length);
     const sign = (p, t) => {
-      delete p.pros; delete p.interest; delete p.acts; p.t = t.id; p.yr = 1; p.el = 4; p.rsAvail = true; p.car = {}; p.aw = []; p.log = []; p.firstY = g.season + 1;
-      p.nil = t.user ? Math.round((p.nilOffer || DY.nilValue(p, t) * 0.6) / 5000) * 5000 : 0;
+      delete p.pros; delete p.interest; delete p.acts; p.t = t.id; p.yr = 1; p.el = 5; p.car = {}; p.aw = []; p.log = []; p.firstY = g.season + 1;
+      p.nil = t.user ? Math.round((p.nilOffer || DY.recruitNil(p) * 0.8) / 5000) * 5000 : 0;
       G().P[p.id] = p; t.roster.push(p.id); counts[t.id]++;
       DY.addLog(p, `Signed with ${t.name} (${p.rec.stars}★, No. ${p.rec.nat} nationally).`);
     };
@@ -428,27 +482,56 @@
         tid = order.find(id => { const t = g.teams[id]; return t && counts[id] < cap(t) && (!t.user || (p.offer && !userOff)); });
       }
       const t = tid != null ? g.teams[tid] : null;
-      if (t && (counts[t.id] < cap(t) || p.commit === t.id) && !(t.user && userOff && !p.real)) sign(p, t);
+      if (t && (counts[t.id] < cap(t) || (p.commit === t.id && (!t.user || counts[t.id] < DY.CAP.hs))) && !(t.user && userOff && !p.real)) sign(p, t);
     });
     // CPU (and recruiting-off Tennessee) fill the rest with lower-rated prospects
     g.teams.forEach(t => {
-      const n = cap(t) - counts[t.id] - (t.user ? 0 : 0);
-      if (t.user && !userOff) return;
+      const n = cap(t) - counts[t.id];
       const needs = DY.teamNeeds(t);
-      for (let i = 0; i < Math.min(n, t.user ? 24 : 16); i++) {
+      // Tennessee (when recruiting is on) only fills real holes: positions where next year's roster is short
+      let fill = t.user && !userOff && !R.locked && DY.myCommits().length >= 14 ? 0 : t.user && !userOff ? Object.keys(needs).filter(k => needs[k] >= 2).reduce((s, k) => s + Math.ceil(needs[k] / 2), 0) : Math.min(n, t.user ? 20 : 16);
+      if (t.user && !userOff) { Object.keys(needs).forEach(k => { needs[k] = needs[k] >= 2 ? Math.ceil(needs[k] / 2) : 0; }); }
+      for (let i = 0; i < Math.min(n, fill); i++) {
+        if (t.user && !userOff && !Object.values(needs).some(v => v > 0)) break;
         const pos = wpick(Object.keys(needs), k => needs[k] + 0.4);
         const c = clamp(0.80 + (t.prestige - 40) / 600 + gauss() * 0.02, 0.76, 0.95);
         const p = prospect(pos, Math.round(c * 1e4) / 1e4, { st: chance(0.6) ? t.st : undefined });
-        p.rec.nat = null; sign(p, t); needs[pos] = Math.max(0, needs[pos] - 1);
+        p.rec.nat = null; if (t.user) p.late = true; sign(p, t); needs[pos] = Math.max(0, needs[pos] - 1);
       }
     });
     // every roster needs bodies at every spot: walk-ons where a team came up short
     const MIN = { QB: 2, RB: 2, WR: 4, TE: 2, OT: 3, IOL: 4, EDGE: 3, DT: 3, LB: 3, CB: 3, S: 3, K: 1, P: 1 };
     g.teams.forEach(t => { for (const pos in MIN) { let have = t.roster.map(DY.P).filter(p => p.pos === pos).length; while (have < MIN[pos]) { const p = prospect(pos, 0.78, { st: t.st }); p.rec.nat = null; p.walkon = true; sign(p, t); have++; } } });
+    // preferred walk-ons keep Tennessee's roster near the limit (they count as newcomers)
+    if (!userOff) {
+      const tn = DY.teamNeeds(ut);
+      let k = 0;
+      while (ut.roster.length < DY.rosterMax() - 2 && DY.newcomers() < DY.CAP.newcomers && k++ < 15) {
+        const pos = wpick(Object.keys(tn), x => (tn[x] || 0) + 0.3);
+        const p = prospect(pos, Math.round(clamp(0.79 + gauss() * 0.015, 0.76, 0.84) * 1e4) / 1e4, { st: ut.st }); p.rec.nat = null; p.walkon = true; sign(p, ut); tn[pos] = Math.max(0, (tn[pos] || 0) - 1);
+      }
+    }
     const mine = ut.roster.map(DY.P).filter(p => p.firstY === g.season + 1);
     DY.news('signing', `Signing day: Tennessee signs ${mine.length}`, `Class rank: No. ${R.classRank || '—'}. Headliners: ${mine.sort((a, b) => b.rec.c - a.rec.c).slice(0, 3).map(p => p.n + ' (' + p.rec.stars + '★ ' + p.pos + ')').join(', ')}.`);
     g.recruit.signed = true; g.recruit.finalRank = R.classRank;
   };
+
+  /* cut-down day: get under the roster limit before the season (you choose, or the staff cuts the lowest) */
+  DY.cutScore = p => p.ovr + (DY.GRADES.length - DY.gradeIdx(p.potG)) * 0.8 - p.yr * 0.6 + (p.captain ? 20 : 0) + (p.pos === 'K' || p.pos === 'P' ? 6 : 0);
+  DY.cutsNeeded = () => Math.max(0, DY.userT().roster.length - DY.rosterMax());
+  DY.autoCuts = final => {
+    const g = G(), ut = DY.userT(), o = g.off;
+    o.cut = o.cut || [];
+    // CPU teams stay at 54-60
+    if (final) g.teams.forEach(t => { if (t.user) return; const extra = t.roster.length - 60; if (extra > 0) { const out = t.roster.map(DY.P).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)).slice(0, extra); out.forEach(p => { p.t = null; p.gone = g.season; p.leave = 'cut'; }); t.roster = t.roster.filter(id => DY.P(id).t === t.id); } });
+    if (!final) return;
+    let need = DY.cutsNeeded() - o.cut.length;
+    if (need > 0) { const order = ut.roster.map(DY.P).filter(p => !o.cut.includes(p.id)).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)); order.slice(0, need).forEach(p => o.cut.push(p.id)); }
+    o.cut.forEach(id => { const p = DY.P(id); if (!p || p.t !== ut.id) return; p.t = null; p.t0 = ut.id; p.gone = g.season; p.leave = 'cut'; DY.addLog(p, 'Released at roster cut-down.'); });
+    ut.roster = ut.roster.filter(id => DY.P(id).t === ut.id);
+    DY.refreshDepth(ut);
+  };
+  DY.toggleCut = id => { const o = G().off; o.cut = o.cut || []; const i = o.cut.indexOf(id); if (i >= 0) o.cut.splice(i, 1); else o.cut.push(id); };
 
   /* the NFL Draft: 7 rounds plus comp picks */
   DY.runDraft = () => {
@@ -471,27 +554,33 @@
     const before = p.ovr, ceil0 = p.ceil;
     let mult = (0.7 + p.tr.work / 170);
     if (t.user) { if (arch === 'developer') mult *= 1.06; if (arch === 'guru' && side === 'O') mult *= 1.1; if (arch === 'architect' && side === 'D') mult *= 1.1; }
-    let gr = Math.max(0, p.ceil - p.ovr) * (GROW[Math.min(6, p.yr)] || 0.05) * mult;
-    // performance last season vs what you would expect from his rating
-    const notes = [];
+    const base0 = Math.max(0, p.ceil - p.ovr) * (GROW[Math.min(6, p.yr)] || 0.05) * mult * 0.9;
+    let gr = base0;
+    // performance last season vs what you would expect from his rating (players who play and produce grow faster)
+    const notes = [], why = [];
+    why.push(`expected path ${base0 >= 0.5 ? '+' + base0.toFixed(1) : '0'} (${p.potG} potential, year ${p.yr}${p.tr.work >= 80 ? ', strong work ethic' : p.tr.work <= 45 ? ', questionable work ethic' : ''})`);
     if ((p.lastGp || 0) >= 6 && p.lastScore > 0) {
       const exp = { QB: 95, RB: 75, WR: 70, TE: 70, OT: 110, IOL: 110, EDGE: 60, DT: 66, LB: 75, CB: 50, S: 50, K: 50, P: 30 }[p.pos] || 60;
-      const z = clamp((p.lastScore - exp * (p.ovr / 82)) / (exp * 0.45), -1.5, 2.5);
-      gr += z * 1.1;
+      const z = clamp((p.lastScore - exp * (p.ovr / 82)) / (exp * 0.45), -1.5, 2);
+      gr += z * 1.4;
+      why.push(`performance ${z >= 0 ? '+' : ''}${(z * 1.4).toFixed(1)} (${p.lastGp} games${z > 0.8 ? ', produced above his rating' : z < -0.5 ? ', underperformed' : ''})`);
       if (z > 1.2) notes.push('a big season pushed him forward');
-      if (z > 1.8 && p.ovr >= p.ceil - 2) { p.ceil = Math.min(99, p.ceil + ri(2, 4)); notes.push('exceeded his potential'); }
-    }
+      if (z > 1.6 && p.ovr >= p.ceil - 2) { p.ceil = Math.min(99, p.ceil + ri(1, 3)); notes.push('exceeded his potential'); }
+    } else if ((p.lastGp || 0) <= 2 && p.yr >= 2) { gr *= 0.8; why.push('barely played (slower growth)'); }
     const aw = p.aw.filter(a => a.y === g.season).map(a => a.a);
-    const awb = Math.min(3, aw.reduce((s, a) => s + ({ HEIS: 3, AA1: 2.5, AA2: 1.8, FRAA: 1.5, SEC1: 1.2, SEC2: 0.8 }[a] || 0), 0));
-    gr += awb; if (awb >= 1.5) notes.push('awards confidence');
+    const awb = Math.min(2.5, aw.reduce((s, a) => s + ({ HEIS: 2.5, AA1: 2, AA2: 1.4, FRAA: 1.2, SEC1: 1, SEC2: 0.6 }[a] || 0), 0));
+    if (awb) { gr += awb; why.push(`awards +${awb.toFixed(1)}`); }
     // boom or bust
-    const bustP = 0.06 * (t.user && arch === 'developer' ? 0.6 : 1), boomP = 0.07;
+    const bustP = 0.06 * (t.user && arch === 'developer' ? 0.6 : 1), boomP = 0.06;
     const r = rnd();
-    if (p.yr <= 3 && r < boomP) { const b = ri(3, 8); p.ceil = Math.min(99, p.ceil + b); gr += ri(2, 4); notes.push(pick(['breakout offseason', 'added 12 pounds of muscle', 'the game slowed down for him', 'a monster spring camp'])); p.boom = (p.boom || 0) + 1; }
-    else if (r < boomP + bustP) { const b = ri(3, 7); p.ceil = Math.max(p.ovr, p.ceil - b); gr *= 0.35; notes.push(pick(['development stalled', 'a lingering injury slowed him', 'struggled to pick up the scheme', 'motivation questions'])); p.bust = (p.bust || 0) + 1; }
-    else if (p.yr >= 3 && r < boomP + bustP + 0.04) { p.ceil = Math.min(99, p.ceil + ri(2, 4)); gr += 1.5; notes.push('late bloomer'); }
-    gr += gauss() * 1.6;
-    gr = clamp(gr, -2.5, 13);
+    if (p.yr <= 3 && r < boomP) { const b = ri(3, 6); p.ceil = Math.min(99, p.ceil + b); gr += ri(1, 3); const w = pick(['breakout offseason', 'added 12 pounds of muscle', 'the game slowed down for him', 'a monster spring camp']); notes.push(w); why.push('BOOM: ' + w); p.boom = (p.boom || 0) + 1; }
+    else if (r < boomP + bustP) { const b = ri(3, 6); p.ceil = Math.max(p.ovr, p.ceil - b); gr *= 0.4; const w = pick(['development stalled', 'a lingering injury slowed him', 'struggled to pick up the scheme', 'motivation questions']); notes.push(w); why.push('BUST: ' + w); p.bust = (p.bust || 0) + 1; }
+    else if (p.yr >= 3 && r < boomP + bustP + 0.04) { p.ceil = Math.min(99, p.ceil + ri(2, 4)); gr += 1.2; notes.push('late bloomer'); why.push('late bloomer'); }
+    gr += gauss() * 1.1;
+    // big jumps are rare: soften anything past +7
+    if (gr > 7) gr = 7 + (gr - 7) * 0.45;
+    gr = clamp(gr, -3, 11);
+    p.why = why;
     if (p.pos === 'K' || p.pos === 'P' || p.pos === 'LS') gr = clamp(gr * 0.45, -2, 4);
     // apply to attributes: the ones that count most for his position move most; speed peaks early
     const w = DY.W[p.pos];
@@ -511,7 +600,7 @@
     if (p.yr >= 4) p.tr.lead = Math.min(99, p.tr.lead + ri(0, 3));
     const delta = p.ovr - before;
     if (t.user) DY.addLog(p, `Offseason: ${delta >= 0 ? '+' : ''}${delta} (${before} → ${p.ovr}).${notes.length ? ' ' + notes.join('; ') + '.' : ''}`);
-    return { id: p.id, before, after: p.ovr, delta, ceil0, ceil: p.ceil, notes };
+    return { id: p.id, before, after: p.ovr, delta, ceil0, ceil: p.ceil, notes, why };
   };
   DY.progressAll = () => {
     const g = G(), ut = DY.userT();
@@ -543,6 +632,50 @@
   };
   DY.legacyBoard = n => Object.entries(G().legacy).map(([id, v]) => ({ p: DY.P(+id), v })).filter(x => x.p).sort((a, b) => b.v - a.v).slice(0, n || 10);
 
+  /* ---------- captains and preseason camp ---------- */
+  // two captains on each side of the ball: leadership first, then experience and ability
+  DY.pickCaptains = t => {
+    const ps = t.roster.map(DY.P).filter(Boolean);
+    const keep = ps.filter(p => p.captain && p.capY === G().season);
+    ps.forEach(p => { if (!keep.includes(p) && !(p.captain && p.capFix)) p.captain = false; });
+    const score = p => p.tr.lead * 0.6 + p.ovr * 0.3 + p.yr * 3;
+    ['O', 'D'].forEach(side => {
+      const cur = ps.filter(p => p.captain && DY.SIDE(p.pos) === side);
+      ps.filter(p => !p.captain && DY.SIDE(p.pos) === side && p.yr >= 3).sort((a, b) => score(b) - score(a)).slice(0, Math.max(0, 2 - cur.length)).forEach(p => { p.captain = true; });
+    });
+    ps.filter(p => p.captain).forEach(p => { p.capY = G().season; });
+  };
+  DY.CAMP_FOCUS = { pass: ['Throwing', ['sac', 'mac', 'dac', 'tup', 'thp']], hands: ['Hands & routes', ['cth', 'cit', 'srr', 'drr', 'rls']], run: ['Running', ['bcv', 'btk', 'elu', 'car']],
+    block: ['Blocking', ['rbk', 'pbk']], rush: ['Pass rush', ['pmv', 'fmv', 'bsh']], cover: ['Coverage', ['mcv', 'zcv', 'prc', 'prs']], tackle: ['Tackling', ['tak', 'pur', 'hit']],
+    kick: ['Kicking', ['kpw', 'kac']], pot: ['Potential', []] };
+  DY.CAMP_MAX = 4;
+  DY.campPlayer = (id, f) => {
+    const g = G(), p = DY.P(id); g.camp = g.camp || { y: g.season, list: [] };
+    if (g.camp.y !== g.season) g.camp = { y: g.season, list: [] };
+    if (g.phase !== 'preseason') return 'Camp is in the preseason.';
+    if (g.camp.list.length >= DY.CAMP_MAX) return `You have used all ${DY.CAMP_MAX} camp spots.`;
+    if (g.camp.list.some(x => x.id === id)) return 'He is already in camp.';
+    const F = DY.CAMP_FOCUS[f]; if (!F) return 'Pick a focus.';
+    const before = p.ovr;
+    if (f === 'pot') { p.ceil = Math.min(99, p.ceil + ri(1, 3)); }
+    else { const keys = F[1].filter(k => p.at[k] != null); if (!keys.length) return 'That focus does not fit his position.'; keys.forEach(k => { p.at[k] = Math.min(99, p.at[k] + ri(1, 3)); }); DY.setOvr(p); if (p.ceil < p.ovr) p.ceil = p.ovr; }
+    g.camp.list.push({ id, f, d: p.ovr - before });
+    DY.addLog(p, `Preseason camp (${F[0].toLowerCase()}): ${p.ovr - before >= 0 ? '+' : ''}${p.ovr - before}.`);
+    return `${p.n}: ${F[0]} camp, ${before} → ${p.ovr}.`;
+  };
+  // the staff fills unused camp spots: young starters-in-waiting with the most room to grow
+  DY.autoCamp = () => {
+    const g = G(); if (g.phase !== 'preseason') return;
+    const t = DY.userT(), used = (g.camp && g.camp.y === g.season ? g.camp.list : []).map(x => x.id);
+    const cands = t.roster.map(DY.P).filter(p => !used.includes(p.id) && p.pos !== 'K' && p.pos !== 'P').sort((a, b) => (b.ceil - b.ovr) * (6 - b.yr) - (a.ceil - a.ovr) * (6 - a.yr));
+    for (const p of cands) {
+      if (g.camp && g.camp.y === g.season && g.camp.list.length >= DY.CAMP_MAX) break;
+      const W = DY.W[p.pos] || {};
+      const best = Object.entries(DY.CAMP_FOCUS).filter(([k]) => k !== 'pot').map(([k, f]) => [k, f[1].reduce((s, a) => s + (W[a] || 0), 0)]).sort((a, b) => b[1] - a[1])[0];
+      if (best && best[1] > 0) DY.campPlayer(p.id, best[0]);
+    }
+  };
+
   /* ---------- a new season ---------- */
   DY.cleanNonconf = y => {
     const g = G(), arr = g.nonconfPick && g.nonconfPick[y]; if (!arr) return;
@@ -569,6 +702,8 @@
     if (h) ut.prestige = clamp(ut.prestige + (h.w - 8) * 0.4 + (h.finish === 'National champions' ? 3 : h.cfpSeed ? 1 : 0), 60, 97);
     trimPlayers();
     g.post = null; g.off = null; g.polls.cfp = null; g.phase = 'preseason'; g.week = 0;
+    g.teams.forEach(t => DY.pickCaptains(t));
+    g.camp = { y: g.season, list: [] };
     DY.buildSchedule(g.season);
     DY.preseasonPoll();
     DY.initRecruiting(true);

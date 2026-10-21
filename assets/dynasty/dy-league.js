@@ -17,7 +17,11 @@
   DY.thirdSatOct = y => { const d = new Date(Date.UTC(y, 9, 1)); while (d.getUTCDay() !== 6) d.setUTCDate(d.getUTCDate() + 1); d.setUTCDate(d.getUTCDate() + 14); return Math.round((d - DY.firstSat(y)) / (7 * 864e5)) + 1; };
   DY.dateStr = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
   DY.LAST_WK = 13;
-  DY.CFP_WEEKS = [10, 11, 12, 13];     // CFP rankings come out the Tuesday after these weeks (early November on)
+  DY.CFP_WEEKS = [10, 11, 12, 13];
+  // difficulty: CPU players get this added to every rating on every snap of your games (Heisman is the balanced default)
+  DY.DIFF = { freshman: -4, varsity: -2, heisman: 0 };
+  // playoff size: the real format is 12 teams in 2026 and 24 teams from 2027 (no conference title games)
+  DY.cfpSize = () => { const g = G(), c = g.settings.cfp; return c === 'real' || c == null ? (g.season >= 2027 ? 24 : 12) : +c; };     // CFP rankings come out the Tuesday after these weeks (early November on)
 
   /* ---------- new dynasty ---------- */
   DY.newDynasty = opts => {
@@ -26,10 +30,10 @@
     const g = DY.G = {
       v: DY.VERSION, seed, season: 2026, startSeason: 2026, phase: 'preseason', week: 0, P: {}, nextId: 1, teams: [], user: DY.UT_ID,
       coach: { name: opts.coach || 'Coach', arch: opts.arch || 'motivator', w: 0, l: 0, hist: [] },
-      settings: Object.assign({ cfp: 12, recruiting: 'manual', portal: 'manual', nil: 'manual', coachMode: 'offense', speed: 'slow', injuries: true, shake: true, difficulty: 'varsity', autosave: true }, opts.settings || {}),
+      settings: Object.assign({ cfp: 'real', recruiting: 'manual', portal: 'manual', nil: 'manual', coachMode: 'offense', speed: 'slow', injuries: true, shake: true, difficulty: 'heisman', autosave: true, offStyle: 'power', watchSeason: false }, opts.settings || {}),
       sched: [], polls: { ap: [], cfp: null, hist: {} }, news: [], hist: [], awards: {}, rec: null, legacy: {}, post: null, off: null, recruit: null, created: Date.now(),
     };
-    g.settings.diffBoost = { freshman: -3, varsity: 0, allamerican: 1.5, heisman: 3 }[g.settings.difficulty] || 0;
+    g.settings.diffBoost = DY.DIFF[g.settings.difficulty] || 0;
     DY.TEAMS.forEach(t0 => {
       const t = Object.assign({}, t0, { roster: [], depth: {}, w: 0, l: 0, cw: 0, cl: 0, pf: 0, pa: 0, res: [], hist: [] });
       t.style = DY.STYLE_OF[t.name] || wpick(Object.keys(DY.STYLES).filter(s => s !== 'option'), s => s === 'spread' ? 4 : s === 'pro' ? 3 : s === 'tempo' ? 2 : s === 'air' ? 1 : 1.2);
@@ -40,9 +44,10 @@
       if (t.id === DY.UT_ID) { t.user = true; DY.importTennessee(t); t.depthEdited = true; } else DY.genRoster(t);
     });
     const ut = DY.userT();
-    if (g.coach.arch === 'guru') ut.style = 'tempo';
+    ut.style = g.settings.offStyle || 'power'; DY.pickCaptains(ut);
     // NIL: contracts sized to the budget
     DY.initNil(ut);
+    g.teams.forEach(t => DY.pickCaptains(t)); g.camp = { y: g.season, list: [] };
     g.teams.forEach(t => { const o = DY.teamOvr(t); t.elo = 1500 + (o.ovr - 76) * 26 + (t.prestige - 70) * 1.2; t.preElo = t.elo; });
     DY.buildSchedule(g.season);
     DY.preseasonPoll();
@@ -256,6 +261,18 @@
       x.box = { ts: GM.ts, ls: GM.lineScore, ps: Object.fromEntries(Object.entries(GM.ps).filter(([id]) => +id > 0)), drives: GM.drives.length, top: DY.topPerf(GM) };
       DY.checkRecords(GM, x);
     } else if (x.post || DY.apRank(x.h) <= 10 || DY.apRank(x.a) <= 10) x.box = { top: DY.topPerf(GM), ls: GM.lineScore };
+    // rivalry series (Tennessee) and trophies (everyone)
+    {
+      const key = [H.name, A.name].sort().join('|');
+      if (x.h === g.user || x.a === g.user) {
+        const o = x.h === g.user ? A : H, won = (x.h === g.user) === hw;
+        const sr = (g.series = g.series || {})[o.name] = g.series[o.name] || { w: 0, l: 0, streak: 0, last: null };
+        if (won) { sr.w++; sr.streak = sr.streak > 0 ? sr.streak + 1 : 1; } else { sr.l++; sr.streak = sr.streak < 0 ? sr.streak - 1 : -1; }
+        sr.last = g.season;
+      }
+      const tro = DY.TROPHIES[key];
+      if (tro && !x.post) { const tr = (g.trophy = g.trophy || {}); const prev = tr[key]; tr[key] = W.id; if (prev != null && prev !== W.id) DY.news('rival', `${W.name} takes the ${tro}`, `${W.name} ${Math.max(GM.score.h, GM.score.a)}, ${Lz.name} ${Math.min(GM.score.h, GM.score.a)}.`); }
+    }
     // records and standings
     if (!x.post || x.post === 'bowl' || x.post) {
       W.w++; Lz.l++;
@@ -299,7 +316,14 @@
     DY.updatePolls(w);
     DY.weekNews(w);
     g.week++;
-    if (g.week > DY.LAST_WK) { g.phase = 'ccg'; DY.setupCCG(); }
+    if (g.week > DY.LAST_WK) {
+      if (DY.cfpSize() === 24) {
+        // no title games: the regular-season leader is the champion (tiebreakers in standings)
+        for (const conf in DY.CONF_GAMES) { const st = DY.standings(conf); if (st[0]) { st[0].champ = g.season; st[0].confChamp = (st[0].confChamp || 0) + 1; } }
+        g.post = { label: 'Selection', games: [], stage: 'ccg', rounds: [], bowls: [], seeds: [] };
+        DY.updatePolls(14); DY.selection();
+      } else { g.phase = 'ccg'; DY.setupCCG(); }
+    }
   };
   DY.healWeek = () => { const g = G(); g.teams.forEach(t => t.roster.forEach(id => { const p = DY.P(id); if (p.inj) { p.inj.wks--; if (p.inj.wks <= 0) p.inj = null; } })); };
   DY.startSeason = () => {
@@ -341,7 +365,7 @@
       const me = x.h === t.id, o = DY.T(me ? x.a : x.h), w = me ? x.res.h > x.res.a : x.res.a > x.res.h;
       const oe = o.fbs ? o.elo : 1250, mar = Math.abs(x.res.h - x.res.a);
       if (w) win += o.fbs ? 10 + clamp((oe - 1450) / 9, 0, 26) + Math.min(mar, 28) / 7 : 1;
-      else pen += 74 - clamp((oe - 1520) / 5, 0, 42) + Math.min(mar, 28) / 3 + (o.fbs ? 0 : 60);
+      else pen += (74 - clamp((oe - 1520) / 5, 0, 42) + Math.min(mar, 28) / 3 + (o.fbs ? 0 : 60)) * (x.post === 'ccg' ? 0.3 : 1);
     });
     return { pen, win };
   }
@@ -410,12 +434,12 @@
 
   /* ---------- the playoff ---------- */
   DY.selection = () => {
-    const g = G(), size = g.settings.cfp === 24 ? 24 : 12;
+    const g = G(), size = DY.cfpSize();
     const cfp = g.polls.cfp.map(x => DY.T(x.t));
     const all = g.teams.slice().sort((a, b) => DY.cfpKey(b, true) - DY.cfpKey(a, true));
     const champs = all.filter(t => t.champ === g.season);
     const p4c = champs.filter(t => DY.P4.includes(t.conf));
-    const g6c = champs.filter(t => !DY.P4.includes(t.conf)).slice(0, size === 24 ? 2 : 1);
+    const g6c = champs.filter(t => !DY.P4.includes(t.conf)).slice(0, 1);
     const field = [...new Set([...p4c, ...g6c])];
     for (const t of all) { if (field.length >= size) break; if (!field.includes(t)) field.push(t); }
     field.sort((a, b) => all.indexOf(a) - all.indexOf(b));
@@ -447,7 +471,8 @@
       else if (r === 2) games = [[0, 1], [2, 3]].map(([a, b], i) => site(prevW[a], prevW[b], false, (i ? 'Cotton Bowl' : 'Orange Bowl') + ' (CFP Semifinal)'));
       else if (r === 3) games = [site(prevW[0], prevW[1], false, 'CFP National Championship')];
     } else {
-      if (r === 0) games = [[8, 23], [15, 16], [11, 20], [12, 19], [9, 22], [14, 17], [10, 21], [13, 18]].map(([a, b]) => site(S[a], S[b], true, 'CFP First Round'));
+      // first round 9-24 at the higher seed; second round at seeds 1-8 (1 vs 16/17, 8 vs 9/24, 4 vs 13/20, 5 vs 12/21, ...)
+      if (r === 0) games = [[15, 16], [8, 23], [12, 19], [11, 20], [14, 17], [9, 22], [13, 18], [10, 21]].map(([a, b]) => site(S[a], S[b], true, 'CFP First Round'));
       else if (r === 1) games = [0, 7, 3, 4, 1, 6, 2, 5].map((seed, i) => site(S[seed], prevW[i], true, 'CFP Second Round'));
       else if (r === 2) { const bowls = DY.shuffle(DY.NY6).slice(0, 4); games = [[0, 1], [2, 3], [4, 5], [6, 7]].map(([a, b], i) => site(prevW[a], prevW[b], false, bowls[i] + ' (CFP Quarterfinal)')); }
       else if (r === 3) games = [[0, 1], [2, 3]].map(([a, b], i) => site(prevW[a], prevW[b], false, (i ? 'Cotton Bowl' : 'Orange Bowl') + ' (CFP Semifinal)'));

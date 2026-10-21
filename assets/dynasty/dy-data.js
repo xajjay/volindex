@@ -337,11 +337,56 @@ Sacramento State|SAC|42|#043927|#C4B581|CA`;
     'Cure Bowl', 'Frisco Bowl', 'Myrtle Beach Bowl', 'Arizona Bowl', 'Bahamas Bowl', 'Famous Idaho Potato Bowl', 'New Orleans Bowl', 'Salute to Veterans Bowl'];
   DY.NY6 = ['Rose Bowl', 'Sugar Bowl', 'Orange Bowl', 'Cotton Bowl', 'Fiesta Bowl', 'Peach Bowl'];
   // team identity (offensive style) by school; others are drawn at random
-  DY.STYLE_OF = { Tennessee: 'tempo', 'Texas Tech': 'air', Army: 'option', Navy: 'option', 'Air Force': 'option', Iowa: 'power', Wisconsin: 'power',
+  DY.STYLE_OF = { Tennessee: 'power', 'Texas Tech': 'air', Army: 'option', Navy: 'option', 'Air Force': 'option', Iowa: 'power', Wisconsin: 'power',
     Georgia: 'pro', Alabama: 'pro', Michigan: 'power', 'Ohio State': 'spread', Oregon: 'tempo', 'Ole Miss': 'tempo', LSU: 'pro', Texas: 'spread',
     'Washington State': 'air', 'Mississippi State': 'air', SMU: 'tempo', 'Kansas State': 'power', Indiana: 'spread' };
+  // offensive identities: pass rate, seconds between snaps, and how often each formation is used
   DY.STYLES = {
-    pro: { name: 'Pro style', pass: 0.45, tempo: 37 }, spread: { name: 'Spread RPO', pass: 0.47, tempo: 33 }, tempo: { name: 'Up-tempo spread', pass: 0.49, tempo: 28 },
-    air: { name: 'Air Raid', pass: 0.58, tempo: 30 }, power: { name: 'Power run', pass: 0.38, tempo: 38 }, option: { name: 'Triple option', pass: 0.14, tempo: 38 },
+    power: { name: 'Power run (12 personnel)', pass: 0.43, tempo: 33, forms: { ace12: 0.33, pistol: 0.2, trips: 0.2, iform: 0.14, doubles: 0.13 } },
+    pro: { name: 'Pro style', pass: 0.47, tempo: 34, forms: { ace12: 0.28, iform: 0.24, doubles: 0.18, trips: 0.15, pistol: 0.1, spread: 0.05 } },
+    spread: { name: 'Spread RPO', pass: 0.5, tempo: 31, forms: { trips: 0.36, doubles: 0.3, pistol: 0.14, spread: 0.14, ace12: 0.06 } },
+    tempo: { name: 'Up-tempo spread', pass: 0.52, tempo: 26, forms: { trips: 0.4, doubles: 0.24, spread: 0.2, empty: 0.06, pistol: 0.1 } },
+    air: { name: 'Air Raid', pass: 0.6, tempo: 29, forms: { spread: 0.4, trips: 0.28, empty: 0.15, doubles: 0.17 } },
+    option: { name: 'Triple option', pass: 0.15, tempo: 36, forms: { pistol: 0.35, iform: 0.35, ace12: 0.2, doubles: 0.1 } },
   };
+  // formations: personnel (RB-TE), receivers on the field, and what they do for the run game, protection and the passing game
+  DY.FORMS = {
+    trips: { name: 'Shotgun Trips', pers: '11', rb: 1, te: 1, wr: 3, run: 0, pro: 0, sep: 0.12, dpers: 'nickel' },
+    doubles: { name: 'Shotgun Doubles', pers: '11', rb: 1, te: 1, wr: 3, run: 0.1, pro: 0.1, sep: 0.06, dpers: 'nickel' },
+    pistol: { name: 'Pistol', pers: '11', rb: 1, te: 1, wr: 3, run: 0.35, pro: 0.15, sep: 0, dpers: 'nickel' },
+    ace12: { name: 'Singleback Ace (12)', pers: '12', rb: 1, te: 2, wr: 2, run: 0.7, pro: 0.45, sep: -0.08, pa: 0.35, dpers: 'base' },
+    iform: { name: 'I-Form (21)', pers: '21', rb: 2, te: 1, wr: 2, run: 0.9, pro: 0.55, sep: -0.12, pa: 0.45, dpers: 'base' },
+    spread: { name: 'Shotgun Spread (10)', pers: '10', rb: 1, te: 0, wr: 4, run: -0.45, pro: -0.3, sep: 0.2, dpers: 'dime' },
+    empty: { name: 'Empty', pers: '01', rb: 0, te: 1, wr: 4, run: -1.6, pro: -0.8, sep: 0.28, dpers: 'dime' },
+    goal: { name: 'Goal Line (13)', pers: '13', rb: 1, te: 3, wr: 1, run: 1.3, pro: 0.8, sep: -0.35, pa: 0.5, dpers: 'goal' },
+  };
+  DY.DPERS = { base: { name: 'Base 4-3', box: 0.45, cov: -0.12 }, nickel: { name: 'Nickel', box: 0, cov: 0 }, dime: { name: 'Dime', box: -0.5, cov: 0.18 }, goal: { name: 'Goal line', box: 1.1, cov: -0.3 } };
+  // the playbook: each named play beats some coverages/fronts and struggles against others
+  DY.BOOK = {
+    in: [{ n: 'Inside Zone', beats: [], weak: [] }, { n: 'Duo', beats: ['c2', 't2', 'c4', 'c6'], weak: ['bear'] }, { n: 'Power', beats: ['c2', 't2', 'prev', 'c4'], weak: ['bear', 'c0'] }, { n: 'Counter', beats: ['c1', 'c3b'], weak: ['c2'], counter: 1 }, { n: 'Trap', beats: ['c0', 'c1f'], weak: ['c3'] }],
+    out: [{ n: 'Outside Zone', beats: ['c2', 'c6'], weak: ['c3b'] }, { n: 'Toss Crack', beats: ['c3', 'c4'], weak: ['bear', 'c1'] }, { n: 'Jet Sweep', beats: ['bear', 'c1f', 'c0'], weak: ['c2', 't2'] }, { n: 'Pin & Pull', beats: ['c3b', 'c4'], weak: ['c0'] }],
+    qb: [{ n: 'Zone Read Keep', beats: ['c1', 'c3b'], weak: ['c0'] }, { n: 'QB Power', beats: ['c2', 't2', 'c4'], weak: ['bear'] }, { n: 'QB Draw', beats: ['c2', 't2', 'c4', 'prev', 'c6'], weak: ['c1f', 'bear'] }, { n: 'Speed Option', beats: ['c0', 'c1f', 'c1'], weak: ['c4', 'c6'] }],
+    quick: [{ n: 'Stick', beats: ['c3', 'c4', 'c6'], weak: ['c1', 'c2'] }, { n: 'Slant-Flat', beats: ['c2', 'c0', 'c1f', 't2'], weak: ['c3b'] }, { n: 'Hitch', beats: ['c3', 'c4', 'prev'], weak: ['c0', 'c1'] }, { n: 'Bubble RPO', beats: ['bear', 'c3b', 'c1'], weak: ['c2', 'c6'] }, { n: 'Snag', beats: ['c3', 'c3b', 'c2'], weak: ['c1'] }],
+    med: [{ n: 'Mesh', beats: ['c1', 'c0', 'c1f'], weak: ['c2', 't2', 'c4'] }, { n: 'Dagger', beats: ['c3', 'c4', 'c6'], weak: ['c1', 'c0'] }, { n: 'Smash', beats: ['c2', 't2', 'c6'], weak: ['c3b', 'c1'] }, { n: 'Curl-Flat', beats: ['c3', 'c3b'], weak: ['c2', 'c1'] }, { n: 'Y-Cross', beats: ['c3', 'c1', 'c4'], weak: ['t2'] }],
+    deep: [{ n: 'Four Verticals', beats: ['c3', 'c1', 'c3b', 'c1f'], weak: ['c4', 'c2', 'prev'] }, { n: 'Post-Wheel', beats: ['c3', 'c6', 'c1f'], weak: ['c2', 'prev'] }, { n: 'Go/Fade', beats: ['c0', 'c1', 'c1f', 'bear'], weak: ['c4', 'c2', 'prev'] }, { n: 'Mills', beats: ['c4', 'c6', 'c2'], weak: ['c0', 'c1f'] }, { n: 'Double Move', beats: ['c1', 'c3b', 'c0'], weak: ['c4', 'prev'] }],
+    screen: [{ n: 'RB Screen', beats: ['c0', 'c1f', 'bear'], weak: ['c2', 'c4'] }, { n: 'WR Tunnel Screen', beats: ['c3', 'c4', 'prev', 'c1f'], weak: ['c2', 't2'] }, { n: 'Bubble Screen', beats: ['bear', 'c3b', 'c0'], weak: ['c2', 'c6'] }],
+    pa: [{ n: 'PA Boot', beats: ['bear', 'c3b', 'c1f'], weak: ['c2', 'prev'] }, { n: 'PA Post', beats: ['c3b', 'c1', 'bear', 'c3'], weak: ['c4', 'c2'] }, { n: 'RPO Glance', beats: ['c3b', 'c1', 'bear'], weak: ['c4', 't2'] }, { n: 'PA Crossers', beats: ['c1', 'c0', 'c3b'], weak: ['t2', 'c6'] }],
+  };
+  // pre-game plans and halftime adjustments
+  DY.PLANS = {
+    bal: { name: 'Balanced', desc: 'Take what they give you.', mod: {} },
+    run: { name: 'Establish the run', desc: '+run blocking, run more, play action hits harder.', mod: { run: 1.2, pass: -0.12, pa: 0.2 } },
+    air: { name: 'Air it out', desc: '+separation, throw more; protection a little thinner.', mod: { sep: 0.15, pro: -0.6, pass: 0.12 } },
+    pressure: { name: 'Bring pressure', desc: '+pass rush on defense; more exposed deep.', mod: { rush: 0.5, deep: -0.3 } },
+    bend: { name: 'Bend, don\'t break', desc: 'Keep everything in front; softer against the run.', mod: { deep: 0.4, short: 0.15, box: -0.25 } },
+  };
+  DY.ADJ_O = { none: { name: 'No change', mod: {} }, run: { name: 'Lean on the run game', mod: { run: 1.0, pass: -0.1 } }, protect: { name: 'Max protect', mod: { pro: 1.3, sep: -0.06 } }, quick: { name: 'Quick game', mod: { sepS: 0.25, pass: 0.05 } }, shots: { name: 'Take shots', mod: { sepD: 0.25, pro: -0.3 } } };
+  DY.ADJ_D = { none: { name: 'No change', mod: {} }, box: { name: 'Stop the run', mod: { box: 0.45, deep: -0.15 } }, deep: { name: 'Take away the deep ball', mod: { deep: 0.45, box: -0.2 } }, pressure: { name: 'Bring more pressure', mod: { rush: 0.55, short: -0.15 } }, contain: { name: 'Contain the QB', mod: { qbrun: -0.8, rush: -0.2 } } };
+  DY.TROPHIES = { 'Mississippi State|Ole Miss': 'Golden Egg', 'Arkansas|LSU': 'Golden Boot', 'Arkansas|Missouri': 'Battle Line Trophy', 'Kentucky|Louisville': "Governor's Cup",
+    'Georgia|Georgia Tech': "Governor's Cup", 'Clemson|South Carolina': 'Palmetto Trophy', 'Oklahoma|Texas': 'Golden Hat', 'Oregon|Oregon State': 'Platypus Trophy',
+    'Minnesota|Wisconsin': "Paul Bunyan's Axe", 'Iowa|Nebraska': 'Heroes Trophy', 'Indiana|Purdue': 'Old Oaken Bucket', 'Arizona|Arizona State': 'Territorial Cup',
+    'Cal|Stanford': 'The Axe', 'UCLA|USC': 'Victory Bell', 'Washington|Washington State': 'Apple Cup', 'Virginia|Virginia Tech': 'Commonwealth Cup',
+    'Illinois|Northwestern': 'Land of Lincoln Trophy', 'Kansas|Kansas State': 'Sunflower Showdown', 'Florida|Florida State': 'Sunshine Showdown' };
+  DY.UT_RIVALS = ['Alabama', 'Kentucky', 'Vanderbilt', 'Florida', 'Georgia', 'LSU', 'South Carolina', 'Auburn', 'Texas'];
+
 })(typeof window !== 'undefined' ? window : globalThis);

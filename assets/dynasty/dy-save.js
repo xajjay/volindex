@@ -34,7 +34,7 @@
     if (!GM || GM.over) return null;
     const L = {};
     for (const s of ['h', 'a']) { L[s] = {}; for (const k in GM.L[s]) { const v = GM.L[s][k]; L[s][k] = Array.isArray(v) ? v.map(p => p.id) : v ? v.id : null; } }
-    const o = Object.assign({}, GM, { T: { h: GM.T.h.id, a: GM.T.a.id }, L, plays: GM.plays.slice(-80).map(p => ({ text: p.text, head: p.head, tag: p.tag, s: p.s, q: p.q, events: p.events, big: p.big })), style: null, ovr: GM.ovr });
+    const o = Object.assign({}, GM, { T: { h: GM.T.h.id, a: GM.T.a.id }, L, plays: GM.plays.slice(-180).map(p => ({ text: p.text, head: p.head, tag: p.tag, s: p.s, q: p.q, events: p.events, big: p.big, di: p.di, type: p.type, anim: p.anim ? { kind: p.anim.kind, los: p.anim.los, end: p.anim.end, inc: p.anim.inc, int: p.anim.int, wiped: p.anim.wiped } : null })), style: null, ovr: GM.ovr });
     o.styleKey = { h: GM.T.h.style, a: GM.T.a.style };
     return o;
   };
