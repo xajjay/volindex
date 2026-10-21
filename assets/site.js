@@ -157,7 +157,6 @@
       <p>Rosters, depth charts, lineups, recruits, schedules and history for every Tennessee sport, plus daily Vol games to play.</p>
       ${window.askHero ? window.askHero() : ''}
     </div>
-    ${window.homeTop ? window.homeTop() : ''}
     <div class="wrap grid g3">
       ${SPORTS.map(s => `<a class="sportcard live" data-sport="${s.key}" href="#${s.key}">
         <div class="sc-name">

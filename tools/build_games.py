@@ -309,3 +309,7 @@ open(os.path.join(HERE, '..', 'data', 'players.js'), 'w', encoding='utf-8').writ
 json.dump([[p['sp'], p['slug'], p['n'], p['pos'], (str(p['yrs'][0]) + ('-' + str(p['yrs'][-1]) if len(p['yrs']) > 1 else '')) if p['yrs'] else ''] for p in people],
           open(os.path.join(HERE, 'players-index.json'), 'w'), ensure_ascii=False)   # used by tools/make_pages.py for player pages + sitemap
 print('players.js', len(people), 'people', len(pjs), 'bytes')
+
+# opponents for the 40-0 / 69-0 runs (real team-seasons from the schedule history files)
+import build_run_opps
+build_run_opps.main()

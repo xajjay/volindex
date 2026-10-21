@@ -20,7 +20,8 @@ email magic links, no passwords to store.
    ```
 
 3. **Authentication → URL configuration**: set Site URL to `https://www.volindex.net` and add
-   `https://www.volindex.net/me` to the redirect URLs.
+   `https://www.volindex.net/me` to the redirect URLs. To test sign-in on the local preview, also add
+   `http://127.0.0.1:8765/**` (otherwise the email link sends you to the live site).
 4. **Project settings → API**: copy the Project URL and the `anon` public key into `assets/auth-config.js`.
 5. Deploy. The My games page now shows "Email me a sign-in link"; after signing in, progress merges and syncs
    after every finished daily.

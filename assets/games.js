@@ -54,23 +54,30 @@
   /* ---------- sports + games ---------- */
   const SPORTS = [
     { key: 'football', name: 'Football', icon: '🏈', file: 'data/games-data.js', games: ['run', 'guesser', 'grid', 'career', 'rankings', 'duel', 'trivia'] },
-    { key: 'mbb', name: "Men's Basketball", icon: '🏀', beta: true, file: 'data/games-mbb.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
-    { key: 'wbb', name: "Women's Basketball", icon: '🏀', beta: true, file: 'data/games-wbb.js', games: ['guesser', 'rankings', 'duel', 'trivia'], lady: true },
-    { key: 'baseball', name: 'Baseball', icon: '⚾', beta: true, file: 'data/games-baseball.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
-    { key: 'softball', name: 'Softball', icon: '🥎', beta: true, file: 'data/games-softball.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
+    { key: 'mbb', name: "Men's Basketball", icon: '🏀', beta: true, file: 'data/games-mbb.js', games: ['run', 'guesser', 'rankings', 'duel', 'trivia'] },
+    { key: 'wbb', name: "Women's Basketball", icon: '🏀', beta: true, file: 'data/games-wbb.js', games: ['run', 'guesser', 'rankings', 'duel', 'trivia'], lady: true },
+    { key: 'baseball', name: 'Baseball', icon: '⚾', beta: true, file: 'data/games-baseball.js', games: ['run', 'guesser', 'rankings', 'duel', 'trivia'] },
+    { key: 'softball', name: 'Softball', icon: '🥎', beta: true, file: 'data/games-softball.js', games: ['run', 'guesser', 'rankings', 'duel', 'trivia'] },
     { key: 'volleyball', name: 'Volleyball', icon: '🏐', beta: true, file: 'data/games-volleyball.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
     { key: 'soccer', name: 'Soccer', icon: '⚽', beta: true, file: 'data/games-soccer.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
   ];
   const SP = k => SPORTS.find(s => s.key === k);
   const GAME_ICON = { run: '🏈', guesser: '🔎', grid: '🟧', career: '🏟️', rankings: '📊', duel: '↕️', trivia: '❓' };
+  // the undefeated-run game is named for a perfect season in that sport: 16-0 football, 40-0 basketball
+  // (31 regular season + 3 SEC tournament + 6 NCAA), 69-0 baseball and softball (56 + 3 SEC + 3 regional + 2 super + 3 CWS + 2 finals)
+  const RUN_NAME = { football: '16-0', mbb: '40-0', wbb: '40-0', baseball: '69-0', softball: '69-0' };
+  const RUN_ICON = { football: '🏈', mbb: '🏀', wbb: '🏀', baseball: '⚾', softball: '🥎' };
+  const gIcon = (sport, g) => g === 'run' ? RUN_ICON[sport] : GAME_ICON[g];
   function gameName(sport, g) {
     const v = SP(sport).lady ? 'Lady Vol' : 'Vol';
-    return { run: '16-0', guesser: v + ' Guesser', grid: 'Power T Grid', career: 'VFL Career', rankings: 'Rocky Top Rankings', duel: 'Higher or Lower', trivia: v + ' Trivia' }[g];
+    return { run: RUN_NAME[sport], guesser: v + ' Guesser', grid: 'Power T Grid', career: 'VFL Career', rankings: 'Rocky Top Rankings', duel: 'Higher or Lower', trivia: v + ' Trivia' }[g];
   }
   function gameBlurb(sport, g) {
     const fb = sport === 'football';
     return {
-      run: 'Spin an era, draft five Vols on offense and five on defense at their best, then play 12 games against all-time great teams. Win the SEC and run the 12-team playoff.',
+      run: fb ? 'Spin an era, draft five Vols on offense and five on defense at their best, then play 12 games against all-time great teams. Win the SEC and run the 12-team playoff.'
+        : sport === 'mbb' || sport === 'wbb' ? `Spin an era and draft a starting five plus a sixth ${SP(sport).lady ? 'Lady Vol' : 'man'} at their best season. Play a 31-game schedule of real Tennessee opponents, the SEC Tournament and the 64-team NCAA Tournament.`
+        : `Spin an era and draft a lineup and a pitching staff at their best season. Play a 56-game schedule of real Tennessee opponents, the SEC Tournament, regionals, super regionals and the ${sport === 'softball' ? "Women's " : ''}College World Series.`,
       guesser: fb ? 'Find the mystery Vol. Every guess shows how close you are on position, prime season, head coach, honors and NFL draft.'
         : 'Find the mystery player. Every guess shows how close you are on position, best season, coach, hometown and a key stat.',
       grid: 'Fill a 3×3 grid with Vols who fit both the row and the column. Nine guesses, no repeats.',
@@ -186,7 +193,7 @@
     const s = SP(sport);
     app.innerHTML = `<div class="wrap games">
       <nav class="gcrumb"><a href="#games">Games</a> <span aria-hidden="true">›</span> <a href="#games-${sport}">${esc(s.name)}</a> <span aria-hidden="true">›</span> <b>${esc(gameName(sport, g))}</b></nav>
-      <header class="ghead"><h1><span aria-hidden="true">${GAME_ICON[g]}</span> ${esc(gameName(sport, g))}${s.beta ? ' <span class="gbeta">Beta</span>' : ''}</h1>${sub ? `<p>${sub}</p>` : ''}</header>
+      <header class="ghead"><h1><span aria-hidden="true">${gIcon(sport, g)}</span> ${esc(gameName(sport, g))}${s.beta ? ' <span class="gbeta">Beta</span>' : ''}</h1>${sub ? `<p>${sub}</p>` : ''}</header>
       <div id="gbody"></div></div>`;
     return app.querySelector('#gbody');
   }
@@ -277,6 +284,7 @@
     const today = etDate();
     app.innerHTML = `<div class="wrap hub-hero games-hero"><div class="eyebrow">Play</div><h1>Vol <span>Games</span></h1>
       <p>Daily games built on Tennessee history. Pick a sport. Every game has a daily challenge that everyone gets the same, plus free play with era filters. New dailies drop at midnight Eastern.</p></div>
+      <div class="wrap"><a class="box gme" href="#me"><span class="gicon" aria-hidden="true">🔥</span><span><b>My games</b><span class="dim">Your streak, today's dailies, titles and stats${window.VI_AUTH_CONFIG ? '. Sign in to sync them across devices.' : '.'}</span></span><span class="btn">Open ›</span></a></div>
       <div class="wrap gsports">${SPORTS.map(s => {
         const done = s.games.filter(g => dailyDone(s.key, g)).length;
         return `<a class="box gsport ${s.key === 'football' ? 'lead' : ''}" href="#games-${s.key}">
@@ -284,7 +292,7 @@
           <span class="gsport-t"><b>${esc(s.name)}</b><span class="dim">${s.games.length} games${done ? ` · ${done} done today` : ''}</span></span>
           ${s.beta ? '<span class="gbeta">Beta</span>' : '<span class="chip new">Full</span>'}</a>`;
       }).join('')}</div>
-      <div class="wrap gfoot"><button class="btn" id="gShareAll">Copy today's results</button> <a class="btn" href="#me">My games: streaks and stats</a>
+      <div class="wrap gfoot"><button class="btn" id="gShareAll">Copy today's results</button>
         <p class="dim">Football games use the Tennessee record book, utsports.com, ESPN and CollegeFootballData.com. Basketball, baseball, softball, volleyball and soccer games are in beta and use utsports.com season stats; more games for every sport are coming soon. Spotted a mistake? Email <a href="mailto:thevolindex@gmail.com">thevolindex@gmail.com</a>.</p></div>`;
     app.querySelector('#gShareAll').addEventListener('click', e => {
       const lines = [];
@@ -308,7 +316,7 @@
       <header class="ghead"><h1><span aria-hidden="true">${s.icon}</span> ${esc(s.name)} games${s.beta ? ' <span class="gbeta">Beta</span>' : ''}</h1>
         <p>${esc(COVERAGE[sport])}</p></header>
       ${betaNote(sport)}
-      <div class="grid g3 gcards">${s.games.map(g => `<a class="box gcard" href="#games-${sport}-${g}"><div class="gcard-top"><span class="gicon" aria-hidden="true">${GAME_ICON[g]}</span>${dailyDone(sport, g) ? '<span class="chip new">Today ✓</span>' : '<span class="chip">Daily</span>'}</div>
+      <div class="grid g3 gcards">${s.games.map(g => `<a class="box gcard" href="#games-${sport}-${g}"><div class="gcard-top"><span class="gicon" aria-hidden="true">${gIcon(sport, g)}</span>${dailyDone(sport, g) ? '<span class="chip new">Today ✓</span>' : '<span class="chip">Daily</span>'}</div>
           <h3>${esc(gameName(sport, g))}</h3><p>${esc(gameBlurb(sport, g))}</p><span class="btn primary">Play</span></a>`).join('')}
         ${s.beta ? `<div class="box gcard soon"><div class="gcard-top"><span class="gicon" aria-hidden="true">🔜</span><span class="chip">Soon</span></div><h3>More games</h3><p>Grids, career paths and sims for ${esc(s.name.toLowerCase())} are on the way.</p></div>` : ''}</div>
       <p class="gfoot dim"><a href="#games">← All sports</a> · <a href="#me">My games: streaks and stats ›</a> · <a href="#players-${sport}">${esc(s.name)} player pages ›</a></p></div>`;
@@ -759,7 +767,8 @@
     if (!ready()) { loading(app); return loadScript(s.file, ready, () => render(app, sport, game), () => loading(app, 'Could not load the games data. Refresh to try again.')); }
     if (sport === 'football') initFootball(); else initSport(sport);
     if (!game) renderSportHub(app, sport);
-    else if (game === 'run') window.VI_RUN ? window.VI_RUN.render(app) : loading(app);
+    else if (game === 'run' && sport === 'football') window.VI_RUN ? window.VI_RUN.render(app) : loading(app);
+    else if (game === 'run') window.VI_RUN2 ? window.VI_RUN2.render(app, sport) : loading(app);
     else if (game === 'guesser') renderGuesser(app, sport);
     else if (game === 'grid') renderGrid(app);
     else if (game === 'career') renderCareer(app);
@@ -777,6 +786,6 @@
   window.VIG = {
     esc, etDate, SITE, reduceMotion, rngFrom, freeSeed, pick, shuffle, gauss, wpick, wsample, ERA_BOOST, decOf, store, copyText, twoTap,
     frame, modeBar, bindMode, dkey, challenge, FB_ERAS, SLOT_NAME, posLabel, statLine, honorChips, getEras, setEras, eraChips, bindEras,
-    data: () => ({ D, ALL, POOL, BYNAME }), rerender, initFootball,
+    data: () => ({ D, ALL, POOL, BYNAME }), rerender, initFootball, initSport, SP, RUN_NAME, gameName,
   };
 })();

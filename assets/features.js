@@ -16,9 +16,13 @@
   const SPORT_NAME = { football: 'Football', volleyball: 'Volleyball', soccer: 'Soccer', mbb: "Men's Basketball", wbb: "Women's Basketball", baseball: 'Baseball', softball: 'Softball' };
   const SPORT_ORDER = ['football', 'mbb', 'wbb', 'baseball', 'softball', 'volleyball', 'soccer'];
   const GAMES = { football: ['run', 'guesser', 'grid', 'career', 'rankings', 'duel', 'trivia'] };
-  ['mbb', 'wbb', 'baseball', 'softball', 'volleyball', 'soccer'].forEach(k => { GAMES[k] = ['guesser', 'rankings', 'duel', 'trivia']; });
+  ['mbb', 'wbb', 'baseball', 'softball'].forEach(k => { GAMES[k] = ['run', 'guesser', 'rankings', 'duel', 'trivia']; });
+  ['volleyball', 'soccer'].forEach(k => { GAMES[k] = ['guesser', 'rankings', 'duel', 'trivia']; });
   const GAME_NAME = { run: '16-0', guesser: 'Vol Guesser', grid: 'Power T Grid', career: 'VFL Career', rankings: 'Rocky Top Rankings', duel: 'Higher or Lower', trivia: 'Vol Trivia' };
   const GAME_ICON = { run: '🏈', guesser: '🔎', grid: '🟧', career: '🏟️', rankings: '📊', duel: '↕️', trivia: '❓' };
+  const RUN_NAME = { football: '16-0', mbb: '40-0', wbb: '40-0', baseball: '69-0', softball: '69-0' }, RUN_ICON = { football: '🏈', mbb: '🏀', wbb: '🏀', baseball: '⚾', softball: '🥎' };
+  const gName = (sp, g) => g === 'run' ? RUN_NAME[sp] : sp === 'wbb' ? GAME_NAME[g].replace(/^Vol /, 'Lady Vol ') : GAME_NAME[g];
+  const gIcon = (sp, g) => g === 'run' ? RUN_ICON[sp] : GAME_ICON[g];
 
   /* ---------- analytics events (GoatCounter; nothing is sent from the owner's opted-out browsers or local previews) ---------- */
   const sent = {};
@@ -35,7 +39,7 @@
     const [a, b, c] = key.split('-'), S = ' · The Vol Index';
     let t = 'The Vol Index · Tennessee athletics, all in one place';
     if (SPORT_NAME[a]) t = `Tennessee ${SPORT_NAME[a]}${TAB_NAME[b] ? ' ' + TAB_NAME[b] : ''}${S}`;
-    else if (a === 'games') t = !b ? 'Vol Games' + S : !c ? `${SPORT_NAME[b] || 'Football'} games${S}` : `${GAME_NAME[c] || 'Vol Games'} · ${SPORT_NAME[b] || 'Football'}${S}`;
+    else if (a === 'games') t = !b ? 'Vol Games' + S : !c ? `${SPORT_NAME[b] || 'Football'} games${S}` : `${(GAME_NAME[c] && gName(SPORT_NAME[b] ? b : 'football', c)) || 'Vol Games'} · ${SPORT_NAME[b] || 'Football'}${S}`;
     else if (a === 'players') t = !b ? 'Tennessee players' + S : key.split('-').length > 2 ? `${titleCase(key.split('-').slice(2).join('-'))} · Tennessee ${SPORT_NAME[b] || ''}${S}` : `Tennessee ${SPORT_NAME[b] || ''} players${S}`;
     else if (a === 'compare') t = 'Compare Vols' + S;
     else if (a === 'me') t = 'Your Vol games' + S;
@@ -66,54 +70,26 @@
     const h = Math.floor(left / 3600), m = Math.floor(left % 3600 / 60), s = left % 60;
     return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   }
-  window.homeTop = function () {
+  // undefeated-run games, one per sport (names come from the real season length; see assets/games-run-sports.js)
+  const RUNS = [['football', '16-0', '🏈', 'Football'], ['mbb', '40-0', '🏀', "Men's hoops"], ['wbb', '40-0', '🏀', "Women's hoops"], ['baseball', '69-0', '⚾', 'Baseball'], ['softball', '69-0', '🥎', 'Softball']];
+  window.homeBottom = function () {
     const today = etDate(), st = streak(anyOn);
-    const fb = GAMES.football, done = fb.filter(g => doneOn('football', g, today)).length;
-    return `<section class="wrap playband" aria-label="Today's Vol games">
-      <div class="pb-head"><div><div class="eyebrow">Play today</div><h2>Daily Vol games</h2>
-        <p>Same puzzles for everyone, new at midnight Eastern${st ? ` · <b class="pb-streak">🔥 ${st}-day streak</b>` : ''} · next in <b id="pbClock">${untilMidnight()}</b></p></div>
-        <a class="btn primary big" href="${href('games-football-run')}">Play 16-0</a></div>
-      <div class="pb-games">${fb.map(g => `<a class="pb-game ${doneOn('football', g, today) ? 'done' : ''}" href="${href('games-football-' + g)}"><span aria-hidden="true">${GAME_ICON[g]}</span><b>${esc(GAME_NAME[g])}</b>${doneOn('football', g, today) ? '<i>✓</i>' : ''}</a>`).join('')}
-        <a class="pb-game more" href="${href('games')}"><span aria-hidden="true">🏀⚾</span><b>Every sport</b><i class="dim">Beta</i></a></div>
-      <div class="pb-foot dim">${done}/${fb.length} football dailies done today · <a href="${href('me')}">Your stats and streaks ›</a> · <a href="${href('players')}">Player pages ›</a> · <a href="${href('compare')}">Compare Vols ›</a></div>
-    </section>`;
+    const fb = GAMES.football.filter(g => g !== 'run'), done = GAMES.football.filter(g => doneOn('football', g, today)).length;
+    return `<section class="wrap pbwrap" aria-label="Today's Vol games"><div class="playband">
+      <div class="pb-head"><div><div class="eyebrow">Vol Games · new at midnight Eastern</div><h2>Play today</h2>
+        <p>Same puzzles for everyone, every day${st ? ` · <b class="pb-streak">🔥 ${st}-day streak</b>` : ''} · next set in <b id="pbClock">${untilMidnight()}</b></p></div>
+        <a class="btn" href="${href('me')}">My games &amp; streaks</a></div>
+      <div class="pb-runs">${RUNS.map(([sp, name, icon, label]) => `<a class="pb-run ${doneOn(sp, 'run', today) ? 'done' : ''}" href="${href('games-' + sp + '-run')}"><span class="pb-ic" aria-hidden="true">${icon}</span><span><b>${name}</b><small>${label}${sp === 'football' ? '' : ' · Beta'}</small></span>${doneOn(sp, 'run', today) ? '<i>✓</i>' : ''}</a>`).join('')}</div>
+      <div class="pb-label">Football dailies <span class="dim">${done}/${GAMES.football.length} done</span></div>
+      <div class="pb-games">${fb.map(g => `<a class="pb-game ${doneOn('football', g, today) ? 'done' : ''}" href="${href('games-football-' + g)}"><span aria-hidden="true">${GAME_ICON[g]}</span><b>${esc(GAME_NAME[g])}</b>${doneOn('football', g, today) ? '<i>✓</i>' : ''}</a>`).join('')}</div>
+      <div class="pb-foot"><a href="${href('games')}">Every sport's games ›</a> · <a href="${href('players')}">Player pages ›</a> · <a href="${href('compare')}">Compare Vols ›</a></div>
+    </div></section>`;
   };
   let clockTimer = null;
   window.wireHome = function (app) {
     clearInterval(clockTimer);
     const el = app.querySelector('#pbClock'); if (el) clockTimer = setInterval(() => { if (!el.isConnected) return clearInterval(clockTimer); el.textContent = untilMidnight(); }, 1000);
-    const otd = app.querySelector('#otd'); if (otd) otd.innerHTML = onThisDay();
   };
-
-  /* ---------- home: On this day in Vols history ---------- */
-  function historyGames() {
-    const out = [], A = window.SITE_AUTO || {};
-    const fb = (A.footballHistory || {}).seasons || {};
-    Object.keys(fb).forEach(y => fb[y].forEach(g => { if (g[3] == null) return; out.push({ sport: 'football', date: g[0], opp: g[1], site: g[2], us: +g[3], them: +g[4] }); }));
-    ['mbb', 'wbb', 'baseball', 'softball', 'volleyball', 'soccer'].forEach(k => {
-      const H = A[k + 'History'] || {};
-      Object.keys(H).forEach(season => (H[season] || []).forEach(g => { if (!g[3] || g[4] == null) return; out.push({ sport: k, date: g[0], opp: g[1], site: g[2], res: g[3], us: +g[4], them: +g[5] }); }));
-    });
-    return out;
-  }
-  function onThisDay() {
-    const today = etDate(), md = today.slice(5), yr = +today.slice(0, 4);
-    let list = [], shift = 0;
-    const all = historyGames();
-    for (; shift <= 3 && !list.length; shift++) {
-      const want = [md, dayShift(today, -shift).slice(5)];
-      list = all.filter(g => want.includes(g.date.slice(5)) && +g.date.slice(0, 4) < yr);
-    }
-    if (!list.length) return '';
-    const score = g => (g.us > g.them ? 10 : 0) + (/#\d|No\. \d/.test(g.opp) ? 8 : 0) + (/Alabama|Florida|Georgia|Kentucky|Vanderbilt|LSU|Texas/.test(g.opp) ? 4 : 0) + Math.min(6, Math.abs(g.us - g.them) / 4) + (g.sport === 'football' ? 3 : 0) + (+g.date.slice(0, 4)) / 1000;
-    list.sort((a, b) => score(b) - score(a));
-    const pick = []; const seenSport = {};
-    for (const g of list) { if (seenSport[g.sport] >= 1 && pick.length < list.length && pick.length >= 2) continue; seenSport[g.sport] = (seenSport[g.sport] || 0) + 1; pick.push(g); if (pick.length === 4) break; }
-    const fmt = d => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-    const line = g => { const w = g.us > g.them ? 'W' : g.us < g.them ? 'L' : 'T'; const opp = String(g.opp).replace(/\s*\(.*?\)\s*$/, ''); return `<li><span class="otd-y">${g.date.slice(0, 4)}</span><span class="otd-s">${esc(SPORT_NAME[g.sport])}</span><span class="otd-r ${w}">${w} ${g.us}-${g.them}</span><span class="otd-o">${g.site === 'A' ? 'at' : 'vs.'} ${esc(opp)}</span></li>`; };
-    return `<div class="eyebrow">On this day${shift > 1 ? ' (or close to it)' : ''} · ${esc(fmt(today))}</div><h3>In Vols history</h3><ul class="otd">${pick.map(line).join('')}</ul>`;
-  }
-  window.homeBottom = function () { return `<section class="wrap otd-wrap"><div class="box otd-box" id="otd"></div></section>`; };
 
   /* ---------- lazy data ---------- */
   function load(src, ready, cb) {
@@ -261,23 +237,25 @@
     return out;
   }
   window.renderMe = function (app) {
-    const S = stats(), run = jget('run-stats') || { played: 0, titles: 0, perfect: 0 }, today = etDate();
+    const S = stats(), today = etDate();
+    const run = ['run-stats'].concat(['mbb', 'wbb', 'baseball', 'softball'].map(k => k + '-run-stats')).map(jget).filter(Boolean)
+      .reduce((a, x) => ({ played: a.played + (x.played || 0), titles: a.titles + (x.titles || 0), perfect: a.perfect + (x.perfect || 0) }), { played: 0, titles: 0, perfect: 0 });
     const st = streak(anyOn), best = (() => { const ds = [...S.days].sort(); let b = 0, cur = 0, prev = null; ds.forEach(d => { cur = prev && dayShift(prev, 1) === d ? cur + 1 : 1; b = Math.max(b, cur); prev = d; }); return b; })();
     const days = Array.from({ length: 28 }, (_, i) => dayShift(today, i - 27));
     const avg = S.trivia.length ? (S.trivia.reduce((a, b) => a + b, 0) / S.trivia.length).toFixed(1) : null;
     const CFG = window.VI_AUTH_CONFIG;
-    app.innerHTML = `<div class="wrap hub-hero"><div class="eyebrow">Your games</div><h1>My Vol games</h1><p>Your streaks and results. Progress is saved in this browser${CFG ? ' and in your account when you sign in' : ''}.</p></div>
-      <div class="wrap">
-        <div class="me-tiles"><div class="box"><b>${st}</b><span>Day streak 🔥</span></div><div class="box"><b>${best}</b><span>Best streak</span></div><div class="box"><b>${S.dailies}</b><span>Dailies finished</span></div>
-          <div class="box"><b>${run.titles || 0}</b><span>16-0 titles in ${run.played || 0} runs</span></div><div class="box"><b>${run.perfect || 0}</b><span>Perfect seasons</span></div><div class="box"><b>${avg ?? '—'}</b><span>Trivia average (of 10)</span></div></div>
-        <div class="box me-cal"><h3>Last four weeks</h3><div class="me-days">${days.map(d => `<span class="${anyOn(d) ? 'on' : ''} ${d === today ? 'today' : ''}" title="${d}"></span>`).join('')}</div></div>
-        <div class="box me-today"><h3>Today's dailies</h3>${SPORT_ORDER.map(sp => `<div class="me-row"><b>${esc(SPORT_NAME[sp])}</b><span>${GAMES[sp].map(g => `<a class="${doneOn(sp, g, today) ? 'done' : ''}" href="${href('games-' + sp + '-' + g)}" title="${esc(GAME_NAME[g])}">${GAME_ICON[g]}${doneOn(sp, g, today) ? '✓' : ''}</a>`).join('')}</span><span class="dim">${S.bySport[sp] || 0} all time</span></div>`).join('')}</div>
-        <div class="box me-sync"><h3>${CFG ? 'Sign in to sync' : 'Move your progress'}</h3>
+    const sync = `        <div class="box me-sync"><h3>${CFG ? 'Sign in to sync' : 'Move your progress'}</h3>
           ${CFG ? `<div id="meAuth"><p class="dim">Sign in with your email and your streaks follow you to every device. We email you a link, no password.</p><div class="grow"><input id="meEmail" type="email" placeholder="you@example.com" autocomplete="email"><button class="btn primary" id="meSend">Email me a sign-in link</button></div><p class="dim small" id="meMsg"></p></div>` :
           `<p class="dim">Accounts are on the way. Until then, copy your transfer code here and paste it on your other phone or computer.</p>`}
           <div class="grow"><button class="btn" id="meCopy">Copy my transfer code</button></div>
-          <details><summary>Paste a code from another device</summary><textarea id="meCode" rows="3" placeholder="Paste your transfer code"></textarea><div class="grow"><button class="btn" id="meLoad">Load progress</button></div><p class="dim small" id="meLoaded"></p></details></div>
-      </div>`;
+          <details><summary>Paste a code from another device</summary><textarea id="meCode" rows="3" placeholder="Paste your transfer code"></textarea><div class="grow"><button class="btn" id="meLoad">Load progress</button></div><p class="dim small" id="meLoaded"></p></details></div>`;
+    app.innerHTML = `<div class="wrap hub-hero"><div class="eyebrow">Your games</div><h1>My Vol games</h1><p>Your streaks and results. Progress is saved in this browser${CFG ? ' and in your account when you sign in' : ''}.</p></div>
+      <div class="wrap">
+${CFG ? sync : ''}        <div class="me-tiles"><div class="box"><b>${st}</b><span>Day streak 🔥</span></div><div class="box"><b>${best}</b><span>Best streak</span></div><div class="box"><b>${S.dailies}</b><span>Dailies finished</span></div>
+          <div class="box"><b>${run.titles || 0}</b><span>Titles in ${run.played || 0} undefeated-run games</span></div><div class="box"><b>${run.perfect || 0}</b><span>Perfect seasons</span></div><div class="box"><b>${avg ?? '—'}</b><span>Trivia average (of 10)</span></div></div>
+        <div class="box me-cal"><h3>Last four weeks</h3><div class="me-days">${days.map(d => `<span class="${anyOn(d) ? 'on' : ''} ${d === today ? 'today' : ''}" title="${d}"></span>`).join('')}</div></div>
+        <div class="box me-today"><h3>Today's dailies</h3>${SPORT_ORDER.map(sp => `<div class="me-row"><b>${esc(SPORT_NAME[sp])}</b><span>${GAMES[sp].map(g => `<a class="${doneOn(sp, g, today) ? 'done' : ''}" href="${href('games-' + sp + '-' + g)}" title="${esc(gName(sp, g))}">${gIcon(sp, g)}${doneOn(sp, g, today) ? '✓' : ''}</a>`).join('')}</span><span class="dim">${S.bySport[sp] || 0} all time</span></div>`).join('')}</div>
+${CFG ? '' : sync}      </div>`;
     app.querySelector('#meCopy').addEventListener('click', e => { const c = toCode(exportProgress()); const b = e.currentTarget; try { navigator.clipboard.writeText(c).then(() => { b.textContent = 'Copied!'; }); } catch (x) { window.prompt('Your transfer code:', c); } });
     app.querySelector('#meLoad').addEventListener('click', () => { const m = app.querySelector('#meLoaded'); try { const n = importProgress(fromCode(app.querySelector('#meCode').value)); m.textContent = `Loaded ${n} saved results.`; setTimeout(() => window.renderMe(app), 900); } catch (e) { m.textContent = "That code didn't work. Copy it again and paste the whole thing."; } });
     if (CFG) wireAuth(app, CFG);
@@ -299,7 +277,8 @@
     const box = app.querySelector('#meAuth'), msg = app.querySelector('#meMsg');
     try {
       const sb = await client(CFG), user = await sync(sb);
-      if (user) { box.innerHTML = `<p>Signed in as <b>${esc(user.email)}</b>. Your progress is synced.</p><div class="grow"><button class="btn" id="meOut">Sign out</button></div>`; box.querySelector('#meOut').addEventListener('click', async () => { await sb.auth.signOut(); window.renderMe(app); }); return; }
+      headerAuth();
+      if (user) { box.innerHTML = `<p>Signed in as <b>${esc(user.email)}</b>. Your progress is synced.</p><div class="grow"><button class="btn" id="meOut">Sign out</button></div>`; box.querySelector('#meOut').addEventListener('click', async () => { await sb.auth.signOut(); headerAuth(); window.renderMe(app); }); return; }
       app.querySelector('#meSend').addEventListener('click', async () => {
         const email = app.querySelector('#meEmail').value.trim(); if (!/.+@.+\..+/.test(email)) { msg.textContent = 'Enter your email.'; return; }
         const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + (window.VI_ROUTER ? window.VI_ROUTER.href('me') : '/me') } });
@@ -307,6 +286,15 @@
       });
     } catch (e) { if (msg) msg.textContent = 'Sign-in is unavailable right now. Your progress is still saved in this browser.'; }
   }
+  // header: "Sign in", or "My account" once a Supabase session is saved in this browser
+  function headerAuth() {
+    const a = document.getElementById('meLink'), CFG = window.VI_AUTH_CONFIG; if (!a) return;
+    if (!CFG) { a.textContent = 'My games'; a.title = 'Your games and streaks'; return; }
+    let on = false; try { const ref = (/https:\/\/([^.]+)\./.exec(CFG.url) || [])[1]; on = !!(ref && localStorage.getItem('sb-' + ref + '-auth-token')); } catch (e) {}
+    a.textContent = on ? 'My account' : 'Sign in'; a.title = on ? 'Your account, games and streaks' : 'Sign in to sync your Vol games across devices';
+  }
+  window.VI_HEADER_AUTH = headerAuth;
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', headerAuth); else headerAuth();
   // keep a signed-in player's progress synced after each finished daily
   window.VI_SYNC = function () { const CFG = window.VI_AUTH_CONFIG; if (!CFG) return; client(CFG).then(sync).catch(() => {}); };
 

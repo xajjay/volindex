@@ -202,6 +202,21 @@
     });
     return out;
   }
+  // former Vols (data/players.js, loaded the first time the search opens): link to their player page
+  const SPN = { football: 'Football', mbb: "Men's Basketball", wbb: "Women's Basketball", baseball: 'Baseball', softball: 'Softball', volleyball: 'Volleyball', soccer: 'Soccer' };
+  function loadPast(cb) {
+    if (window.VI_PLAYERS) return cb && cb();
+    let sc = document.querySelector('script[data-f="data/players.js"]');
+    if (!sc) { sc = document.createElement('script'); sc.src = 'data/players.js'; sc.dataset.f = 'data/players.js'; document.head.appendChild(sc); }
+    if (cb) sc.addEventListener('load', cb, { once: true });
+  }
+  function pastPlayers(n, current) {
+    const P = window.VI_PLAYERS && window.VI_PLAYERS.players; if (!P) return [];
+    const cur = new Set(current.map(h => norm(h.p.name)));
+    let hits = P.filter(p => { const m = norm(p.n); return m.length > 4 && n.includes(' ' + m + ' ') && !cur.has(m); });
+    if (!hits.length) { const words = n.trim().split(' ').filter(w => w.length > 3); hits = P.filter(p => { const last = norm(p.n).split(' ').pop(); return words.includes(last); }); if (hits.length > 5) hits = []; }
+    return hits.slice(0, 4).map(p => ({ title: `${p.n} · ${SPN[p.sp]}`, html: `<p>${esc(p.pos || '')}${p.yrs && p.yrs.length ? ' · ' + p.yrs[0] + (p.yrs.length > 1 ? '-' + String(p.yrs[p.yrs.length - 1] + (/bb$/.test(p.sp) ? 1 : 0)).slice(2) : '') : ''}${p.line ? ' · best season ' + esc(p.bestS || p.best) + ': ' + esc(p.line) : ''}</p>`, go: '#players-' + p.sp + '-' + p.slug, score: 58 }));
+  }
   function playerAnswer(h) {
     const { k, p } = h; const tab = k === 'football' ? 'roster' : 'roster';
     const E = (window.EXTRAS || {})[k] || {};
@@ -237,6 +252,7 @@
     SITE_PAGES.forEach(([re, f]) => { if (re.test(P.n)) out.push(f()); });
     if (P.rec) out.push(recordAnswer(P.rec));
     P.players.forEach(h => out.push(playerAnswer(h)));
+    pastPlayers(P.n, P.players).forEach(a => out.push(a));
     if (P.opp) gameAnswers(P.opp, P.sports).forEach(a => out.push(a));
     if (/\b(today|tonight)\b/.test(P.n) && !P.sports.length) out.push(upcomingAll(0));
     else if (/\b(this week(end)?|next few days|coming up|upcoming)\b/.test(P.n) && !P.sports.length) out.push(upcomingAll(7));
@@ -315,6 +331,7 @@
     }
     panel.hidden = false; document.body.classList.add('asking');
     const inp = panel.querySelector('input'); inp.value = q || ''; draw(inp.value); setTimeout(() => inp.focus(), 0);
+    loadPast(() => { if (!panel.hidden) draw(inp.value); });
   }
   function closePanel() { if (panel) { panel.hidden = true; document.body.classList.remove('asking'); } }
   window.openAsk = openPanel;

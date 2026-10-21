@@ -209,7 +209,9 @@ def build_sport(sport):
         for k, pk in (('pts', 'ppg'), ('reb', 'rpg'), ('ast', 'apg')):
             if st.get(k) is not None: st[pk] = round(st[k] / st['gp'], 1)
         return st
-    srows = [dict(n=r['n'], s=r['s'], y=start_year(r['s']), k=r['k'], pos=r['pos'], st=per_game(r['st'])) for r in rows]
+    # every season line carries its own rating, readable stat line and head coach (the undefeated-run drafts use season lines)
+    srows = [dict(n=r['n'], s=r['s'], y=start_year(r['s']), k=r['k'], pos=r['pos'], st=per_game(r['st']), ovr=r['ovr'],
+                  line=line_text(sport, r), coach=coach(sport, r['s'])) for r in rows]
     return dict(name=NAME[sport], players=out, rows=srows, records=records,
                 first=min({r['s'] for r in rows}, key=start_year), last=max({r['s'] for r in rows}, key=start_year))
 
