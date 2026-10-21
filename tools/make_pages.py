@@ -97,14 +97,14 @@ def load_players():
     return []
 people = load_players()
 SP_SLUG = {"football": "football", "mbb": "mens-basketball", "wbb": "womens-basketball", "baseball": "baseball", "softball": "softball", "volleyball": "volleyball", "soccer": "soccer"}
-COLS = {"pos": "Pos", "gp": "GP", "cmp": "Cmp", "att": "Att", "yds": "Pass yds", "td": "Pass TD", "int": "INT", "car": "Car", "ryds": "Rush yds", "rtd": "Rush TD",
+COLS = {"pos": "Pos", "ovr": "OVR", "gp": "GP", "cmp": "Cmp", "att": "Att", "yds": "Pass yds", "td": "Pass TD", "int": "INT", "car": "Car", "ryds": "Rush yds", "rtd": "Rush TD",
         "rec": "Rec", "cyds": "Rec yds", "ctd": "Rec TD", "tot": "Tackles", "tfl": "TFL", "sk": "Sacks", "ints": "INT", "pd": "PBU", "ff": "FF",
         "pts": "Pts", "ppg": "PPG", "reb": "Reb", "rpg": "RPG", "ast": "Ast", "apg": "APG", "stl": "Stl", "blk": "Blk", "tpm": "3PM", "fgp": "FG%",
         "ab": "AB", "h": "H", "hr": "HR", "rbi": "RBI", "r": "R", "sb": "SB", "avg": "AVG", "app": "App", "w": "W", "l": "L", "era": "ERA", "ip": "IP", "so": "K", "sv": "SV",
         "k": "Kills", "a": "Ast", "d": "Digs", "b": "Blocks", "sa": "Aces", "sp": "Sets", "g": "Goals", "sho": "SHO", "gaa": "GAA"}
-HON = {"AAu": "Unanimous All-American", "AAc": "Consensus All-American", "AA1": "All-American", "AA2": "All-America 2nd/3rd team", "SEC": "First-team All-SEC",
+HON = {"AAu": "Unanimous All-American", "AAc": "Consensus All-American", "AA1": "All-American", "AA2": "All-America 2nd/3rd team", "AAH": "All-America honorable mention", "SEC": "First-team All-SEC", "PPOY": "SEC Pitcher of the Year",
        "SEC2": "Second-team All-SEC", "POY": "SEC Player of the Year", "OPOY": "SEC Offensive POY", "DPOY": "SEC Defensive POY", "H2": "Heisman runner-up", "H5": "Heisman top 5", "H8": "Heisman top 10"}
-def hon_text(h): return h[2:] + " Award" if h.startswith("W:") else h[2:] + " finalist" if h.startswith("F:") else HON.get(h, h)
+def hon_text(h): return h[2:] + ("" if any(w in h for w in ("Award", "Trophy", "Year")) else " Award") if h.startswith("W:") else h[2:] + " finalist" if h.startswith("F:") else HON.get(h, h)
 def fmt(v):
     if isinstance(v, float) and v < 1: return f"{v:.3f}".lstrip("0")
     return f"{v:,}" if isinstance(v, int) else str(v)
@@ -118,7 +118,8 @@ def player_body(p):
     ss = SP_SLUG[p["sp"]]; sname = SPORTS[ss]
     facts = [("Position", p.get("pos")), ("Seasons", span(p)), ("Hometown", p.get("home")), ("Before Tennessee", p.get("frm")), ("Coach (best season)", p.get("coach"))]
     if p.get("draft"): facts.append(("NFL draft", f"{p['draft'][0]}, round {p['draft'][1]}" if p["draft"][1] else f"{p['draft'][0]}, undrafted free agent"))
-    if p.get("mlb"): facts.append(("MLB draft", p["mlb"].replace(" rd ", ", round ")))
+    if p.get("pro"): facts.append((p["pro"]["lg"] + " draft", f"{p['pro']['y']}, round {p['pro']['rd']}" + (f", pick {p['pro']['pick']}" if p["pro"].get("pick") else "")))
+    elif p.get("mlb"): facts.append(("MLB draft", p["mlb"].replace(" rd ", ", round ")))
     if p.get("nfl"): facts.append(("NFL teams", " → ".join(p["nfl"])))
     keys = []
     for sn in p.get("seasons", []):

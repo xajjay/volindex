@@ -691,12 +691,26 @@
   const TRIVIA_N = 10;
   const DIFFS = [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard'], ['mix', 'Mix']];
   function triviaBank(sport) { return sport === 'football' ? D.trivia : SDATA[sport].trivia; }
-  function makeTrivia(r, sport, eras, diff) {
+  // Daily trivia walks through the whole bank in a fixed shuffled order, a few questions per day, so nothing repeats
+  // until every question at that difficulty has been used. Free play skips questions this browser has seen recently.
+  const dayNum = () => Math.floor(Date.parse(etDate() + 'T12:00:00Z') / 864e5);
+  function makeTrivia(r, sport, eras, diff, daily) {
     const all = sportEras(sport), allEras = eras.length === all.length;
     const bank = triviaBank(sport).filter(q => q.y == null || allEras || eras.includes(decOf(q.y)) || (q.y < all[0] && eras.includes(all[0])));
-    const by = d => shuffle(r, bank.filter(q => q.d === d));
+    const seenKey = 'triv-seen-' + sport, seen = new Set(daily ? [] : store.get(seenKey, []));
+    const PER_DAY = { easy: 3, medium: 4, hard: 3 };
+    const by = d => {
+      const list = bank.filter(q => q.d === d);
+      if (daily) {   // fixed cycle: day N starts where day N-1 stopped
+        const cyc = shuffle(rngFrom('trivia-cycle-' + sport + '-' + d), list); if (!cyc.length) return cyc;
+        const start = (dayNum() * PER_DAY[d]) % cyc.length;
+        return cyc.slice(start).concat(cyc.slice(0, start));
+      }
+      const fresh = shuffle(r, list.filter(q => !seen.has(q.q))), old = shuffle(r, list.filter(q => seen.has(q.q)));
+      return fresh.concat(old);
+    };
     let plan;
-    if (diff === 'mix') plan = [['easy', 4], ['medium', 4], ['hard', 2]];
+    if (diff === 'mix') plan = [['easy', 3], ['medium', 4], ['hard', 3]];
     else plan = [[diff, TRIVIA_N]];
     const out = [], usedA = new Set(), usedQ = new Set();
     const take = (list, n) => { for (const q of list) { if (n <= 0) break; if (usedA.has(q.a) || usedQ.has(q.q)) continue; out.push(q); usedA.add(q.a); usedQ.add(q.q); n--; } return n; };
@@ -707,12 +721,13 @@
     });
     // curated questions first within each difficulty feel more like trivia; keep a light mix
     const qs = out.slice(0, TRIVIA_N).map(q => ({ q: q.q, a: q.a, d: q.d, opts: shuffle(r, [q.a].concat(q.w.slice(0, 3))) }));
+    if (!daily) store.set(seenKey, qs.map(q => q.q).concat(Array.from(seen)).slice(0, 400));
     return { qs, i: 0, picks: [], done: false, diff };
   }
   function renderTrivia(app, sport) {
-    const body = frame(app, sport, 'trivia', 'Ten questions. Daily is a mix (four easy, four medium, two hard). In free play, pick a difficulty and the eras you want.');
+    const body = frame(app, sport, 'trivia', 'Ten questions. Daily is a mix (three easy, four medium, three hard) and works through the whole question bank before anything repeats. In free play, pick a difficulty and the eras you want.');
     const diffNow = getDiff(sport);
-    const { G, st, saved } = gameState(sport, 'trivia', (r, eras, daily) => makeTrivia(r, sport, eras, daily ? 'mix' : diffNow));
+    const { G, st, saved } = gameState(sport, 'trivia', (r, eras, daily) => makeTrivia(r, sport, eras, daily ? 'mix' : diffNow, daily));
     if (G.mode === 'free' && st.diff !== diffNow && !st.picks.length) { G.st = null; return renderTrivia(app, sport); }
     const extra = `<div class="gfree-row"><span class="glabel">Difficulty</span><div class="gchips">${DIFFS.map(([k, l]) => `<button data-diff="${k}" aria-pressed="${diffNow === k}">${l}</button>`).join('')}</div></div>`;
     const q = st.qs[st.i], answered = st.picks.length > st.i;

@@ -109,12 +109,12 @@
   const withPlayers = (app, label, fn) => window.VI_PLAYERS ? (initPlayers(), fn()) : (loading(app, label), load('data/players.js', () => !!window.VI_PLAYERS, () => { initPlayers(); fn(); }));
 
   /* ---------- player pages ---------- */
-  const HON = { AAu: 'Unanimous All-American', AAc: 'Consensus All-American', AA1: 'First-team All-American', AA2: 'All-America 2nd/3rd team', SEC: 'First-team All-SEC', SEC2: 'Second-team All-SEC', POY: 'SEC Player of the Year', OPOY: 'SEC Offensive Player of the Year', DPOY: 'SEC Defensive Player of the Year', H2: 'Heisman runner-up', H5: 'Heisman top 5', H8: 'Heisman top 10' };
-  const honText = h => h.startsWith('W:') ? h.slice(2) + ' Award winner' : h.startsWith('F:') ? h.slice(2) + ' Award finalist' : (HON[h] || h);
+  const HON = { AAu: 'Unanimous All-American', AAc: 'Consensus All-American', AA1: 'First-team All-American', AA2: 'All-America 2nd/3rd team', AAH: 'All-America honorable mention', SEC: 'First-team All-SEC', SEC2: 'Second-team All-SEC', POY: 'SEC Player of the Year', PPOY: 'SEC Pitcher of the Year', OPOY: 'SEC Offensive Player of the Year', DPOY: 'SEC Defensive Player of the Year', H2: 'Heisman runner-up', H5: 'Heisman top 5', H8: 'Heisman top 10' };
+  const honText = h => h.startsWith('W:') ? h.slice(2) + (/Award|Trophy|Year/.test(h) ? '' : ' Award') + (/Year$/.test(h) ? '' : ' winner') : h.startsWith('F:') ? h.slice(2) + (/Award|Trophy/.test(h) ? '' : ' Award') + ' finalist' : (HON[h] || h);
   const COLS = {
     football: [['pos', 'Pos'], ['cmp', 'Cmp'], ['att', 'Att'], ['yds', 'Pass yds'], ['td', 'Pass TD'], ['int', 'INT thrown'], ['car', 'Car'], ['ryds', 'Rush yds'], ['rtd', 'Rush TD'], ['rec', 'Rec'], ['cyds', 'Rec yds'], ['ctd', 'Rec TD'], ['tot', 'Tackles'], ['tfl', 'TFL'], ['sk', 'Sacks'], ['ints', 'INT'], ['pd', 'PBU'], ['ff', 'FF'], ['ovr', '16-0 OVR']],
-    hoops: [['gp', 'G'], ['pts', 'Pts'], ['ppg', 'PPG'], ['reb', 'Reb'], ['rpg', 'RPG'], ['ast', 'Ast'], ['apg', 'APG'], ['stl', 'Stl'], ['blk', 'Blk'], ['tpm', '3PM'], ['fgp', 'FG%']],
-    diamond: [['gp', 'G'], ['ab', 'AB'], ['h', 'H'], ['hr', 'HR'], ['rbi', 'RBI'], ['r', 'R'], ['sb', 'SB'], ['avg', 'AVG'], ['app', 'App'], ['w', 'W'], ['l', 'L'], ['era', 'ERA'], ['ip', 'IP'], ['so', 'K'], ['sv', 'SV']],
+    hoops: [['ovr', '40-0 OVR'], ['gp', 'G'], ['pts', 'Pts'], ['ppg', 'PPG'], ['reb', 'Reb'], ['rpg', 'RPG'], ['ast', 'Ast'], ['apg', 'APG'], ['stl', 'Stl'], ['blk', 'Blk'], ['tpm', '3PM'], ['fgp', 'FG%']],
+    diamond: [['ovr', '69-0 OVR'], ['gp', 'G'], ['ab', 'AB'], ['h', 'H'], ['hr', 'HR'], ['rbi', 'RBI'], ['r', 'R'], ['sb', 'SB'], ['avg', 'AVG'], ['app', 'App'], ['w', 'W'], ['l', 'L'], ['era', 'ERA'], ['ip', 'IP'], ['so', 'K'], ['sv', 'SV']],
     volleyball: [['sp', 'Sets'], ['k', 'Kills'], ['a', 'Assists'], ['d', 'Digs'], ['b', 'Blocks'], ['sa', 'Aces'], ['hp', 'Hit %']],
     soccer: [['gp', 'G'], ['g', 'Goals'], ['a', 'Assists'], ['pts', 'Pts'], ['sv', 'Saves'], ['sho', 'SO'], ['gaa', 'GAA'], ['w', 'W']],
   };
@@ -163,7 +163,7 @@
     const facts = [
       ['Position', p.pos === 'DL' ? 'DT' : p.pos], ['Seasons in our data', p.span], ['Hometown', p.home], ['Before Tennessee', p.frm],
       p.sp === 'football' ? ['NFL draft', p.draft ? (p.draft[1] ? `${p.draft[0]}, round ${p.draft[1]}` : `${p.draft[0]}, undrafted free agent`) : null] : ['Coach (best season)', p.coach],
-      p.mlb ? ['MLB draft', p.mlb.replace(' rd ', ', round ')] : null,
+      p.pro ? [p.pro.lg + ' draft', `${p.pro.y}, round ${p.pro.rd}${p.pro.pick ? ', pick ' + p.pro.pick : ''}`] : p.mlb ? ['MLB draft', p.mlb.replace(' rd ', ', round ')] : null,
       p.sp === 'football' ? ['NFL teams', (p.nfl || []).join(' → ')] : null,
     ].filter(x => x && x[1]);
     const related = PL.filter(x => x.sp === p.sp && x !== p && x.yrs.some(y => p.yrs.includes(y))).sort((a, b) => b.ovr - a.ovr).slice(0, 8);
@@ -171,7 +171,7 @@
       <nav class="gcrumb"><a href="${href('players')}">Players</a> <span aria-hidden="true">›</span> <a href="${href('players-' + p.sp)}">${esc(SPORT_NAME[p.sp])}</a> <span aria-hidden="true">›</span> <b>${esc(p.n)}</b></nav>
       <header class="pl-head"><div><div class="eyebrow">Tennessee ${esc(SPORT_NAME[p.sp])}</div><h1>${esc(p.n)}</h1>
         <div class="pl-hon">${hon.map(h => `<span class="chip honor">${esc(honText(h))}</span>`).join('')}</div></div>
-        ${p.sp === 'football' ? `<div class="pl-ovr" title="16-0 overall rating for his best season"><b>${p.ovr}</b><span>16-0 OVR (${p.best})</span></div>` : ''}</header>
+        ${RUN_NAME[p.sp] ? `<div class="pl-ovr" title="${RUN_NAME[p.sp]} overall rating for the best season"><b>${p.ovr}</b><span>${RUN_NAME[p.sp]} OVR (${esc(p.bestS || p.best)})</span></div>` : ''}</header>
       <dl class="pl-facts">${facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
       <div class="box pl-box"><h3>Season by season</h3>${seasonTable(p)}<p class="dim small">${p.sp === 'football' ? 'Best season highlighted. 1980s and early 1990s lines come from the UT record book\'s season leaders; 1995 on are full season stats.' : 'Best season highlighted. Season stats from utsports.com, Tennessee record books, Sports-Reference and The Baseball Cube.'}</p></div>
       <div class="grow"><a class="btn primary" href="${href('compare')}?a=${p.sp}/${p.slug}">Compare with another Vol</a> <a class="btn" href="${href('games-' + p.sp + '-guesser')}">Play ${p.sp === 'wbb' ? 'Lady Vol' : 'Vol'} Guesser</a></div>
@@ -194,7 +194,7 @@
         const tot = totals(p), tcols = colsFor(p.sp).filter(([k]) => tot[k] != null && !/^(gp|app|sp)$/.test(k));
         return `<div class="box cmp-col"><div class="eyebrow">${esc(SPORT_NAME[p.sp])} · ${esc(p.pos === 'DL' ? 'DT' : p.pos || '')} · ${esc(p.span)}</div>
           <h3><a href="${href('players-' + p.sp + '-' + p.slug)}">${esc(p.n)}</a></h3>
-          ${p.sp === 'football' ? `<p><b class="cmp-ovr">${p.ovr}</b> 16-0 OVR</p>` : ''}
+          ${RUN_NAME[p.sp] ? `<p><b class="cmp-ovr">${p.ovr}</b> ${RUN_NAME[p.sp]} OVR</p>` : ''}
           <div class="pl-hon">${(p.hon || []).slice(0, 4).map(h => `<span class="chip honor">${esc(honText(h))}</span>`).join('')}</div>
           <h4>Best season (${esc(best ? best.s : '')})</h4><dl class="cmp-stats">${cols.map(([k, l]) => `<div data-k="b-${k}"><dt>${esc(l)}</dt><dd>${esc(fmtV(k, best.st[k]))}</dd></div>`).join('')}</dl>
           <h4>Totals in our data (${p.seasons.length} season${p.seasons.length === 1 ? '' : 's'})</h4><dl class="cmp-stats">${tcols.map(([k, l]) => `<div data-k="t-${k}"><dt>${esc(l)}</dt><dd>${esc(fmtV(k, tot[k]))}</dd></div>`).join('') || '<p class="dim small">Only a best-season line for this player.</p>'}</dl></div>`;

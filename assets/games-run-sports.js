@@ -57,9 +57,9 @@
   // balance (tools: scratch bal2.js): a strong draft wins about 1 title in 5; a random draft rarely gets out of the first weekend
   const TUNE = Object.assign({
     mbb: { center: -4, mult: 1.0, sd: 9, hca: 3.2 },
-    wbb: { center: -4.5, mult: 1.05, sd: 9, hca: 3.2 },
+    wbb: { center: -1.2, mult: 1.05, sd: 9, hca: 3.2 },
     baseball: { center: -4, mult: 1.15, hfa: 0.25 },
-    softball: { center: -3, mult: 1.15, hfa: 0.2 },
+    softball: { center: -2.2, mult: 1.15, hfa: 0.2 },
   }, window.VI_RUN2_TUNE || {});
 
   /* =====================================================================================
@@ -784,12 +784,14 @@
   }
   const rer = () => rerender();
   function ovrHelp(sport) {
-    const c = CONF[sport];
+    const c = CONF[sport], lg = LG[sport];
     return `<details class="gnote"><summary><b>How OVR works</b></summary>
-      <p>Every rating is for one season. It's where that season ranks among every Tennessee ${c.hoops ? (c.lady ? "women's" : "men's") + ' basketball' : sport} season in our data, from 60 (the bottom of the list) to 95 (the best season we have).</p>
-      <ul>${c.hoops ? '<li><b>Production:</b> points, rebounds (x0.8), assists (x1.1), steals and blocks (x1.5), per game.</li><li><b>Team rating:</b> the average of your starting five, with your sixth player counting half.</li>'
-        : `<li><b>Hitters:</b> batting average, home runs, RBI, runs and steals.</li><li><b>Pitchers:</b> innings, strikeouts, wins and saves, minus ERA.</li><li><b>In games:</b> your lineup's average faces the other team's pitching; ${sport === 'baseball' ? 'the weekend starters throw games 1, 2 and 3 of a series, midweek games go to the bullpen, and the closer covers the late innings' : 'the ace throws two of every three games and the No. 2 throws the third'}.</li>`}
-        <li><b>Opponents:</b> real team-seasons Tennessee played since 2000. A team ranked No. 1 when Tennessee played them rates about 93, No. 25 about 82, an unranked power-conference team 77, a mid-major 66-72, plus a bump for teams that beat Tennessee.</li></ul></details>`;
+      <p>Same build as football's 16-0. OVR = 62 + <b>production</b> (0-24) + <b>awards</b> (0-11)${lg ? ` + <b>${lg} draft</b> (0-8)` : ''}. Above 95 the climb gets steeper (each point counts 40%), the ceiling is 98, and 99 is reserved for ${sport === 'wbb' ? 'Chamique Holdsclaw and Candace Parker' : sport === 'softball' ? 'Monica Abbott' : 'nobody yet'}.</p>
+      <ul><li><b>Production:</b> where that season ranks among every Tennessee ${c.hoops ? (c.lady ? "women's" : "men's") + ' basketball' : sport} season in our data (${c.hoops ? 'points, rebounds, assists, steals and blocks per game' : 'average, homers, RBI, runs and steals for hitters; innings, strikeouts, wins and saves minus ERA for pitchers'}).</li>
+      <li><b>Awards:</b> first-team All-American 7, second/third team 4, honorable mention 2; first-team All-SEC 3, second team 1.5; SEC ${c.hoops ? 'Player' : 'Player or Pitcher'} of the Year 3.5; national player of the year or national award 4, finalist 1.5.</li>
+      ${lg ? `<li><b>${lg} draft:</b> ${sport === 'baseball' ? 'top-5 pick 8, top-15 pick 7, rest of the first round 6, 2nd round 5, 3rd 4, 4th-5th 3, 6th-10th 2, 11th-20th 1' : sport === 'mbb' ? 'top-5 pick 8, lottery pick (6-14) 7, rest of the first round 6, second round 4' : 'top-5 pick 8, first round 6, second round 4, third 2, fourth 1'}. Seasons before the last one at Tennessee get half.</li>` : ''}
+      <li><b>Floors:</b> first-team All-American 88, second/third team 84, first-team All-SEC or SEC ${c.hoops ? 'Player' : 'Player/Pitcher'} of the Year 83${lg ? ', top-5 pick 87, first-round pick 85, second round 82, third round 79' : ''}.</li>
+      <li><b>Opponents:</b> real team-seasons Tennessee played since 2000. A team ranked No. 1 when Tennessee played them rates about 93, No. 25 about 82, an unranked power-conference team 77, a mid-major 66-72, plus a bump for teams that beat Tennessee.</li></ul></details>`;
   }
   function setup(body, daily) {
     const sport = SPORT, c = CONF[sport], X = R(sport), isDaily = X.mode === 'daily', D = data(sport);
@@ -837,12 +839,25 @@
     const grp = (lab, arr, key, val) => arr.length ? `<div class="gboard-side ${side === key ? 'on' : ''}"><div class="glabel">${lab}${arr.every(s => s.p) ? ` <span class="grate">${Math.round(val)}</span>` : ''}</div><div class="gslots">${arr.map(cell).join('')}</div></div>` : '';
     return `<div class="gboard ${compact ? 'compact' : ''}">${grp('Lineup', off, 'O', me.off)}${grp('Pitching', def, 'D', me.pit)}</div>`;
   }
+  const HONS = { AA1: 'All-American', AA2: 'All-America 2nd/3rd', AAH: 'All-America HM', SEC: 'All-SEC', SEC2: 'All-SEC 2nd', POY: 'SEC POY', PPOY: 'SEC Pitcher of the Year' };
+  const honChip = h => `<span class="chip honor">${esc(h.startsWith('W:') ? h.slice(2) : h.startsWith('F:') ? h.slice(2) + ' finalist' : HONS[h] || h)}</span>`;
+  const LG = { mbb: 'NBA', wbb: 'WNBA', baseball: 'MLB', softball: '' };
+  function ovrWhy(st, row) {
+    if (!row.rb) return 'OVR ' + row.ovr;
+    const [prod, aw, dr, fl] = row.rb, raw = Math.round((62 + prod + aw + dr) * 10) / 10;
+    let t = `OVR ${row.ovr}: 62 base + ${prod} production + ${aw} awards + ${dr} ${LG[st.sport] || 'pro'} draft = ${raw}`;
+    if (row.ovr === 99) return t + '. 99 is reserved for the all-time greats.';
+    if (raw > 95) t += `; points above 95 count 40%`;
+    if (fl) t += ` (raised to the ${fl} floor for honors or draft slot)`;
+    return t;
+  }
   function card(st, row, can, i) {
-    const D = data(st.sport), p = D.pl[row.n], draft = p && p.draft;
+    const D = data(st.sport), p = D.pl[row.n], pro = p && p.pro;
+    const draft = pro ? `<span class="chip draft">${esc(pro.lg)} Rd ${pro.rd}${pro.pick ? ' #' + pro.pick : ''} (${pro.y})</span>` : p && p.draft ? `<span class="chip draft">MLB Rd ${esc(String(p.draft).split(' rd ')[1] || '')} (${esc(String(p.draft).split(' ')[0])})</span>` : '';
     return `<button class="gpcard deal ${can ? '' : 'off'}" data-id="${esc(row.id)}" style="--d:${i * 70}ms" ${can ? '' : 'disabled aria-disabled="true"'}>
-      <span class="gpc-top"><span class="gpos">${esc(row.pos || (row.k === 'P' ? 'P' : 'UT'))}</span>${can ? '' : '<span class="gpc-filled">Filled</span>'}<span class="govr" title="${esc('OVR ' + row.ovr + ': where this season ranks among every Tennessee season in our data (60-95)')}">${row.ovr}</span></span>
+      <span class="gpc-top"><span class="gpos">${esc(row.pos || (row.k === 'P' ? 'P' : 'UT'))}</span>${can ? '' : '<span class="gpc-filled">Filled</span>'}<span class="govr" title="${esc(ovrWhy(st, row))}">${row.ovr}</span></span>
       <b class="gpc-name">${esc(row.n)}</b><span class="gpc-yr">${esc(row.s)} · ${esc(row.coach || '')}</span>
-      <span class="gpc-line">${esc(row.line || '')}</span><span class="gpc-hon">${draft ? `<span class="chip draft">MLB Rd ${esc(String(draft).split(' rd ')[1] || '')} (${esc(String(draft).split(' ')[0])})</span>` : ''}</span>
+      <span class="gpc-line">${esc(row.line || '')}</span><span class="gpc-hon">${(row.hon || []).slice(0, 2).map(honChip).join('')}${draft}</span>
     </button>`;
   }
   function draftView(body) {

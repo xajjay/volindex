@@ -296,10 +296,11 @@ for p in out:
                        seasons=sorted(fb_seasons[p['n']], key=lambda x: x['y'])))
 for k, v in sports.items():
     rs = collections.defaultdict(list)
-    for r in v['rows']: rs[r['n']].append(dict(y=r['y'], s=r['s'], pos=r['pos'], k=r['k'], st=r['st']))
+    for r in v['rows']: rs[r['n']].append(dict(y=r['y'], s=r['s'], pos=r['pos'], k=r['k'], st=r['st'], ovr=r.get('ovr'), hon=r.get('hon') or []))
     for p in v['players']:
         people.append(dict(sp=k, n=p['n'], slug=slugify(p['n']), pos=p['pos'], yrs=p['ys'], ovr=p['ovr'], best=p['y'], bestS=p['s'], line=p['line'],
-                           frm=p.get('prev'), home=p.get('home'), coach=p.get('coach'), mlb=p.get('draft'), seasons=sorted(rs[p['n']], key=lambda x: (x['y'], x['k']))))
+                           frm=p.get('prev'), home=p.get('home'), coach=p.get('coach'), hon=p.get('honAll') or [], pro=p.get('pro'),
+                           mlb=None if p.get('pro') else p.get('draft'), seasons=sorted(rs[p['n']], key=lambda x: (x['y'], x['k']))))
 seen = collections.Counter()
 for p in people:   # unique slugs per sport
     key = (p['sp'], p['slug']); seen[key] += 1
