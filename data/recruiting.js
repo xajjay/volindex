@@ -35,7 +35,9 @@ window.RECRUITING = {
   wbb: {
     year: 2027,
     intro: "Kim Caldwell's recruiting: the class of 2027, this year's freshmen and where to follow along.",
-    commits: [],
+    commits: [
+      { name: 'Maci Pringle', pos: 'Wing', from: 'Flower Mound HS (Flower Mound, Texas)', rank: '4-star (ESPN) · 6-1', date: 'Oct. 20, 2026', src: 'https://www.rockytopinsider.com/2026/10/20/lady-vols-basketball-land-commitment-of-four-star-wing-maci-pringle-after-recent-visit/' },
+    ],
     none: 'No 2027 commitments confirmed by a current source yet. Earlier pledges from before the 2024 coaching change are not counted.',
     note: 'Lady Vol Hoops signed a top-10 class for the second straight year in November 2025.',
     trackers: [

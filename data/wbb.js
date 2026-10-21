@@ -985,7 +985,7 @@ window.SITE.wbb = {
    ]
   ],
   "recruits": [],
-  "recruitNote": "2027 commitments not yet tracked here."
+  "recruitNote": "2027: Maci Pringle (4-star wing, Flower Mound, Texas) committed Oct. 20, 2026, the first pledge of the class."
  },
  "history": {
   "titles": [
