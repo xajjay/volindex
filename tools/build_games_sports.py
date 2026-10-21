@@ -212,7 +212,7 @@ def draft_pts(sport, d):
         return 8 if pk <= 5 else 7 if pk <= 14 else 6 if rd == 1 else 4
     return 8 if pk and pk <= 5 else 6 if rd == 1 else 4 if rd == 2 else 2 if rd == 3 else 1   # WNBA
 AWARD_PTS = {'AA1': 7, 'AA2': 4, 'AAH': 2, 'SEC': 3, 'SEC2': 1.5, 'POY': 3.5, 'PPOY': 3.5}
-LEGENDS = {('wbb', 'chamiqueholdsclaw'), ('wbb', 'candaceparker'), ('softball', 'monicaabbott')}
+LEGENDS = {('wbb', 'chamiqueholdsclaw'), ('wbb', 'candaceparker'), ('softball', 'monicaabbott'), ('softball', 'karlynpickens'), ('mbb', 'daltonknecht'), ('baseball', 'christianmoore')}
 def season_end(sport, s): return start_year(s) + (1 if sport in ('mbb', 'wbb') else 0)
 def rate_rows(sport, rows):
     if sport not in ('mbb', 'wbb', 'baseball', 'softball'):
