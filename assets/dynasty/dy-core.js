@@ -80,11 +80,11 @@
   DY.makeAttrs = (pos, target, archName) => {
     const arch = (DY.ARCH[pos].find(a => a[0] === archName) || pick(DY.ARCH[pos]));
     const w = DY.W[pos], at = {};
-    for (const k in w) at[k] = target + (arch[1][k] || 0) + gauss() * 3.4 + (k === 'spd' ? (DY.SPD_ADJ[pos] || 0) : 0) + (k === 'mcv' ? -4 : 0);
+    for (const k in w) at[k] = target + (arch[1][k] || 0) + gauss() * 3.4 + (k === 'spd' ? (DY.SPD_ADJ[pos] || 0) : 0);
     const p = { pos, at };
     for (let it = 0; it < 4; it++) {
       let s = 0; for (const k in w) s += w[k] * at[k];
-      const d = target - s; for (const k in w) at[k] = clamp(at[k] + d * (k === 'mcv' ? 0.4 : 1.12), 20, 99);
+      const d = target - s; for (const k in w) at[k] = clamp(at[k] + d, 20, 99);
     }
     for (const [k, off] of DY.EXTRA[pos] || []) at[k] = clamp(target + off + (arch[1][k] || 0) + gauss() * 4, 15, 95);
     if (!at.spd) at.spd = clamp(target - 25 + gauss() * 4, 25, 80);
@@ -110,7 +110,7 @@
 
   /* ---------- personality (Burger Town-style traits that explain what happens on the field) ---------- */
   DY.TRAITS = { disc: 'Discipline', clutch: 'Clutch', cons: 'Consistency', ego: 'Ego', lead: 'Leadership', work: 'Work ethic', tough: 'Toughness', loyal: 'Loyalty' };
-  DY.makeTraits = () => { const t = {}; for (const k in DY.TRAITS) t[k] = Math.round(clamp(64 + gauss() * 15, 15, 99)); return t; };
+  DY.makeTraits = () => { const t = {}; for (const k in DY.TRAITS) t[k] = Math.round(clamp(58 + gauss() * 17, 10, 99)); return t; };
   DY.persLabel = p => {
     const t = p.tr;
     if (t.ego >= 80 && t.disc <= 45) return ['Hot Head', 'Plays with an edge that can boil over: personal fouls and taunting flags follow him.'];
@@ -271,7 +271,7 @@
     'Xavier Gilliam': { yr: 3, ovr: 95 }, 'Carson Gentle': { yr: 3 }, 'Nathan Robinson': { yr: 4 }, 'Edwin Spillman': { yr: 3 }, 'Tevis Metcalf': { yr: 4 },
     'Daune Morris': { ovr: 82, arch: 'Elusive Back' }, 'Javin Gordon': { ovr: 75 }, 'David Sanders Jr.': { ovr: 92, arch: 'Pass Protector' },
     'JJ Finch': { ovr: 75 }, 'Ethan Utley': { ovr: 75 }, 'Jeremiah Telander': { pos: 'EDGE', tr: { lead: 96 }, note: 'Hybrid edge/linebacker.' },
-    'Arion Carter': { ovr: 88, tr: { lead: 99, work: 92, clutch: 88, disc: 90, tough: 92, loyal: 92 }, captain: true },
+    'Arion Carter': { ovr: 88, at: { mcv: 79 }, tr: { lead: 99, work: 94, clutch: 90, disc: 92, tough: 94, loyal: 94, cons: 88, ego: 35 }, captain: true },
     'Amare Campbell': { ovr: 87, at: { tak: 91, pur: 90 } }, 'Ty Redmond': { ovr: 87, at: { mcv: 88, awr: 86, tak: 82 } },
     'Dejuan Lane': { ovr: 90, at: { zcv: 92, awr: 90, tak: 88 }, tr: { lead: 90 } }, 'Edrees Farooq': { ovr: 85 },
   };
@@ -325,8 +325,6 @@
         home: rp.home || 'Knoxville, TN', st: hm ? stAbbr(hm[1]) : 'TN', hs: rp.hs || '', arch: fx.arch || realArch(pos, rp), grade: walkon ? 74 : g,
         rec: walkon ? { walkon: true, stars: 0 } : { c: comp, stars, g, nat: hs ? hs.nat : null, cls: hs ? hs.cls : null, src: hs ? '247 Composite' : 'rating' },
       });
-      // real players carry a stronger culture: personality shifted up
-      for (const k in p.tr) p.tr[k] = Math.round(clamp(p.tr[k] + 7, 20, k === 'lead' ? 94 : 99));
       if (fx.tr) Object.assign(p.tr, fx.tr);
       if (fx.at) Object.assign(p.at, fx.at);
       DY.fitOvr(p, ovr, fx.at);

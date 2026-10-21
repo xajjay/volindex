@@ -342,7 +342,7 @@ Sacramento State|SAC|42|#043927|#C4B581|CA`;
     'Washington State': 'air', 'Mississippi State': 'air', SMU: 'tempo', 'Kansas State': 'power', Indiana: 'spread' };
   // offensive identities: pass rate, seconds between snaps, and how often each formation is used
   DY.STYLES = {
-    power: { name: 'Power run (12 personnel)', pass: 0.43, tempo: 33, forms: { ace12: 0.33, pistol: 0.2, trips: 0.2, iform: 0.14, doubles: 0.13 } },
+    power: { name: 'Power run', pass: 0.43, tempo: 33, forms: { ace12: 0.33, pistol: 0.2, trips: 0.2, iform: 0.14, doubles: 0.13 } },
     pro: { name: 'Pro style', pass: 0.47, tempo: 34, forms: { ace12: 0.28, iform: 0.24, doubles: 0.18, trips: 0.15, pistol: 0.1, spread: 0.05 } },
     spread: { name: 'Spread RPO', pass: 0.5, tempo: 31, forms: { trips: 0.36, doubles: 0.3, pistol: 0.14, spread: 0.14, ace12: 0.06 } },
     tempo: { name: 'Up-tempo spread', pass: 0.52, tempo: 26, forms: { trips: 0.4, doubles: 0.24, spread: 0.2, empty: 0.06, pistol: 0.1 } },

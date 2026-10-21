@@ -65,7 +65,7 @@
       <div class="box gsetup dy-setup">
         <div class="gfield"><div class="glabel">Coach name</div><input id="dyCoach" class="dy-in" maxlength="28" placeholder="Your name" value="${esc(s.coach)}"></div>
         <div class="gfield"><div class="glabel">Coaching style</div><div class="dy-archs">${Object.entries(DY.COACH_ARCH).map(([k, a]) => `<button type="button" class="dy-arch" data-arch="${k}" aria-pressed="${s.arch === k}"><b>${esc(a.name)}</b><small>${esc(a.desc)}</small></button>`).join('')}</div></div>
-        <div class="gfield"><div class="glabel">Offensive identity</div>${seg('offStyle', Object.entries(DY.STYLES).map(([k, st]) => [k, st.name]))}<p class="dim small">Tennessee in 2026 leans on the run out of 12 personnel at a standard pace. Change it any time in Settings.</p></div>
+        <div class="gfield"><div class="glabel">Offensive identity</div>${seg('offStyle', Object.entries(DY.STYLES).map(([k, st]) => [k, st.name]))}<p class="dim small">Tennessee leans on the run and plays at a slower pace this season. You can change it any time in Settings.</p></div>
         <div class="gfield"><div class="glabel">Difficulty</div>${seg('diff', [['freshman', 'Freshman'], ['varsity', 'Varsity'], ['heisman', 'Heisman (balanced)']])}<p class="dim small">Heisman is the real thing. Lower levels take a little off CPU players in your games.</p></div>
         <div class="gfield"><div class="glabel">Playoff</div>${seg('cfp', [['real', 'Real format (12 in 2026, 24 from 2027)'], [12, '12 teams'], [24, '24 teams']])}</div>
         <div class="gfield"><div class="glabel">Play calling</div>${seg('coachMode', [['offense', 'Offense (your DC calls defense)'], ['full', 'Offense and defense'], ['watch', 'Just watch']])}</div>
