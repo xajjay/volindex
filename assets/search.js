@@ -327,7 +327,7 @@
     const theme = document.getElementById('themeBtn'); theme ? bar.insertBefore(b, theme) : bar.appendChild(b);
   }
   // big box on the home page
-  window.askHero = () => `<form class="askhero" id="askHero" role="search"><span aria-hidden="true">⌕</span><input type="search" placeholder="Ask the Index: “Football Roster”, “Volleyball Schedule”, “Basketball Recruiting”" aria-label="Ask the Index"><button class="btn primary" type="submit">Ask</button></form>`;
+  window.askHero = () => `<form class="askhero" id="askHero" role="search"><span aria-hidden="true">⌕</span><input type="search" placeholder="${matchMedia && matchMedia('(max-width: 560px)').matches ? 'Ask the Index: “Football roster”' : 'Ask the Index: “Football Roster”, “Volleyball Schedule”, “Basketball Recruiting”'}" aria-label="Ask the Index"><button class="btn primary" type="submit">Ask</button></form>`;
   window.wireAskHero = () => {
     const f = document.getElementById('askHero'); if (!f) return;
     const i = f.querySelector('input');

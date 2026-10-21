@@ -20,7 +20,7 @@
   /* ---------- seeded random ---------- */
   function hashStr(str) { let h = 1779033703 ^ str.length; for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; } return () => { h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); return (h ^= h >>> 16) >>> 0; }; }
   function rngFrom(seed) { let a = hashStr(String(seed))(); return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-  const freeSeed = () => String(Date.now()) + Math.random();
+  const freeSeed = () => Math.random().toString(36).slice(2, 9);   // short, so it fits in a challenge link
   const pick = (r, arr) => arr[Math.floor(r() * arr.length)];
   function shuffle(r, arr) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   function gauss(r) { let u = 0, v = 0; while (!u) u = r(); while (!v) v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
@@ -29,6 +29,7 @@
   // newer eras get a light boost: 2020s x1.25, 2010s x1.12
   const ERA_BOOST = d => d >= 2020 ? 1.25 : d >= 2010 ? 1.12 : 1;
   const decOf = y => Math.floor(y / 10) * 10;
+  const slug = n => (window.VI_SLUG ? window.VI_SLUG(n) : String(n).toLowerCase().replace(/[^a-z0-9]+/g, '-'));
 
   /* ---------- storage (per browser) ---------- */
   const store = {
@@ -213,23 +214,56 @@
   }
   // per game state: { mode, st }. make(r, eras) builds a fresh game.
   const GST = {};
+  // ?c=<seed>.<eras> in the address = a friend's challenge link: free play with exactly their puzzle
+  function challenge() {
+    let c = null; try { c = new URLSearchParams(location.search).get('c'); } catch (e) {}
+    if (!c || !/^[a-z0-9]{3,12}(\.[0-9-]+)?$/.test(c)) return null;
+    const [seed, e] = c.split('.');
+    return { seed, eras: e ? e.split('-').map(x => +x < 50 ? 2000 + +x : 1900 + +x) : null, raw: c };
+  }
   function gameState(sport, g, make) {
     const key = sport + '|' + g, G = GST[key] || (GST[key] = { mode: 'daily', st: null }), today = etDate();
+    const ch = challenge();
+    if (ch && G.chUsed !== ch.raw) { G.chUsed = ch.raw; G.mode = 'free'; G.st = null; G.ch = ch; }
     const saved = store.get(dkey(sport, g, today), null);
-    const stale = !G.st || G.st.mode !== G.mode || (G.mode === 'daily' && G.st.date !== today) || (G.mode === 'free' && G.st.eraKey !== eraKey(sport));
+    const stale = !G.st || G.st.mode !== G.mode || (G.mode === 'daily' && G.st.date !== today) || (G.mode === 'free' && G.st.eraKey !== 'ch' && G.st.eraKey !== eraKey(sport));
     if (stale) {
       if (G.mode === 'daily' && saved && saved.state) G.st = saved.state;
       else {
-        const daily = G.mode === 'daily', eras = daily ? sportEras(sport) : getEras(sport);
-        const r = rngFrom(daily ? sport + '-' + g + '-' + today : freeSeed());
-        G.st = Object.assign({ mode: G.mode, date: today, eraKey: daily ? 'all' : eraKey(sport), eras }, make(r, eras, daily));
+        const daily = G.mode === 'daily', c = !daily && G.ch;
+        const eras = daily ? sportEras(sport) : c && c.eras ? c.eras.filter(e => sportEras(sport).includes(e)) : getEras(sport);
+        const seed = daily ? sport + '-' + g + '-' + today : (c ? c.seed : freeSeed());
+        const r = rngFrom(daily ? seed : 'free-' + sport + '-' + g + '-' + seed);
+        G.st = Object.assign({ mode: G.mode, date: today, eraKey: daily ? 'all' : c ? 'ch' : eraKey(sport), eras: eras.length ? eras : sportEras(sport), seed, sp: sport, g, fromChallenge: !!c }, make(r, eras.length ? eras : sportEras(sport), daily));
+        G.ch = null;
       }
     }
     return { G, st: G.st, saved };
   }
-  function saveDaily(sport, g, st) { if (st.mode === 'daily') store.set(dkey(sport, g, st.date), { state: st, share: st.share }); }
+  // the share text, plus a link that drops a friend into the same free-play puzzle
+  function challengeLink(st) {
+    const all = sportEras(st.sp), eras = (st.eras || all);
+    const e = eras.length === all.length ? '' : '.' + eras.map(x => String(x).slice(2)).join('-');
+    return `https://www.volindex.net/games/${SPORT_PATH[st.sp]}/${st.g}?c=${st.seed}${e}`;
+  }
+  function copyShare(st, btn) {
+    const txt = (st.share || '') + (st.mode === 'free' && st.seed ? `\nSame puzzle: ${challengeLink(st)}` : '');
+    if (window.VI_TRACK) window.VI_TRACK('share/' + st.sp + '/' + st.g);
+    copyText(txt, btn);
+  }
+  const SPORT_PATH = { football: 'football', mbb: 'mens-basketball', wbb: 'womens-basketball', baseball: 'baseball', softball: 'softball', volleyball: 'volleyball', soccer: 'soccer' };
+  function saveDaily(sport, g, st) {
+    if (st.mode === 'daily') store.set(dkey(sport, g, st.date), { state: st, share: st.share });
+    if (st.done && !st.tracked) {   // count a finished game once (analytics) and sync a signed-in player's progress
+      st.tracked = 1;
+      if (window.VI_TRACK) window.VI_TRACK('finish/' + sport + '/' + g + '/' + st.mode);
+      if (st.mode === 'daily' && window.VI_SYNC) window.VI_SYNC();
+      if (st.mode === 'daily') store.set(dkey(sport, g, st.date), { state: st, share: st.share });
+    }
+  }
   function topBar(body, sport, G, saved, extra) {
-    return `${modeBar(G.mode, !!(saved && saved.state && saved.state.done))}${G.mode === 'free' ? eraChips(sport, extra) : ''}`;
+    const chal = G.mode === 'free' && G.st && G.st.fromChallenge ? '<div class="gchal">🤝 You\'re playing a friend\'s challenge: the exact same puzzle they got.</div>' : '';
+    return `${modeBar(G.mode, !!(saved && saved.state && saved.state.done))}${chal}${G.mode === 'free' && !(G.st && G.st.fromChallenge) ? eraChips(sport, extra) : ''}`;
   }
   function bindTop(body, sport, G) {
     bindMode(body, m => { G.mode = m; G.st = null; rerender(); });
@@ -250,7 +284,7 @@
           <span class="gsport-t"><b>${esc(s.name)}</b><span class="dim">${s.games.length} games${done ? ` · ${done} done today` : ''}</span></span>
           ${s.beta ? '<span class="gbeta">Beta</span>' : '<span class="chip new">Full</span>'}</a>`;
       }).join('')}</div>
-      <div class="wrap gfoot"><button class="btn" id="gShareAll">Copy today's results</button>
+      <div class="wrap gfoot"><button class="btn" id="gShareAll">Copy today's results</button> <a class="btn" href="#me">My games: streaks and stats</a>
         <p class="dim">Football games use the Tennessee record book, utsports.com, ESPN and CollegeFootballData.com. Basketball, baseball, softball, volleyball and soccer games are in beta and use utsports.com season stats; more games for every sport are coming soon. Spotted a mistake? Email <a href="mailto:thevolindex@gmail.com">thevolindex@gmail.com</a>.</p></div>`;
     app.querySelector('#gShareAll').addEventListener('click', e => {
       const lines = [];
@@ -260,11 +294,11 @@
   }
   const COVERAGE = {
     football: 'Every Vol from 1980 to today appears at his best season. 1980s and early 1990s stats come from the UT record book; 1995 on use full season stats from utsports.com, ESPN and CollegeFootballData.com.',
-    mbb: 'Season stats from utsports.com, 2000-01 to 2025-26 (top players each season).',
-    wbb: 'Season stats from utsports.com start in 2015-16, so Lady Vols legends like Chamique Holdsclaw and Candace Parker show up in Trivia for now.',
-    baseball: 'Season stats from utsports.com, 2017 to 2026 (no 2020 season). Older seasons are coming.',
-    softball: 'Season stats from utsports.com, 2006 to 2026 (no 2020 season).',
-    volleyball: 'Season stats from utsports.com, 2006 to 2025.',
+    mbb: '1990-91 to 1999-2000 from the Tennessee basketball record book (top scorers and stat leaders); 2000-01 to today from utsports.com season stats.',
+    wbb: 'Full season stats from 1990-91 to today (utsports.com year-by-year stats and all-time rosters), so Holdsclaw, Catchings and Parker are all here. 1998-99 is still missing.',
+    baseball: '2000-2016 from the record book\'s year-by-year leaders (one leader per stat, so fewer names per season); 2017 to today from utsports.com season stats. No 2020 season.',
+    softball: '2000-2026 season stats from the softball media guide and utsports.com, including the Monica Abbott years. No 2020 season.',
+    volleyball: 'Season stats from utsports.com, 2006 to 2025. Earlier seasons are not online yet.',
     soccer: 'Season stats from utsports.com, 2001 to 2025.',
   };
   function renderSportHub(app, sport) {
@@ -277,7 +311,7 @@
       <div class="grid g3 gcards">${s.games.map(g => `<a class="box gcard" href="#games-${sport}-${g}"><div class="gcard-top"><span class="gicon" aria-hidden="true">${GAME_ICON[g]}</span>${dailyDone(sport, g) ? '<span class="chip new">Today ✓</span>' : '<span class="chip">Daily</span>'}</div>
           <h3>${esc(gameName(sport, g))}</h3><p>${esc(gameBlurb(sport, g))}</p><span class="btn primary">Play</span></a>`).join('')}
         ${s.beta ? `<div class="box gcard soon"><div class="gcard-top"><span class="gicon" aria-hidden="true">🔜</span><span class="chip">Soon</span></div><h3>More games</h3><p>Grids, career paths and sims for ${esc(s.name.toLowerCase())} are on the way.</p></div>` : ''}</div>
-      <p class="gfoot dim"><a href="#games">← All sports</a></p></div>`;
+      <p class="gfoot dim"><a href="#games">← All sports</a> · <a href="#me">My games: streaks and stats ›</a> · <a href="#players-${sport}">${esc(s.name)} player pages ›</a></p></div>`;
   }
 
   /* =====================================================================================
@@ -355,7 +389,7 @@
         <div class="gguess-top"><div class="eyebrow">Guess ${Math.min(st.guesses.length + 1, GUESS_MAX)} of ${GUESS_MAX} · ${st.pool || ''} possible answers</div>
           ${st.done ? '' : '<div id="gsrch"></div>'}</div>
         ${st.done ? `<div class="greveal ${won ? 'win' : ''}"><div class="eyebrow">${won ? 'Got it in ' + st.guesses.length : st.gaveUp ? 'You gave up. The answer' : 'The answer'}</div><h3>${esc(ans.n)}</h3>
-          <p>${esc(A.reveal(ans))}</p><p>${A.chips(ans)}</p>
+          <p>${esc(A.reveal(ans))}</p><p>${A.chips(ans)}</p><p><a href="#players-${sport}-${slug(ans.n)}">Player page ›</a></p>
           <div class="grow"><button class="btn primary" id="gShare">Copy result</button> <button class="btn" id="gNew">New player (free play)</button></div></div>` : ''}
         <div class="ghints">${hints.map((h, i) => i < shown ? `<div class="ghint on"><b>${esc(h[0])}</b> ${esc(h[1])}</div>` : `<div class="ghint"><b>${esc(h[0])}</b> <span class="dim">after ${(i + 1) * 2} misses</span></div>`).join('')}</div>
         <div class="gtable-wrap"><table class="gtable"><thead><tr><th>Player</th>${A.head.map(h => `<th>${h}</th>`).join('')}</tr></thead>
@@ -374,7 +408,7 @@
       saveDaily(sport, 'guesser', st); rerender(); refocus();
     }, 'Guess a player');
     twoTap(body.querySelector('#gGive'), 'Tap again to reveal', () => { finish(true); saveDaily(sport, 'guesser', st); rerender(); });
-    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyText(st.share, e.currentTarget));
+    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyShare(st, e.currentTarget));
     const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { G.mode = 'free'; G.st = null; rerender(); });
   }
 
@@ -450,7 +484,7 @@
       if (!ok && !st.done) { const m = document.getElementById('gmsg'); if (m) m.textContent = `${n} doesn't fit that square. ${st.left} guesses left.`; refocus(); }
     }, 'Name a Vol');
     twoTap(body.querySelector('#gGive'), 'Tap again to end', () => { finish(); rerender(); });
-    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyText(st.share, e.currentTarget));
+    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyShare(st, e.currentTarget));
     const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { G.mode = 'free'; G.st = null; rerender(); });
   }
 
@@ -481,7 +515,7 @@
         <div class="eyebrow">Career path${c.teams.length > 1 ? ' · ' + c.teams.length + ' NFL teams' : ''} · ${st.pool || ''} notable VFLs in this pool</div>
         <div class="gteams">${path}</div>
         <dl class="gclues">${clues.map((cl, i) => i < shown ? `<div><dt>${esc(cl[0])}</dt><dd>${esc(cl[1])}</dd></div>` : `<div class="locked"><dt>${esc(cl[0])}</dt><dd>Unlocks after ${i + 1} miss${i ? 'es' : ''}</dd></div>`).join('')}</dl>
-        ${st.done ? `<div class="greveal ${won ? 'win' : ''}"><div class="eyebrow">${won ? 'Correct in ' + st.guesses.length : st.gaveUp ? 'You gave up. The answer' : 'The answer'}</div><h3>${esc(c.n)}</h3>
+        ${st.done ? `<div class="greveal ${won ? 'win' : ''}"><div class="eyebrow">${won ? 'Correct in ' + st.guesses.length : st.gaveUp ? 'You gave up. The answer' : 'The answer'}</div><h3>${esc(c.n)}</h3>${p ? `<p><a href="#players-football-${slug(c.n)}">Player page ›</a></p>` : ''}
           <div class="grow"><button class="btn primary" id="gShare">Copy result</button> <button class="btn" id="gNew">Another career (free play)</button></div></div>`
         : `<div class="eyebrow">Guess ${st.guesses.length + 1} of ${CAREER_MAX}</div><div id="gsrch"></div><div class="grow"><button class="glink" id="gGive">Give up</button></div>`}
         ${st.guesses.length ? `<ul class="gmisses">${st.guesses.map(x => `<li class="${x === c.n ? 'hit' : ''}">${esc(x)}</li>`).join('')}</ul>` : ''}
@@ -499,7 +533,7 @@
       saveDaily(sport, 'career', st); rerender(); refocus();
     }, 'Name the VFL');
     twoTap(body.querySelector('#gGive'), 'Tap again to reveal', () => { finish(true); saveDaily(sport, 'career', st); rerender(); });
-    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyText(st.share, e.currentTarget));
+    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyShare(st, e.currentTarget));
     const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { G.mode = 'free'; G.st = null; rerender(); });
   }
 
@@ -515,7 +549,7 @@
     { k: 'tfl', l: 'Tackles for loss', slots: ['EDGE', 'DL', 'LB'], min: 6 },
   ];
   const RK_SPORT = {
-    hoops: [{ k: 'pts', l: 'Points', min: 200 }, { k: 'reb', l: 'Rebounds', min: 100 }, { k: 'ast', l: 'Assists', min: 60 }, { k: 'tpm', l: '3-pointers made', min: 25 }, { k: 'blk', l: 'Blocks', min: 15 }, { k: 'stl', l: 'Steals', min: 25 }],
+    hoops: [{ k: 'ppg', l: 'Points per game', min: 8, fmt: v => Number(v).toFixed(1) }, { k: 'rpg', l: 'Rebounds per game', min: 4, fmt: v => Number(v).toFixed(1) }, { k: 'apg', l: 'Assists per game', min: 2, fmt: v => Number(v).toFixed(1) }, { k: 'pts', l: 'Points', min: 200 }, { k: 'reb', l: 'Rebounds', min: 100 }, { k: 'ast', l: 'Assists', min: 60 }, { k: 'tpm', l: '3-pointers made', min: 25 }, { k: 'blk', l: 'Blocks', min: 15 }, { k: 'stl', l: 'Steals', min: 25 }],
     diamond: [{ k: 'h', l: 'Hits', kind: 'H', min: 40 }, { k: 'hr', l: 'Home runs', kind: 'H', min: 3 }, { k: 'rbi', l: 'RBI', kind: 'H', min: 20 }, { k: 'sb', l: 'Stolen bases', kind: 'H', min: 5 },
       { k: 'avg', l: 'Batting average', kind: 'H', min: .2, fmt: f3, need: s => (s.ab || 0) >= 100 }, { k: 'so', l: 'Strikeouts (pitching)', kind: 'P', min: 40 }, { k: 'w', l: 'Wins (pitching)', kind: 'P', min: 4 },
       { k: 'era', l: 'ERA', kind: 'P', min: .1, asc: true, fmt: f2, need: s => (s.ip || 0) >= 50 }, { k: 'ip', l: 'Innings pitched', kind: 'P', min: 40 }],
@@ -580,7 +614,7 @@
       }
       saveDaily(sport, 'rankings', st); rerender();
     });
-    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyText(st.share, e.currentTarget));
+    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyShare(st, e.currentTarget));
     const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { G.mode = 'free'; G.st = null; rerender(); });
   }
 
@@ -629,7 +663,7 @@
     if (nx) nx.addEventListener('click', () => {
       const wasOk = st.picks[st.i] === truth(rd);
       if (st.endless) {
-        if (wasOk) { const r = rngFrom(freeSeed()); st.rounds.push(duelPair(r, sport, st.eras) || duelPair(r, sport, sportEras(sport))); st.i++; }
+        if (wasOk) { const r = rngFrom(st.seed + '|round' + (st.i + 1)); st.rounds.push(duelPair(r, sport, st.eras) || duelPair(r, sport, sportEras(sport))); st.i++; }
         else st.done = true;
       } else if (st.i + 1 < st.rounds.length) st.i++; else st.done = true;
       if (st.done) {
@@ -639,7 +673,7 @@
       }
       saveDaily(sport, 'duel', st); rerender();
     });
-    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyText(st.share, e.currentTarget));
+    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyShare(st, e.currentTarget));
     const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { G.mode = 'free'; G.st = null; rerender(); });
   }
 
@@ -705,7 +739,7 @@
       }
       saveDaily(sport, 'trivia', st); rerender();
     });
-    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyText(st.share, e.currentTarget));
+    const sh = body.querySelector('#gShare'); if (sh) sh.addEventListener('click', e => copyShare(st, e.currentTarget));
     const nw = body.querySelector('#gNew'); if (nw) nw.addEventListener('click', () => { G.mode = 'free'; G.st = null; rerender(); });
   }
 
@@ -742,7 +776,7 @@
   // shared helpers for assets/games-run.js
   window.VIG = {
     esc, etDate, SITE, reduceMotion, rngFrom, freeSeed, pick, shuffle, gauss, wpick, wsample, ERA_BOOST, decOf, store, copyText, twoTap,
-    frame, modeBar, bindMode, dkey, FB_ERAS, SLOT_NAME, posLabel, statLine, honorChips, getEras, setEras, eraChips, bindEras,
+    frame, modeBar, bindMode, dkey, challenge, FB_ERAS, SLOT_NAME, posLabel, statLine, honorChips, getEras, setEras, eraChips, bindEras,
     data: () => ({ D, ALL, POOL, BYNAME }), rerender, initFootball,
   };
 })();

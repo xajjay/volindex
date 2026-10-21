@@ -75,13 +75,14 @@
             time: g.time && !/TBD|TBA/i.test(g.time) ? g.time.replace(/ ?ET$/i, '').replace(/\./g, '').replace(/ ?pm$/i, ' PM').replace(/ ?am$/i, ' AM') : old.time || null,
             kind: g.exh || /\((Exh|Exhibition|Scrimmage)/i.test(g.opp) || /^(E|S)$/.test(g.type || '') ? 'exh' : g.conf ? 'conf' : (old.kind === 'exh' ? 'nonconf' : old.kind || 'nonconf'),
             result: g.result || null, us: g.us != null ? +g.us : null, them: g.them != null ? +g.them : null,
-            gid: g.id, hasBox: !!(A.box && A.box[String(g.id)]), watch: g.watch, live: g.live, event: g.tournament, note: g.note,
+            gid: g.id, hasBox: !!((A.box && A.box[String(g.id)]) || (A.boxIds && A.boxIds.includes(String(g.id)))), watch: g.watch, live: g.live, event: g.tournament, note: g.note,
           });
         });
         setRecord(D);
       }
       if (A.stats) D.statsAuto = A.stats;
       if (A.box) D.box = A.box;
+      else if (A.boxIds) D.boxLazy = 'data/' + (A.boxFile || D.key + '-box.js');   // box scores split out at deploy: loaded on first open
       { const yr = parseInt(D.season, 10), st = /baseball|softball/.test(D.key) ? `${yr}-01-01` : `${yr}-08-01`;
         if (A.rpi && A.rpi.date && A.rpi.date >= st) D.rpiAuto = A.rpi;
         if (A.poll && A.poll.date && A.poll.date >= st) D.pollCur = A.poll; }
@@ -217,6 +218,14 @@
     return Object.keys(keys).sort((a, b) => keys[b] - keys[a]).slice(0, 10).map(k => [human(k).replace(/^(Attack|Set|Serve|Defense|Block|Misc) Stats /, ''), k]);
   }
   function openBoxSport(D, g) {
+    if (!D.box && D.boxLazy) {   // box scores live in their own file on the published site; load it once, then open
+      const k = D.key; window.SITE_BOX = window.SITE_BOX || {};
+      if (window.SITE_BOX[k]) { D.box = window.SITE_BOX[k]; return openBoxSport(D, g); }
+      const sc = document.createElement('script'); sc.src = D.boxLazy;
+      sc.onload = () => { D.box = (window.SITE_BOX || {})[k] || {}; openBoxSport(D, g); };
+      sc.onerror = () => { D.boxLazy = null; openBoxSport(D, g); };
+      document.head.appendChild(sc); return;
+    }
     const B = D.box && D.box[String(g.gid)];
     const head = `<div><div class="eyebrow">Final · ${fmtDate(g.date, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</div><h3>Tennessee ${g.us ?? ''}, ${esc(g.opp)} ${g.them ?? ''}</h3></div>`;
     if (!B) { window.showDialog(head, `<p>Full box score loads with the next automatic update.</p>`); return; }

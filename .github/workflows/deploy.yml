@@ -42,7 +42,7 @@ jobs:
         if: steps.chk.outputs.go == 'yes'
         run: |
           mkdir _site
-          cp -r index.html manifest.webmanifest sw.js assets data _site/
+          cp -r index.html manifest.webmanifest sw.js robots.txt assets data _site/
           [ -f CNAME ] && cp CNAME _site/ || true
           # cache-busting: browsers re-download CSS, JS and data after every deploy
           V=$(git rev-parse --short HEAD)-$(date +%s)
@@ -50,7 +50,10 @@ jobs:
           grep -c "?v=$V" _site/index.html
           sed -i "s/volindex-v1/volindex-$V/" _site/sw.js
           sed -i -E "s#(icons/[a-z0-9-]+\.png)\"#\1?v=$V\"#g" _site/manifest.webmanifest
+          python3 tools/split_boxes.py _site
+          cp tools/players-index.json _site/players-index.json 2>/dev/null || true
           python3 tools/make_pages.py _site
+          rm -f _site/players-index.json
       - uses: actions/configure-pages@v5
         if: steps.chk.outputs.go == 'yes'
       - uses: actions/upload-pages-artifact@v3

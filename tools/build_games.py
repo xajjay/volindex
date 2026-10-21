@@ -160,6 +160,7 @@ def floor_for(h, rd):
     f = max(f, {1: 85, 2: 82, 3: 79}.get(rd, 0))
     return f
 
+LEGENDS = {'Peyton Manning', 'Reggie White'}
 # fan favorites that belong in Vol Guesser even without big honors
 POPULAR = {'Nico Iamaleava', 'Tyler Bray', 'Joe Milton', 'Jabari Small', 'Jaylen Wright', 'Bru McCoy', 'Tee Martin', 'Casey Clausen', 'Erik Ainge', 'Jauan Jennings', 'Squirrel White', 'Joey Aguilar'}
 rows = []
@@ -186,10 +187,15 @@ for slot, rs in by.items():
             below = sum(1 for v in vals if v < r['raw']); pct = below / max(1, len(vals) - 1)
         rd = draft_rd.get(r['n'], (None, None))[1]
         prod, aw, dr = 24 * pct, hon_bonus(r['hon']), DRAFT_PTS.get(rd, 0)
-        ovr = 62 + prod + aw + dr
+        raw = 62 + prod + aw + dr
+        # above 95 the climb gets steeper (each extra point counts 40%) and 98 is the ceiling;
+        # 99 is reserved for the two Pro Football Hall of Famers of the era, Peyton Manning and Reggie White
+        ovr = raw if raw <= 95 else 95 + (raw - 95) * 0.4
         fl = floor_for(r['hon'], rd)
-        r['ovr'] = round(min(99, max(ovr, fl)))
-        r['rb'] = [round(prod, 1), round(aw, 1), dr, fl if fl > ovr else 0]
+        ovr = min(98, max(ovr, fl))
+        if r['n'] in LEGENDS and r['hon']: ovr = 99
+        r['ovr'] = round(ovr)
+        r['rb'] = [round(prod, 1), round(aw, 1), dr, fl if fl > raw else 0]
 
 def coach(y):
     if y <= 1992: return 'Johnny Majors'
@@ -272,3 +278,34 @@ for s in OFF + DEF:
     ps = [p for p in pool if p['slot'] == s]
     dec = collections.Counter(p['y'] // 10 * 10 for p in ps)
     print(s, len(ps), dict(sorted(dec.items())), ' | ', ', '.join(f"{p['n']} {p['y']} {p['ovr']}" for p in ps[:6]))
+
+# ---------------------------------------------------------------------------------------------
+# Player pages: data/players.js (one record per player per sport, every season we have)
+# ---------------------------------------------------------------------------------------------
+def slugify(n):
+    s = re.sub(r"[’'.]", '', n.lower()); s = re.sub(r'[^a-z0-9]+', '-', s).strip('-'); return s
+people = []
+fb_seasons = collections.defaultdict(list)
+for r in rows:
+    fb_seasons[r['n']].append(dict(y=r['y'], s=str(r['y']), pos=r['slot'], ovr=r['ovr'], st={a: (int(b) if float(b).is_integer() else b) for a, b in r['st'].items()}, hon=r['hon']))
+vfl_by = {c['n']: c for c in careers}
+for p in out:
+    c = vfl_by.get(p['n'])
+    people.append(dict(sp='football', n=p['n'], slug=slugify(p['n']), pos=p['slot'], yrs=p['yrs'], ovr=p['ovr'], best=p['y'], hon=p['honAll'],
+                       draft=p['draft'], nfl=(c['teams'] if c else p.get('nfl')), frm=p.get('from'), home=p.get('home'),
+                       seasons=sorted(fb_seasons[p['n']], key=lambda x: x['y'])))
+for k, v in sports.items():
+    rs = collections.defaultdict(list)
+    for r in v['rows']: rs[r['n']].append(dict(y=r['y'], s=r['s'], pos=r['pos'], k=r['k'], st=r['st']))
+    for p in v['players']:
+        people.append(dict(sp=k, n=p['n'], slug=slugify(p['n']), pos=p['pos'], yrs=p['ys'], ovr=p['ovr'], best=p['y'], bestS=p['s'], line=p['line'],
+                           frm=p.get('prev'), home=p.get('home'), coach=p.get('coach'), seasons=sorted(rs[p['n']], key=lambda x: (x['y'], x['k']))))
+seen = collections.Counter()
+for p in people:   # unique slugs per sport
+    key = (p['sp'], p['slug']); seen[key] += 1
+    if seen[key] > 1: p['slug'] += '-' + str(seen[key])
+pjs = '/* Written by tools/build_games.py: every player in the games data, for the player pages and the compare tool. */\nwindow.VI_PLAYERS = ' + json.dumps(dict(built=built, players=people), separators=(',', ':'), ensure_ascii=False) + ';\n'
+open(os.path.join(HERE, '..', 'data', 'players.js'), 'w', encoding='utf-8').write(pjs)
+json.dump([[p['sp'], p['slug'], p['n'], p['pos'], (str(p['yrs'][0]) + ('-' + str(p['yrs'][-1]) if len(p['yrs']) > 1 else '')) if p['yrs'] else ''] for p in people],
+          open(os.path.join(HERE, 'players-index.json'), 'w'), ensure_ascii=False)   # used by tools/make_pages.py for player pages + sitemap
+print('players.js', len(people), 'people', len(pjs), 'bytes')

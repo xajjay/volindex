@@ -1,0 +1,143 @@
+# Baseball 2000-2016 year-by-year statistical leaders from the 2019 Tennessee Baseball Media Guide, Records & Honors (utsports.com).
+# year|category|value|player   (ties listed with commas are skipped by the build)
+2000|Batting Average|.401|Chris Burke
+2001|Batting Average|.435|Chris Burke
+2002|Batting Average|.362|Jordan Czarniecki
+2003|Batting Average|.327|Nick Crowe
+2004|Batting Average|.330|Alex Suarez
+2005|Batting Average|.387|Chase Headley
+2006|Batting Average|.366|Julio Borbon
+2007|Batting Average|.345|Julio Borbon
+2008|Batting Average|.330|Kentrail Davis
+2009|Batting Average|.364|Cody Hawn
+2010|Batting Average|.352|P.J. Polk
+2011|Batting Average|.332|Khayyan Norfork
+2012|Batting Average|.297|Will Maddox
+2013|Batting Average|.361|Scott Price
+2014|Batting Average|.330|Christin Stewart
+2015|Batting Average|.325|Nick Senzel
+2016|Batting Average|.352|Nick Senzel
+2000|Hits|109|Chris Burke
+2001|Hits|118|Chris Burke
+2002|Hits|74|Walter Sevilla
+2003|Hits|65|Jordan Czarniecki
+2004|Hits|77|Eli Iorg
+2005|Hits|96|Eli Iorg
+2006|Hits|86|Julio Borbon
+2007|Hits|75|Andy Simunic
+2008|Hits|68|Kentrail Davis
+2009|Hits|72|Cody Hawn
+2010|Hits|76|P.J. Polk
+2011|Hits|68|Khayyan Norfork
+2012|Hits|63|Will Maddox
+2013|Hits|69|Will Maddox
+2014|Hits|72|Christin Stewart
+2015|Hits|65|Nick Senzel
+2016|Hits|74|Nick Senzel
+2000|Runs Batted In|60|Kris Bennett
+2001|Runs Batted In|73|Jeff Christensen
+2002|Runs Batted In|46|Jordan Czarniecki
+2004|Runs Batted In|45|Chris Kemp
+2005|Runs Batted In|72|Eli Iorg
+2006|Runs Batted In|52|J.P. Arencibia
+2007|Runs Batted In|49|Tony Delmonico
+2008|Runs Batted In|44|Kentrail Davis
+2009|Runs Batted In|81|Cody Hawn
+2010|Runs Batted In|61|Cody Hawn
+2011|Runs Batted In|39|Matt Duffy
+2012|Runs Batted In|28|Chris Fritts
+2013|Runs Batted In|27|Christin Stewart
+2015|Runs Batted In|47|Christin Stewart
+2016|Runs Batted In|59|Nick Senzel
+2000|Home Runs|11|Jeff Christensen
+2001|Home Runs|20|Chris Burke
+2002|Home Runs|8|Jordan Czarniecki
+2003|Home Runs|9|Javi Herrera
+2004|Home Runs|6|Brian Cleveland
+2005|Home Runs|15|Eli Iorg
+2007|Home Runs|9|Tony Delmonico
+2008|Home Runs|13|Kentrail Davis
+2009|Home Runs|22|Cody Hawn
+2010|Home Runs|15|Blake Forsythe
+2011|Home Runs|7|Ethan Bennett
+2012|Home Runs|6|Drew Steckenrider
+2014|Home Runs|5|Christin Stewart
+2015|Home Runs|15|Christin Stewart
+2000|Stolen Bases|58|Stevie Daniel
+2001|Stolen Bases|49|Chris Burke
+2002|Stolen Bases|25|Walter Sevilla
+2003|Stolen Bases|32|Jordan Czarniecki
+2004|Stolen Bases|26|Eli Iorg
+2005|Stolen Bases|27|Eli Iorg
+2006|Stolen Bases|19|Julio Borbon
+2007|Stolen Bases|29|Andy Simunic
+2008|Stolen Bases|20|Andy Simunic
+2009|Stolen Bases|8|Josh Liles
+2010|Stolen Bases|25|P.J. Polk
+2011|Stolen Bases|29|Khayyan Norfork
+2012|Stolen Bases|14|Will Maddox
+2013|Stolen Bases|22|Will Maddox
+2014|Stolen Bases|24|Will Maddox
+2015|Stolen Bases|15|A.J. Simcox
+2016|Stolen Bases|25|Nick Senzel
+2000|Wins|10|Jamie Bennett
+2001|Wins|10|Wyatt Allen
+2004|Wins|8|Scot Drucker
+2005|Wins|15|Luke Hochevar
+2006|Wins|9|Craig Cobb
+2007|Wins|8|Craig Cobb
+2012|Wins|5|Dalton Saberhagen
+2013|Wins|5|Zack Godley
+2015|Wins|5|Kyle Serrano
+2016|Wins|6|Aaron Soto
+2000|ERA|2.71|Jamie Bennett
+2001|ERA|3.68|Brandon Crowe
+2002|ERA|3.35|Beau Massey
+2003|ERA|3.04|Dusty Johnson
+2004|ERA|2.01|Derek Tharpe
+2005|ERA|2.26|Luke Hochevar
+2006|ERA|3.31|Craig Cobb
+2007|ERA|2.80|James Adkins
+2008|ERA|4.59|Bryan Morgado
+2009|ERA|4.10|Jeff Lockwood
+2010|ERA|3.04|Stephen McCray
+2011|ERA|3.25|T.J. Thornton
+2012|ERA|3.36|Drew Steckenrider
+2013|ERA|3.49|Zack Godley
+2014|ERA|2.44|Andy Cox
+2015|ERA|2.92|Bret Marks
+2016|ERA|4.04|Zach Warren
+2000|Innings Pitched|149.2|Jamie Bennett
+2001|Innings Pitched|104.1|Wyatt Allen
+2002|Innings Pitched|115.2|Jeffery Terrell
+2003|Innings Pitched|93.1|Derek Tharpe
+2004|Innings Pitched|80.2|Derek Tharpe
+2005|Innings Pitched|139.2|Luke Hochevar
+2006|Innings Pitched|111.1|Craig Cobb
+2007|Innings Pitched|122.0|James Adkins
+2008|Innings Pitched|83.2|Nick Hernandez
+2009|Innings Pitched|84.1|Nick Hernandez
+2010|Innings Pitched|91.2|Stephen McCray
+2011|Innings Pitched|95.2|Steven Gruver
+2012|Innings Pitched|72.2|Nick Williams
+2013|Innings Pitched|108.1|Zack Godley
+2014|Innings Pitched|89.1|Nick Williams
+2015|Innings Pitched|77.0|Bret Marks
+2016|Innings Pitched|75.2|Zach Warren
+2000|Strikeouts|111|Jamie Bennett
+2001|Strikeouts|110|Wyatt Allen
+2002|Strikeouts|111|Jeffery Terrell
+2003|Strikeouts|88|Derek Tharpe
+2004|Strikeouts|84|Derek Tharpe
+2005|Strikeouts|154|Luke Hochevar
+2006|Strikeouts|112|James Adkins
+2007|Strikeouts|133|James Adkins
+2008|Strikeouts|104|Bryan Morgado
+2009|Strikeouts|75|Bryan Morgado
+2010|Strikeouts|74|Bryan Morgado
+2011|Strikeouts|84|Steven Gruver
+2012|Strikeouts|79|Drew Steckenrider
+2013|Strikeouts|98|Zack Godley
+2014|Strikeouts|70|Andy Cox
+2015|Strikeouts|89|Bret Marks
+2016|Strikeouts|66|Andy Cox

@@ -36,6 +36,9 @@ def start_year(season):            # '2015-16' -> 2015 ; '2024' -> 2024
 def coach(sport, season):
     y = start_year(season)
     if sport == 'mbb':
+        if y <= 1988: return 'Don DeVoe'
+        if y <= 1993: return 'Wade Houston'
+        if y <= 1996: return "Kevin O'Neill"
         return 'Jerry Green' if y <= 2000 else 'Buzz Peterson' if y <= 2004 else 'Bruce Pearl' if y <= 2010 else 'Cuonzo Martin' if y <= 2013 else 'Donnie Tyndall' if y == 2014 else 'Rick Barnes'
     if sport == 'wbb':
         return 'Pat Summitt' if y <= 2011 else 'Holly Warlick' if y <= 2018 else 'Kellie Harper' if y <= 2023 else 'Kim Caldwell'
@@ -55,7 +58,55 @@ def num(v):
     except ValueError: return None
 
 def parse(sport):
-    path = os.path.join(HERE, f'games_ut_{sport}.txt')
+    rows, records = [], {}
+    hist = os.path.join(HERE, f'games_hist_{sport}.txt')
+    if os.path.exists(hist):
+        rows, records = (parse_hoops_leaders(hist) if sport == 'mbb' else parse_stat_leaders(hist) if sport == 'baseball' else parse_file(hist, sport))
+    have = set(records) | {r['s'] for r in rows}
+    r2, rec2 = parse_file(os.path.join(HERE, f'games_ut_{sport}.txt'), sport)
+    rows += [r for r in r2 if r['s'] not in have]          # a full season from the history file replaces a partial one
+    records.update({k: v for k, v in rec2.items() if k not in have})
+    return rows, records
+
+def parse_stat_leaders(path):
+    """year|category|value|player from a record book's year-by-year leaders (baseball)"""
+    HIT = {'Batting Average': 'avg', 'Hits': 'h', 'Runs Batted In': 'rbi', 'Home Runs': 'hr', 'Stolen Bases': 'sb'}
+    PIT = {'Wins': 'w', 'ERA': 'era', 'Innings Pitched': 'ip', 'Strikeouts': 'so'}
+    acc = collections.OrderedDict()
+    for line in open(path, encoding='utf-8'):
+        if not line.strip() or line.startswith('#'): continue
+        y, cat, val, n = line.rstrip('\n').split('|')
+        if ',' in n: continue
+        if cat in HIT: k, key = 'H', HIT[cat]
+        elif cat in PIT: k, key = 'P', PIT[cat]
+        else: continue
+        r = acc.setdefault((y, n, k), dict(n=n, s=y, pos='P' if k == 'P' else '', home=None, prev=None, st={}))
+        r['st'][key] = num(val)
+    rows = list(acc.values())
+    for r in rows:   # hitters need an at-bat marker so they read as hitters
+        if r['pos'] != 'P': r['st'].setdefault('ab', 0)
+    return rows, {}
+
+def parse_hoops_leaders(path):
+    """season|name|pos|class|ppg|gp|pts|reb|ast|blk|stl from the men's record book (top scorers + stat leaders)"""
+    rows, records, games = [], {}, {}
+    for line in open(path, encoding='utf-8'):
+        line = line.rstrip('\n')
+        if not line.strip() or line.startswith('# '): continue
+        if line.startswith('#'):
+            season, rec = line[1:].split('|', 1); records[season] = rec.strip()
+            w, l = re.match(r'(\d+)-(\d+)', rec.strip()).groups(); games[season] = int(w) + int(l); continue
+        season, n, pos, cls, ppg, gp, pts, reb, ast, blk, stl = line.split('|')
+        gp = num(gp) or games.get(season)
+        st = {'gp': gp}
+        if num(pts) is not None: st['pts'] = num(pts)
+        elif num(ppg) is not None and gp: st['pts'] = round(num(ppg) * gp)
+        for k, v in (('reb', reb), ('ast', ast), ('blk', blk), ('stl', stl)):
+            if num(v) is not None: st[k] = num(v)
+        rows.append(dict(n=n.strip(), s=season, pos=pos.strip(), home=None, prev=None, st=st))
+    return rows, records
+
+def parse_file(path, sport):
     rows, records = [], {}
     season = None
     for line in open(path, encoding='utf-8'):
@@ -74,7 +125,7 @@ def parse(sport):
 
 def kind(sport, r):
     st = r['st']
-    if sport in ('baseball', 'softball'): return 'H' if st.get('ab') else 'P'
+    if sport in ('baseball', 'softball'): return 'P' if r.get('pos') == 'P' and not st.get('ab') else 'H' if 'ab' in st or 'avg' in st else 'P'
     if sport == 'soccer': return 'GK' if 'sv' in st else 'F'
     return 'X'
 
@@ -102,7 +153,9 @@ def line_text(sport, r):
         if st.get(key) not in (None, 0): parts.append(f'{f(st[key])} {label}')
     if sport in ('mbb', 'wbb'):
         gp = st.get('gp') or 1
-        parts.append(f"{st.get('pts', 0) / gp:.1f} ppg"); parts.append(f"{st.get('reb', 0) / gp:.1f} rpg"); parts.append(f"{st.get('ast', 0) / gp:.1f} apg")
+        parts.append(f"{st.get('pts', 0) / gp:.1f} ppg")
+        if st.get('reb') is not None: parts.append(f"{st['reb'] / gp:.1f} rpg")
+        if st.get('ast') is not None: parts.append(f"{st['ast'] / gp:.1f} apg")
         if st.get('tpm', 0) >= 40: add('tpm', '3-pointers')
         if st.get('blk', 0) >= 40: add('blk', 'blocks')
     elif sport in ('baseball', 'softball'):
@@ -148,9 +201,15 @@ def build_sport(sport):
                         home=next((r['home'] for r in rs if r['home']), None), prev=next((r['prev'] for r in rs if r['prev']), None),
                         coach=coach(sport, best['s']), seasons=seasons, ys=[start_year(x) for x in seasons]))
     out.sort(key=lambda p: (-p['ovr'], p['n']))
-    srows = [dict(n=r['n'], s=r['s'], y=start_year(r['s']), k=r['k'], pos=r['pos'], st=r['st']) for r in rows]
+    def per_game(st):
+        if sport not in ('mbb', 'wbb') or not st.get('gp'): return st
+        st = dict(st)
+        for k, pk in (('pts', 'ppg'), ('reb', 'rpg'), ('ast', 'apg')):
+            if st.get(k) is not None: st[pk] = round(st[k] / st['gp'], 1)
+        return st
+    srows = [dict(n=r['n'], s=r['s'], y=start_year(r['s']), k=r['k'], pos=r['pos'], st=per_game(r['st'])) for r in rows]
     return dict(name=NAME[sport], players=out, rows=srows, records=records,
-                first=min(records, key=start_year), last=max(records, key=start_year))
+                first=min({r['s'] for r in rows}, key=start_year), last=max({r['s'] for r in rows}, key=start_year))
 
 def build_all():
     return {s: build_sport(s) for s in COLS}

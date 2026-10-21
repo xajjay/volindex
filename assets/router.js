@@ -13,7 +13,8 @@
   var SPORT_BACK = {}, TAB_BACK = {};
   Object.keys(SPORT).forEach(function (k) { SPORT_BACK[SPORT[k]] = k; });
   Object.keys(TAB).forEach(function (k) { if (k !== 'recruits' && k !== 'ratings') TAB_BACK[TAB[k]] = k; });
-  var KEY_RE = /^(games(-[a-z0-9]+){0,2}|home|sources|about|football|volleyball|soccer|mbb|wbb|baseball|softball)(-[a-z0-9]+)?$/;
+  // players-<sport>-<name-slug> (the slug has its own hyphens), compare, me (your games profile)
+  var KEY_RE = /^(games(-[a-z0-9]+){0,2}|players(-[a-z0-9]+)*|compare|me|home|sources|about|football|volleyball|soccer|mbb|wbb|baseball|softball)(-[a-z0-9]+)?$/;
 
   var host = location.hostname, BASE = null;
   if (/^https?:$/.test(location.protocol)) {
@@ -28,6 +29,8 @@
     if (!key || key === 'home') return BASE;
     if (key === 'sources') return BASE + 'sources';
     if (/^games(-|$)/.test(key)) { var g = key.split('-'); return BASE + 'games' + (g[1] ? '/' + (SPORT[g[1]] || g[1]) : '') + (g[2] ? '/' + g[2] : ''); }
+    if (/^players(-|$)/.test(key)) { var q = key.split('-'); return BASE + 'players' + (q[1] ? '/' + (SPORT[q[1]] || q[1]) : '') + (q.length > 2 ? '/' + q.slice(2).join('-') : ''); }
+    if (key === 'compare' || key === 'me') return BASE + key;
     var i = key.indexOf('-'), s = i < 0 ? key : key.slice(0, i), t = i < 0 ? '' : key.slice(i + 1);
     var p = BASE + (SPORT[s] || s);
     if (t && t !== 'overview') p += '/' + (TAB[t] || t);
@@ -39,6 +42,8 @@
     if (!parts.length || parts[0] === 'index.html') return 'home';
     if (parts[0] === 'sources') return 'sources';
     if (parts[0] === 'games') return ['games'].concat(parts[1] ? [SPORT_BACK[parts[1]] || parts[1]] : [], parts[2] ? [parts[2]] : []).join('-');
+    if (parts[0] === 'players') return ['players'].concat(parts[1] ? [SPORT_BACK[parts[1]] || parts[1]] : [], parts[2] ? [parts[2]] : []).join('-');
+    if (parts[0] === 'compare' || parts[0] === 'me') return parts[0];
     var s = SPORT_BACK[parts[0]] || parts[0];
     if (!parts[1]) return s;
     var t = TAB_BACK[parts[1]] || parts[1];
@@ -50,11 +55,11 @@
     return keyOfPath(location.pathname);
   }
   function fire() { window.dispatchEvent(new Event('vi:route')); }
-  function go(key, replace) {
+  function go(key, replace, search) {
     key = String(key || 'home').replace(/^#/, '');
     if (!pathMode) { if (location.hash.slice(1) !== key) location.hash = '#' + key; else fire(); return; }
-    var p = pathOf(key);
-    if (p !== location.pathname) history[replace ? 'replaceState' : 'pushState']({ key: key }, '', p);
+    var p = pathOf(key) + (search || '');   // a query (?c= challenge seed, ?a= compare) rides along
+    if (p !== location.pathname + location.search) history[replace ? 'replaceState' : 'pushState']({ key: key }, '', p);
     fire();
   }
   window.VI_ROUTER = { key: current, go: go, href: function (k) { return pathMode ? pathOf(k) : '#' + k; }, pathMode: pathMode, path: function (k) { return pathOf(k).slice((BASE || '/').length - 1); } };
@@ -69,10 +74,11 @@
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       var a = e.target.closest && e.target.closest('a[href]'); if (!a || a.target === '_blank') return;
       var href = a.getAttribute('href'), key = null;
+      var search = '';
       if (href.charAt(0) === '#') { if (KEY_RE.test(href.slice(1))) key = href.slice(1); }
-      else if (a.origin === location.origin && a.pathname.indexOf(BASE) === 0 && !/\.[a-z0-9]+$/i.test(a.pathname)) key = keyOfPath(a.pathname);
+      else if (a.origin === location.origin && a.pathname.indexOf(BASE) === 0 && !/\.[a-z0-9]+$/i.test(a.pathname)) { key = keyOfPath(a.pathname); search = a.search; }
       if (!key) return;
-      e.preventDefault(); go(key);
+      e.preventDefault(); go(key, false, search);
     });
     // show clean addresses on links (hover, long-press, copy link)
     var fix = function (root) {

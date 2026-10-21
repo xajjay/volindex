@@ -67,7 +67,7 @@
 
   /* ---------- router ---------- */
   function route() {
-    const h = window.VI_ROUTER ? window.VI_ROUTER.key() : ((location.hash || '#home').slice(1));
+    const h = (window.VI_ROUTER ? window.VI_ROUTER.key() : ((location.hash || '#home').slice(1))).split('?')[0];
     const [sport, tab, sub] = h.split('-');
     const d = document.getElementById('playerDlg'); if (d && d.open) d.close();
     document.querySelectorAll('.sportnav a').forEach(a => a.setAttribute('aria-current', a.dataset.sport === sport ? 'page' : 'false'));
@@ -76,7 +76,11 @@
     else if (sport === 'sources') renderSources();
     else if (sport === 'about' && window.renderAbout) { window.renderAbout(app, tab); return; }
     else if (sport === 'games' && window.renderGames) window.renderGames(app, tab, sub);
+    else if (sport === 'players' && window.renderPlayers) window.renderPlayers(app, tab, h.split('-').slice(2).join('-'));
+    else if (sport === 'compare' && window.renderCompare) window.renderCompare(app);
+    else if (sport === 'me' && window.renderMe) window.renderMe(app);
     else renderHub();
+    if (window.VI_SET_TITLE) window.VI_SET_TITLE(h);
     if (!window.VI_KEEP_SCROLL) window.scrollTo(0, 0);
     window.VI_KEEP_SCROLL = false;
   }
@@ -150,9 +154,10 @@
     <div class="wrap hub-hero">
       <div class="eyebrow">University of Tennessee · Knoxville</div>
       <h1>The Vol <span>Index</span></h1>
-      <p>Rosters, depth charts, lineups, recruits, ratings, schedules and history for Tennessee athletics: football, volleyball, soccer, basketball, baseball, softball and more to come.</p>
+      <p>Rosters, depth charts, lineups, recruits, schedules and history for every Tennessee sport, plus daily Vol games to play.</p>
       ${window.askHero ? window.askHero() : ''}
     </div>
+    ${window.homeTop ? window.homeTop() : ''}
     <div class="wrap grid g3">
       ${SPORTS.map(s => `<a class="sportcard live" data-sport="${s.key}" href="#${s.key}">
         <div class="sc-name">
@@ -165,8 +170,10 @@
         ${s.key === 'football' && F ? watchLine(next && Object.assign({ tv: (next.espn || {}).tv }, next), next && kick(next)) : window.sportNext ? (n => watchLine(n, n && (n.time ? n.time + ' ET' : null)))(window.sportNext(s.key)) : ''}
       </a>`).join('')}
     </div>
+    ${window.homeBottom ? window.homeBottom() : ''}
     ${window.mediaHub ? window.mediaHub() : ''}`;
     window.wireAskHero && window.wireAskHero();
+    window.wireHome && window.wireHome(app);
   }
   const POLL_SOURCES = [
     ['Football: AP Top 25', 'AP via ESPN', 'https://www.espn.com/college-football/rankings'],

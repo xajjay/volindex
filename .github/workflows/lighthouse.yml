@@ -1,0 +1,32 @@
+# Speed and accessibility check (Lighthouse) on the packaged site. Runs by hand and on pull requests;
+# results show in the run's summary and as a link to the full report. It never blocks a deploy.
+# Targets (Google's "good" Core Web Vitals): largest paint under 2.5 s, layout shift under 0.1.
+name: Lighthouse
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ["assets/**", "data/**", "index.html"]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package site like the deploy does
+        run: |
+          mkdir _site
+          cp -r index.html manifest.webmanifest sw.js robots.txt assets data _site/
+          python3 tools/split_boxes.py _site
+          cp tools/players-index.json _site/ && python3 tools/make_pages.py _site && rm _site/players-index.json
+      - uses: treosh/lighthouse-ci-action@v12
+        with:
+          staticDistDir: ./_site
+          urls: |
+            http://localhost/
+            http://localhost/football
+            http://localhost/games
+            http://localhost/games/football/run
+          configPath: ./.github/lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true

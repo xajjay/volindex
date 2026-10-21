@@ -18,7 +18,8 @@
   const REROLLS = 3, CARDS = 6;
   const RUN = { side: store.get('run-side', 'both'), mode: 'daily', st: null };
   const eraLabel = d => d + 's';
-  const winLabel = w => w + '-' + String(w + 4).slice(2);
+  const winEnd = w => w === 2020 ? 2025 : w + 4;   // the 2020s run as one window, 2020-25
+  const winLabel = w => w + '-' + String(winEnd(w)).slice(2);
   const lastName = n => n.replace(/ (Jr\.|Sr\.|II|III|IV)$/, '').split(' ').pop();
   const runSlots = side => side === 'off' ? SLOTS.slice(0, 5) : side === 'def' ? SLOTS.slice(5) : SLOTS.slice();
 
@@ -27,7 +28,7 @@
      ===================================================================================== */
   const OPP = id => D.opponents.find(o => o.id === id);
   // tuning (see the balance notes in the games report): opponents sit on the Vol rating scale centered at CENTER
-  const TUNE = Object.assign({ center: 77.25, mult: 0.7, sd: 8.5, stock: 88 }, window.VI_RUN_TUNE || {});
+  const TUNE = Object.assign({ center: 76.9, mult: 0.7, sd: 8.5, stock: 88 }, window.VI_RUN_TUNE || {});
   const sq = v => TUNE.center + (v - 78) * 0.7;
   const strength = o => o.off + o.deff;
   // committee resume: team strength plus a bump for few losses (a 14-0 team should not be a 12 seed)
@@ -200,11 +201,11 @@
     const used = REROLLS - st.rerolls, r = rngFrom(st.seed + '|spin' + st.spin + '|' + used);
     const side = currentSide(st), open = openSlots(st).filter(p => sideOf(p) === side);
     const taken = new Set(st.slots.filter(s => s.p).map(s => s.p.n));
-    const seen = new Set(st.seen || []), recent = new Set(st.daily ? [] : store.get('run-recent', []));
+    const seen = new Set(st.seen || []), recent = new Set();   // spins depend only on the seed, so a challenge link replays them exactly
     const sidePool = POOL.filter(p => sideOf(p.slot) === side && !taken.has(p.n));
     // spins land on a five-season window (1995-99, 2000-04 ...) inside the decades you picked
-    const inWin = (p, w) => p.y >= w && p.y <= w + 4;
-    const winsOf = decs => decs.reduce((a, e) => a.concat([e, e + 5]), []);
+    const inWin = (p, w) => p.y >= w && p.y <= winEnd(w);
+    const winsOf = decs => decs.reduce((a, e) => a.concat(e === 2020 ? [2020] : [e, e + 5]), []);
     const fits = w => sidePool.some(p => inWin(p, w) && open.includes(p.slot));
     let wins = winsOf(st.eras).filter(fits), wide = false;
     if (!wins.length) { wins = winsOf(FB_ERAS).filter(fits); wide = true; }
@@ -276,43 +277,74 @@
   }
   const qLabel = q => q === 5 ? 'OT' : 'Q' + q;
   const clockTxt = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  // line score: points per quarter (OT as a fifth column when needed)
+  function lineScore(ev, res, uptoSec) {
+    const cols = res.ot ? 5 : 4, us = Array(cols).fill(0), them = Array(cols).fill(0);
+    ev.forEach(e => { if (evSec(e) <= uptoSec) { const i = e.q - 1; if (e.us) us[i] += e.v; else them[i] += e.v; } });
+    return { us, them, cols };
+  }
+  const evSec = e => e.q === 5 ? 3600 + 300 : (e.q - 1) * 900 + (900 - e.clock);
+  function lineTable(o, ls, curQ, done) {
+    const head = ['1', '2', '3', '4', 'OT'].slice(0, ls.cols);
+    const cell = (v, i) => `<td class="${!done && i + 1 === curQ ? 'cur' : ''}">${done || i + 1 <= curQ ? v : ''}</td>`;
+    const tot = a => a.reduce((x, y) => x + y, 0);
+    return `<table class="glines" id="sLines"><thead><tr><th></th>${head.map((h, i) => `<th class="${!done && i + 1 === curQ ? 'cur' : ''}">${h}</th>`).join('')}<th>T</th></tr></thead>
+      <tbody><tr class="ut"><th>TENN</th>${ls.us.map(cell).join('')}<td class="t">${tot(ls.us)}</td></tr>
+      <tr><th>${esc(o.team.length > 10 ? o.team.slice(0, 4).toUpperCase() : o.team.toUpperCase())}</th>${ls.them.map(cell).join('')}<td class="t">${tot(ls.them)}</td></tr></tbody></table>`;
+  }
+  const SPEEDS = [['slow', 'Slower', 17000], ['normal', 'Normal', 10000], ['fast', 'Faster', 4500]];
+  const speedMs = () => (SPEEDS.find(x => x[0] === store.get('sim-speed', 'normal')) || SPEEDS[1])[2];
   function liveBox(st, g, o, ev, done) {
     const res = g.res, label = g.label || ('Week ' + g.wk);
+    const ls = lineScore(ev, res, done ? 99999 : -1), sp = store.get('sim-speed', 'normal');
     return `<div class="box glive ${done ? (res.w ? 'w' : 'l') : 'running'}" id="glive">
-      <div class="glive-head"><span class="eyebrow">${esc(label)}${g.neutral ? ' · neutral site' : g.home ? ' · Neyland Stadium' : g.home === false && !g.label ? ' · road game' : ''}</span>${done ? '' : '<button class="glink" id="gSkip">Skip</button>'}</div>
+      <div class="glive-head"><span class="eyebrow">${esc(label)}${g.neutral ? ' · neutral site' : g.home ? ' · Neyland Stadium' : g.home === false && !g.label ? ' · road game' : ''}</span>
+        ${done ? '' : `<span class="gspeed" role="group" aria-label="Sim speed">${SPEEDS.map(([k, l]) => `<button data-speed="${k}" aria-pressed="${sp === k}">${l}</button>`).join('')}<button class="glink" id="gSkip">Skip</button></span>`}</div>
       <div class="gscore"><div class="gsc-t ut"><span>Tennessee</span><b id="sUs">${done ? res.us : 0}</b></div>
-        <div class="gsc-mid"><span id="sClock">${done ? (res.ot ? 'FINAL/OT' : 'FINAL') : 'Q1 15:00'}</span><div class="gsc-bar"><i id="sBar" style="width:${done ? 100 : 0}%"></i></div></div>
-        <div class="gsc-t"><span>${esc(o.y + ' ' + o.team)}</span><b id="sThem">${done ? res.them : 0}</b></div></div>
+        <div class="gsc-mid"><span id="sClock">${done ? (res.ot ? 'FINAL/OT' : 'FINAL') : 'Q1 15:00'}</span></div>
+        <div class="gsc-t opp"><span>${esc(o.y + ' ' + o.team)}</span><b id="sThem">${done ? res.them : 0}</b></div></div>
+      <div id="sLineWrap">${lineTable(o, ls, done ? 9 : 1, done)}</div>
       <ol class="gfeed" id="sFeed">${done ? ev.map(e => feedLi(e)).join('') : ''}</ol></div>`;
   }
   const feedLi = e => `<li class="${e.us ? 'us' : 'them'}"><span class="gf-t">${qLabel(e.q)} ${e.q === 5 ? '' : clockTxt(e.clock)}</span><span class="gf-x">${esc(e.text)}</span><span class="gf-s">${e.a}-${e.b}</span></li>`;
   let ANIM = 0;
-  function animateLive(ev, res, onDone) {
+  // plays the game out on a game clock; speed can change mid-game (Slower / Normal / Faster)
+  function animateLive(ev, res, o, onDone) {
     const token = ++ANIM, box = document.getElementById('glive'); if (!box) return onDone();
-    const elUs = box.querySelector('#sUs'), elThem = box.querySelector('#sThem'), elClock = box.querySelector('#sClock'), bar = box.querySelector('#sBar'), feed = box.querySelector('#sFeed');
-    const DUR = 4600, OT = res.ot ? 900 : 0, t0 = performance.now(); let shown = 0, finished = false;
-    const evT = e => e.q === 5 ? DUR + OT * .7 : ((e.q - 1) * 900 + (900 - e.clock)) / 3600 * DUR;
+    const elUs = box.querySelector('#sUs'), elThem = box.querySelector('#sThem'), elClock = box.querySelector('#sClock'), feed = box.querySelector('#sFeed'), lw = box.querySelector('#sLineWrap');
+    const END = res.ot ? 3600 + 600 : 3600;
+    let gsec = 0, last = performance.now(), shown = 0, finished = false, curQ = 1;
     const end = () => {
       if (finished) return; finished = true;
       while (shown < ev.length) feed.insertAdjacentHTML('beforeend', feedLi(ev[shown++]));
-      elUs.textContent = res.us; elThem.textContent = res.them; elClock.textContent = res.ot ? 'FINAL/OT' : 'FINAL'; bar.style.width = '100%';
+      elUs.textContent = res.us; elThem.textContent = res.them; elClock.textContent = res.ot ? 'FINAL/OT' : 'FINAL';
+      lw.innerHTML = lineTable(o, lineScore(ev, res, 99999), 9, true);
       box.classList.remove('running'); box.classList.add(res.w ? 'w' : 'l');
-      setTimeout(onDone, reduceMotion() ? 0 : 650);
+      const sp = box.querySelector('.gspeed'); if (sp) sp.remove();
+      setTimeout(onDone, reduceMotion() ? 0 : 900);
     };
+    box.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => {
+      store.set('sim-speed', b.dataset.speed);
+      box.querySelectorAll('[data-speed]').forEach(x => x.setAttribute('aria-pressed', x === b));
+    }));
     const skip = box.querySelector('#gSkip'); if (skip) skip.addEventListener('click', () => { ANIM++; end(); });
     if (reduceMotion()) return end();
     const step = now => {
       if (token !== ANIM || finished) return;
-      const t = now - t0, gm = Math.min(t, DUR);
-      const sec = Math.floor(gm / DUR * 3600), q = Math.min(4, Math.floor(sec / 900) + 1), left = q * 900 - sec;
-      elClock.textContent = t > DUR ? 'OT' : `Q${q} ${clockTxt(Math.max(0, left))}`; bar.style.width = Math.min(100, t / (DUR + OT) * 100) + '%';
-      while (shown < ev.length && evT(ev[shown]) <= t) {
+      const dt = Math.min(100, now - last); last = now;
+      gsec += dt * 3600 / speedMs();
+      const q = gsec >= 3600 ? 5 : Math.min(4, Math.floor(gsec / 900) + 1);
+      elClock.textContent = q === 5 ? 'Overtime' : `Q${q} ${clockTxt(Math.max(0, Math.ceil(q * 900 - gsec)))}`;
+      let changed = q !== curQ; curQ = q;
+      while (shown < ev.length && evSec(ev[shown]) <= gsec) {
         const e = ev[shown++]; feed.insertAdjacentHTML('beforeend', feedLi(e));
-        const li = feed.lastElementChild; li.classList.add('pop');
-        (e.us ? elUs : elThem).textContent = e.us ? e.a : e.b; (e.us ? elUs : elThem).parentElement.classList.add('flash');
-        setTimeout(() => { const el = (e.us ? elUs : elThem).parentElement; if (el) el.classList.remove('flash'); }, 500);
+        feed.lastElementChild.classList.add('pop'); feed.scrollTop = feed.scrollHeight;
+        const el = e.us ? elUs : elThem; el.textContent = e.us ? e.a : e.b;
+        const tile = el.parentElement; tile.classList.add('flash'); setTimeout(() => tile.classList.remove('flash'), 700);
+        changed = true;
       }
-      if (t >= DUR + OT) return end();
+      if (changed) lw.innerHTML = lineTable(o, lineScore(ev, res, gsec), curQ, false);
+      if (gsec >= END) return end();
       requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
@@ -326,6 +358,14 @@
     const today = etDate(), daily = store.get(dkey('football', 'run'), null);
     const body = frame(app, 'football', 'run', 'Spin an era and draft Vols at their best season: offense first, then defense. Then try to run the table: 12 games, the SEC Championship and the 12-team College Football Playoff.');
     if (RUN.mode === 'daily' && daily && daily.final && (!RUN.st || !RUN.st.daily || RUN.st.date !== today || RUN.st.phase !== 'done')) { RUN.st = daily.final; RUN.st.phase = 'done'; }
+    const ch = V.challenge();
+    if (ch && RUN.chUsed !== ch.raw) {   // a friend's challenge link: same spins, same schedule
+      RUN.chUsed = ch.raw; RUN.mode = 'free';
+      let side = 'both'; try { side = { o: 'off', d: 'def' }[new URLSearchParams(location.search).get('s')] || 'both'; } catch (e) {}
+      RUN.st = { phase: 'draft', daily: false, date: today, seed: ch.seed, side, eras: ch.eras && ch.eras.length ? ch.eras : FB_ERAS.slice(), fromChallenge: true,
+        slots: runSlots(side).map(p => ({ pos: p, p: null })), spin: 0, rerolls: REROLLS, offer: null, seen: [] };
+      runSpin(RUN.st);
+    }
     const st = RUN.st;
     if (!st || (st.daily && st.date !== today)) { RUN.st = null; return setup(body, daily); }
     if (st.phase === 'draft') return draft(body);
@@ -347,7 +387,7 @@
           <p class="dim small">1980s and early 1990s stat lines come from the UT record book (season leaders) and honors; 1995 on are full season stats. If your eras run out of players at a spot (there are no tight ends with big numbers before 2000), that spin pulls from any era.</p></div>`}
         <div class="gnote"><b>Prime seasons only.</b> Every Vol shows his single best season at Tennessee. Tap or hover a rating to see how it was built.</div>
         <details class="gnote"><summary><b>How OVR works</b></summary>
-          <p>OVR = 62 + <b>production</b> (0-24) + <b>awards</b> (0-11) + <b>NFL draft</b> (0-8), capped at 99.</p>
+          <p>OVR = 62 + <b>production</b> (0-24) + <b>awards</b> (0-11) + <b>NFL draft</b> (0-8). Above 95 the climb gets steeper (each point counts 40%), the ceiling is 98, and 99 is reserved for Peyton Manning and Reggie White.</p>
           <ul><li><b>Production:</b> where that season ranks among every Vol at the same spot since 1980 (yards and touchdowns on offense; sacks, tackles for loss, tackles, interceptions and pass breakups on defense, with tackles counting more for interior linemen).</li>
           <li><b>Awards:</b> All-America (unanimous 8, consensus 7, first team 5.5, second/third 3), All-SEC (first 3, second 1.5), SEC player of the year 3-4, national award 4, finalist 1.5, Heisman top 2/5/10 4/2/1.</li>
           <li><b>Draft:</b> 1st round 8, 2nd 6, 3rd 4, 4th 3, 5th 2, 6th-7th 1.</li>
@@ -368,7 +408,7 @@
   }
   function howTo() {
     return `<details class="box ghow"><summary>How it works</summary>
-      <ol><li><b>Spin.</b> Each spin lands on an era and deals six Vols from that era on the side of the ball you're building. Offense first (QB, RB, two WRs, TE), then defense (DT, edge, LB, CB, safety).</li>
+      <ol><li><b>Spin.</b> Each spin lands on a five-season window (1995-99, 2000-04 ... 2020-25) and deals six Vols from it on the side of the ball you're building. Offense first (QB, RB, two WRs, TE), then defense (DT, edge, LB, CB, safety).</li>
       <li><b>Draft.</b> Take one player per spin. Spots you've already filled are greyed out, so a loaded spin can still hurt. Three re-spins per run. Players you've already seen show up less.</li>
       <li><b>Play.</b> Your offense and defense ratings are the average of your starters. Nine SEC games and three non-conference games against great teams from the last 30 seasons (2019 LSU, 2001 Miami, 2022 Georgia...). Sim one game at a time or the whole season.</li>
       <li><b>Postseason.</b> Finish in the SEC's top two for Atlanta. On Selection Day the committee seeds a 12-team field (five best conference champions plus seven at-large, straight seeding, seeds 1-4 get a bye). A perfect run is 16-0, or 17-0 if you have to play in the first round.</li></ol></details>`;
@@ -384,21 +424,26 @@
   function ovrWhy(p) {
     if (!p.rb) return 'Rating for this season';
     const [prod, aw, dr, fl] = p.rb;
-    return `OVR ${p.ovr} = 62 base + ${prod} production + ${aw} awards + ${dr} NFL draft` + (fl ? ` (raised to the ${fl} floor for his honors/draft slot)` : '') + (p.ovr === 99 ? ', capped at 99' : '');
+    const raw = Math.round((62 + prod + aw + dr) * 10) / 10;
+    let t = `62 base + ${prod} production + ${aw} awards + ${dr} NFL draft = ${raw}`;
+    if (p.ovr === 99) return t + '. 99 is reserved for Peyton Manning and Reggie White.';
+    if (raw > 95) t += `; points above 95 count 40%, so ${p.ovr}`;
+    if (fl) t += ` (raised to the ${fl} floor for his honors or draft slot)`;
+    return 'OVR ' + p.ovr + ': ' + t;
   }
   function card(p, can, i) {
     return `<button class="gpcard deal ${can ? '' : 'off'}" data-n="${esc(p.n)}" style="--d:${i * 70}ms" ${can ? '' : 'disabled aria-disabled="true"'}>
-      <span class="gpc-top"><span class="gpos">${posLabel(p.slot)}</span><span class="govr" title="${esc(ovrWhy(p))}">${p.ovr}</span></span>
+      <span class="gpc-top"><span class="gpos">${posLabel(p.slot)}</span>${can ? '' : '<span class="gpc-filled">Filled</span>'}<span class="govr" title="${esc(ovrWhy(p))}">${p.ovr}</span></span>
       <b class="gpc-name">${esc(p.n)}</b><span class="gpc-yr">${p.y} · ${esc(p.coach)}</span>
       <span class="gpc-line">${esc(statLine(p))}</span><span class="gpc-hon">${honorChips(p.hon, 2)}${draftChip(p)}</span>
-      ${can ? '' : `<span class="gpc-lock">${posLabel(p.slot)} filled</span>`}</button>`;
+    </button>`;
   }
   function draft(body) {
     const st = RUN.st, side = currentSide(st), offer = st.offer || { ids: [] };
     const open = openSlots(st);
     const cards = offer.ids.map(n => BYNAME[n.toLowerCase()]).filter(Boolean);
     const sideSlots = st.slots.filter(s => sideOf(s.pos) === side), pickN = sideSlots.filter(s => s.p).length + 1;
-    body.innerHTML = `${st.daily ? '<div class="gtag">Daily challenge · ' + esc(st.date) + '</div>' : ''}
+    body.innerHTML = `${st.daily ? '<div class="gtag">Daily challenge · ' + esc(st.date) + '</div>' : st.fromChallenge ? '<div class="gchal">🤝 A friend\'s challenge: you start from the exact spins and schedule they got.</div>' : ''}
       ${board(st, false, side)}
       ${st.banner ? `<div class="gbanner">${esc(st.banner)}</div>` : ''}
       <div class="box gspin">
@@ -428,7 +473,7 @@
   function spinAnim(el, era, cardsEl) {
     if (reduceMotion()) return;
     const final = el.textContent; let i = 0; el.classList.add('spinning'); if (cardsEl) cardsEl.classList.add('hold');
-    const seq = [1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 1985, 1995, 2005];
+    const seq = [1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 1985, 1995, 2005, 2015];
     const tick = () => {
       el.textContent = winLabel(seq[i % seq.length]) + ' Vols'; i++;
       if (i < seq.length) setTimeout(tick, 40 + i * 9);
@@ -442,6 +487,7 @@
     const o = OPP(g.o), where = g.neutral ? 'vs.' : g.home ? 'vs.' : 'at';
     const SHORT = { 'SEC Championship': 'SEC title', 'CFP first round': 'CFP 1st rd', 'CFP quarterfinal': 'CFP QF', 'CFP semifinal': 'CFP semi', 'National championship': 'Title game' };
     const show = done && !pending;
+    if (pending) done = false;
     return `<li class="${show ? (g.res.w ? 'w' : 'l') : ''} ${pending ? 'pend' : ''}" data-wk="${g.wk}"><span class="gwk">${esc(label ? SHORT[label] || label : 'Wk ' + g.wk)}</span>
       <span class="gopp"><b>${where} ${o.y} ${esc(o.team)}</b> <span class="dim">(${esc(o.rec)})${g.conf ? ' · SEC' : ''}</span><span class="gstars">${esc(o.stars.join(', '))}</span></span>
       <span class="gorat" title="Opponent offense / defense">${o.off}/${o.deff}</span>
@@ -449,6 +495,7 @@
   }
   function teamBox(st) {
     const me = teamRatings(st), rc = record(st);
+    if (st.live && !st.live.done && st.live.idx != null) { const g = st.games[st.live.idx]; if (g.res.w) rc.w--; else rc.l--; if (g.conf) { if (g.res.w) rc.cw--; else rc.cl--; } }
     return `<div class="box gteam"><div class="eyebrow">Your Vols</div>
       <div class="grat"><div><span>${Math.round(me.off)}</span>Offense${me.genericOff ? ' <i class="dim">(stock)</i>' : ''}</div><div><span>${Math.round(me.def)}</span>Defense${me.genericDef ? ' <i class="dim">(stock)</i>' : ''}</div><div><span id="recAll">${rc.w}-${rc.l}</span>Record</div><div><span id="recSec">${rc.cw}-${rc.cl}</span>SEC</div></div>
       ${board(st, true)}</div>`;
@@ -462,14 +509,14 @@
       ${live}
       <div class="grid g2">${teamBox(st)}
       <div class="box gsched"><div class="gsched-head"><h3>Regular season</h3>${left ? `<div class="gbtns"><button class="btn" id="simOne" ${busy ? 'disabled' : ''}>Sim game ${st.played + 1}</button> <button class="btn primary" id="simAll" ${busy ? 'disabled' : ''}>Sim season</button></div>` : ''}</div>
-        <ol class="glist">${st.games.map((g, i) => gameRow(st, g, i < st.played, null, st.reveal && i >= st.reveal.from && i < st.reveal.to)).join('')}</ol>
+        <ol class="glist">${st.games.map((g, i) => gameRow(st, g, i < st.played, null, (st.reveal && i >= st.reveal.from && i < st.reveal.to) || (st.live && !st.live.done && i === st.live.idx))).join('')}</ol>
         ${!left && !busy ? `<div class="grow"><button class="btn primary big" id="toPost">Postseason →</button></div>` : ''}</div></div>`;
     const one = body.querySelector('#simOne');
     if (one) one.addEventListener('click', () => { const idx = st.played; playRegular(st); st.live = { idx, done: false }; rerender(); });
     const all = body.querySelector('#simAll');
     if (all) all.addEventListener('click', () => { const from = st.played; while (st.played < st.games.length) playRegular(st); st.live = null; st.reveal = { from, to: st.played }; rerender(); });
     const tp = body.querySelector('#toPost'); if (tp) tp.addEventListener('click', () => { st.live = null; enterPost(st); rerender(); });
-    if (st.live && !st.live.done) { const g = st.games[st.live.idx], o = OPP(g.o); animateLive(plays(st, g, o, st.seed + '|' + g.wk), g.res, () => { if (st.live) st.live.done = true; rerender(); }); }
+    if (st.live && !st.live.done) { const g = st.games[st.live.idx], o = OPP(g.o); animateLive(plays(st, g, o, st.seed + '|' + g.wk), g.res, o, () => { if (st.live) st.live.done = true; rerender(); }); }
     if (st.reveal) revealRows(body, st);
   }
   function revealRows(body, st) {
@@ -503,7 +550,7 @@
       if (st.live) {
         body.innerHTML = head + liveBox(st, g, o, plays(st, g, o, st.seed + '|scg'), st.live.done) +
           (st.live.done ? `<div class="grow"><button class="btn primary big" id="toSel">${g.res.w ? 'SEC champions! On to Selection Day →' : 'Selection Day →'}</button></div>` : '');
-        if (!st.live.done) animateLive(plays(st, g, o, st.seed + '|scg'), g.res, () => { st.live.done = true; rerender(); });
+        if (!st.live.done) animateLive(plays(st, g, o, st.seed + '|scg'), g.res, o, () => { st.live.done = true; rerender(); });
         const b = body.querySelector('#toSel'); if (b) b.addEventListener('click', () => { st.live = null; makeSelection(st); st.revealSel = true; rerender(); });
         return;
       }
@@ -530,8 +577,8 @@
       else actions = `<button class="btn primary" id="nextRd">${inField && alive ? 'Sim the first round (you have a bye)' : 'Sim the ' + esc((roundName || '').replace('CFP ', ''))}</button> <button class="btn" id="simRest">Sim the whole playoff</button>`;
     }
     body.innerHTML = `${head}${sel}${live}
-      <div class="box gbracket-box"><div class="gsched-head"><h3>College Football Playoff</h3><span class="eyebrow">${inField ? 'You: No. ' + st.seed12 + ' seed' : 'You missed the field'}${!alive && inField ? ' · eliminated' : ''}</span></div>
-        ${bracket(st)}
+      <div class="box gbracket-box"><div class="gsched-head"><h3>College Football Playoff</h3><span class="eyebrow">${inField ? 'You: No. ' + st.seed12 + ' seed' : 'You missed the field'}${!alive && inField && !busy ? ' · eliminated' : ''}</span></div>
+        ${bracket(st, busy ? st.br.cur - 1 : -1)}
         <div class="grow">${actions}</div></div>`;
     if (st.revealSel) {
       st.revealSel = false;
@@ -546,7 +593,7 @@
     const nr = body.querySelector('#nextRd'); if (nr) nr.addEventListener('click', () => { st.live = null; play(); });
     const sr = body.querySelector('#simRest'); if (sr) sr.addEventListener('click', () => { st.live = null; while (st.br.cur < ROUNDS.length) playRound(st); rerender(); });
     const tr = body.querySelector('#toRes'); if (tr) tr.addEventListener('click', () => { st.live = null; st.phase = 'done'; finishRun(st); rerender(); });
-    if (busy) { const g = st.post[st.live.g], o = OPP(g.o); animateLive(plays(st, g, o, st.seed + '|' + g.wk), g.res, () => { st.live.done = true; rerender(); }); }
+    if (busy) { const g = st.post[st.live.g], o = OPP(g.o); animateLive(plays(st, g, o, st.seed + '|' + g.wk), g.res, o, () => { st.live.done = true; rerender(); }); }
   }
   function selectionDay(st) {
     const f = st.br.field.slice().sort((a, b) => b.seed - a.seed);
@@ -554,7 +601,8 @@
       ${(st.notes || []).map(n => `<p class="dim">${esc(n)}</p>`).join('')}
       <ol class="gsel">${f.map(x => `<li class="${x.me ? 'me' : ''} ${x.seed <= 4 ? 'bye' : ''}"><span class="gseed">${x.seed}</span><b>${esc(teamName(st, x.seed))}</b>${x.me ? '' : `<span class="dim">${esc(OPP(x.id).rec)}</span>`}${x.seed <= 4 ? '<span class="chip">Bye</span>' : ''}</li>`).join('')}</ol></div>`;
   }
-  function bracket(st) {
+  // hide = index of a round whose results stay hidden while Tennessee's game in it is still being played
+  function bracket(st, hide = -1) {
     const br = st.br;
     const team = (seed, score, win, played) => {
       const f = fieldOf(st, seed);
@@ -569,12 +617,13 @@
     const cols = ROUNDS.map(([rk, label], i) => {
       let games = br.rounds[rk];
       let html;
-      if (games) html = games.map(g => match(g, rk)).join('');
+      if (games && i === hide) html = games.map(g => tbd(g.a, g.b)).join('');
+      else if (games) html = games.map(g => match(g, rk)).join('');
       else if (rk === 'QF') html = [1, 2, 3, 4].map(s => tbd(s, null)).join('');
       else html = (rk === 'SF' ? [0, 1] : [0]).map(() => tbd(null, null)).join('');
       return `<div class="gbcol ${br.cur === i ? 'cur' : ''}"><div class="glabel">${esc(label.replace('CFP ', '').replace('National championship', 'Championship'))}</div>${html}</div>`;
     }).join('');
-    const champ = br.champ ? `<div class="gbchamp ${fieldOf(st, br.champ).me ? 'me' : ''}">🏆 ${esc(teamName(st, br.champ))}</div>` : '';
+    const champ = br.champ && hide < ROUNDS.length - 1 ? `<div class="gbchamp ${fieldOf(st, br.champ).me ? 'me' : ''}">🏆 ${esc(teamName(st, br.champ))}</div>` : '';
     return `<div class="gbracket">${cols}</div>${champ}`;
   }
 
@@ -582,7 +631,11 @@
   function finishRun(st) {
     const s = summary(st), me = teamRatings(st);
     const sq = st.games.map(g => g.res.w ? '🟧' : '⬛').join('') + (st.post.length ? ' ' + st.post.map(g => g.res.w ? '🟧' : '⬛').join('') : '');
-    st.share = `🏈 16-0${st.daily ? ' ' + st.date : ''}: ${s.wins}-${s.losses} · ${s.tier}\n${sq}\nOFF ${Math.round(me.off)} · DEF ${Math.round(me.def)}\n${SITE}`;
+    const e = st.eras.length === FB_ERAS.length ? '' : '.' + st.eras.map(x => String(x).slice(2)).join('-');
+    const link = st.daily ? SITE : `https://www.volindex.net/games/football/run?c=${st.seed}${e}${st.side === 'both' ? '' : '&s=' + st.side[0]}`;
+    st.share = `🏈 16-0${st.daily ? ' ' + st.date : ''}: ${s.wins}-${s.losses} · ${s.tier}\n${sq}\nOFF ${Math.round(me.off)} · DEF ${Math.round(me.def)}\n${st.daily ? link : 'Same draft: ' + link}`;
+    if (window.VI_TRACK) window.VI_TRACK('finish/football/run/' + (st.daily ? 'daily' : 'free'));
+    if (st.daily && window.VI_SYNC) setTimeout(window.VI_SYNC, 500);
     if (st.daily) store.set(dkey('football', 'run', st.date), { final: JSON.parse(JSON.stringify(st)), share: st.share });
     const hist = store.get('run-stats', { played: 0, titles: 0, perfect: 0, best: null });
     hist.played++; if (s.title) hist.titles++; if (s.perfect) hist.perfect++;
@@ -603,11 +656,11 @@
         ${champName && !s.title ? `<p class="dim">National champion: ${esc(champName)}</p>` : ''}
         <div class="grow"><button class="btn primary" id="runShare">Copy result</button> <button class="btn" id="runAgain">${st.daily ? 'Free play' : 'Play again'}</button></div>
         <p class="dim small">Your runs: ${hist.played} played · ${hist.titles} titles · ${hist.perfect} perfect</p></div>
-      <div class="grid g2"><div class="box gteam"><div class="eyebrow">Your Vols · OFF ${Math.round(me.off)} · DEF ${Math.round(me.def)}</div>${board(st, true)}</div>
-        <div class="box gsched"><h3>Season</h3><ol class="glist">${st.games.map(g => gameRow(st, g, true)).join('')}${(st.post || []).map(g => gameRow(st, g, true, g.label)).join('')}</ol></div></div>
-      ${st.br ? `<div class="box gbracket-box"><h3>Playoff bracket</h3>${bracket(st)}</div>` : ''}`;
+      ${st.br ? `<div class="box gbracket-box"><h3>Playoff bracket</h3>${bracket(st)}</div>` : ''}
+      <div class="gresults"><div class="box gteam"><div class="eyebrow">Your Vols · OFF ${Math.round(me.off)} · DEF ${Math.round(me.def)}</div>${board(st, true)}</div>
+        <div class="box gsched"><h3>Season</h3><ol class="glist compact">${st.games.map(g => gameRow(st, g, true)).join('')}${(st.post || []).map(g => gameRow(st, g, true, g.label)).join('')}</ol></div></div>`;
     bindMode(body, m => { RUN.mode = m; RUN.st = null; rerender(); });
-    body.querySelector('#runShare').addEventListener('click', e => copyText(st.share || '', e.currentTarget));
+    body.querySelector('#runShare').addEventListener('click', e => { if (window.VI_TRACK) window.VI_TRACK('share/football/run'); copyText(st.share || '', e.currentTarget); });
     body.querySelector('#runAgain').addEventListener('click', () => { RUN.mode = 'free'; RUN.st = null; rerender(); });
   }
 
