@@ -53,7 +53,7 @@
 
   /* ---------- sports + games ---------- */
   const SPORTS = [
-    { key: 'football', name: 'Football', icon: '🏈', file: 'data/games-data.js', games: ['run', 'guesser', 'grid', 'career', 'rankings', 'duel', 'trivia'] },
+    { key: 'football', name: 'Football', icon: '🏈', file: 'data/games-data.js', games: ['dynasty', 'run', 'guesser', 'grid', 'career', 'rankings', 'duel', 'trivia'] },
     { key: 'mbb', name: "Men's Basketball", icon: '🏀', beta: true, file: 'data/games-mbb.js', games: ['run', 'guesser', 'rankings', 'duel', 'trivia'] },
     { key: 'wbb', name: "Women's Basketball", icon: '🏀', beta: true, file: 'data/games-wbb.js', games: ['run', 'guesser', 'rankings', 'duel', 'trivia'], lady: true },
     { key: 'baseball', name: 'Baseball', icon: '⚾', beta: true, file: 'data/games-baseball.js', games: ['run', 'guesser', 'rankings', 'duel', 'trivia'] },
@@ -62,7 +62,7 @@
     { key: 'soccer', name: 'Soccer', icon: '⚽', beta: true, file: 'data/games-soccer.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
   ];
   const SP = k => SPORTS.find(s => s.key === k);
-  const GAME_ICON = { run: '🏈', guesser: '🔎', grid: '🟧', career: '🏟️', rankings: '📊', duel: '↕️', trivia: '❓' };
+  const GAME_ICON = { dynasty: '🏟️', run: '🏈', guesser: '🔎', grid: '🟧', career: '🏟️', rankings: '📊', duel: '↕️', trivia: '❓' };
   // the undefeated-run game is named for a perfect season in that sport: 16-0 football, 40-0 basketball
   // (31 regular season + 3 SEC tournament + 6 NCAA), 69-0 baseball and softball (56 + 3 SEC + 3 regional + 2 super + 3 CWS + 2 finals)
   const RUN_NAME = { football: '16-0', mbb: '40-0', wbb: '40-0', baseball: '69-0', softball: '69-0' };
@@ -70,11 +70,12 @@
   const gIcon = (sport, g) => g === 'run' ? RUN_ICON[sport] : GAME_ICON[g];
   function gameName(sport, g) {
     const v = SP(sport).lady ? 'Lady Vol' : 'Vol';
-    return { run: RUN_NAME[sport], guesser: v + ' Guesser', grid: 'Power T Grid', career: 'VFL Career', rankings: 'Rocky Top Rankings', duel: 'Higher or Lower', trivia: v + ' Trivia' }[g];
+    return { dynasty: 'Vol Dynasty', run: RUN_NAME[sport], guesser: v + ' Guesser', grid: 'Power T Grid', career: 'VFL Career', rankings: 'Rocky Top Rankings', duel: 'Higher or Lower', trivia: v + ' Trivia' }[g];
   }
   function gameBlurb(sport, g) {
     const fb = sport === 'football';
     return {
+      dynasty: 'Take over Tennessee with the real 2026 roster. Call the plays in a live, animated sim, recruit the real 2027 class and beyond, manage NIL and the portal, and chase the playoff for as many seasons as you want.',
       run: fb ? 'Spin an era, draft five Vols on offense and five on defense at their best, then play 12 games against all-time great teams. Win the SEC and run the 12-team playoff.'
         : sport === 'mbb' || sport === 'wbb' ? `Spin an era and draft a starting five plus a sixth ${SP(sport).lady ? 'Lady Vol' : 'man'} at their best season. Play a 31-game schedule of real Tennessee opponents, the SEC Tournament and the 64-team NCAA Tournament.`
         : `Spin an era and draft a lineup and a pitching staff at their best season. Play a 56-game schedule of real Tennessee opponents, the SEC Tournament, regionals, super regionals and the ${sport === 'softball' ? "Women's " : ''}College World Series.`,
@@ -316,7 +317,7 @@
       <header class="ghead"><h1><span aria-hidden="true">${s.icon}</span> ${esc(s.name)} games${s.beta ? ' <span class="gbeta">Beta</span>' : ''}</h1>
         <p>${esc(COVERAGE[sport])}</p></header>
       ${betaNote(sport)}
-      <div class="grid g3 gcards">${s.games.map(g => `<a class="box gcard" href="#games-${sport}-${g}"><div class="gcard-top"><span class="gicon" aria-hidden="true">${gIcon(sport, g)}</span>${dailyDone(sport, g) ? '<span class="chip new">Today ✓</span>' : '<span class="chip">Daily</span>'}</div>
+      <div class="grid g3 gcards">${s.games.map(g => `<a class="box gcard" href="#games-${sport}-${g}"><div class="gcard-top"><span class="gicon" aria-hidden="true">${gIcon(sport, g)}</span>${g === 'dynasty' ? '<span class="chip new">Preview</span>' : dailyDone(sport, g) ? '<span class="chip new">Today ✓</span>' : '<span class="chip">Daily</span>'}</div>
           <h3>${esc(gameName(sport, g))}</h3><p>${esc(gameBlurb(sport, g))}</p><span class="btn primary">Play</span></a>`).join('')}
         ${s.beta ? `<div class="box gcard soon"><div class="gcard-top"><span class="gicon" aria-hidden="true">🔜</span><span class="chip">Soon</span></div><h3>More games</h3><p>Grids, career paths and sims for ${esc(s.name.toLowerCase())} are on the way.</p></div>` : ''}</div>
       <p class="gfoot dim"><a href="#games">← All sports</a> · <a href="#me">My games: streaks and stats ›</a> · <a href="#players-${sport}">${esc(s.name)} player pages ›</a></p></div>`;
@@ -767,6 +768,16 @@
   }
 
   /* ---------- entry ---------- */
+  // Vol Dynasty: its own scripts and stylesheet, loaded the first time you open it
+  const DYN_FILES = ['dy-data', 'dy-core', 'dy-engine', 'dy-league', 'dy-off', 'dy-save', 'dy-game', 'dy-ui'];
+  function renderDynasty(app) {
+    if (!document.querySelector('link[data-dyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/dynasty/dynasty.css?v=1'; l.dataset.dyn = 1; document.head.appendChild(l); }
+    if (window.VI_DYN && window.DYG) return window.VI_DYN.render(app);
+    loading(app, 'Loading Vol Dynasty…');
+    let i = 0;
+    const next = () => { if (i >= DYN_FILES.length) return window.VI_DYN.render(app); const f = 'assets/dynasty/' + DYN_FILES[i++] + '.js?v=1'; loadScript(f, () => false, next, () => loading(app, 'Could not load Vol Dynasty. Refresh to try again.')); };
+    next();
+  }
   let last = null;
   function rerender() { if (last) render(last.app, last.sport, last.game, true); }
   function loading(app, msg) { app.innerHTML = `<div class="wrap hub-hero"><div class="eyebrow">Games</div><h1>${esc(msg || 'Loading…')}</h1></div>`; }
@@ -777,6 +788,7 @@
     const s = SP(sport);
     if (!s) return renderHome(app);
     if (game && !s.games.includes(game)) game = null;
+    if (sport === 'football' && game === 'dynasty') return renderDynasty(app);
     // football data is needed for every football game; beta sports load their own file
     const ready = sport === 'football' ? () => !!window.VI_GAMES_DATA : () => !!(window.VI_GAMES_SPORT && window.VI_GAMES_SPORT[sport]);
     if (!ready()) { loading(app); return loadScript(s.file, ready, () => render(app, sport, game), () => loading(app, 'Could not load the games data. Refresh to try again.')); }
