@@ -266,7 +266,7 @@
   }
   // AJ's corrections to the real roster (class, role, ratings); 5-in-5 eligibility: Fr, So, Jr, Sr, 5th
   DY.UT_FIX = {
-    'George MacIntyre': { yr: 2 }, 'DeSean Bishop': { yr: 4, walkon: true }, 'Braylon Staley': { yr: 3 }, 'Jesse Perry': { yr: 3, at: { rbk: 85, pbk: 75 }, note: 'A natural guard playing tackle.' },
+    'George MacIntyre': { yr: 2 }, 'DeSean Bishop': { yr: 4, walkon: true, ovr: 92, tr: { cons: 90, ego: 30, lead: 92, work: 95, disc: 88, clutch: 90 }, note: 'Former walk-on turned Heisman candidate.' }, 'Braylon Staley': { yr: 3 }, 'Jesse Perry': { yr: 3, at: { rbk: 85, pbk: 75 }, note: 'A natural guard playing tackle.' },
     'Sam Pendleton': { yr: 4 }, 'Nic Moore': { yr: 2 }, 'Tyree Weathersby': { yr: 4, ovr: 87 }, 'Jordan Norman': { yr: 4 }, 'Christian Gass': { yr: 2 },
     'Xavier Gilliam': { yr: 3, ovr: 95 }, 'Carson Gentle': { yr: 3 }, 'Nathan Robinson': { yr: 4 }, 'Edwin Spillman': { yr: 3 }, 'Tevis Metcalf': { yr: 4 },
     'Daune Morris': { ovr: 82, arch: 'Elusive Back' }, 'Javin Gordon': { ovr: 75 }, 'David Sanders Jr.': { ovr: 92, arch: 'Pass Protector' },

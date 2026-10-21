@@ -119,6 +119,11 @@
     const body = APP.querySelector('#dyBody');
     ({ home, schedule, roster, depth, recruit, polls, standings, stats, nil, history, settings })[V.tab](body);
     APP.firstElementChild.onclick = onClick; APP.firstElementChild.onchange = onChange;
+    const cq = APP.querySelector('#dyCampQ');
+    if (cq) {
+      const run = () => { const q = cq.value.trim().toLowerCase(); let n = 0; APP.querySelectorAll('#dyCampT tr').forEach(tr => { const show = q.length > 0 && tr.dataset.campq.split(/\s+/).some(w => w.startsWith(q)) || (q.length > 1 && tr.dataset.campq.includes(q)); tr.hidden = !show || n >= 25; if (show) n++; }); APP.querySelector('#dyCampHint').textContent = q ? (n ? `${n} match${n > 1 ? 'es' : ''}` : 'No players match.') : 'Type to find a player.'; V.campq = cq.value; };
+      cq.oninput = run; if (V.campq) { cq.value = V.campq; run(); }
+    }
     const at = APP.querySelector('.dyh-tabs [aria-selected="true"]'); if (at && at.scrollIntoView && root.innerWidth < 900) at.scrollIntoView({ block: 'nearest', inline: 'center' });
   }
   function primaryAction() {
@@ -291,13 +296,13 @@
   function preseasonCard() {
     const g = G(), ut = DY.userT(), o = DY.teamOvr(ut), games = DY.userGames();
     const camp = (g.camp && g.camp.y === g.season ? g.camp.list : []) || [];
-    const cands = ut.roster.map(DY.P).filter(p => !camp.some(c => c.id === p.id)).sort((a, b) => (b.ceil - b.ovr) - (a.ceil - a.ovr)).slice(0, 14);
+    const cands = ut.roster.map(DY.P).filter(p => !camp.some(c => c.id === p.id)).sort((a, b) => a.n.localeCompare(b.n));
     return `<div class="box"><div class="glabel">${g.season} season preview</div><h3>Tennessee opens No. ${DY.apRank(ut.id) || 'NR'}</h3>
       <p class="dim">Team overall ${o.ovr} (offense ${o.off}, defense ${o.def}). ${esc((DY.STYLES[ut.style] || DY.STYLES.power).name)} offense. NIL budget ${DY.money(ut.budget)}.</p>
       <ol class="dy-sched-mini">${games.map(x => `<li><span>Wk ${x.wk}</span> ${x.h === ut.id ? 'vs' : 'at'} ${tlink(DY.oppOf(x))}${x.tag ? ' ' + tag(x.tag) : ''}</li>`).join('')}</ol></div>
       <div class="box"><div class="glabel">Preseason camp · ${camp.length}/${DY.CAMP_MAX} spots</div><p class="dim small">Send up to four players to a camp focus for a small boost (or work on raising one player's ceiling). Unused spots are filled by your staff when the season starts.</p>
       ${camp.length ? `<ul class="dy-mini">${camp.map(c => `<li>${plink(DY.P(c.id))} <small>${esc(DY.CAMP_FOCUS[c.f][0])} · ${c.d >= 0 ? '+' : ''}${c.d}</small></li>`).join('')}</ul>` : ''}
-      ${camp.length < DY.CAMP_MAX ? `<div class="dy-scroll"><table class="dyt dy-tight"><tbody>${cands.map(p => `<tr><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${ovrB(p.ovr)} <span class="dy-pot">${p.potG}</span></td><td><select data-campsel="${p.id}"><option value="">Camp focus…</option>${Object.entries(DY.CAMP_FOCUS).filter(([k, f]) => k === 'pot' || f[1].some(a => p.at[a] != null)).map(([k, f]) => `<option value="${k}">${esc(f[0])}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>` : ''}
+      ${camp.length < DY.CAMP_MAX ? `<input id="dyCampQ" class="dy-in" type="search" placeholder="Search a player or position (e.g. Bishop, WR)" autocomplete="off"><p class="dim small" id="dyCampHint">Type to find a player.</p><div class="dy-scroll"><table class="dyt dy-tight" id="dyCampT"><tbody>${cands.map(p => `<tr hidden data-campq="${esc((p.n + ' ' + p.pos).toLowerCase())}"><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${ovrB(p.ovr)} <span class="dy-pot">${p.potG}</span></td><td><select data-campsel="${p.id}"><option value="">Camp focus…</option>${Object.entries(DY.CAMP_FOCUS).filter(([k, f]) => k === 'pot' || f[1].some(a => p.at[a] != null)).map(([k, f]) => `<option value="${k}">${esc(f[0])}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>` : ''}
       <div class="grow"><button class="btn primary big" data-act="main">Kick off the season</button><button class="btn" data-goto="depth">Set the depth chart</button></div></div>`;
   }
   function lastGameCard(x) {
