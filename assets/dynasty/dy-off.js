@@ -35,7 +35,8 @@
   function prospect(pos, c, o) {
     o = o || {};
     const g = c * 100;
-    const ovr = Math.round(clamp(61.5 + (g - 80) * 0.7 - 1 + gauss() * 3, 45, 82));
+    // elite prospects arrive closer to ready: a top 5-star lands around 78-83
+    const ovr = Math.round(clamp(61.5 + (g - 80) * 0.7 - 1 + Math.max(0, g - 90) * 0.75 + gauss() * (g >= 98 ? 1.7 : 3), 45, 85));
     const p = DY.makePlayer(pos, ovr, Object.assign({ t: null, yr: 1, el: 5, grade: g, rec: { c, stars: DY.starsOf(c), g } }, o));
     p.pros = true; p.interest = {}; p.commit = null; p.pref = prefs(); p.scout = 0; p.acts = {}; p.offer = false; p.visit = null; p.nilOffer = 0;
     // gems and busts: the composite misses on some players
@@ -235,7 +236,8 @@
   DY.OFF_ORDER = ['recap', 'nil', 'portal', 'signing', 'draft', 'progress', 'cuts', 'schedule'];
   // limits per offseason (AJ): 30 newcomers (20 high school, 20 transfers), 30 departures, 15 transfers out, 15 NFL entries
   DY.CAP = { newcomers: 30, hs: 20, tin: 20, out: 30, tout: 15, nfl: 15 };
-  DY.rosterMax = () => G().rosterMax || 88;
+  DY.ROSTER_MAX = 85;
+  DY.rosterMax = () => DY.ROSTER_MAX;
   DY.startOffseason = () => {
     const g = G();
     g.off = { stage: 'recap', leaving: [], portal: null, draft: null, prog: [], nilAsk: [], season: g.season };

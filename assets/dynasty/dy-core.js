@@ -342,7 +342,7 @@
     cutWr.forEach(id => delete DY.G.P[id]);
     team.roster = ids.filter(id => !cutWr.has(id));
     team.depth = DY.autoDepth(team, depth ? realDepthOrder(depth, team.roster) : null);
-    DY.G.rosterMax = team.roster.length;
+    DY.G.rosterMax = 85;
     return team.roster;
   };
   const ST_FULL = { 'Tenn.': 'TN', 'Ga.': 'GA', 'Fla.': 'FL', 'Ala.': 'AL', 'Va.': 'VA', 'Md.': 'MD', 'N.C.': 'NC', 'S.C.': 'SC', 'Ky.': 'KY', 'Miss.': 'MS', 'La.': 'LA',
