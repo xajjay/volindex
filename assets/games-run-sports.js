@@ -29,20 +29,23 @@
     softball: { hoops: false, run: '69-0', icon: '🥎', reg: 56, secSeries: 8, inn: 7, base: 4.3, k: 0.19, cws: "Women's College World Series", omaha: 'Oklahoma City', who: 'Lady Vols' },
   };
   // roster slots: [code, label, side (O lineup / D pitching / X basketball), fits(row)]
+  // positions are strict: a player only goes in a spot his listed position allows (a G/F can play guard or forward)
+  const has = (r, ...ts) => toks(r.pos).some(t => ts.includes(t));
   const HOOP_SLOTS = [
-    ['G', 'Guard', 'X', r => toks(r.pos).some(t => t === 'G' || t === 'PG')],
-    ['G', 'Guard', 'X', r => toks(r.pos).some(t => t === 'G' || t === 'PG')],
-    ['W', 'Wing', 'X', r => toks(r.pos).some(t => t === 'G' || t === 'F' || t === 'PG')],
-    ['B', 'Big', 'X', r => toks(r.pos).some(t => t === 'F' || t === 'C')],
-    ['B', 'Big', 'X', r => toks(r.pos).some(t => t === 'F' || t === 'C')],
+    ['G', 'Guard', 'X', r => has(r, 'G', 'PG', 'SG')],
+    ['G', 'Guard', 'X', r => has(r, 'G', 'PG', 'SG')],
+    ['F', 'Forward', 'X', r => has(r, 'F', 'SF', 'PF')],
+    ['F', 'Forward', 'X', r => has(r, 'F', 'SF', 'PF')],
+    ['B', 'Big', 'X', r => has(r, 'C', 'F', 'PF')],
     ['6', 'Sixth', 'X', () => true],
   ];
-  const IF_T = ['1B', '2B', '3B', 'SS', 'IF', 'INF', 'UTL', 'UT'];
-  const fitC = r => isHitter(r) && toks(r.pos).includes('C');
-  const fitIF = r => isHitter(r) && (!toks(r.pos).length || toks(r.pos).some(t => IF_T.includes(t)));
-  const fitOF = r => isHitter(r) && (!toks(r.pos).length || toks(r.pos).some(t => t === 'OF' || t === 'UTL' || t === 'UT'));
+  // diamond: generic "IF/INF" infielders can play any base, utility players (UT/UTL) infield or outfield; no listed position = DH/DP only
+  const GEN_IF = ['IF', 'INF', 'UTL', 'UT'];
+  const fitBase = base => r => isHitter(r) && has(r, base, ...GEN_IF);
+  const fitC = r => isHitter(r) && has(r, 'C');
+  const fitOF = r => isHitter(r) && has(r, 'OF', 'LF', 'CF', 'RF', 'UTL', 'UT');
   const fitP = r => r.k === 'P';
-  const DIA_HIT = [['C', 'Catcher', 'O', fitC], ['IF', 'Infield', 'O', fitIF], ['IF', 'Infield', 'O', fitIF], ['IF', 'Infield', 'O', fitIF], ['IF', 'Infield', 'O', fitIF],
+  const DIA_HIT = [['C', 'Catcher', 'O', fitC], ['1B', 'First base', 'O', fitBase('1B')], ['2B', 'Second base', 'O', fitBase('2B')], ['SS', 'Shortstop', 'O', fitBase('SS')], ['3B', 'Third base', 'O', fitBase('3B')],
     ['OF', 'Outfield', 'O', fitOF], ['OF', 'Outfield', 'O', fitOF], ['OF', 'Outfield', 'O', fitOF]];
   const SLOTS = {
     mbb: HOOP_SLOTS, wbb: HOOP_SLOTS,
@@ -527,7 +530,7 @@
   // slot fit functions are not saved with the state (it goes to localStorage), so put them back
   function hydrate(st) {
     const defs = SLOTS[st.sport]; let i = 0;
-    st.slots.forEach(s => { const d = defs.find((x, j) => x[0] === s.code && x[2] === s.side && j >= i) || defs.find(x => x[0] === s.code); s.fits = d[3]; });
+    st.slots.forEach(s => { const d = defs.find((x, j) => x[0] === s.code && x[2] === s.side && j >= i) || defs.find(x => x[0] === s.code); s.fits = d ? d[3] : () => true; });
     const D = data(st.sport); st.slots.forEach(s => { if (s.p && !s.p.st) s.p = D.by[s.p.id] || s.p; });
     return st;
   }
@@ -559,7 +562,7 @@
   function place(st, row) {
     const side = currentSide(st);
     const open = st.slots.filter(s => !s.p && s.side === side && s.fits(row));
-    const flex = s => ['6', 'DH', 'DP', 'W'].includes(s.code) ? 1 : 0;
+    const flex = s => ['6', 'DH', 'DP'].includes(s.code) ? 2 : s.code === 'B' ? 1 : 0;
     open.sort((a, b) => flex(a) - flex(b));
     return open[0] || null;
   }
@@ -817,11 +820,11 @@
   function howTo(sport) {
     const c = CONF[sport];
     return `<details class="box ghow"><summary>How it works</summary><ol>
-      ${c.hoops ? `<li><b>Spin.</b> Each spin lands on a five-season window (1990-95, 1995-2000 ... 2020-26) and deals six players from it. Fill two guards, a wing, two bigs and a ${c.sixth.toLowerCase()} (anyone). Spots you've filled are greyed out. Three re-spins per run.</li>
+      ${c.hoops ? `<li><b>Spin.</b> Each spin lands on a five-season window (1990-95, 1995-2000 ... 2020-26) and deals six players from it. Fill two guards, two forwards, a big (forward or center) and a ${c.sixth.toLowerCase()} (anyone). Players only go where their listed position allows. Spots you've filled are greyed out. Three re-spins per run.</li>
       <li><b>Play.</b> ${c.nonconf} non-conference games and ${c.secG} SEC games (every SEC team at least once, a few twice), all real teams Tennessee played since 2000, each at the strength they had that season. Sim one game at a time or the whole season.</li>
       <li><b>SEC Tournament.</b> Seeded by your SEC record against how the rest of the league finished. Top four seeds get a double bye, so the champion plays three games.</li>
       <li><b>NCAA Tournament.</b> The committee seeds you from your record. Win six games in your region and at the Final Four. 31 + 3 + 6 = 40-0.</li>`
-      : `<li><b>Spin.</b> Each spin lands on a five-season window and deals six players. Lineup first (catcher, four infielders, three outfielders and a ${sport === 'baseball' ? 'DH' : 'DP'}), then the pitching staff (${sport === 'baseball' ? 'three weekend starters and a closer' : 'an ace and a No. 2'}). Three re-spins per run.</li>
+      : `<li><b>Spin.</b> Each spin lands on a five-season window and deals six players. Lineup first (catcher, first, second, short, third, three outfielders and a ${sport === 'baseball' ? 'DH' : 'DP'}; players listed only as infielders can play any base, and players with no listed position can only ${sport === 'baseball' ? 'DH' : 'DP'}), then the pitching staff (${sport === 'baseball' ? 'three weekend starters and a closer' : 'an ace and a No. 2'}). Three re-spins per run.</li>
       <li><b>Play.</b> 56 games: ${c.secSeries} SEC weekend series plus ${sport === 'softball' ? 'tournament weekends' : 'non-conference weekends'} and midweek games, all real teams Tennessee played since 2000. Play a weekend at a time or sim the season.</li>
       <li><b>Postseason.</b> The single-elimination SEC Tournament (top four seeds get a double bye: three games), then the NCAA: a four-team double-elimination regional (three wins), a best-of-three super regional (two), the ${c.cws} in ${c.omaha} (three wins in a double-elimination bracket) and the best-of-three finals (two). 56 + 3 + 3 + 2 + 3 + 2 = 69-0.</li>`}
     </ol></details>`;
