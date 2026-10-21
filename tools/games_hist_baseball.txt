@@ -1,143 +1,190 @@
-# Baseball 2000-2016 year-by-year statistical leaders from the 2019 Tennessee Baseball Media Guide, Records & Honors (utsports.com).
-# year|category|value|player   (ties listed with commas are skipped by the build)
-2000|Batting Average|.401|Chris Burke
-2001|Batting Average|.435|Chris Burke
-2002|Batting Average|.362|Jordan Czarniecki
-2003|Batting Average|.327|Nick Crowe
-2004|Batting Average|.330|Alex Suarez
-2005|Batting Average|.387|Chase Headley
-2006|Batting Average|.366|Julio Borbon
-2007|Batting Average|.345|Julio Borbon
-2008|Batting Average|.330|Kentrail Davis
-2009|Batting Average|.364|Cody Hawn
-2010|Batting Average|.352|P.J. Polk
-2011|Batting Average|.332|Khayyan Norfork
-2012|Batting Average|.297|Will Maddox
-2013|Batting Average|.361|Scott Price
-2014|Batting Average|.330|Christin Stewart
-2015|Batting Average|.325|Nick Senzel
-2016|Batting Average|.352|Nick Senzel
-2000|Hits|109|Chris Burke
-2001|Hits|118|Chris Burke
-2002|Hits|74|Walter Sevilla
-2003|Hits|65|Jordan Czarniecki
-2004|Hits|77|Eli Iorg
-2005|Hits|96|Eli Iorg
-2006|Hits|86|Julio Borbon
-2007|Hits|75|Andy Simunic
-2008|Hits|68|Kentrail Davis
-2009|Hits|72|Cody Hawn
-2010|Hits|76|P.J. Polk
-2011|Hits|68|Khayyan Norfork
-2012|Hits|63|Will Maddox
-2013|Hits|69|Will Maddox
-2014|Hits|72|Christin Stewart
-2015|Hits|65|Nick Senzel
-2016|Hits|74|Nick Senzel
-2000|Runs Batted In|60|Kris Bennett
-2001|Runs Batted In|73|Jeff Christensen
-2002|Runs Batted In|46|Jordan Czarniecki
-2004|Runs Batted In|45|Chris Kemp
-2005|Runs Batted In|72|Eli Iorg
-2006|Runs Batted In|52|J.P. Arencibia
-2007|Runs Batted In|49|Tony Delmonico
-2008|Runs Batted In|44|Kentrail Davis
-2009|Runs Batted In|81|Cody Hawn
-2010|Runs Batted In|61|Cody Hawn
-2011|Runs Batted In|39|Matt Duffy
-2012|Runs Batted In|28|Chris Fritts
-2013|Runs Batted In|27|Christin Stewart
-2015|Runs Batted In|47|Christin Stewart
-2016|Runs Batted In|59|Nick Senzel
-2000|Home Runs|11|Jeff Christensen
-2001|Home Runs|20|Chris Burke
-2002|Home Runs|8|Jordan Czarniecki
-2003|Home Runs|9|Javi Herrera
-2004|Home Runs|6|Brian Cleveland
-2005|Home Runs|15|Eli Iorg
-2007|Home Runs|9|Tony Delmonico
-2008|Home Runs|13|Kentrail Davis
-2009|Home Runs|22|Cody Hawn
-2010|Home Runs|15|Blake Forsythe
-2011|Home Runs|7|Ethan Bennett
-2012|Home Runs|6|Drew Steckenrider
-2014|Home Runs|5|Christin Stewart
-2015|Home Runs|15|Christin Stewart
-2000|Stolen Bases|58|Stevie Daniel
-2001|Stolen Bases|49|Chris Burke
-2002|Stolen Bases|25|Walter Sevilla
-2003|Stolen Bases|32|Jordan Czarniecki
-2004|Stolen Bases|26|Eli Iorg
-2005|Stolen Bases|27|Eli Iorg
-2006|Stolen Bases|19|Julio Borbon
-2007|Stolen Bases|29|Andy Simunic
-2008|Stolen Bases|20|Andy Simunic
-2009|Stolen Bases|8|Josh Liles
-2010|Stolen Bases|25|P.J. Polk
-2011|Stolen Bases|29|Khayyan Norfork
-2012|Stolen Bases|14|Will Maddox
-2013|Stolen Bases|22|Will Maddox
-2014|Stolen Bases|24|Will Maddox
-2015|Stolen Bases|15|A.J. Simcox
-2016|Stolen Bases|25|Nick Senzel
-2000|Wins|10|Jamie Bennett
-2001|Wins|10|Wyatt Allen
-2004|Wins|8|Scot Drucker
-2005|Wins|15|Luke Hochevar
-2006|Wins|9|Craig Cobb
-2007|Wins|8|Craig Cobb
-2012|Wins|5|Dalton Saberhagen
-2013|Wins|5|Zack Godley
-2015|Wins|5|Kyle Serrano
-2016|Wins|6|Aaron Soto
-2000|ERA|2.71|Jamie Bennett
-2001|ERA|3.68|Brandon Crowe
-2002|ERA|3.35|Beau Massey
-2003|ERA|3.04|Dusty Johnson
-2004|ERA|2.01|Derek Tharpe
-2005|ERA|2.26|Luke Hochevar
-2006|ERA|3.31|Craig Cobb
-2007|ERA|2.80|James Adkins
-2008|ERA|4.59|Bryan Morgado
-2009|ERA|4.10|Jeff Lockwood
-2010|ERA|3.04|Stephen McCray
-2011|ERA|3.25|T.J. Thornton
-2012|ERA|3.36|Drew Steckenrider
-2013|ERA|3.49|Zack Godley
-2014|ERA|2.44|Andy Cox
-2015|ERA|2.92|Bret Marks
-2016|ERA|4.04|Zach Warren
-2000|Innings Pitched|149.2|Jamie Bennett
-2001|Innings Pitched|104.1|Wyatt Allen
-2002|Innings Pitched|115.2|Jeffery Terrell
-2003|Innings Pitched|93.1|Derek Tharpe
-2004|Innings Pitched|80.2|Derek Tharpe
-2005|Innings Pitched|139.2|Luke Hochevar
-2006|Innings Pitched|111.1|Craig Cobb
-2007|Innings Pitched|122.0|James Adkins
-2008|Innings Pitched|83.2|Nick Hernandez
-2009|Innings Pitched|84.1|Nick Hernandez
-2010|Innings Pitched|91.2|Stephen McCray
-2011|Innings Pitched|95.2|Steven Gruver
-2012|Innings Pitched|72.2|Nick Williams
-2013|Innings Pitched|108.1|Zack Godley
-2014|Innings Pitched|89.1|Nick Williams
-2015|Innings Pitched|77.0|Bret Marks
-2016|Innings Pitched|75.2|Zach Warren
-2000|Strikeouts|111|Jamie Bennett
-2001|Strikeouts|110|Wyatt Allen
-2002|Strikeouts|111|Jeffery Terrell
-2003|Strikeouts|88|Derek Tharpe
-2004|Strikeouts|84|Derek Tharpe
-2005|Strikeouts|154|Luke Hochevar
-2006|Strikeouts|112|James Adkins
-2007|Strikeouts|133|James Adkins
-2008|Strikeouts|104|Bryan Morgado
-2009|Strikeouts|75|Bryan Morgado
-2010|Strikeouts|74|Bryan Morgado
-2011|Strikeouts|84|Steven Gruver
-2012|Strikeouts|79|Drew Steckenrider
-2013|Strikeouts|98|Zack Godley
-2014|Strikeouts|70|Andy Cox
-2015|Strikeouts|89|Bret Marks
-2016|Strikeouts|66|Andy Cox
+# Baseball 2000-2016 from The Baseball Cube (thebaseballcube.com college stats, Tennessee team pages): top six hitters by hits (80+ AB)
+# and top four pitchers by innings (30+ IP) each season, with position, home state and MLB draft (year and round).
+# name|pos|home|before UT|gp,ab,h,hr,rbi,r,sb,avg,app,w,l,era,ip,so,sv|MLB draft
+#2000|40-23, 10-18
+Chris Burke|2B|KY||63,272,109,4,55,69,56,.401|2001 rd 1
+Kris Bennett|3B|TN||62,239,78,2,60,47,20,.326|2001 rd 30
+Stevie Daniel|SS|TN||63,237,75,3,36,66,58,.316|2001 rd 6
+Justin Parker|P|TN||60,222,70,4,40,54,13,.315|2001 rd 18
+Jeff Christensen|OF|TN||62,198,70,11,54,61,21,.354|2001 rd 5
+Jeff Baumtrog|OF|TN||58,176,60,3,34,48,14,.341|
+Jamie Bennett|LHP|TN||,,,,,,,,24,10,4,2.71,149.2,111,1|2000 rd 22
+Jordan De Jong|RHP|IA||,,,,,,,,20,5,3,5.59,66.0,49,0|2002 rd 18
+Wyatt Allen|RHP|TN||,,,,,,,,16,4,3,4.19,53.2,55,0|2001 rd 1
+Joe Bertolino|LHP|CA||,,,,,,,,15,4,3,3.80,47.1,42,0|
+#2001|48-20, 18-12
+Chris Burke|2B|KY||67,271,118,20,60,105,49,.435|2001 rd 1
+Stevie Daniel|SS|TN||67,277,91,4,61,67,46,.329|2001 rd 6
+Jeff Christensen|OF|TN||68,258,88,12,73,59,24,.341|2001 rd 5
+Kris Bennett|3B|TN||63,231,73,4,41,47,13,.316|2001 rd 30
+Javi Herrera|C|FL||63,213,63,7,45,32,2,.296|2003 rd 2
+Dan Wilson|OF|CA||61,187,55,5,37,28,5,.294|
+Wyatt Allen|RHP|TN||,,,,,,,,18,10,3,6.30,104.1,110,0|2001 rd 1
+Patrick Hicklen|RHP|TN||,,,,,,,,16,5,4,5.27,80.1,61,3|2004 rd 16
+Brian Gates|RHP|IA||,,,,,,,,19,6,5,5.03,77.0,76,3|2001 rd 28
+Justin Parker|LHP|TN||,,,,,,,,15,4,3,6.40,52.0,58,0|2001 rd 18
+#2002|27-28, 12-18
+Walter Sevilla|2B|Nicaragua||54,224,74,1,33,42,25,.330|2003 rd 34
+Jordan Czarniecki|OF|IN||54,199,72,8,46,47,24,.362|2003 rd 25
+Matt Sternberg|1B-3B|FL||54,197,64,4,35,40,1,.325|
+Brandon Hopkins|OF|TN||55,197,60,4,36,34,6,.305|
+Hal Bibee|C|TN||53,192,60,5,35,24,3,.313|
+Nick Crowe|C|TN||53,193,53,2,21,42,10,.275|
+Jeffery Terrell|LHP|TN||,,,,,,,,25,5,8,4.67,115.2,111,6|2002 rd 31
+Ben Riley|LHP|KS||,,,,,,,,15,5,3,5.08,90.1,75,0|2000 rd 49
+Patrick Hicklen|RHP|TN||,,,,,,,,11,5,3,6.14,55.2,48,0|2004 rd 16
+Joey Andrews|RHP|CO||,,,,,,,,22,4,4,5.92,48.2,44,2|
+#2003|31-24, 13-17
+Jordan Czarniecki|OF|IN||55,209,65,4,30,54,32,.311|2003 rd 25
+Javi Herrera|C|FL||55,199,59,9,32,35,5,.296|2003 rd 2
+Walter Sevilla|2B|Nicaragua||55,214,58,3,32,35,12,.271|2003 rd 34
+Nick Crowe|C|TN||55,159,52,2,29,32,9,.327|
+Brian Cleveland|SS|CA||53,188,51,4,32,25,3,.271|2004 rd 16
+Michael Rivera|2B|Nicaragua||43,180,51,2,26,28,4,.283|2006 rd 17
+Derek Tharpe|LHP|TN||,,,,,,,,15,6,6,3.95,93.1,88,0|2004 rd 6
+Ben Riley|LHP|KS||,,,,,,,,15,3,6,3.48,93.0,63,0|2000 rd 49
+Luke Hochevar|RHP|CO||,,,,,,,,21,6,5,4.64,77.2,73,3|2006 rd 1
+Dusty Johnson|LHP|TN||,,,,,,,,16,6,1,3.04,56.1,41,0|
+#2004|38-24, 14-16
+Eli Iorg|OF|CA||58,238,77,4,36,47,26,.324|2005 rd 1
+Kyle Norrid|1B-3B|FL||59,224,70,2,32,36,1,.313|
+Eric King|2B|CA||62,246,68,2,42,47,10,.276|2005 rd 13
+Josh Alley|OF|IL||57,219,66,5,25,54,15,.301|2005 rd 10
+Brian Cleveland|SS|CA||62,228,64,6,43,37,9,.281|2004 rd 16
+Alex Suarez|OF|FL||59,182,60,3,32,33,4,.330|
+Derek Tharpe|LHP|TN||,,,,,,,,13,6,1,2.01,80.2,84,0|2004 rd 6
+Sean Watson|RHP|FL||,,,,,,,,15,4,5,4.54,75.1,51,0|2006 rd 2
+Craig Cobb|RHP|TN||,,,,,,,,21,3,5,3.45,70.1,40,1|
+Luke Hochevar|RHP|CO||,,,,,,,,11,4,2,2.86,63.0,60,0|2006 rd 1
+#2005|46-19, 18-11
+Eli Iorg|OF|CA||63,252,96,15,72,63,27,.381|2005 rd 1
+Eric King|2B|CA||67,277,92,1,45,53,19,.332|2005 rd 13
+Chase Headley|3B|CO||67,238,92,14,65,82,6,.387|2005 rd 2
+J.P. Arencibia|C|FL||67,283,91,14,71,54,0,.322|2007 rd 1
+Josh Alley|OF|IL||67,253,82,3,45,70,25,.324|2005 rd 10
+Michael Rivera|2B|Nicaragua||67,245,81,1,42,51,13,.331|2006 rd 17
+Luke Hochevar|RHP|CO||,,,,,,,,19,15,3,2.26,139.2,154,0|2006 rd 1
+James Adkins|LHP|TN||,,,,,,,,19,10,5,3.32,127.1,135,0|2007 rd 1
+Craig Cobb|RHP|TN||,,,,,,,,21,7,4,4.53,99.1,54,0|
+Sean Watson|RHP|FL||,,,,,,,,29,7,3,2.85,79.0,82,7|2006 rd 2
+#2006|31-24, 11-18
+Julio Borbon|OF|MS||55,235,86,1,30,45,19,.366|2007 rd 1
+J.P. Arencibia|C|FL||55,216,76,11,52,44,0,.352|2007 rd 1
+Tony Delmonico|3B|TN||54,203,68,3,36,39,7,.335|2008 rd 6
+Michael Rivera|2B|Nicaragua||55,212,67,4,36,33,5,.316|2006 rd 17
+Chris Kemp|1B|GA||55,204,64,11,41,35,0,.314|
+Kelly Edmundson|C|MO||52,183,55,9,39,35,0,.301|2006 rd 11
+Craig Cobb|RHP|TN||,,,,,,,,26,9,3,3.31,111.1,64,1|
+James Adkins|LHP|TN||,,,,,,,,16,8,6,4.50,106.0,112,0|2007 rd 1
+Josh Lindblom|RHP|IN||,,,,,,,,17,4,6,5.01,88.0,68,0|2008 rd 2
+Deunte Heath|RHP|GA||,,,,,,,,15,4,3,3.86,56.0,39,0|2006 rd 19
+#2007|34-25, 13-15
+Andy Simunic|OF|TN||58,225,75,1,27,44,29,.333|2008 rd 17
+Tony Delmonico|3B|TN||59,228,74,9,49,53,10,.325|2008 rd 6
+Yan Gomes|C|Brazil||59,226,70,8,47,48,4,.310|2009 rd 10
+Daniel Lima|SS|FL||56,225,63,3,32,33,11,.280|2009 rd 23
+J.P. Arencibia|C|FL||52,191,63,8,42,47,2,.330|2007 rd 1
+Julio Borbon|OF|MS||40,174,60,3,28,35,10,.345|2007 rd 1
+James Adkins|LHP|TN||,,,,,,,,17,7,7,2.80,122.0,133,0|2007 rd 1
+Craig Cobb|RHP|TN||,,,,,,,,17,8,6,5.91,102.0,56,0|
+Lance McClain|LHP|TN||,,,,,,,,20,6,5,4.64,83.1,39,0|2008 rd 12
+Nick Hernandez|LHP|FL||,,,,,,,,21,4,4,6.23,52.0,44,1|2009 rd 12
+#2008|27-29, 12-18
+Kentrail Davis|OF|AL||54,206,68,13,44,45,7,.330|2009 rd 1
+Cody Brown|3B|TN||55,207,61,9,40,37,1,.295|
+Yan Gomes|C|Brazil||52,193,61,5,35,35,1,.316|2009 rd 10
+Andy Simunic|OF|TN||48,192,57,1,8,47,20,.297|2008 rd 17
+Jeff Lockwood|1B|CO||52,177,53,9,37,29,1,.299|
+Shawn Griffin|OF|FL||52,169,53,12,35,31,6,.314|2008 rd 20
+Nick Hernandez|LHP|FL||,,,,,,,,14,2,5,5.16,83.2,63,0|2009 rd 12
+Bryan Morgado|LHP|FL||,,,,,,,,14,5,5,4.59,80.1,104,0|2010 rd 4
+Steve Crnkovich|RHP|IL||,,,,,,,,22,5,6,6.24,66.1,42,0|
+Ty'Relle Harris|RHP|CA||,,,,,,,,17,2,2,4.62,64.1,57,1|2009 rd 19
+#2009|26-29, 11-19
+Cody Hawn|1B|TN||50,198,72,22,81,46,0,.364|2010 rd 6
+Blake Forsythe|C|TN||55,196,68,15,46,51,5,.347|2010 rd 3
+Kentrail Davis|OF|AL||55,214,66,9,30,58,4,.308|2009 rd 1
+Zach Osborne|SS|KY||55,203,57,4,33,33,4,.281|
+Josh Liles|C|TN||35,147,46,8,25,28,8,.313|
+P.J. Polk|OF|TN||43,151,45,3,21,31,7,.298|2010 rd 13
+Nick Hernandez|LHP|FL||,,,,,,,,14,4,5,5.23,84.1,70,0|2009 rd 12
+Ty'Relle Harris|RHP|CA||,,,,,,,,19,4,4,6.18,55.1,58,1|2009 rd 19
+Bryan Morgado|LHP|FL||,,,,,,,,20,4,2,6.36,52.1,75,2|2010 rd 4
+Stephen McCray|RHP|GA||,,,,,,,,19,4,3,5.16,52.1,39,0|2010 rd 16
+#2010|30-26, 12-18
+P.J. Polk|OF|TN||55,216,76,12,51,56,25,.352|2010 rd 13
+Cody Hawn|1B|TN||54,199,65,14,61,40,2,.327|2010 rd 6
+Matt Duffy|3B|MA||55,207,63,4,41,36,4,.304|2011 rd 20
+Zach Osborne|SS|KY||56,206,59,5,25,43,5,.286|
+Blake Forsythe|C|TN||55,199,57,15,57,40,0,.286|2010 rd 3
+Josh Liles|C|TN||49,191,57,3,29,48,19,.298|
+Stephen McCray|RHP|GA||,,,,,,,,14,6,4,3.04,91.2,64,0|2010 rd 16
+Steve Crnkovich|RHP|IL||,,,,,,,,25,6,2,5.58,71.0,39,1|
+Bryan Morgado|LHP|FL||,,,,,,,,15,2,7,7.90,68.1,74,0|2010 rd 4
+Steven Gruver|LHP|PA||,,,,,,,,12,4,4,6.21,58.0,45,0|2011 rd 7
+#2011|25-29, 7-23
+Khayyan Norfork|3B|TN||54,205,68,4,37,36,29,.332|2011 rd 23
+Matt Duffy|3B|MA||54,189,59,6,39,35,7,.312|2011 rd 20
+Zach Osborne|SS|KY||50,176,58,1,19,27,5,.330|
+Andrew Toles|OF|GA||51,204,55,1,25,30,21,.270|2012 rd 3
+Josh Liles|C|TN||53,186,49,1,23,24,11,.263|
+Ethan Bennett|C|IL||40,126,33,7,25,24,1,.262|
+Steven Gruver|LHP|PA||,,,,,,,,14,5,7,3.95,95.2,84,0|2011 rd 7
+Rob Catapano|LHP|FL||,,,,,,,,13,2,5,6.39,49.1,23,0|
+Nick Blount|RHP|GA||,,,,,,,,17,1,5,6.04,47.2,21,1|2013 rd 9
+Jon Reed|RHP|OK||,,,,,,,,14,1,2,5.40,41.2,22,0|
+#2012|24-31, 8-22
+Will Maddox|IF|GA||55,212,63,2,19,33,14,.297|2014 rd 18
+Davis Morgan|1B|KS||51,179,53,2,20,16,3,.296|
+Zach Osborne|SS|KY||55,198,51,0,17,29,8,.258|
+Chris Pierce|OF|CA||55,185,47,2,24,29,9,.254|
+Chris Fritts|OF|TX||54,170,42,2,28,28,3,.247|
+Drew Steckenrider|OF|GA||52,181,40,6,26,28,12,.221|2012 rd 8
+Nick Williams|RHP|IN||,,,,,,,,22,3,5,4.33,72.2,55,3|2014 rd 26
+Zack Godley|RHP|SC||,,,,,,,,12,4,2,3.50,69.1,53,0|2013 rd 10
+Drew Steckenrider|RHP|GA||,,,,,,,,27,4,6,3.36,67.0,79,1|2012 rd 8
+Robbie Kidd|RHP|VA||,,,,,,,,21,2,3,4.86,63.0,41,0|
+#2013|23-29, 9-19
+Will Maddox|IF|GA||51,207,69,0,20,42,22,.333|2014 rd 18
+Scott Price|1B|SC||45,184,66,2,25,25,4,.359|
+A.J. Simcox|SS|TN||50,180,51,0,26,25,8,.283|2015 rd 14
+Taylor Smart|IF|WA||49,172,46,2,19,29,12,.267|2014 rd 26
+Vince Jackson|OF|GA||43,155,45,2,24,17,5,.290|2016 rd 14
+Christin Stewart|OF|GA||46,145,45,3,27,27,5,.310|2015 rd 1
+Zack Godley|RHP|SC||,,,,,,,,16,5,7,3.49,108.1,98,0|2013 rd 10
+Nick Williams|RHP|IN||,,,,,,,,18,2,4,5.02,61.0,56,0|2014 rd 26
+Aaron Quillen|RHP|TN||,,,,,,,,14,2,4,6.79,51.2,30,0|2016 rd 22
+Andy Cox|LHP|TN||,,,,,,,,21,2,2,5.29,47.2,31,1|2016 rd 7
+#2014|31-23, 12-18
+Christin Stewart|OF|GA||54,218,72,5,39,45,7,.330|2015 rd 1
+Will Maddox|IF|GA||54,195,58,3,21,38,24,.297|2014 rd 18
+Nick Senzel|3B|GA||53,181,57,1,39,37,14,.315|2016 rd 1
+Taylor Smart|IF|WA||53,185,54,4,29,37,8,.292|2014 rd 26
+Scott Price|1B|SC||45,172,49,3,29,29,3,.285|
+Vince Jackson|OF|GA||49,154,36,2,27,21,7,.234|2016 rd 14
+Nick Williams|RHP|IN||,,,,,,,,15,5,5,3.22,89.1,65,0|2014 rd 26
+Andy Cox|LHP|TN||,,,,,,,,27,5,1,2.44,77.1,70,2|2016 rd 7
+Hunter Martin|RHP|TN||,,,,,,,,14,4,4,3.25,63.2,43,0|2017 rd 20
+Kyle Serrano|RHP|TN||,,,,,,,,19,3,3,4.55,59.1,40,1|2017 rd 10
+#2015|24-26, 11-18
+Nick Senzel|3B|GA||50,200,65,4,28,33,7,.325|2016 rd 1
+A.J. Simcox|SS|TN||50,188,55,1,27,29,15,.293|2015 rd 14
+Christin Stewart|OF|GA||50,177,55,15,47,39,4,.311|2015 rd 1
+Andrew Lee|1B|KY||41,144,44,9,31,22,1,.306|2015 rd 11
+Jordan Rodgers|IF|TN||38,97,27,0,12,9,0,.278|2017 rd 6
+Vince Jackson|OF|GA||23,81,26,0,7,12,7,.321|2016 rd 14
+Bret Marks|RHP|GA||,,,,,,,,13,4,5,2.92,77.0,89,0|2015 rd 15
+Drake Owenby|LHP|TN||,,,,,,,,15,2,6,4.83,69.0,60,0|2015 rd 12
+Andy Cox|LHP|TN||,,,,,,,,21,3,3,3.36,67.0,63,3|2016 rd 7
+Kyle Serrano|RHP|TN||,,,,,,,,22,5,4,4.47,54.1,47,0|2017 rd 10
+#2016|29-28, 9-21
+Nick Senzel|3B|GA||57,210,74,8,59,57,25,.352|2016 rd 1
+Vince Jackson|OF|GA||57,207,69,8,57,42,7,.333|2016 rd 14
+Derek Lance|IF|TN||57,198,65,0,24,32,8,.328|
+Chris Hall|OF|TN||57,202,62,0,22,49,12,.307|
+Jordan Rodgers|IF|TN||56,216,61,4,56,36,13,.282|2017 rd 6
+Benito Santiago|C|CA||53,181,56,1,18,33,5,.309|2018 rd 34
+Zach Warren|LHP|NJ||,,,,,,,,14,5,5,4.04,75.2,58,0|2017 rd 14
+Andy Cox|LHP|TN||,,,,,,,,22,3,6,6.72,68.1,66,3|2016 rd 7
+Aaron Soto|LHP|FL||,,,,,,,,17,6,2,3.63,62.0,40,0|2018 rd 32
+Eric Freeman|RHP|TN||,,,,,,,,22,3,1,3.00,54.0,41,0|

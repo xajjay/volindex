@@ -294,9 +294,9 @@
   }
   const COVERAGE = {
     football: 'Every Vol from 1980 to today appears at his best season. 1980s and early 1990s stats come from the UT record book; 1995 on use full season stats from utsports.com, ESPN and CollegeFootballData.com.',
-    mbb: '1990-91 to 1999-2000 from the Tennessee basketball record book (top scorers and stat leaders); 2000-01 to today from utsports.com season stats.',
-    wbb: 'Full season stats from 1990-91 to today (utsports.com year-by-year stats and all-time rosters), so Holdsclaw, Catchings and Parker are all here. 1998-99 is still missing.',
-    baseball: '2000-2016 from the record book\'s year-by-year leaders (one leader per stat, so fewer names per season); 2017 to today from utsports.com season stats. No 2020 season.',
+    mbb: 'Full season stats from 1990-91 to today: the 1990s from Sports-Reference (top seven scorers each season), 2000-01 on from utsports.com.',
+    wbb: 'Full season stats from 1990-91 to today (utsports.com year-by-year stats and all-time rosters), so Holdsclaw, Catchings and Parker are all here. 1998-99 comes from Sports-Reference.',
+    baseball: 'Full season stats from 2000 to today: 2000-2016 from The Baseball Cube (top six hitters and top four pitchers each season), 2017 on from utsports.com. No 2020 season.',
     softball: '2000-2026 season stats from the softball media guide and utsports.com, including the Monica Abbott years. No 2020 season.',
     volleyball: 'Season stats from utsports.com, 2006 to 2025. Earlier seasons are not online yet.',
     soccer: 'Season stats from utsports.com, 2001 to 2025.',

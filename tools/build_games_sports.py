@@ -43,7 +43,7 @@ def coach(sport, season):
     if sport == 'wbb':
         return 'Pat Summitt' if y <= 2011 else 'Holly Warlick' if y <= 2018 else 'Kellie Harper' if y <= 2023 else 'Kim Caldwell'
     if sport == 'baseball':
-        return 'Dave Serrano' if y <= 2017 else 'Tony Vitello' if y <= 2025 else 'Josh Elander'
+        return 'Rod Delmonico' if y <= 2007 else 'Todd Raleigh' if y <= 2011 else 'Dave Serrano' if y <= 2017 else 'Tony Vitello' if y <= 2025 else 'Josh Elander'
     if sport == 'softball':
         return 'The Weeklys' if y <= 2018 else 'Karen Weekly'
     if sport == 'volleyball':
@@ -61,7 +61,7 @@ def parse(sport):
     rows, records = [], {}
     hist = os.path.join(HERE, f'games_hist_{sport}.txt')
     if os.path.exists(hist):
-        rows, records = (parse_hoops_leaders(hist) if sport == 'mbb' else parse_stat_leaders(hist) if sport == 'baseball' else parse_file(hist, sport))
+        rows, records = (parse_stat_leaders(hist) if sport == 'baseball' and 'category|' in open(hist).read(400) else parse_file(hist, sport))
     have = set(records) | {r['s'] for r in rows}
     r2, rec2 = parse_file(os.path.join(HERE, f'games_ut_{sport}.txt'), sport)
     rows += [r for r in r2 if r['s'] not in have]          # a full season from the history file replaces a partial one
@@ -114,13 +114,14 @@ def parse_file(path, sport):
         if not line.strip() or line.startswith('# '): continue
         if line.startswith('#'):
             season, rec = line[1:].split('|', 1); records[season] = rec.strip(); continue
-        n, pos, st_, prev, stats = line.split('|')
+        parts = line.split('|'); n, pos, st_, prev, stats = parts[:5]
+        draft = parts[5].strip() if len(parts) > 5 and parts[5].strip() else None   # baseball: MLB draft "2016 rd 1"
         vals = stats.split(',')
         st = {}
         for k, v in zip(COLS[sport], vals):
             x = num(v)
             if x is not None: st[k] = x
-        rows.append(dict(n=n.strip(), s=season, pos=pos.strip(), home=state(st_), prev=prev.strip() or None, st=st))
+        rows.append(dict(n=n.strip(), s=season, pos=pos.strip(), home=state(st_), prev=prev.strip() or None, st=st, draft=draft))
     return rows, records
 
 def kind(sport, r):
@@ -199,7 +200,8 @@ def build_sport(sport):
         out.append(dict(n=n, pos=best['pos'] or next((r['pos'] for r in rs if r['pos']), ''), k=best['k'], s=best['s'], y=start_year(best['s']),
                         ovr=best['ovr'], st=best['st'], line=line_text(sport, best),
                         home=next((r['home'] for r in rs if r['home']), None), prev=next((r['prev'] for r in rs if r['prev']), None),
-                        coach=coach(sport, best['s']), seasons=seasons, ys=[start_year(x) for x in seasons]))
+                        coach=coach(sport, best['s']), seasons=seasons, ys=[start_year(x) for x in seasons],
+                        **({'draft': next(r['draft'] for r in rs if r.get('draft'))} if any(r.get('draft') for r in rs) else {})))
     out.sort(key=lambda p: (-p['ovr'], p['n']))
     def per_game(st):
         if sport not in ('mbb', 'wbb') or not st.get('gp'): return st

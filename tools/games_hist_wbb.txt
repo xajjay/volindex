@@ -201,3 +201,11 @@ Semeka Randall|G|OH||32,329,160,71,52,2,2,0.417
 Ashley Robinson|C|TX||34,301,181,26,27,51,0,0.492
 Tamika Catchings|F|TX||17,259,150,50,31,20,23,0.477
 Tasha Butts|G|GA||34,160,67,27,17,8,18,0.427
+#1998-99|31-3, 13-1
+Chamique Holdsclaw|F|NY||34,724,274,80,70,23,3,0.519
+Tamika Catchings|F|TX||34,563,249,95,88,31,19,0.513
+Semeka Randall|G|OH||33,464,160,46,60,5,2,0.512
+Michelle Snow|C|FL||34,290,218,12,24,46,0,0.600
+Kellie Harper|G|TN||34,254,77,141,48,1,32,0.449
+Kristen Clement|G|PA||33,252,67,84,51,6,25,0.461
+Teresa Geter|C|SC||28,166,131,28,26,45,0,0.453

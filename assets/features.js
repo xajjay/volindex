@@ -126,7 +126,8 @@
   let PL = null, BYKEY = {};
   function initPlayers() {
     if (PL) return PL; PL = window.VI_PLAYERS.players;
-    PL.forEach(p => { BYKEY[p.sp + '/' + p.slug] = p; p.span = p.yrs && p.yrs.length ? (p.yrs[0] + (p.yrs.length > 1 ? '-' + String(p.yrs[p.yrs.length - 1]).slice(2) : '')) : ''; });
+    PL.forEach(p => { BYKEY[p.sp + '/' + p.slug] = p; const hoops = p.sp === 'mbb' || p.sp === 'wbb', last = p.yrs && p.yrs.length ? p.yrs[p.yrs.length - 1] + (hoops ? 1 : 0) : 0;
+      p.span = p.yrs && p.yrs.length ? (p.yrs[0] + (last !== p.yrs[0] ? '-' + String(last).slice(2) : '')) : ''; });
     return PL;
   }
   const withPlayers = (app, label, fn) => window.VI_PLAYERS ? (initPlayers(), fn()) : (loading(app, label), load('data/players.js', () => !!window.VI_PLAYERS, () => { initPlayers(); fn(); }));
@@ -186,6 +187,7 @@
     const facts = [
       ['Position', p.pos === 'DL' ? 'DT' : p.pos], ['Seasons in our data', p.span], ['Hometown', p.home], ['Before Tennessee', p.frm],
       p.sp === 'football' ? ['NFL draft', p.draft ? (p.draft[1] ? `${p.draft[0]}, round ${p.draft[1]}` : `${p.draft[0]}, undrafted free agent`) : null] : ['Coach (best season)', p.coach],
+      p.mlb ? ['MLB draft', p.mlb.replace(' rd ', ', round ')] : null,
       p.sp === 'football' ? ['NFL teams', (p.nfl || []).join(' → ')] : null,
     ].filter(x => x && x[1]);
     const related = PL.filter(x => x.sp === p.sp && x !== p && x.yrs.some(y => p.yrs.includes(y))).sort((a, b) => b.ovr - a.ovr).slice(0, 8);
@@ -195,7 +197,7 @@
         <div class="pl-hon">${hon.map(h => `<span class="chip honor">${esc(honText(h))}</span>`).join('')}</div></div>
         ${p.sp === 'football' ? `<div class="pl-ovr" title="16-0 overall rating for his best season"><b>${p.ovr}</b><span>16-0 OVR (${p.best})</span></div>` : ''}</header>
       <dl class="pl-facts">${facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
-      <div class="box pl-box"><h3>Season by season</h3>${seasonTable(p)}<p class="dim small">${p.sp === 'football' ? 'Best season highlighted. 1980s and early 1990s lines come from the UT record book\'s season leaders; 1995 on are full season stats.' : 'Best season highlighted. Season stats from utsports.com and Tennessee record books.'}</p></div>
+      <div class="box pl-box"><h3>Season by season</h3>${seasonTable(p)}<p class="dim small">${p.sp === 'football' ? 'Best season highlighted. 1980s and early 1990s lines come from the UT record book\'s season leaders; 1995 on are full season stats.' : 'Best season highlighted. Season stats from utsports.com, Tennessee record books, Sports-Reference and The Baseball Cube.'}</p></div>
       <div class="grow"><a class="btn primary" href="${href('compare')}?a=${p.sp}/${p.slug}">Compare with another Vol</a> <a class="btn" href="${href('games-' + p.sp + '-guesser')}">Play ${p.sp === 'wbb' ? 'Lady Vol' : 'Vol'} Guesser</a></div>
       ${related.length ? `<h3 class="pl-sub">Teammates in our data</h3><div class="pl-grid">${related.map(playerCard).join('')}</div>` : ''}
     </div>`;

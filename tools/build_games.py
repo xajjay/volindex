@@ -299,7 +299,7 @@ for k, v in sports.items():
     for r in v['rows']: rs[r['n']].append(dict(y=r['y'], s=r['s'], pos=r['pos'], k=r['k'], st=r['st']))
     for p in v['players']:
         people.append(dict(sp=k, n=p['n'], slug=slugify(p['n']), pos=p['pos'], yrs=p['ys'], ovr=p['ovr'], best=p['y'], bestS=p['s'], line=p['line'],
-                           frm=p.get('prev'), home=p.get('home'), coach=p.get('coach'), seasons=sorted(rs[p['n']], key=lambda x: (x['y'], x['k']))))
+                           frm=p.get('prev'), home=p.get('home'), coach=p.get('coach'), mlb=p.get('draft'), seasons=sorted(rs[p['n']], key=lambda x: (x['y'], x['k']))))
 seen = collections.Counter()
 for p in people:   # unique slugs per sport
     key = (p['sp'], p['slug']); seen[key] += 1
