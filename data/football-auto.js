@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-10-22. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-10-24. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-10-22",
+ "updated": "2026-10-24",
  "team": {
   "record": "6-1",
   "sec": "3-1",
@@ -118,22 +118,22 @@ window.SITE_AUTO.football = {
    ],
    "oppg": [
     14.7,
-    10,
+    11,
     1
    ],
    "ypg": [
     405.1,
-    59,
+    58,
     9
    ],
    "rushYpg": [
     217.1,
-    18,
+    17,
     2
    ],
    "passYpg": [
     188.0,
-    110,
+    111,
     16
    ],
    "oypg": [
@@ -143,7 +143,7 @@ window.SITE_AUTO.football = {
    ],
    "oRushYpg": [
     121.3,
-    42,
+    43,
     10
    ],
    "oPassYpg": [
@@ -1168,7 +1168,7 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Tackles for loss",
-     "rank": 24
+     "rank": 25
     }
    ],
    "Xavier Gilliam": [
@@ -1178,25 +1178,25 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Sacks",
-     "rank": 18
+     "rank": 19
     }
    ],
    "Amare Campbell": [
     {
      "stat": "Tackles for loss",
-     "rank": 54
+     "rank": 56
     }
    ],
    "Jeremiah Telander": [
     {
      "stat": "Sacks",
-     "rank": 94
+     "rank": 97
     }
    ],
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 38
+     "rank": 39
     }
    ],
    "Dejuan Lane": [
@@ -1206,13 +1206,13 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Passes defended",
-     "rank": 80
+     "rank": 84
     }
    ],
    "Ty Redmond": [
     {
      "stat": "Passes defended",
-     "rank": 14
+     "rank": 15
     }
    ],
    "Kayin Lee": [
@@ -1224,27 +1224,27 @@ window.SITE_AUTO.football = {
    "Faizon Brandon": [
     {
      "stat": "Passing TD",
-     "rank": 85
+     "rank": 88
     }
    ],
    "Mike Matthews": [
     {
      "stat": "Receiving yards",
-     "rank": 42
+     "rank": 43
     },
     {
      "stat": "Receptions",
-     "rank": 83
+     "rank": 90
     },
     {
      "stat": "Receiving TD",
-     "rank": 92
+     "rank": 94
     }
    ],
    "DeSean Bishop": [
     {
      "stat": "Rushing yards",
-     "rank": 3
+     "rank": 5
     },
     {
      "stat": "Rushing TD",
@@ -1252,209 +1252,6 @@ window.SITE_AUTO.football = {
     }
    ]
   }
- },
- "recruits": {
-  "2027": [
-   {
-    "name": "David Gabriel Georges",
-    "pos": "RB",
-    "hs": "Baylor School",
-    "home": "Chattanooga, TN",
-    "ht": "6-0",
-    "wt": 210,
-    "grade": 99,
-    "stars": 5,
-    "nat": "9"
-   },
-   {
-    "name": "Kesean Bowman",
-    "pos": "WR",
-    "hs": "Brentwood Academy",
-    "home": "Brentwood, TN",
-    "ht": "6-0.5",
-    "wt": 176,
-    "grade": 98,
-    "stars": 4,
-    "nat": "60"
-   },
-   {
-    "name": "Kenneth Simon II",
-    "pos": "LB",
-    "hs": "Brentwood Academy",
-    "home": "Brentwood, TN",
-    "ht": "6-2",
-    "wt": 212,
-    "grade": 94,
-    "stars": 4,
-    "nat": "143"
-   },
-   {
-    "name": "Princeton Uwaifo",
-    "pos": "OT",
-    "hs": "Siegel",
-    "home": "Murfreesboro, TN",
-    "ht": "6-5.5",
-    "wt": 342,
-    "grade": 92,
-    "stars": 4,
-    "nat": "206"
-   },
-   {
-    "name": "Malik Howard",
-    "pos": "TE",
-    "hs": "Oak Ridge",
-    "home": "Oak Ridge, TN",
-    "ht": "6-3.5",
-    "wt": 231,
-    "grade": 92,
-    "stars": 4,
-    "nat": "211"
-   },
-   {
-    "name": "Marcus Jones",
-    "pos": "S",
-    "hs": "The Haverford School",
-    "home": "Haverford, PA",
-    "ht": "6-3",
-    "wt": 190,
-    "grade": 91,
-    "stars": 4,
-    "nat": "283"
-   },
-   {
-    "name": "Niko Kampas",
-    "pos": "OT",
-    "hs": "NFL Academy",
-    "home": "London, EN",
-    "ht": "6-7.5",
-    "wt": 294,
-    "grade": 90,
-    "stars": 4,
-    "nat": "323"
-   },
-   {
-    "name": "Q'Mari Hudson",
-    "pos": "OT",
-    "hs": "Western Branch",
-    "home": "Chesapeake, VA",
-    "ht": "6-4.5",
-    "wt": 330,
-    "grade": 90,
-    "stars": 4,
-    "nat": "387"
-   },
-   {
-    "name": "Dylan Haley",
-    "pos": "ATH",
-    "hs": "Cherokee Bluff",
-    "home": "Flowery Branch, GA",
-    "ht": "6-1",
-    "wt": 180,
-    "grade": 89,
-    "stars": 3,
-    "nat": "526"
-   },
-   {
-    "name": "Asa Barnes",
-    "pos": "RB",
-    "hs": "Westview",
-    "home": "Martin, TN",
-    "ht": "5-11",
-    "wt": 200,
-    "grade": 88,
-    "stars": 3,
-    "nat": "554"
-   },
-   {
-    "name": "JP Peace",
-    "pos": "LB",
-    "hs": "Maryville",
-    "home": "Maryville, TN",
-    "ht": "6-3",
-    "wt": 220,
-    "grade": 88,
-    "stars": 3,
-    "nat": "598"
-   },
-   {
-    "name": "Jaden Butler",
-    "pos": "ATH",
-    "hs": "Haywood",
-    "home": "Brownsville, TN",
-    "ht": "6-1",
-    "wt": 190,
-    "grade": 88,
-    "stars": 3,
-    "nat": "598"
-   },
-   {
-    "name": "Brandon Leavell",
-    "pos": "ATH",
-    "hs": "Goodpasture Christian School",
-    "home": "Madison, TN",
-    "ht": "6-0.5",
-    "wt": 165,
-    "grade": 88,
-    "stars": 3,
-    "nat": "629"
-   },
-   {
-    "name": "Dayon Cooper",
-    "pos": "ATH",
-    "hs": "South Pittsburg",
-    "home": "South Pittsburg, TN",
-    "ht": "6-1",
-    "wt": 183,
-    "grade": 88,
-    "stars": 3,
-    "nat": "705"
-   },
-   {
-    "name": "Derrick Baker",
-    "pos": "QB",
-    "hs": "Milton",
-    "home": "Alpharetta, GA",
-    "ht": "6-1",
-    "wt": 226,
-    "grade": 88,
-    "stars": 3,
-    "nat": "805"
-   },
-   {
-    "name": "Carter Jamison",
-    "pos": "S",
-    "hs": "Creekside",
-    "home": "Fairburn, GA",
-    "ht": "5-10",
-    "wt": 180,
-    "grade": 87,
-    "stars": 3,
-    "nat": "1166"
-   },
-   {
-    "name": "Ford Fehling",
-    "pos": "K",
-    "hs": "Marvin Ridge",
-    "home": "Waxhaw, NC",
-    "ht": "6-1",
-    "wt": 195,
-    "grade": 80,
-    "stars": 3,
-    "nat": "2149"
-   },
-   {
-    "name": "Sam McKeown",
-    "pos": "LS",
-    "hs": "Jenks",
-    "home": "Jenks, OK",
-    "ht": "6-4",
-    "wt": 225,
-    "grade": 80,
-    "stars": 3,
-    "nat": "2157"
-   }
-  ],
-  "2028": []
  },
  "espn": {
   "Furman": {
@@ -1492,27 +1289,27 @@ window.SITE_AUTO.football = {
    "ou": 50.5,
    "ml": "+114",
    "book": "Draft Kings",
-   "win": 59.9
+   "win": 59.5
   },
   "Kentucky": {
    "tv": null,
    "kick": "2026-11-07T05:00Z",
-   "win": 71.5
+   "win": 71.1
   },
   "Texas A&M": {
    "tv": null,
    "kick": "2026-11-14T05:00Z",
-   "win": 56.5
+   "win": 56.0
   },
   "LSU": {
    "tv": null,
    "kick": "2026-11-21T05:00Z",
-   "win": 42.3
+   "win": 41.9
   },
   "Vanderbilt": {
    "tv": null,
    "kick": "2026-11-28T05:00Z",
-   "win": 86.9
+   "win": 86.8
   }
  },
  "teamSheet": {
@@ -1533,7 +1330,7 @@ window.SITE_AUTO.football = {
     "Total yards per game",
     "Total offense",
     405.1,
-    59,
+    58,
     9,
     false
    ],
@@ -1542,7 +1339,7 @@ window.SITE_AUTO.football = {
     "Yards per play",
     "Total offense",
     5.84,
-    71,
+    70,
     10,
     false
    ],
@@ -1551,7 +1348,7 @@ window.SITE_AUTO.football = {
     "Passing yards per game",
     "Passing",
     188.0,
-    110,
+    111,
     16,
     false
    ],
@@ -1569,7 +1366,7 @@ window.SITE_AUTO.football = {
     "Yards per pass attempt",
     "Passing",
     7.15,
-    87,
+    86,
     12,
     false
    ],
@@ -1578,7 +1375,7 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     9.0,
-    82,
+    84,
     12,
     false
    ],
@@ -1596,7 +1393,7 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     18.0,
-    121,
+    120,
     14,
     true
    ],
@@ -1605,7 +1402,7 @@ window.SITE_AUTO.football = {
     "Rushing yards per game",
     "Rushing",
     217.1,
-    18,
+    17,
     2,
     false
    ],
@@ -1614,7 +1411,7 @@ window.SITE_AUTO.football = {
     "Yards per carry",
     "Rushing",
     5.03,
-    36,
+    37,
     3,
     false
    ],
@@ -1623,7 +1420,7 @@ window.SITE_AUTO.football = {
     "Rushing TDs",
     "Rushing",
     18.0,
-    13,
+    14,
     4,
     false
    ],
@@ -1632,7 +1429,7 @@ window.SITE_AUTO.football = {
     "Receptions per game",
     "Receiving",
     16.7,
-    98,
+    99,
     16,
     false
    ],
@@ -1641,7 +1438,7 @@ window.SITE_AUTO.football = {
     "Yards per reception",
     "Receiving",
     11.25,
-    97,
+    96,
     12,
     false
    ],
@@ -1650,7 +1447,7 @@ window.SITE_AUTO.football = {
     "First downs per game",
     "Downs",
     22.6,
-    34,
+    32,
     6,
     false
    ],
@@ -1659,7 +1456,7 @@ window.SITE_AUTO.football = {
     "3rd down conversion %",
     "Downs",
     36.6,
-    96,
+    95,
     14,
     false
    ],
@@ -1677,7 +1474,7 @@ window.SITE_AUTO.football = {
     "Penalty yards per game",
     "Downs",
     58.1,
-    79,
+    80,
     9,
     true
    ],
@@ -1704,7 +1501,7 @@ window.SITE_AUTO.football = {
     "Points allowed per game",
     "Points allowed",
     14.7,
-    10,
+    11,
     1,
     true
    ],
@@ -1749,7 +1546,7 @@ window.SITE_AUTO.football = {
     "Opponent completion %",
     "Pass defense",
     63.2,
-    96,
+    97,
     11,
     true
    ],
@@ -1758,7 +1555,7 @@ window.SITE_AUTO.football = {
     "Interceptions",
     "Pass defense",
     7.0,
-    17,
+    19,
     4,
     false
    ],
@@ -1776,7 +1573,7 @@ window.SITE_AUTO.football = {
     "Rushing yards allowed per game",
     "Run defense",
     121.3,
-    42,
+    43,
     10,
     true
    ],
@@ -1785,7 +1582,7 @@ window.SITE_AUTO.football = {
     "Yards per carry allowed",
     "Run defense",
     3.77,
-    54,
+    53,
     11,
     true
    ],
@@ -1803,7 +1600,7 @@ window.SITE_AUTO.football = {
     "Takeaways",
     "Run defense",
     13.0,
-    9,
+    10,
     3,
     false
    ],
@@ -1812,7 +1609,7 @@ window.SITE_AUTO.football = {
     "Turnover margin",
     "Run defense",
     3.0,
-    33,
+    35,
     4,
     false
    ],
@@ -2006,1495 +1803,6 @@ window.SITE_AUTO.football = {
     ]
    ]
   }
- },
- "ratings": {
-  "Drake Martinez": {
-   "pos": "TE",
-   "num": 44,
-   "year": 1,
-   "hs": {
-    "grade": 83.04,
-    "stars": 3,
-    "nat": 1753,
-    "cls": 2021,
-    "school": "Houston St. Thomas",
-    "committedTo": "Colorado State"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "UT Martin",
-    "season": 2026
-   }
-  },
-  "DJ Burks": {
-   "pos": "DB",
-   "num": 42,
-   "year": 1,
-   "hs": {
-    "grade": 84.44,
-    "stars": 3,
-    "nat": 1433,
-    "cls": 2022,
-    "school": "Maryville",
-    "committedTo": "App State"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "App State",
-    "season": 2026
-   }
-  },
-  "Ethan Davis": {
-   "pos": "TE",
-   "num": 0,
-   "year": 1,
-   "hs": {
-    "grade": 94.01,
-    "stars": 4,
-    "nat": 144,
-    "cls": 2023,
-    "school": "Collins Hill",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Isaiah Hardge": {
-   "pos": "DB",
-   "num": 29,
-   "year": 1,
-   "hs": {
-    "grade": 85.97,
-    "stars": 3,
-    "nat": 1128,
-    "cls": 2023,
-    "school": "St. Thomas Aquinas",
-    "committedTo": "Colorado"
-   },
-   "transfer": {
-    "grade": 86.0,
-    "stars": 3,
-    "origin": "Colorado",
-    "season": 2026
-   }
-  },
-  "TJ Metcalf": {
-   "pos": "DB",
-   "num": 1,
-   "year": 1,
-   "hs": {
-    "grade": 88.42,
-    "stars": 3,
-    "nat": 542,
-    "cls": 2023,
-    "school": "Pinson Valley",
-    "committedTo": "Arkansas"
-   },
-   "transfer": {
-    "grade": 87.0,
-    "stars": 3,
-    "origin": "Michigan",
-    "season": 2026
-   }
-  },
-  "Kayin Lee": {
-   "pos": "DB",
-   "num": 14,
-   "year": 1,
-   "hs": {
-    "grade": 93.86,
-    "stars": 4,
-    "nat": 147,
-    "cls": 2023,
-    "school": "Cedar Grove",
-    "committedTo": "Auburn"
-   },
-   "transfer": {
-    "grade": 88.0,
-    "stars": 3,
-    "origin": "Auburn",
-    "season": 2026
-   }
-  },
-  "Ryan Staub": {
-   "pos": "QB",
-   "num": 8,
-   "year": 1,
-   "hs": {
-    "grade": 87.44,
-    "stars": 3,
-    "nat": 734,
-    "cls": 2023,
-    "school": "West Ranch",
-    "committedTo": "Colorado"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "Colorado",
-    "season": 2026
-   }
-  },
-  "Shamurad Umarov": {
-   "pos": "OL",
-   "num": 74,
-   "year": 1,
-   "hs": {
-    "grade": 90.31,
-    "stars": 4,
-    "nat": 310,
-    "cls": 2023,
-    "school": "Denmark",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Sam Pendleton": {
-   "pos": "OL",
-   "num": 56,
-   "year": 1,
-   "hs": {
-    "grade": 89.33,
-    "stars": 4,
-    "nat": 406,
-    "cls": 2023,
-    "school": "Reagan",
-    "committedTo": "Notre Dame"
-   },
-   "transfer": {
-    "grade": 90.0,
-    "stars": 4,
-    "origin": "Notre Dame",
-    "season": 2025
-   }
-  },
-  "Nathan Robinson": {
-   "pos": "DL",
-   "num": 19,
-   "year": 1,
-   "hs": {
-    "grade": 88.28,
-    "stars": 3,
-    "nat": 559,
-    "cls": 2023,
-    "school": "Greenbrier",
-    "committedTo": "Tennessee"
-   }
-  },
-  "DeSean Bishop": {
-   "pos": "RB",
-   "num": 18,
-   "year": 1,
-   "hs": {
-    "grade": 85.33,
-    "stars": 3,
-    "nat": 1315,
-    "cls": 2023,
-    "school": "Karns",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jeremiah Telander": {
-   "pos": "LB",
-   "num": 22,
-   "year": 1,
-   "hs": {
-    "grade": 87.96,
-    "stars": 3,
-    "nat": 613,
-    "cls": 2023,
-    "school": "Gainesville",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Daevin Hobbs": {
-   "pos": "DL",
-   "num": 5,
-   "year": 1,
-   "hs": {
-    "grade": 97.41,
-    "stars": 4,
-    "nat": 57,
-    "cls": 2023,
-    "school": "Jay M. Robinson",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Tyree Weathersby": {
-   "pos": "DL",
-   "num": 18,
-   "year": 1,
-   "hs": {
-    "grade": 90.47,
-    "stars": 4,
-    "nat": 299,
-    "cls": 2023,
-    "school": "New Manchester",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Dejuan Lane": {
-   "pos": "DB",
-   "num": 10,
-   "year": 1,
-   "hs": {
-    "grade": 90.41,
-    "stars": 4,
-    "nat": 325,
-    "cls": 2024,
-    "school": "Gilman",
-    "committedTo": "Penn State"
-   },
-   "transfer": {
-    "grade": 87.0,
-    "stars": 3,
-    "origin": "Penn State",
-    "season": 2026
-   }
-  },
-  "Mike Matthews": {
-   "pos": "WR",
-   "num": 4,
-   "year": 1,
-   "hs": {
-    "grade": 98.82,
-    "stars": 5,
-    "nat": 24,
-    "cls": 2024,
-    "school": "Parkview",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Edwin Spillman": {
-   "pos": "LB",
-   "num": 13,
-   "year": 1,
-   "hs": {
-    "grade": 90.0,
-    "stars": 4,
-    "nat": 357,
-    "cls": 2024,
-    "school": "Lipscomb Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Ory Williams": {
-   "pos": "OL",
-   "num": 77,
-   "year": 1,
-   "hs": {
-    "grade": 89.35,
-    "stars": 4,
-    "nat": 433,
-    "cls": 2024,
-    "school": "San Marcos",
-    "committedTo": "LSU"
-   },
-   "transfer": {
-    "grade": 86.0,
-    "stars": 3,
-    "origin": "LSU",
-    "season": 2026
-   }
-  },
-  "Hunter Barnes": {
-   "pos": "RB",
-   "num": 24,
-   "year": 1
-  },
-  "Bennett Brady": {
-   "pos": "LS",
-   "num": 48,
-   "year": 1
-  },
-  "Josh Turbyville": {
-   "pos": "PK",
-   "num": 94,
-   "year": 1
-  },
-  "Arion Carter": {
-   "pos": "LB",
-   "num": 7,
-   "year": 1,
-   "hs": {
-    "grade": 94.39,
-    "stars": 4,
-    "nat": 130,
-    "cls": 2023,
-    "school": "Smyrna",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Carson Gentle": {
-   "pos": "DL",
-   "num": 35,
-   "year": 1,
-   "hs": {
-    "grade": 86.97,
-    "stars": 3,
-    "nat": 928,
-    "cls": 2024,
-    "school": "McCallie School",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Donovan Haslam": {
-   "pos": "OL",
-   "num": 69,
-   "year": 1,
-   "transfer": {
-    "grade": 86.0,
-    "stars": 3,
-    "origin": "West Virginia",
-    "season": 2026
-   }
-  },
-  "Wendell Moe Jr.": {
-   "pos": "OL",
-   "num": 75,
-   "year": 1,
-   "hs": {
-    "grade": 82.56,
-    "stars": 3,
-    "nat": 1912,
-    "cls": 2022,
-    "school": "Long Beach Poly",
-    "committedTo": "Arizona"
-   },
-   "transfer": {
-    "grade": 88.0,
-    "stars": 3,
-    "origin": "Arizona",
-    "season": 2025
-   }
-  },
-  "Jadais Richard": {
-   "pos": "DB",
-   "num": 8,
-   "year": 1,
-   "hs": {
-    "grade": 89.59,
-    "stars": 4,
-    "nat": 368,
-    "cls": 2022,
-    "school": "West Monroe",
-    "committedTo": "Vanderbilt"
-   },
-   "transfer": {
-    "grade": 86.0,
-    "stars": 3,
-    "origin": "Miami",
-    "season": 2026
-   }
-  },
-  "Amare Campbell": {
-   "pos": "LB",
-   "num": 0,
-   "year": 1,
-   "hs": {
-    "grade": 85.42,
-    "stars": 3,
-    "nat": 1293,
-    "cls": 2023,
-    "school": "Unity Reed",
-    "committedTo": "North Carolina"
-   },
-   "transfer": {
-    "grade": 87.0,
-    "stars": 3,
-    "origin": "Penn State",
-    "season": 2026
-   }
-  },
-  "Edrees Farooq": {
-   "pos": "DB",
-   "num": 15,
-   "year": 1,
-   "hs": {
-    "grade": 88.33,
-    "stars": 3,
-    "nat": 592,
-    "cls": 2024,
-    "school": "St. Frances Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jackson Ross": {
-   "pos": "P",
-   "num": 98,
-   "year": 1,
-   "hs": {
-    "grade": 78.94,
-    "stars": 2,
-    "nat": 2679,
-    "cls": 2022,
-    "school": "ProKick Australia",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Trent Thomas": {
-   "pos": "TE",
-   "num": 82,
-   "year": 1,
-   "hs": {
-    "grade": 84.37,
-    "stars": 3,
-    "nat": 1622,
-    "cls": 2023,
-    "school": "Cottage Hill Christian Academy",
-    "committedTo": "South Alabama"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "South Alabama",
-    "season": 2026
-   }
-  },
-  "Jordan Norman": {
-   "pos": "DL",
-   "num": 33,
-   "year": 1,
-   "hs": {
-    "grade": 82.96,
-    "stars": 3,
-    "nat": 2016,
-    "cls": 2023,
-    "school": "Hoover",
-    "committedTo": "South Alabama"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "Tulane",
-    "season": 2026
-   }
-  },
-  "Braylon Staley": {
-   "pos": "WR",
-   "num": 14,
-   "year": 1,
-   "hs": {
-    "grade": 95.01,
-    "stars": 4,
-    "nat": 106,
-    "cls": 2024,
-    "school": "Strom Thurmond",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Gage Ginther": {
-   "pos": "OL",
-   "num": 78,
-   "year": 1,
-   "hs": {
-    "grade": 88.17,
-    "stars": 3,
-    "nat": 628,
-    "cls": 2024,
-    "school": "Fossil Ridge",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jesse Perry": {
-   "pos": "OL",
-   "num": 72,
-   "year": 1,
-   "hs": {
-    "grade": 87.39,
-    "stars": 3,
-    "nat": 801,
-    "cls": 2024,
-    "school": "Middle Tennessee Christian School",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Justin Baker": {
-   "pos": "RB",
-   "num": 2,
-   "year": 1,
-   "hs": {
-    "grade": 88.11,
-    "stars": 3,
-    "nat": 619,
-    "cls": 2025,
-    "school": "Buford",
-    "committedTo": "Tennessee"
-   }
-  },
-  "DaSaahn Brame": {
-   "pos": "TE",
-   "num": 7,
-   "year": 1,
-   "hs": {
-    "grade": 96.82,
-    "stars": 4,
-    "nat": 61,
-    "cls": 2025,
-    "school": "Derby",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Isaiah Campbell": {
-   "pos": "DL",
-   "num": 47,
-   "year": 1,
-   "hs": {
-    "grade": 98.32,
-    "stars": 4,
-    "nat": 33,
-    "cls": 2025,
-    "school": "Southern Durham",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jaedon Harmon": {
-   "pos": "LB",
-   "num": 12,
-   "year": 1,
-   "hs": {
-    "grade": 93.1,
-    "stars": 4,
-    "nat": 168,
-    "cls": 2025,
-    "school": "Rome",
-    "committedTo": "Tennessee"
-   }
-  },
-  "George MacIntyre": {
-   "pos": "QB",
-   "num": 12,
-   "year": 1,
-   "hs": {
-    "grade": 93.55,
-    "stars": 4,
-    "nat": 151,
-    "cls": 2025,
-    "school": "Brentwood Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jadon Perlotte": {
-   "pos": "LB",
-   "num": 27,
-   "year": 1,
-   "hs": {
-    "grade": 89.43,
-    "stars": 4,
-    "nat": 417,
-    "cls": 2025,
-    "school": "Buford",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Daune Morris": {
-   "pos": "RB",
-   "num": 17,
-   "year": 1,
-   "hs": {
-    "grade": 89.42,
-    "stars": 4,
-    "nat": 419,
-    "cls": 2025,
-    "school": "Oakland",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Tre Poteat III": {
-   "pos": "DB",
-   "num": 3,
-   "year": 1,
-   "hs": {
-    "grade": 89.5,
-    "stars": 4,
-    "nat": 404,
-    "cls": 2025,
-    "school": "Verona Area",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Ty Redmond": {
-   "pos": "DB",
-   "num": 4,
-   "year": 1,
-   "hs": {
-    "grade": 87.81,
-    "stars": 3,
-    "nat": 702,
-    "cls": 2025,
-    "school": "Milton",
-    "committedTo": "Tennessee"
-   }
-  },
-  "David Sanders Jr.": {
-   "pos": "OL",
-   "num": 70,
-   "year": 1,
-   "hs": {
-    "grade": 99.73,
-    "stars": 5,
-    "nat": 6,
-    "cls": 2025,
-    "school": "Providence Day School",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Ethan Utley": {
-   "pos": "DL",
-   "num": 17,
-   "year": 1,
-   "hs": {
-    "grade": 91.99,
-    "stars": 4,
-    "nat": 219,
-    "cls": 2025,
-    "school": "Ensworth",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jeremias Heard": {
-   "pos": "OL",
-   "num": 51,
-   "year": 1,
-   "hs": {
-    "grade": 88.19,
-    "stars": 3,
-    "nat": 627,
-    "cls": 2024,
-    "school": "Model 9-12",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Tevis Metcalf": {
-   "pos": "DB",
-   "num": 20,
-   "year": 1,
-   "hs": {
-    "grade": 88.42,
-    "stars": 3,
-    "nat": 542,
-    "cls": 2023,
-    "school": "Pinson Valley",
-    "committedTo": "Arkansas"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "Michigan",
-    "season": 2026
-   }
-  },
-  "Xavier Gilliam": {
-   "pos": "DL",
-   "num": 2,
-   "year": 1,
-   "hs": {
-    "grade": 87.58,
-    "stars": 3,
-    "nat": 750,
-    "cls": 2024,
-    "school": "Quince Orchard",
-    "committedTo": "Penn State"
-   },
-   "transfer": {
-    "grade": 94.0,
-    "stars": 4,
-    "origin": "Penn State",
-    "season": 2026
-   }
-  },
-  "Jordan Burns": {
-   "pos": "LB",
-   "num": 11,
-   "year": 1,
-   "hs": {
-    "grade": 89.5,
-    "stars": 4,
-    "nat": 409,
-    "cls": 2024,
-    "school": "Pace Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Ian Duarte": {
-   "pos": "WR",
-   "num": 81,
-   "year": 1,
-   "hs": {
-    "grade": 84.0,
-    "stars": 3,
-    "nat": 1710,
-    "cls": 2023,
-    "school": "Eagle",
-    "committedTo": "Idaho State"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "Idaho State",
-    "season": 2026
-   }
-  },
-  "Ed Baker": {
-   "pos": "OL",
-   "num": 71,
-   "year": 1,
-   "hs": {
-    "grade": 87.22,
-    "stars": 3,
-    "nat": 1030,
-    "cls": 2026,
-    "school": "St. Frances Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Hezekiah Harris": {
-   "pos": "DL",
-   "num": 97,
-   "year": 1,
-   "hs": {
-    "grade": 92.4,
-    "stars": 4,
-    "nat": 196,
-    "cls": 2026,
-    "school": "Jemison",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Faizon Brandon": {
-   "pos": "QB",
-   "num": 11,
-   "year": 1,
-   "hs": {
-    "grade": 99.39,
-    "stars": 5,
-    "nat": 10,
-    "cls": 2026,
-    "school": "Grimsley",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Kedric Golston II": {
-   "pos": "DL",
-   "num": 37,
-   "year": 1,
-   "hs": {
-    "grade": 89.11,
-    "stars": 4,
-    "nat": 469,
-    "cls": 2026,
-    "school": "Stone Bridge",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Nathan Roberts": {
-   "pos": "WR",
-   "num": 36,
-   "year": 1
-  },
-  "Zach Groves": {
-   "pos": "DL",
-   "num": 56,
-   "year": 1,
-   "hs": {
-    "grade": 90.53,
-    "stars": 4,
-    "nat": 310,
-    "cls": 2026,
-    "school": "East Robertson",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Tyreek King": {
-   "pos": "WR",
-   "num": 19,
-   "year": 1,
-   "hs": {
-    "grade": 94.55,
-    "stars": 4,
-    "nat": 131,
-    "cls": 2026,
-    "school": "Knoxville Catholic",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Dereon Albert": {
-   "pos": "DL",
-   "num": 59,
-   "year": 1,
-   "hs": {
-    "grade": 89.71,
-    "stars": 4,
-    "nat": 396,
-    "cls": 2026,
-    "school": "Jackson Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Joakim Dodson": {
-   "pos": "WR",
-   "num": 9,
-   "year": 1,
-   "hs": {
-    "grade": 88.17,
-    "stars": 3,
-    "nat": 614,
-    "cls": 2025,
-    "school": "Baylor School",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Tim Merritt": {
-   "pos": "DB",
-   "num": 25,
-   "year": 1,
-   "hs": {
-    "grade": 88.83,
-    "stars": 3,
-    "nat": 507,
-    "cls": 2025,
-    "school": "Parker",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Dylan Lewis": {
-   "pos": "DB",
-   "num": 24,
-   "year": 1,
-   "hs": {
-    "grade": 87.78,
-    "stars": 3,
-    "nat": 706,
-    "cls": 2025,
-    "school": "Milton",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Mariyon Dye": {
-   "pos": "DL",
-   "num": 9,
-   "year": 1,
-   "hs": {
-    "grade": 96.05,
-    "stars": 4,
-    "nat": 77,
-    "cls": 2025,
-    "school": "Elkhart",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Travis Smith Jr.": {
-   "pos": "WR",
-   "num": 1,
-   "year": 1,
-   "hs": {
-    "grade": 95.51,
-    "stars": 4,
-    "nat": 85,
-    "cls": 2025,
-    "school": "Westlake",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jack-Henry Jakobik": {
-   "pos": "WR",
-   "num": 29,
-   "year": 1
-  },
-  "Cooper Ranvier": {
-   "pos": "PK",
-   "num": 28,
-   "year": 1,
-   "transfer": {
-    "grade": null,
-    "stars": null,
-    "origin": "Louisville",
-    "season": 2026
-   }
-  },
-  "Cole Harrison": {
-   "pos": "TE",
-   "num": 80,
-   "year": 1,
-   "hs": {
-    "grade": 86.42,
-    "stars": 3,
-    "nat": 1102,
-    "cls": 2024,
-    "school": "Junipero Serra",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Christian Gass": {
-   "pos": "DL",
-   "num": 44,
-   "year": 1,
-   "hs": {
-    "grade": 92.42,
-    "stars": 4,
-    "nat": 202,
-    "cls": 2025,
-    "school": "Eastside",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Radarious Jackson": {
-   "pos": "WR",
-   "num": 3,
-   "year": 1,
-   "hs": {
-    "grade": 91.11,
-    "stars": 4,
-    "nat": 269,
-    "cls": 2025,
-    "school": "Sheffield",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Nic Moore": {
-   "pos": "OL",
-   "num": 58,
-   "year": 1,
-   "hs": {
-    "grade": 91.18,
-    "stars": 4,
-    "nat": 261,
-    "cls": 2025,
-    "school": "Jefferson County",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Sidney Walton": {
-   "pos": "DB",
-   "num": 23,
-   "year": 1,
-   "hs": {
-    "grade": 87.86,
-    "stars": 3,
-    "nat": 692,
-    "cls": 2025,
-    "school": "Moody",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Joel Wyatt": {
-   "pos": "DB",
-   "num": 31,
-   "year": 1,
-   "hs": {
-    "grade": 96.97,
-    "stars": 4,
-    "nat": 71,
-    "cls": 2026,
-    "school": "Oakland",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Charles House III": {
-   "pos": "DL",
-   "num": 99,
-   "year": 1,
-   "hs": {
-    "grade": 89.25,
-    "stars": 4,
-    "nat": 447,
-    "cls": 2025,
-    "school": "North Mecklenburg",
-    "committedTo": "Tennessee"
-   }
-  },
-  "TK Keys": {
-   "pos": "WR",
-   "num": 5,
-   "year": 1,
-   "hs": {
-    "grade": 99.33,
-    "stars": 5,
-    "nat": 13,
-    "cls": 2026,
-    "school": "Hattiesburg",
-    "committedTo": "Tennessee"
-   }
-  },
-  "TJ White": {
-   "pos": "LB",
-   "num": 51,
-   "year": 1,
-   "hs": {
-    "grade": 96.96,
-    "stars": 4,
-    "nat": 72,
-    "cls": 2026,
-    "school": "Jackson Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Gabriel Osenda": {
-   "pos": "OL",
-   "num": 79,
-   "year": 1,
-   "hs": {
-    "grade": 95.66,
-    "stars": 4,
-    "nat": 102,
-    "cls": 2026,
-    "school": "Baylor School",
-    "committedTo": "Tennessee"
-   }
-  },
-  "KJ McClain": {
-   "pos": "DB",
-   "num": 40,
-   "year": 1,
-   "hs": {
-    "grade": 87.67,
-    "stars": 3,
-    "nat": 833,
-    "cls": 2026,
-    "school": "St. Joseph Regional",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Kamari Blair": {
-   "pos": "OL",
-   "num": 66,
-   "year": 1,
-   "hs": {
-    "grade": 93.64,
-    "stars": 4,
-    "nat": 157,
-    "cls": 2026,
-    "school": "Kirkwood",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Javonte Smith": {
-   "pos": "DB",
-   "num": 30,
-   "year": 1,
-   "hs": {
-    "grade": 88.67,
-    "stars": 3,
-    "nat": 554,
-    "cls": 2026,
-    "school": "Jackson North Side",
-    "committedTo": "Tennessee"
-   }
-  },
-  "CJ Edwards": {
-   "pos": "DL",
-   "num": 85,
-   "year": 1,
-   "hs": {
-    "grade": 88.0,
-    "stars": 3,
-    "nat": 731,
-    "cls": 2026,
-    "school": "St. Joseph",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Antoni Ogumoro": {
-   "pos": "OL",
-   "num": 55,
-   "year": 1,
-   "hs": {
-    "grade": 88.36,
-    "stars": 3,
-    "nat": 573,
-    "cls": 2025,
-    "school": "Elgin",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jackson Mathews": {
-   "pos": "DB",
-   "num": 43,
-   "year": 1,
-   "hs": {
-    "grade": 80.0,
-    "stars": 3,
-    "nat": 2850,
-    "cls": 2024,
-    "school": "Christ Presbyterian Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Ryan Scott": {
-   "pos": "LB",
-   "num": 50,
-   "year": 1
-  },
-  "Grier Short": {
-   "pos": "LB",
-   "num": 57,
-   "year": 1
-  },
-  "Mike Bethea II": {
-   "pos": "DL",
-   "num": 55,
-   "year": 1
-  },
-  "Qua Moss": {
-   "pos": "DB",
-   "num": 6,
-   "year": 1,
-   "transfer": {
-    "grade": 86.0,
-    "stars": 3,
-    "origin": "Kansas State",
-    "season": 2026
-   }
-  },
-  "Doren Sacha": {
-   "pos": "WR",
-   "num": 26,
-   "year": 1
-  },
-  "Michael Kostantonov": {
-   "pos": "OL",
-   "num": 65,
-   "year": 1
-  },
-  "Blake Howard": {
-   "pos": "LS",
-   "num": 53,
-   "year": 1,
-   "transfer": {
-    "grade": null,
-    "stars": null,
-    "origin": "Eastern Kentucky",
-    "season": 2026
-   }
-  },
-  "Carter Gooden": {
-   "pos": "DL",
-   "num": 36,
-   "year": 1,
-   "hs": {
-    "grade": 95.44,
-    "stars": 4,
-    "nat": 106,
-    "cls": 2026,
-    "school": "Tabor Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "JJ Finch": {
-   "pos": "DL",
-   "num": 26,
-   "year": 1,
-   "hs": {
-    "grade": 89.11,
-    "stars": 4,
-    "nat": 469,
-    "cls": 2026,
-    "school": "Warren Central",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Brayden Rouse": {
-   "pos": "LB",
-   "num": 28,
-   "year": 1,
-   "hs": {
-    "grade": 96.65,
-    "stars": 4,
-    "nat": 79,
-    "cls": 2026,
-    "school": "Kell",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Zay Anderson": {
-   "pos": "DB",
-   "num": 34,
-   "year": 1,
-   "hs": {
-    "grade": 92.52,
-    "stars": 4,
-    "nat": 189,
-    "cls": 2026,
-    "school": "Greeneville",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Darryl Rivers": {
-   "pos": "DL",
-   "num": 39,
-   "year": 1,
-   "hs": {
-    "grade": 88.67,
-    "stars": 3,
-    "nat": 554,
-    "cls": 2026,
-    "school": "McEachern",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jamyan Theodore": {
-   "pos": "DB",
-   "num": 21,
-   "year": 1,
-   "hs": {
-    "grade": 88.89,
-    "stars": 3,
-    "nat": 507,
-    "cls": 2026,
-    "school": "Baylor School",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Luca Wolf": {
-   "pos": "TE",
-   "num": 87,
-   "year": 1,
-   "hs": {
-    "grade": 88.55,
-    "stars": 3,
-    "nat": 604,
-    "cls": 2026,
-    "school": "NFL Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Will Rajecki": {
-   "pos": "RB",
-   "num": 34,
-   "year": 1,
-   "hs": {
-    "grade": 86.67,
-    "stars": 3,
-    "nat": 1263,
-    "cls": 2026,
-    "school": "Sequoyah",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jowell Combay": {
-   "pos": "DB",
-   "num": 38,
-   "year": 1,
-   "hs": {
-    "grade": 88.56,
-    "stars": 3,
-    "nat": 586,
-    "cls": 2026,
-    "school": "Kell",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Luke Thompson": {
-   "pos": "WR",
-   "num": 85,
-   "year": 1,
-   "hs": {
-    "grade": 88.22,
-    "stars": 3,
-    "nat": 665,
-    "cls": 2026,
-    "school": "Franklin",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Mason Phillips": {
-   "pos": "QB",
-   "num": 13,
-   "year": 1
-  },
-  "Ben Petermann": {
-   "pos": "WR",
-   "num": 35,
-   "year": 1
-  },
-  "Deon Hardin": {
-   "pos": "WR",
-   "num": 88,
-   "year": 1
-  },
-  "Grady Dangerfield": {
-   "pos": "PK",
-   "num": 93,
-   "year": 1
-  },
-  "Javin Gordon": {
-   "pos": "RB",
-   "num": 6,
-   "year": 1,
-   "hs": {
-    "grade": 86.33,
-    "stars": 3,
-    "nat": 1203,
-    "cls": 2025,
-    "school": "Stephens County",
-    "committedTo": "Tulane"
-   },
-   "transfer": {
-    "grade": 86.0,
-    "stars": 3,
-    "origin": "Tulane",
-    "season": 2026
-   }
-  },
-  "Brayden Carroll": {
-   "pos": "WR",
-   "num": 38,
-   "year": 1,
-   "hs": {
-    "grade": 84.0,
-    "stars": 3,
-    "nat": 2533,
-    "cls": 2026,
-    "school": "Bradley Central",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Charlie Powell III": {
-   "pos": "OL",
-   "num": 59,
-   "year": 1
-  },
-  "Nuk Simmons": {
-   "pos": "DL",
-   "num": 87,
-   "year": 1,
-   "hs": {
-    "grade": 87.22,
-    "stars": 3,
-    "nat": 1030,
-    "cls": 2026,
-    "school": "Carver",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Logan Foley": {
-   "pos": "P",
-   "num": 99,
-   "year": 1,
-   "hs": {
-    "grade": 81.0,
-    "stars": 3,
-    "nat": 3267,
-    "cls": 2026,
-    "school": "ProKick Australia",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jacolby Cooper": {
-   "pos": "WR",
-   "num": 30,
-   "year": 1,
-   "hs": {
-    "grade": 86.11,
-    "stars": 3,
-    "nat": 1523,
-    "cls": 2026,
-    "school": "Alcoa",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Lane Cope": {
-   "pos": "WR",
-   "num": 31,
-   "year": 1
-  },
-  "Thomas Storm": {
-   "pos": "OL",
-   "num": 60,
-   "year": 1
-  },
-  "Jeremy George-El": {
-   "pos": "OL",
-   "num": 63,
-   "year": 1,
-   "hs": {
-    "grade": 86.5,
-    "stars": 3,
-    "nat": 1336,
-    "cls": 2026,
-    "school": "Knoxville Catholic",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Breeze Carter": {
-   "pos": "DL",
-   "num": 95,
-   "year": 1,
-   "hs": {
-    "grade": 92.63,
-    "stars": 4,
-    "nat": 183,
-    "cls": 2026,
-    "school": "Douglas County",
-    "committedTo": "Tennessee"
-   }
-  }
- },
- "talent": {
-  "rank": 13,
-  "score": 885.9,
-  "of": 138,
-  "top": [
-   [
-    "Georgia",
-    1003.67
-   ],
-   [
-    "Texas",
-    985.17
-   ],
-   [
-    "Oregon",
-    984.33
-   ],
-   [
-    "Alabama",
-    973.53
-   ],
-   [
-    "Ohio State",
-    964.27
-   ],
-   [
-    "Notre Dame",
-    953.03
-   ],
-   [
-    "Texas A&M",
-    933.0
-   ],
-   [
-    "LSU",
-    931.76
-   ],
-   [
-    "USC",
-    899.0
-   ],
-   [
-    "Florida",
-    891.07
-   ],
-   [
-    "Michigan",
-    890.02
-   ],
-   [
-    "Miami",
-    885.94
-   ],
-   [
-    "Tennessee",
-    885.9
-   ],
-   [
-    "Ole Miss",
-    885.72
-   ],
-   [
-    "South Carolina",
-    862.87
-   ]
-  ]
  },
  "box": {
   "Furman": {
@@ -11717,6 +10025,2118 @@ window.SITE_AUTO.football = {
    ]
   }
  },
+ "pear": {
+  "week": 8,
+  "ratings": [
+   [
+    "TSR",
+    "17.3",
+    12
+   ],
+   [
+    "SP+",
+    "17.5",
+    13
+   ],
+   [
+    "FPI",
+    "18.1",
+    12
+   ],
+   [
+    "FEI",
+    "0.93",
+    13
+   ],
+   [
+    "Massey",
+    "8.76",
+    11
+   ],
+   [
+    "Dokter",
+    "68.84",
+    11
+   ],
+   [
+    "Sagarin",
+    "88.19",
+    11
+   ],
+   [
+    "RQI",
+    "0.744",
+    8
+   ],
+   [
+    "SOS",
+    "10.73",
+    29
+   ]
+  ],
+  "offense": [
+   [
+    "Rating",
+    "38.30",
+    15
+   ],
+   [
+    "Success rate",
+    "0.04",
+    40
+   ],
+   [
+    "EPA/play (PPA)",
+    "0.07",
+    58
+   ],
+   [
+    "Rush PPA",
+    "0.18",
+    12
+   ],
+   [
+    "Pass PPA",
+    "-0.06",
+    98
+   ],
+   [
+    "Points per opportunity",
+    "0.62",
+    46
+   ],
+   [
+    "Drive quality",
+    "17.70",
+    19
+   ]
+  ],
+  "defense": [
+   [
+    "Rating",
+    "21.00",
+    14
+   ],
+   [
+    "Success rate",
+    "-0.06",
+    22
+   ],
+   [
+    "EPA/play (PPA)",
+    "-0.27",
+    3
+   ],
+   [
+    "Rush PPA",
+    "-0.26",
+    9
+   ],
+   [
+    "Pass PPA",
+    "-0.25",
+    14
+   ],
+   [
+    "Points per opportunity",
+    "-1.63",
+    3
+   ],
+   [
+    "Drive quality",
+    "-20.90",
+    12
+   ]
+  ],
+  "games": [
+   [
+    "South Carolina",
+    29,
+    "Tennessee -3.0",
+    "31.5-28.5",
+    58.4
+   ],
+   [
+    "Kentucky",
+    26,
+    "Tennessee -8.5",
+    "34.8-26.3",
+    72.2
+   ],
+   [
+    "Texas A&M",
+    24,
+    "Tennessee -2.0",
+    "29.7-27.7",
+    55.6
+   ],
+   [
+    "LSU",
+    6,
+    "LSU -1.8",
+    "29.7-31.5",
+    45.0
+   ],
+   [
+    "Vanderbilt",
+    62,
+    "Tennessee -13.3",
+    "35.2-21.9",
+    81.7
+   ]
+  ],
+  "played": [
+   [
+    "Furman",
+    49
+   ],
+   [
+    "Georgia Tech",
+    70
+   ],
+   [
+    "Kennesaw State",
+    114
+   ],
+   [
+    "Texas",
+    8
+   ],
+   [
+    "Auburn",
+    28
+   ],
+   [
+    "Arkansas",
+    60
+   ],
+   [
+    "Alabama",
+    7
+   ]
+  ],
+  "record": "6-1",
+  "sec": {
+   "Georgia": [
+    23.9,
+    4,
+    43.8,
+    5,
+    19.9,
+    7,
+    37
+   ],
+   "LSU": [
+    22.1,
+    6,
+    42.6,
+    6,
+    20.5,
+    10,
+    25
+   ],
+   "Alabama": [
+    21.8,
+    7,
+    44.9,
+    3,
+    23.1,
+    32,
+    5
+   ],
+   "Texas": [
+    21.6,
+    8,
+    41.4,
+    9,
+    19.8,
+    5,
+    9
+   ],
+   "Ole Miss": [
+    17.6,
+    11,
+    42.3,
+    8,
+    24.6,
+    49,
+    16
+   ],
+   "Tennessee": [
+    17.3,
+    12,
+    38.3,
+    15,
+    21.0,
+    14,
+    29
+   ],
+   "Florida": [
+    14.2,
+    17,
+    40.1,
+    11,
+    25.9,
+    65,
+    6
+   ],
+   "Missouri": [
+    12.9,
+    22,
+    35.0,
+    26,
+    22.0,
+    22,
+    24
+   ],
+   "Oklahoma": [
+    12.5,
+    23,
+    32.4,
+    38,
+    19.9,
+    8,
+    2
+   ],
+   "Texas A&M": [
+    12.3,
+    24,
+    33.9,
+    30,
+    21.6,
+    17,
+    23
+   ],
+   "Kentucky": [
+    11.8,
+    26,
+    37.3,
+    19,
+    25.6,
+    61,
+    4
+   ],
+   "Auburn": [
+    11.6,
+    28,
+    34.1,
+    29,
+    22.5,
+    27,
+    10
+   ],
+   "South Carolina": [
+    11.3,
+    29,
+    36.0,
+    24,
+    24.7,
+    51,
+    21
+   ],
+   "Mississippi State": [
+    9.4,
+    36,
+    36.8,
+    20,
+    27.4,
+    95,
+    8
+   ],
+   "Arkansas": [
+    1.8,
+    60,
+    28.5,
+    62,
+    26.7,
+    82,
+    11
+   ],
+   "Vanderbilt": [
+    1.0,
+    62,
+    28.0,
+    65,
+    26.9,
+    85,
+    18
+   ]
+  }
+ },
+ "fpi": {
+  "Arkansas": [
+   2.2,
+   58
+  ],
+  "Georgia": [
+   26.7,
+   3
+  ],
+  "Ole Miss": [
+   18.8,
+   11
+  ],
+  "Vanderbilt": [
+   0.5,
+   66
+  ],
+  "Alabama": [
+   24.2,
+   6
+  ],
+  "South Carolina": [
+   11.6,
+   29
+  ],
+  "Tennessee": [
+   18.1,
+   12
+  ],
+  "LSU": [
+   23.0,
+   8
+  ],
+  "Kentucky": [
+   12.7,
+   26
+  ],
+  "Oklahoma": [
+   13.3,
+   22
+  ],
+  "Florida": [
+   14.3,
+   19
+  ],
+  "Texas": [
+   23.6,
+   7
+  ],
+  "Missouri": [
+   12.3,
+   27
+  ],
+  "Texas A&M": [
+   13.5,
+   20
+  ],
+  "Mississippi State": [
+   9.1,
+   38
+  ],
+  "Auburn": [
+   13.4,
+   21
+  ]
+ },
+ "log": [
+  "OK   games, results and record",
+  "OK   AP and Coaches polls",
+  "OK   team per-game numbers and national/SEC ranks",
+  "OK   player season stats",
+  "OK   national (FBS) ranks for Tennessee players",
+  "SKIP recruiting classes: HTTP Error 502: Bad Gateway",
+  "OK   ESPN lines, TV and win chances",
+  "OK   full team stat sheet with national and SEC ranks",
+  "SKIP 247 ratings for the full roster (HS composite + transfer) and team talent: HTTP Error 502: Bad Gateway",
+  "OK   box scores for finished games (ESPN)",
+  "SKIP matchup previews for remaining games (CFBD): HTTP Error 502: Bad Gateway",
+  "OK   season-by-season schedules and team leaders (cached after the first run)",
+  "OK   PEAR ratings (week 8)",
+  "OK   FPI ratings and ranks for the SEC (CFBD)"
+ ],
+ "recruits": {
+  "2027": [
+   {
+    "name": "David Gabriel Georges",
+    "pos": "RB",
+    "hs": "Baylor School",
+    "home": "Chattanooga, TN",
+    "ht": "6-0",
+    "wt": 210,
+    "grade": 99,
+    "stars": 5,
+    "nat": "9"
+   },
+   {
+    "name": "Kesean Bowman",
+    "pos": "WR",
+    "hs": "Brentwood Academy",
+    "home": "Brentwood, TN",
+    "ht": "6-0.5",
+    "wt": 176,
+    "grade": 98,
+    "stars": 4,
+    "nat": "60"
+   },
+   {
+    "name": "Kenneth Simon II",
+    "pos": "LB",
+    "hs": "Brentwood Academy",
+    "home": "Brentwood, TN",
+    "ht": "6-2",
+    "wt": 212,
+    "grade": 94,
+    "stars": 4,
+    "nat": "143"
+   },
+   {
+    "name": "Princeton Uwaifo",
+    "pos": "OT",
+    "hs": "Siegel",
+    "home": "Murfreesboro, TN",
+    "ht": "6-5.5",
+    "wt": 342,
+    "grade": 92,
+    "stars": 4,
+    "nat": "206"
+   },
+   {
+    "name": "Malik Howard",
+    "pos": "TE",
+    "hs": "Oak Ridge",
+    "home": "Oak Ridge, TN",
+    "ht": "6-3.5",
+    "wt": 231,
+    "grade": 92,
+    "stars": 4,
+    "nat": "211"
+   },
+   {
+    "name": "Marcus Jones",
+    "pos": "S",
+    "hs": "The Haverford School",
+    "home": "Haverford, PA",
+    "ht": "6-3",
+    "wt": 190,
+    "grade": 91,
+    "stars": 4,
+    "nat": "283"
+   },
+   {
+    "name": "Niko Kampas",
+    "pos": "OT",
+    "hs": "NFL Academy",
+    "home": "London, EN",
+    "ht": "6-7.5",
+    "wt": 294,
+    "grade": 90,
+    "stars": 4,
+    "nat": "323"
+   },
+   {
+    "name": "Q'Mari Hudson",
+    "pos": "OT",
+    "hs": "Western Branch",
+    "home": "Chesapeake, VA",
+    "ht": "6-4.5",
+    "wt": 330,
+    "grade": 90,
+    "stars": 4,
+    "nat": "387"
+   },
+   {
+    "name": "Dylan Haley",
+    "pos": "ATH",
+    "hs": "Cherokee Bluff",
+    "home": "Flowery Branch, GA",
+    "ht": "6-1",
+    "wt": 180,
+    "grade": 89,
+    "stars": 3,
+    "nat": "526"
+   },
+   {
+    "name": "Asa Barnes",
+    "pos": "RB",
+    "hs": "Westview",
+    "home": "Martin, TN",
+    "ht": "5-11",
+    "wt": 200,
+    "grade": 88,
+    "stars": 3,
+    "nat": "554"
+   },
+   {
+    "name": "JP Peace",
+    "pos": "LB",
+    "hs": "Maryville",
+    "home": "Maryville, TN",
+    "ht": "6-3",
+    "wt": 220,
+    "grade": 88,
+    "stars": 3,
+    "nat": "598"
+   },
+   {
+    "name": "Jaden Butler",
+    "pos": "ATH",
+    "hs": "Haywood",
+    "home": "Brownsville, TN",
+    "ht": "6-1",
+    "wt": 190,
+    "grade": 88,
+    "stars": 3,
+    "nat": "598"
+   },
+   {
+    "name": "Brandon Leavell",
+    "pos": "ATH",
+    "hs": "Goodpasture Christian School",
+    "home": "Madison, TN",
+    "ht": "6-0.5",
+    "wt": 165,
+    "grade": 88,
+    "stars": 3,
+    "nat": "629"
+   },
+   {
+    "name": "Dayon Cooper",
+    "pos": "ATH",
+    "hs": "South Pittsburg",
+    "home": "South Pittsburg, TN",
+    "ht": "6-1",
+    "wt": 183,
+    "grade": 88,
+    "stars": 3,
+    "nat": "705"
+   },
+   {
+    "name": "Derrick Baker",
+    "pos": "QB",
+    "hs": "Milton",
+    "home": "Alpharetta, GA",
+    "ht": "6-1",
+    "wt": 226,
+    "grade": 88,
+    "stars": 3,
+    "nat": "805"
+   },
+   {
+    "name": "Carter Jamison",
+    "pos": "S",
+    "hs": "Creekside",
+    "home": "Fairburn, GA",
+    "ht": "5-10",
+    "wt": 180,
+    "grade": 87,
+    "stars": 3,
+    "nat": "1166"
+   },
+   {
+    "name": "Ford Fehling",
+    "pos": "K",
+    "hs": "Marvin Ridge",
+    "home": "Waxhaw, NC",
+    "ht": "6-1",
+    "wt": 195,
+    "grade": 80,
+    "stars": 3,
+    "nat": "2149"
+   },
+   {
+    "name": "Sam McKeown",
+    "pos": "LS",
+    "hs": "Jenks",
+    "home": "Jenks, OK",
+    "ht": "6-4",
+    "wt": 225,
+    "grade": 80,
+    "stars": 3,
+    "nat": "2157"
+   }
+  ],
+  "2028": []
+ },
+ "ratings": {
+  "Drake Martinez": {
+   "pos": "TE",
+   "num": 44,
+   "year": 1,
+   "hs": {
+    "grade": 83.04,
+    "stars": 3,
+    "nat": 1753,
+    "cls": 2021,
+    "school": "Houston St. Thomas",
+    "committedTo": "Colorado State"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "UT Martin",
+    "season": 2026
+   }
+  },
+  "DJ Burks": {
+   "pos": "DB",
+   "num": 42,
+   "year": 1,
+   "hs": {
+    "grade": 84.44,
+    "stars": 3,
+    "nat": 1433,
+    "cls": 2022,
+    "school": "Maryville",
+    "committedTo": "App State"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "App State",
+    "season": 2026
+   }
+  },
+  "Ethan Davis": {
+   "pos": "TE",
+   "num": 0,
+   "year": 1,
+   "hs": {
+    "grade": 94.01,
+    "stars": 4,
+    "nat": 144,
+    "cls": 2023,
+    "school": "Collins Hill",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Isaiah Hardge": {
+   "pos": "DB",
+   "num": 29,
+   "year": 1,
+   "hs": {
+    "grade": 85.97,
+    "stars": 3,
+    "nat": 1128,
+    "cls": 2023,
+    "school": "St. Thomas Aquinas",
+    "committedTo": "Colorado"
+   },
+   "transfer": {
+    "grade": 86.0,
+    "stars": 3,
+    "origin": "Colorado",
+    "season": 2026
+   }
+  },
+  "TJ Metcalf": {
+   "pos": "DB",
+   "num": 1,
+   "year": 1,
+   "hs": {
+    "grade": 88.42,
+    "stars": 3,
+    "nat": 542,
+    "cls": 2023,
+    "school": "Pinson Valley",
+    "committedTo": "Arkansas"
+   },
+   "transfer": {
+    "grade": 87.0,
+    "stars": 3,
+    "origin": "Michigan",
+    "season": 2026
+   }
+  },
+  "Kayin Lee": {
+   "pos": "DB",
+   "num": 14,
+   "year": 1,
+   "hs": {
+    "grade": 93.86,
+    "stars": 4,
+    "nat": 147,
+    "cls": 2023,
+    "school": "Cedar Grove",
+    "committedTo": "Auburn"
+   },
+   "transfer": {
+    "grade": 88.0,
+    "stars": 3,
+    "origin": "Auburn",
+    "season": 2026
+   }
+  },
+  "Ryan Staub": {
+   "pos": "QB",
+   "num": 8,
+   "year": 1,
+   "hs": {
+    "grade": 87.44,
+    "stars": 3,
+    "nat": 734,
+    "cls": 2023,
+    "school": "West Ranch",
+    "committedTo": "Colorado"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "Colorado",
+    "season": 2026
+   }
+  },
+  "Shamurad Umarov": {
+   "pos": "OL",
+   "num": 74,
+   "year": 1,
+   "hs": {
+    "grade": 90.31,
+    "stars": 4,
+    "nat": 310,
+    "cls": 2023,
+    "school": "Denmark",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Sam Pendleton": {
+   "pos": "OL",
+   "num": 56,
+   "year": 1,
+   "hs": {
+    "grade": 89.33,
+    "stars": 4,
+    "nat": 406,
+    "cls": 2023,
+    "school": "Reagan",
+    "committedTo": "Notre Dame"
+   },
+   "transfer": {
+    "grade": 90.0,
+    "stars": 4,
+    "origin": "Notre Dame",
+    "season": 2025
+   }
+  },
+  "Nathan Robinson": {
+   "pos": "DL",
+   "num": 19,
+   "year": 1,
+   "hs": {
+    "grade": 88.28,
+    "stars": 3,
+    "nat": 559,
+    "cls": 2023,
+    "school": "Greenbrier",
+    "committedTo": "Tennessee"
+   }
+  },
+  "DeSean Bishop": {
+   "pos": "RB",
+   "num": 18,
+   "year": 1,
+   "hs": {
+    "grade": 85.33,
+    "stars": 3,
+    "nat": 1315,
+    "cls": 2023,
+    "school": "Karns",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jeremiah Telander": {
+   "pos": "LB",
+   "num": 22,
+   "year": 1,
+   "hs": {
+    "grade": 87.96,
+    "stars": 3,
+    "nat": 613,
+    "cls": 2023,
+    "school": "Gainesville",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Daevin Hobbs": {
+   "pos": "DL",
+   "num": 5,
+   "year": 1,
+   "hs": {
+    "grade": 97.41,
+    "stars": 4,
+    "nat": 57,
+    "cls": 2023,
+    "school": "Jay M. Robinson",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Tyree Weathersby": {
+   "pos": "DL",
+   "num": 18,
+   "year": 1,
+   "hs": {
+    "grade": 90.47,
+    "stars": 4,
+    "nat": 299,
+    "cls": 2023,
+    "school": "New Manchester",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Dejuan Lane": {
+   "pos": "DB",
+   "num": 10,
+   "year": 1,
+   "hs": {
+    "grade": 90.41,
+    "stars": 4,
+    "nat": 325,
+    "cls": 2024,
+    "school": "Gilman",
+    "committedTo": "Penn State"
+   },
+   "transfer": {
+    "grade": 87.0,
+    "stars": 3,
+    "origin": "Penn State",
+    "season": 2026
+   }
+  },
+  "Mike Matthews": {
+   "pos": "WR",
+   "num": 4,
+   "year": 1,
+   "hs": {
+    "grade": 98.82,
+    "stars": 5,
+    "nat": 24,
+    "cls": 2024,
+    "school": "Parkview",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Edwin Spillman": {
+   "pos": "LB",
+   "num": 13,
+   "year": 1,
+   "hs": {
+    "grade": 90.0,
+    "stars": 4,
+    "nat": 357,
+    "cls": 2024,
+    "school": "Lipscomb Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Ory Williams": {
+   "pos": "OL",
+   "num": 77,
+   "year": 1,
+   "hs": {
+    "grade": 89.35,
+    "stars": 4,
+    "nat": 433,
+    "cls": 2024,
+    "school": "San Marcos",
+    "committedTo": "LSU"
+   },
+   "transfer": {
+    "grade": 86.0,
+    "stars": 3,
+    "origin": "LSU",
+    "season": 2026
+   }
+  },
+  "Hunter Barnes": {
+   "pos": "RB",
+   "num": 24,
+   "year": 1
+  },
+  "Bennett Brady": {
+   "pos": "LS",
+   "num": 48,
+   "year": 1
+  },
+  "Josh Turbyville": {
+   "pos": "PK",
+   "num": 94,
+   "year": 1
+  },
+  "Arion Carter": {
+   "pos": "LB",
+   "num": 7,
+   "year": 1,
+   "hs": {
+    "grade": 94.39,
+    "stars": 4,
+    "nat": 130,
+    "cls": 2023,
+    "school": "Smyrna",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Carson Gentle": {
+   "pos": "DL",
+   "num": 35,
+   "year": 1,
+   "hs": {
+    "grade": 86.97,
+    "stars": 3,
+    "nat": 928,
+    "cls": 2024,
+    "school": "McCallie School",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Donovan Haslam": {
+   "pos": "OL",
+   "num": 69,
+   "year": 1,
+   "transfer": {
+    "grade": 86.0,
+    "stars": 3,
+    "origin": "West Virginia",
+    "season": 2026
+   }
+  },
+  "Wendell Moe Jr.": {
+   "pos": "OL",
+   "num": 75,
+   "year": 1,
+   "hs": {
+    "grade": 82.56,
+    "stars": 3,
+    "nat": 1912,
+    "cls": 2022,
+    "school": "Long Beach Poly",
+    "committedTo": "Arizona"
+   },
+   "transfer": {
+    "grade": 88.0,
+    "stars": 3,
+    "origin": "Arizona",
+    "season": 2025
+   }
+  },
+  "Jadais Richard": {
+   "pos": "DB",
+   "num": 8,
+   "year": 1,
+   "hs": {
+    "grade": 89.59,
+    "stars": 4,
+    "nat": 368,
+    "cls": 2022,
+    "school": "West Monroe",
+    "committedTo": "Vanderbilt"
+   },
+   "transfer": {
+    "grade": 86.0,
+    "stars": 3,
+    "origin": "Miami",
+    "season": 2026
+   }
+  },
+  "Amare Campbell": {
+   "pos": "LB",
+   "num": 0,
+   "year": 1,
+   "hs": {
+    "grade": 85.42,
+    "stars": 3,
+    "nat": 1293,
+    "cls": 2023,
+    "school": "Unity Reed",
+    "committedTo": "North Carolina"
+   },
+   "transfer": {
+    "grade": 87.0,
+    "stars": 3,
+    "origin": "Penn State",
+    "season": 2026
+   }
+  },
+  "Edrees Farooq": {
+   "pos": "DB",
+   "num": 15,
+   "year": 1,
+   "hs": {
+    "grade": 88.33,
+    "stars": 3,
+    "nat": 592,
+    "cls": 2024,
+    "school": "St. Frances Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jackson Ross": {
+   "pos": "P",
+   "num": 98,
+   "year": 1,
+   "hs": {
+    "grade": 78.94,
+    "stars": 2,
+    "nat": 2679,
+    "cls": 2022,
+    "school": "ProKick Australia",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Trent Thomas": {
+   "pos": "TE",
+   "num": 82,
+   "year": 1,
+   "hs": {
+    "grade": 84.37,
+    "stars": 3,
+    "nat": 1622,
+    "cls": 2023,
+    "school": "Cottage Hill Christian Academy",
+    "committedTo": "South Alabama"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "South Alabama",
+    "season": 2026
+   }
+  },
+  "Jordan Norman": {
+   "pos": "DL",
+   "num": 33,
+   "year": 1,
+   "hs": {
+    "grade": 82.96,
+    "stars": 3,
+    "nat": 2016,
+    "cls": 2023,
+    "school": "Hoover",
+    "committedTo": "South Alabama"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "Tulane",
+    "season": 2026
+   }
+  },
+  "Braylon Staley": {
+   "pos": "WR",
+   "num": 14,
+   "year": 1,
+   "hs": {
+    "grade": 95.01,
+    "stars": 4,
+    "nat": 106,
+    "cls": 2024,
+    "school": "Strom Thurmond",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Gage Ginther": {
+   "pos": "OL",
+   "num": 78,
+   "year": 1,
+   "hs": {
+    "grade": 88.17,
+    "stars": 3,
+    "nat": 628,
+    "cls": 2024,
+    "school": "Fossil Ridge",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jesse Perry": {
+   "pos": "OL",
+   "num": 72,
+   "year": 1,
+   "hs": {
+    "grade": 87.39,
+    "stars": 3,
+    "nat": 801,
+    "cls": 2024,
+    "school": "Middle Tennessee Christian School",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Justin Baker": {
+   "pos": "RB",
+   "num": 2,
+   "year": 1,
+   "hs": {
+    "grade": 88.11,
+    "stars": 3,
+    "nat": 619,
+    "cls": 2025,
+    "school": "Buford",
+    "committedTo": "Tennessee"
+   }
+  },
+  "DaSaahn Brame": {
+   "pos": "TE",
+   "num": 7,
+   "year": 1,
+   "hs": {
+    "grade": 96.82,
+    "stars": 4,
+    "nat": 61,
+    "cls": 2025,
+    "school": "Derby",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Isaiah Campbell": {
+   "pos": "DL",
+   "num": 47,
+   "year": 1,
+   "hs": {
+    "grade": 98.32,
+    "stars": 4,
+    "nat": 33,
+    "cls": 2025,
+    "school": "Southern Durham",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jaedon Harmon": {
+   "pos": "LB",
+   "num": 12,
+   "year": 1,
+   "hs": {
+    "grade": 93.1,
+    "stars": 4,
+    "nat": 168,
+    "cls": 2025,
+    "school": "Rome",
+    "committedTo": "Tennessee"
+   }
+  },
+  "George MacIntyre": {
+   "pos": "QB",
+   "num": 12,
+   "year": 1,
+   "hs": {
+    "grade": 93.55,
+    "stars": 4,
+    "nat": 151,
+    "cls": 2025,
+    "school": "Brentwood Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jadon Perlotte": {
+   "pos": "LB",
+   "num": 27,
+   "year": 1,
+   "hs": {
+    "grade": 89.43,
+    "stars": 4,
+    "nat": 417,
+    "cls": 2025,
+    "school": "Buford",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Daune Morris": {
+   "pos": "RB",
+   "num": 17,
+   "year": 1,
+   "hs": {
+    "grade": 89.42,
+    "stars": 4,
+    "nat": 419,
+    "cls": 2025,
+    "school": "Oakland",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Tre Poteat III": {
+   "pos": "DB",
+   "num": 3,
+   "year": 1,
+   "hs": {
+    "grade": 89.5,
+    "stars": 4,
+    "nat": 404,
+    "cls": 2025,
+    "school": "Verona Area",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Ty Redmond": {
+   "pos": "DB",
+   "num": 4,
+   "year": 1,
+   "hs": {
+    "grade": 87.81,
+    "stars": 3,
+    "nat": 702,
+    "cls": 2025,
+    "school": "Milton",
+    "committedTo": "Tennessee"
+   }
+  },
+  "David Sanders Jr.": {
+   "pos": "OL",
+   "num": 70,
+   "year": 1,
+   "hs": {
+    "grade": 99.73,
+    "stars": 5,
+    "nat": 6,
+    "cls": 2025,
+    "school": "Providence Day School",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Ethan Utley": {
+   "pos": "DL",
+   "num": 17,
+   "year": 1,
+   "hs": {
+    "grade": 91.99,
+    "stars": 4,
+    "nat": 219,
+    "cls": 2025,
+    "school": "Ensworth",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jeremias Heard": {
+   "pos": "OL",
+   "num": 51,
+   "year": 1,
+   "hs": {
+    "grade": 88.19,
+    "stars": 3,
+    "nat": 627,
+    "cls": 2024,
+    "school": "Model 9-12",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Tevis Metcalf": {
+   "pos": "DB",
+   "num": 20,
+   "year": 1,
+   "hs": {
+    "grade": 88.42,
+    "stars": 3,
+    "nat": 542,
+    "cls": 2023,
+    "school": "Pinson Valley",
+    "committedTo": "Arkansas"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "Michigan",
+    "season": 2026
+   }
+  },
+  "Xavier Gilliam": {
+   "pos": "DL",
+   "num": 2,
+   "year": 1,
+   "hs": {
+    "grade": 87.58,
+    "stars": 3,
+    "nat": 750,
+    "cls": 2024,
+    "school": "Quince Orchard",
+    "committedTo": "Penn State"
+   },
+   "transfer": {
+    "grade": 94.0,
+    "stars": 4,
+    "origin": "Penn State",
+    "season": 2026
+   }
+  },
+  "Jordan Burns": {
+   "pos": "LB",
+   "num": 11,
+   "year": 1,
+   "hs": {
+    "grade": 89.5,
+    "stars": 4,
+    "nat": 409,
+    "cls": 2024,
+    "school": "Pace Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Ian Duarte": {
+   "pos": "WR",
+   "num": 81,
+   "year": 1,
+   "hs": {
+    "grade": 84.0,
+    "stars": 3,
+    "nat": 1710,
+    "cls": 2023,
+    "school": "Eagle",
+    "committedTo": "Idaho State"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "Idaho State",
+    "season": 2026
+   }
+  },
+  "Ed Baker": {
+   "pos": "OL",
+   "num": 71,
+   "year": 1,
+   "hs": {
+    "grade": 87.22,
+    "stars": 3,
+    "nat": 1030,
+    "cls": 2026,
+    "school": "St. Frances Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Hezekiah Harris": {
+   "pos": "DL",
+   "num": 97,
+   "year": 1,
+   "hs": {
+    "grade": 92.4,
+    "stars": 4,
+    "nat": 196,
+    "cls": 2026,
+    "school": "Jemison",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Faizon Brandon": {
+   "pos": "QB",
+   "num": 11,
+   "year": 1,
+   "hs": {
+    "grade": 99.39,
+    "stars": 5,
+    "nat": 10,
+    "cls": 2026,
+    "school": "Grimsley",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Kedric Golston II": {
+   "pos": "DL",
+   "num": 37,
+   "year": 1,
+   "hs": {
+    "grade": 89.11,
+    "stars": 4,
+    "nat": 469,
+    "cls": 2026,
+    "school": "Stone Bridge",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Nathan Roberts": {
+   "pos": "WR",
+   "num": 36,
+   "year": 1
+  },
+  "Zach Groves": {
+   "pos": "DL",
+   "num": 56,
+   "year": 1,
+   "hs": {
+    "grade": 90.53,
+    "stars": 4,
+    "nat": 310,
+    "cls": 2026,
+    "school": "East Robertson",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Tyreek King": {
+   "pos": "WR",
+   "num": 19,
+   "year": 1,
+   "hs": {
+    "grade": 94.55,
+    "stars": 4,
+    "nat": 131,
+    "cls": 2026,
+    "school": "Knoxville Catholic",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Dereon Albert": {
+   "pos": "DL",
+   "num": 59,
+   "year": 1,
+   "hs": {
+    "grade": 89.71,
+    "stars": 4,
+    "nat": 396,
+    "cls": 2026,
+    "school": "Jackson Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Joakim Dodson": {
+   "pos": "WR",
+   "num": 9,
+   "year": 1,
+   "hs": {
+    "grade": 88.17,
+    "stars": 3,
+    "nat": 614,
+    "cls": 2025,
+    "school": "Baylor School",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Tim Merritt": {
+   "pos": "DB",
+   "num": 25,
+   "year": 1,
+   "hs": {
+    "grade": 88.83,
+    "stars": 3,
+    "nat": 507,
+    "cls": 2025,
+    "school": "Parker",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Dylan Lewis": {
+   "pos": "DB",
+   "num": 24,
+   "year": 1,
+   "hs": {
+    "grade": 87.78,
+    "stars": 3,
+    "nat": 706,
+    "cls": 2025,
+    "school": "Milton",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Mariyon Dye": {
+   "pos": "DL",
+   "num": 9,
+   "year": 1,
+   "hs": {
+    "grade": 96.05,
+    "stars": 4,
+    "nat": 77,
+    "cls": 2025,
+    "school": "Elkhart",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Travis Smith Jr.": {
+   "pos": "WR",
+   "num": 1,
+   "year": 1,
+   "hs": {
+    "grade": 95.51,
+    "stars": 4,
+    "nat": 85,
+    "cls": 2025,
+    "school": "Westlake",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jack-Henry Jakobik": {
+   "pos": "WR",
+   "num": 29,
+   "year": 1
+  },
+  "Cooper Ranvier": {
+   "pos": "PK",
+   "num": 28,
+   "year": 1,
+   "transfer": {
+    "grade": null,
+    "stars": null,
+    "origin": "Louisville",
+    "season": 2026
+   }
+  },
+  "Cole Harrison": {
+   "pos": "TE",
+   "num": 80,
+   "year": 1,
+   "hs": {
+    "grade": 86.42,
+    "stars": 3,
+    "nat": 1102,
+    "cls": 2024,
+    "school": "Junipero Serra",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Christian Gass": {
+   "pos": "DL",
+   "num": 44,
+   "year": 1,
+   "hs": {
+    "grade": 92.42,
+    "stars": 4,
+    "nat": 202,
+    "cls": 2025,
+    "school": "Eastside",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Radarious Jackson": {
+   "pos": "WR",
+   "num": 3,
+   "year": 1,
+   "hs": {
+    "grade": 91.11,
+    "stars": 4,
+    "nat": 269,
+    "cls": 2025,
+    "school": "Sheffield",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Nic Moore": {
+   "pos": "OL",
+   "num": 58,
+   "year": 1,
+   "hs": {
+    "grade": 91.18,
+    "stars": 4,
+    "nat": 261,
+    "cls": 2025,
+    "school": "Jefferson County",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Sidney Walton": {
+   "pos": "DB",
+   "num": 23,
+   "year": 1,
+   "hs": {
+    "grade": 87.86,
+    "stars": 3,
+    "nat": 692,
+    "cls": 2025,
+    "school": "Moody",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Joel Wyatt": {
+   "pos": "DB",
+   "num": 31,
+   "year": 1,
+   "hs": {
+    "grade": 96.97,
+    "stars": 4,
+    "nat": 71,
+    "cls": 2026,
+    "school": "Oakland",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Charles House III": {
+   "pos": "DL",
+   "num": 99,
+   "year": 1,
+   "hs": {
+    "grade": 89.25,
+    "stars": 4,
+    "nat": 447,
+    "cls": 2025,
+    "school": "North Mecklenburg",
+    "committedTo": "Tennessee"
+   }
+  },
+  "TK Keys": {
+   "pos": "WR",
+   "num": 5,
+   "year": 1,
+   "hs": {
+    "grade": 99.33,
+    "stars": 5,
+    "nat": 13,
+    "cls": 2026,
+    "school": "Hattiesburg",
+    "committedTo": "Tennessee"
+   }
+  },
+  "TJ White": {
+   "pos": "LB",
+   "num": 51,
+   "year": 1,
+   "hs": {
+    "grade": 96.96,
+    "stars": 4,
+    "nat": 72,
+    "cls": 2026,
+    "school": "Jackson Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Gabriel Osenda": {
+   "pos": "OL",
+   "num": 79,
+   "year": 1,
+   "hs": {
+    "grade": 95.66,
+    "stars": 4,
+    "nat": 102,
+    "cls": 2026,
+    "school": "Baylor School",
+    "committedTo": "Tennessee"
+   }
+  },
+  "KJ McClain": {
+   "pos": "DB",
+   "num": 40,
+   "year": 1,
+   "hs": {
+    "grade": 87.67,
+    "stars": 3,
+    "nat": 833,
+    "cls": 2026,
+    "school": "St. Joseph Regional",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Kamari Blair": {
+   "pos": "OL",
+   "num": 66,
+   "year": 1,
+   "hs": {
+    "grade": 93.64,
+    "stars": 4,
+    "nat": 157,
+    "cls": 2026,
+    "school": "Kirkwood",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Javonte Smith": {
+   "pos": "DB",
+   "num": 30,
+   "year": 1,
+   "hs": {
+    "grade": 88.67,
+    "stars": 3,
+    "nat": 554,
+    "cls": 2026,
+    "school": "Jackson North Side",
+    "committedTo": "Tennessee"
+   }
+  },
+  "CJ Edwards": {
+   "pos": "DL",
+   "num": 85,
+   "year": 1,
+   "hs": {
+    "grade": 88.0,
+    "stars": 3,
+    "nat": 731,
+    "cls": 2026,
+    "school": "St. Joseph",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Antoni Ogumoro": {
+   "pos": "OL",
+   "num": 55,
+   "year": 1,
+   "hs": {
+    "grade": 88.36,
+    "stars": 3,
+    "nat": 573,
+    "cls": 2025,
+    "school": "Elgin",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jackson Mathews": {
+   "pos": "DB",
+   "num": 43,
+   "year": 1,
+   "hs": {
+    "grade": 80.0,
+    "stars": 3,
+    "nat": 2850,
+    "cls": 2024,
+    "school": "Christ Presbyterian Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Ryan Scott": {
+   "pos": "LB",
+   "num": 50,
+   "year": 1
+  },
+  "Grier Short": {
+   "pos": "LB",
+   "num": 57,
+   "year": 1
+  },
+  "Mike Bethea II": {
+   "pos": "DL",
+   "num": 55,
+   "year": 1
+  },
+  "Qua Moss": {
+   "pos": "DB",
+   "num": 6,
+   "year": 1,
+   "transfer": {
+    "grade": 86.0,
+    "stars": 3,
+    "origin": "Kansas State",
+    "season": 2026
+   }
+  },
+  "Doren Sacha": {
+   "pos": "WR",
+   "num": 26,
+   "year": 1
+  },
+  "Michael Kostantonov": {
+   "pos": "OL",
+   "num": 65,
+   "year": 1
+  },
+  "Blake Howard": {
+   "pos": "LS",
+   "num": 53,
+   "year": 1,
+   "transfer": {
+    "grade": null,
+    "stars": null,
+    "origin": "Eastern Kentucky",
+    "season": 2026
+   }
+  },
+  "Carter Gooden": {
+   "pos": "DL",
+   "num": 36,
+   "year": 1,
+   "hs": {
+    "grade": 95.44,
+    "stars": 4,
+    "nat": 106,
+    "cls": 2026,
+    "school": "Tabor Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "JJ Finch": {
+   "pos": "DL",
+   "num": 26,
+   "year": 1,
+   "hs": {
+    "grade": 89.11,
+    "stars": 4,
+    "nat": 469,
+    "cls": 2026,
+    "school": "Warren Central",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Brayden Rouse": {
+   "pos": "LB",
+   "num": 28,
+   "year": 1,
+   "hs": {
+    "grade": 96.65,
+    "stars": 4,
+    "nat": 79,
+    "cls": 2026,
+    "school": "Kell",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Zay Anderson": {
+   "pos": "DB",
+   "num": 34,
+   "year": 1,
+   "hs": {
+    "grade": 92.52,
+    "stars": 4,
+    "nat": 189,
+    "cls": 2026,
+    "school": "Greeneville",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Darryl Rivers": {
+   "pos": "DL",
+   "num": 39,
+   "year": 1,
+   "hs": {
+    "grade": 88.67,
+    "stars": 3,
+    "nat": 554,
+    "cls": 2026,
+    "school": "McEachern",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jamyan Theodore": {
+   "pos": "DB",
+   "num": 21,
+   "year": 1,
+   "hs": {
+    "grade": 88.89,
+    "stars": 3,
+    "nat": 507,
+    "cls": 2026,
+    "school": "Baylor School",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Luca Wolf": {
+   "pos": "TE",
+   "num": 87,
+   "year": 1,
+   "hs": {
+    "grade": 88.55,
+    "stars": 3,
+    "nat": 604,
+    "cls": 2026,
+    "school": "NFL Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Will Rajecki": {
+   "pos": "RB",
+   "num": 34,
+   "year": 1,
+   "hs": {
+    "grade": 86.67,
+    "stars": 3,
+    "nat": 1263,
+    "cls": 2026,
+    "school": "Sequoyah",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jowell Combay": {
+   "pos": "DB",
+   "num": 38,
+   "year": 1,
+   "hs": {
+    "grade": 88.56,
+    "stars": 3,
+    "nat": 586,
+    "cls": 2026,
+    "school": "Kell",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Luke Thompson": {
+   "pos": "WR",
+   "num": 85,
+   "year": 1,
+   "hs": {
+    "grade": 88.22,
+    "stars": 3,
+    "nat": 665,
+    "cls": 2026,
+    "school": "Franklin",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Mason Phillips": {
+   "pos": "QB",
+   "num": 13,
+   "year": 1
+  },
+  "Ben Petermann": {
+   "pos": "WR",
+   "num": 35,
+   "year": 1
+  },
+  "Deon Hardin": {
+   "pos": "WR",
+   "num": 88,
+   "year": 1
+  },
+  "Grady Dangerfield": {
+   "pos": "PK",
+   "num": 93,
+   "year": 1
+  },
+  "Javin Gordon": {
+   "pos": "RB",
+   "num": 6,
+   "year": 1,
+   "hs": {
+    "grade": 86.33,
+    "stars": 3,
+    "nat": 1203,
+    "cls": 2025,
+    "school": "Stephens County",
+    "committedTo": "Tulane"
+   },
+   "transfer": {
+    "grade": 86.0,
+    "stars": 3,
+    "origin": "Tulane",
+    "season": 2026
+   }
+  },
+  "Brayden Carroll": {
+   "pos": "WR",
+   "num": 38,
+   "year": 1,
+   "hs": {
+    "grade": 84.0,
+    "stars": 3,
+    "nat": 2533,
+    "cls": 2026,
+    "school": "Bradley Central",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Charlie Powell III": {
+   "pos": "OL",
+   "num": 59,
+   "year": 1
+  },
+  "Nuk Simmons": {
+   "pos": "DL",
+   "num": 87,
+   "year": 1,
+   "hs": {
+    "grade": 87.22,
+    "stars": 3,
+    "nat": 1030,
+    "cls": 2026,
+    "school": "Carver",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Logan Foley": {
+   "pos": "P",
+   "num": 99,
+   "year": 1,
+   "hs": {
+    "grade": 81.0,
+    "stars": 3,
+    "nat": 3267,
+    "cls": 2026,
+    "school": "ProKick Australia",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jacolby Cooper": {
+   "pos": "WR",
+   "num": 30,
+   "year": 1,
+   "hs": {
+    "grade": 86.11,
+    "stars": 3,
+    "nat": 1523,
+    "cls": 2026,
+    "school": "Alcoa",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Lane Cope": {
+   "pos": "WR",
+   "num": 31,
+   "year": 1
+  },
+  "Thomas Storm": {
+   "pos": "OL",
+   "num": 60,
+   "year": 1
+  },
+  "Jeremy George-El": {
+   "pos": "OL",
+   "num": 63,
+   "year": 1,
+   "hs": {
+    "grade": 86.5,
+    "stars": 3,
+    "nat": 1336,
+    "cls": 2026,
+    "school": "Knoxville Catholic",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Breeze Carter": {
+   "pos": "DL",
+   "num": 95,
+   "year": 1,
+   "hs": {
+    "grade": 92.63,
+    "stars": 4,
+    "nat": 183,
+    "cls": 2026,
+    "school": "Douglas County",
+    "committedTo": "Tennessee"
+   }
+  }
+ },
+ "talent": {
+  "rank": 13,
+  "score": 885.9,
+  "of": 138,
+  "top": [
+   [
+    "Georgia",
+    1003.67
+   ],
+   [
+    "Texas",
+    985.17
+   ],
+   [
+    "Oregon",
+    984.33
+   ],
+   [
+    "Alabama",
+    973.53
+   ],
+   [
+    "Ohio State",
+    964.27
+   ],
+   [
+    "Notre Dame",
+    953.03
+   ],
+   [
+    "Texas A&M",
+    933.0
+   ],
+   [
+    "LSU",
+    931.76
+   ],
+   [
+    "USC",
+    899.0
+   ],
+   [
+    "Florida",
+    891.07
+   ],
+   [
+    "Michigan",
+    890.02
+   ],
+   [
+    "Miami",
+    885.94
+   ],
+   [
+    "Tennessee",
+    885.9
+   ],
+   [
+    "Ole Miss",
+    885.72
+   ],
+   [
+    "South Carolina",
+    862.87
+   ]
+  ]
+ },
  "previews": {
   "South Carolina": {
    "record": "3-3",
@@ -13245,425 +13665,5 @@ window.SITE_AUTO.football = {
     ]
    }
   }
- },
- "pear": {
-  "week": 8,
-  "ratings": [
-   [
-    "TSR",
-    "17.3",
-    12
-   ],
-   [
-    "SP+",
-    "17.5",
-    13
-   ],
-   [
-    "FPI",
-    "18.1",
-    12
-   ],
-   [
-    "FEI",
-    "0.93",
-    13
-   ],
-   [
-    "Massey",
-    "8.76",
-    11
-   ],
-   [
-    "Dokter",
-    "68.84",
-    11
-   ],
-   [
-    "Sagarin",
-    "88.19",
-    11
-   ],
-   [
-    "RQI",
-    "0.744",
-    8
-   ],
-   [
-    "SOS",
-    "10.73",
-    29
-   ]
-  ],
-  "offense": [
-   [
-    "Rating",
-    "38.30",
-    15
-   ],
-   [
-    "Success rate",
-    "0.04",
-    40
-   ],
-   [
-    "EPA/play (PPA)",
-    "0.07",
-    58
-   ],
-   [
-    "Rush PPA",
-    "0.18",
-    12
-   ],
-   [
-    "Pass PPA",
-    "-0.06",
-    98
-   ],
-   [
-    "Points per opportunity",
-    "0.62",
-    46
-   ],
-   [
-    "Drive quality",
-    "17.70",
-    19
-   ]
-  ],
-  "defense": [
-   [
-    "Rating",
-    "21.00",
-    14
-   ],
-   [
-    "Success rate",
-    "-0.06",
-    22
-   ],
-   [
-    "EPA/play (PPA)",
-    "-0.27",
-    3
-   ],
-   [
-    "Rush PPA",
-    "-0.26",
-    9
-   ],
-   [
-    "Pass PPA",
-    "-0.25",
-    14
-   ],
-   [
-    "Points per opportunity",
-    "-1.63",
-    3
-   ],
-   [
-    "Drive quality",
-    "-20.90",
-    12
-   ]
-  ],
-  "games": [
-   [
-    "South Carolina",
-    29,
-    "Tennessee -3.0",
-    "31.5-28.5",
-    58.4
-   ],
-   [
-    "Kentucky",
-    26,
-    "Tennessee -8.5",
-    "34.8-26.3",
-    72.2
-   ],
-   [
-    "Texas A&M",
-    24,
-    "Tennessee -2.0",
-    "29.7-27.7",
-    55.6
-   ],
-   [
-    "LSU",
-    6,
-    "LSU -1.8",
-    "29.7-31.5",
-    45.0
-   ],
-   [
-    "Vanderbilt",
-    62,
-    "Tennessee -13.3",
-    "35.2-21.9",
-    81.7
-   ]
-  ],
-  "played": [
-   [
-    "Furman",
-    49
-   ],
-   [
-    "Georgia Tech",
-    70
-   ],
-   [
-    "Kennesaw State",
-    114
-   ],
-   [
-    "Texas",
-    8
-   ],
-   [
-    "Auburn",
-    28
-   ],
-   [
-    "Arkansas",
-    60
-   ],
-   [
-    "Alabama",
-    7
-   ]
-  ],
-  "record": "6-1",
-  "sec": {
-   "Georgia": [
-    23.9,
-    4,
-    43.8,
-    5,
-    19.9,
-    7,
-    37
-   ],
-   "LSU": [
-    22.1,
-    6,
-    42.6,
-    6,
-    20.5,
-    10,
-    25
-   ],
-   "Alabama": [
-    21.8,
-    7,
-    44.9,
-    3,
-    23.1,
-    32,
-    5
-   ],
-   "Texas": [
-    21.6,
-    8,
-    41.4,
-    9,
-    19.8,
-    5,
-    9
-   ],
-   "Ole Miss": [
-    17.6,
-    11,
-    42.3,
-    8,
-    24.6,
-    49,
-    16
-   ],
-   "Tennessee": [
-    17.3,
-    12,
-    38.3,
-    15,
-    21.0,
-    14,
-    29
-   ],
-   "Florida": [
-    14.2,
-    17,
-    40.1,
-    11,
-    25.9,
-    65,
-    6
-   ],
-   "Missouri": [
-    12.9,
-    22,
-    35.0,
-    26,
-    22.0,
-    22,
-    24
-   ],
-   "Oklahoma": [
-    12.5,
-    23,
-    32.4,
-    38,
-    19.9,
-    8,
-    2
-   ],
-   "Texas A&M": [
-    12.3,
-    24,
-    33.9,
-    30,
-    21.6,
-    17,
-    23
-   ],
-   "Kentucky": [
-    11.8,
-    26,
-    37.3,
-    19,
-    25.6,
-    61,
-    4
-   ],
-   "Auburn": [
-    11.6,
-    28,
-    34.1,
-    29,
-    22.5,
-    27,
-    10
-   ],
-   "South Carolina": [
-    11.3,
-    29,
-    36.0,
-    24,
-    24.7,
-    51,
-    21
-   ],
-   "Mississippi State": [
-    9.4,
-    36,
-    36.8,
-    20,
-    27.4,
-    95,
-    8
-   ],
-   "Arkansas": [
-    1.8,
-    60,
-    28.5,
-    62,
-    26.7,
-    82,
-    11
-   ],
-   "Vanderbilt": [
-    1.0,
-    62,
-    28.0,
-    65,
-    26.9,
-    85,
-    18
-   ]
-  }
- },
- "fpi": {
-  "Arkansas": [
-   2.2,
-   58
-  ],
-  "Georgia": [
-   26.7,
-   3
-  ],
-  "Ole Miss": [
-   18.8,
-   11
-  ],
-  "Vanderbilt": [
-   0.5,
-   66
-  ],
-  "Alabama": [
-   24.2,
-   6
-  ],
-  "South Carolina": [
-   11.6,
-   29
-  ],
-  "Tennessee": [
-   18.1,
-   12
-  ],
-  "LSU": [
-   23.0,
-   8
-  ],
-  "Kentucky": [
-   12.7,
-   26
-  ],
-  "Oklahoma": [
-   13.3,
-   22
-  ],
-  "Florida": [
-   14.3,
-   19
-  ],
-  "Texas": [
-   23.6,
-   7
-  ],
-  "Missouri": [
-   12.3,
-   27
-  ],
-  "Texas A&M": [
-   13.5,
-   20
-  ],
-  "Mississippi State": [
-   9.1,
-   38
-  ],
-  "Auburn": [
-   13.4,
-   21
-  ]
- },
- "log": [
-  "OK   games, results and record",
-  "OK   AP and Coaches polls",
-  "OK   team per-game numbers and national/SEC ranks",
-  "OK   player season stats",
-  "OK   national (FBS) ranks for Tennessee players",
-  "OK   recruiting classes",
-  "OK   ESPN lines, TV and win chances",
-  "OK   full team stat sheet with national and SEC ranks",
-  "OK   247 ratings for the full roster (HS composite + transfer) and team talent",
-  "OK   box scores for finished games (ESPN)",
-  "OK   matchup previews for remaining games (CFBD)",
-  "OK   season-by-season schedules and team leaders (cached after the first run)",
-  "OK   PEAR ratings (week 8)",
-  "OK   FPI ratings and ranks for the SEC (CFBD)"
- ]
+ }
 };
