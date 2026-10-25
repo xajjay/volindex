@@ -1,10 +1,10 @@
-/* Written by tools/update_data.py on 2026-10-24. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-10-25. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-10-24",
+ "updated": "2026-10-25",
  "team": {
-  "record": "6-1",
-  "sec": "3-1",
+  "record": "6-2",
+  "sec": "3-2",
   "pollWeek": "Week 8",
   "coaches": 11,
   "ap": 11,
@@ -112,43 +112,43 @@ window.SITE_AUTO.football = {
   ],
   "ranks": {
    "ppg": [
-    33.4,
-    42,
-    7
+    32.2,
+    48,
+    8
    ],
    "oppg": [
-    14.7,
-    11,
-    1
+    16.2,
+    20,
+    3
    ],
    "ypg": [
-    405.1,
-    58,
+    394.5,
+    65,
     9
    ],
    "rushYpg": [
-    217.1,
+    213.0,
     17,
     2
    ],
    "passYpg": [
-    188.0,
-    111,
+    181.5,
+    116,
     16
    ],
    "oypg": [
-    280.6,
-    14,
+    288.5,
+    16,
     5
    ],
    "oRushYpg": [
-    121.3,
+    122.9,
     43,
     10
    ],
    "oPassYpg": [
-    159.3,
-    8,
+    165.6,
+    12,
     2
    ]
   }
@@ -213,7 +213,10 @@ window.SITE_AUTO.football = {
   {
    "opp": "South Carolina",
    "date": "2026-10-24",
-   "site": "A"
+   "site": "A",
+   "result": "L",
+   "us": 24,
+   "them": 27
   },
   {
    "opp": "Kentucky",
@@ -276,12 +279,12 @@ window.SITE_AUTO.football = {
   },
   "TJ Metcalf": {
    "def": {
-    "solo": 20,
-    "ast": 18,
-    "tot": 38,
+    "solo": 24,
+    "ast": 21,
+    "tot": 45,
     "tfl": 0.0,
     "sacks": 0.0,
-    "int": 0,
+    "int": 1,
     "pbu": 0,
     "qbh": 1,
     "fr": 0,
@@ -315,10 +318,10 @@ window.SITE_AUTO.football = {
   },
   "Nathan Robinson": {
    "def": {
-    "solo": 2,
-    "ast": 6,
-    "tot": 8,
-    "tfl": 0.0,
+    "solo": 3,
+    "ast": 8,
+    "tot": 11,
+    "tfl": 1.0,
     "sacks": 0.0,
     "int": 0,
     "pbu": 1,
@@ -329,30 +332,30 @@ window.SITE_AUTO.football = {
   },
   "DeSean Bishop": {
    "rush": [
-    139,
-    837,
-    6.0,
+    171,
+    957,
+    5.6,
     59,
-    10
+    11
    ],
    "rec": [
-    8,
-    54,
-    6.8,
+    9,
+    64,
+    7.1,
     15,
     0
    ]
   },
   "Jeremiah Telander": {
    "def": {
-    "solo": 11,
-    "ast": 17,
-    "tot": 28,
-    "tfl": 4.0,
+    "solo": 12,
+    "ast": 22,
+    "tot": 34,
+    "tfl": 5.0,
     "sacks": 3.0,
     "int": 1,
-    "pbu": 2,
-    "qbh": 2,
+    "pbu": 3,
+    "qbh": 3,
     "fr": 0,
     "ff": 0
    }
@@ -360,8 +363,8 @@ window.SITE_AUTO.football = {
   "Daevin Hobbs": {
    "def": {
     "solo": 5,
-    "ast": 5,
-    "tot": 10,
+    "ast": 6,
+    "tot": 11,
     "tfl": 2.5,
     "sacks": 0.0,
     "int": 0,
@@ -373,11 +376,11 @@ window.SITE_AUTO.football = {
   },
   "Tyree Weathersby": {
    "def": {
-    "solo": 9,
-    "ast": 8,
-    "tot": 17,
-    "tfl": 8.0,
-    "sacks": 6.5,
+    "solo": 10,
+    "ast": 9,
+    "tot": 19,
+    "tfl": 8.5,
+    "sacks": 7.0,
     "int": 0,
     "pbu": 1,
     "qbh": 3,
@@ -387,9 +390,9 @@ window.SITE_AUTO.football = {
   },
   "Dejuan Lane": {
    "def": {
-    "solo": 16,
+    "solo": 24,
     "ast": 12,
-    "tot": 28,
+    "tot": 36,
     "tfl": 5.0,
     "sacks": 2.0,
     "int": 3,
@@ -401,25 +404,25 @@ window.SITE_AUTO.football = {
   },
   "Mike Matthews": {
    "rush": [
-    3,
     4,
-    1.3,
+    12,
+    3.0,
     10,
-    0
+    1
    ],
    "rec": [
-    29,
-    481,
-    16.6,
+    34,
+    528,
+    15.5,
     57,
     3
    ]
   },
   "Edwin Spillman": {
    "def": {
-    "solo": 11,
+    "solo": 13,
     "ast": 12,
-    "tot": 23,
+    "tot": 25,
     "tfl": 2.0,
     "sacks": 2.0,
     "int": 0,
@@ -461,9 +464,9 @@ window.SITE_AUTO.football = {
   },
   "Arion Carter": {
    "def": {
-    "solo": 24,
-    "ast": 19,
-    "tot": 43,
+    "solo": 25,
+    "ast": 21,
+    "tot": 46,
     "tfl": 5.0,
     "sacks": 2.0,
     "int": 0,
@@ -489,11 +492,11 @@ window.SITE_AUTO.football = {
   },
   "Amare Campbell": {
    "def": {
-    "solo": 26,
-    "ast": 20,
-    "tot": 46,
-    "tfl": 6.5,
-    "sacks": 2.0,
+    "solo": 31,
+    "ast": 21,
+    "tot": 52,
+    "tfl": 8.0,
+    "sacks": 3.0,
     "int": 0,
     "pbu": 3,
     "qbh": 1,
@@ -503,12 +506,12 @@ window.SITE_AUTO.football = {
   },
   "Jackson Ross": {
    "punt": [
-    28,
-    1253,
-    44.8,
+    32,
+    1426,
+    44.6,
     57,
     null,
-    13,
+    14,
     null
    ]
   },
@@ -524,10 +527,10 @@ window.SITE_AUTO.football = {
   "Jordan Norman": {
    "def": {
     "solo": 5,
-    "ast": 8,
-    "tot": 13,
-    "tfl": 3.5,
-    "sacks": 2.0,
+    "ast": 9,
+    "tot": 14,
+    "tfl": 4.0,
+    "sacks": 2.5,
     "int": 0,
     "pbu": 0,
     "qbh": 2,
@@ -537,9 +540,9 @@ window.SITE_AUTO.football = {
   },
   "Braylon Staley": {
    "rec": [
-    26,
-    203,
-    7.8,
+    32,
+    259,
+    8.1,
     35,
     2
    ]
@@ -555,16 +558,16 @@ window.SITE_AUTO.football = {
   },
   "Dasaahn Brame": {
    "rush": [
-    1,
-    1,
+    2,
+    2,
     1.0,
     1,
-    1
+    2
    ],
    "rec": [
-    12,
-    169,
-    14.1,
+    14,
+    181,
+    12.9,
     68,
     0
    ],
@@ -597,19 +600,19 @@ window.SITE_AUTO.football = {
   },
   "George MacIntyre": {
    "pass": [
-    53,
-    80,
-    592,
+    69,
+    103,
+    728,
     2,
     3,
     null,
     null
    ],
    "rush": [
-    6,
-    -10,
-    -1.7,
-    1,
+    13,
+    -1,
+    -0.1,
+    12,
     0
    ],
    "def": {
@@ -622,7 +625,7 @@ window.SITE_AUTO.football = {
     "pbu": 0,
     "qbh": 0,
     "fr": 0,
-    "ff": 2
+    "ff": 3
    }
   },
   "Jadon Perlotte": {
@@ -641,9 +644,9 @@ window.SITE_AUTO.football = {
   },
   "Daune Morris": {
    "rush": [
-    58,
-    344,
-    5.9,
+    61,
+    349,
+    5.7,
     47,
     2
    ],
@@ -685,13 +688,13 @@ window.SITE_AUTO.football = {
   },
   "Ty Redmond": {
    "def": {
-    "solo": 16,
-    "ast": 13,
-    "tot": 29,
+    "solo": 20,
+    "ast": 15,
+    "tot": 35,
     "tfl": 0.0,
     "sacks": 0.0,
     "int": 0,
-    "pbu": 6,
+    "pbu": 9,
     "qbh": 0,
     "fr": 0,
     "ff": 0
@@ -727,14 +730,14 @@ window.SITE_AUTO.football = {
   },
   "Xavier Gilliam": {
    "def": {
-    "solo": 11,
-    "ast": 12,
-    "tot": 23,
-    "tfl": 10.5,
-    "sacks": 5.0,
+    "solo": 12,
+    "ast": 14,
+    "tot": 26,
+    "tfl": 11.5,
+    "sacks": 6.0,
     "int": 0,
     "pbu": 2,
-    "qbh": 6,
+    "qbh": 9,
     "fr": 2,
     "ff": 0
    }
@@ -870,11 +873,11 @@ window.SITE_AUTO.football = {
   },
   "Mariyon Dye": {
    "def": {
-    "solo": 6,
+    "solo": 8,
     "ast": 3,
-    "tot": 9,
-    "tfl": 5.0,
-    "sacks": 4.0,
+    "tot": 11,
+    "tfl": 6.0,
+    "sacks": 5.0,
     "int": 0,
     "pbu": 1,
     "qbh": 1,
@@ -905,18 +908,18 @@ window.SITE_AUTO.football = {
   },
   "Cooper Ranvier": {
    "kick": [
-    10,
     11,
-    27,
-    27,
+    12,
+    30,
+    30,
     49
    ]
   },
   "Radarious Jackson": {
    "rec": [
-    11,
-    139,
-    12.6,
+    12,
+    145,
+    12.1,
     45,
     0
    ],
@@ -972,9 +975,9 @@ window.SITE_AUTO.football = {
   },
   "TJ White": {
    "def": {
-    "solo": 1,
-    "ast": 2,
-    "tot": 3,
+    "solo": 2,
+    "ast": 3,
+    "tot": 5,
     "tfl": 0.0,
     "sacks": 0.0,
     "int": 0,
@@ -1000,14 +1003,14 @@ window.SITE_AUTO.football = {
   },
   "Mar'Quavious Moss": {
    "def": {
-    "solo": 20,
-    "ast": 4,
-    "tot": 24,
-    "tfl": 2.0,
-    "sacks": 0.0,
+    "solo": 21,
+    "ast": 5,
+    "tot": 26,
+    "tfl": 3.5,
+    "sacks": 1.0,
     "int": 0,
     "pbu": 2,
-    "qbh": 2,
+    "qbh": 4,
     "fr": 0,
     "ff": 1
    },
@@ -1036,8 +1039,8 @@ window.SITE_AUTO.football = {
   "JJ Finch": {
    "def": {
     "solo": 1,
-    "ast": 1,
-    "tot": 2,
+    "ast": 2,
+    "tot": 3,
     "tfl": 0.5,
     "sacks": 0.0,
     "int": 0,
@@ -1078,8 +1081,8 @@ window.SITE_AUTO.football = {
   "Jamyan Theodore": {
    "def": {
     "solo": 1,
-    "ast": 0,
-    "tot": 1,
+    "ast": 1,
+    "tot": 2,
     "tfl": 0.0,
     "sacks": 0.0,
     "int": 0,
@@ -1116,16 +1119,16 @@ window.SITE_AUTO.football = {
   },
   "Javin Gordon": {
    "rush": [
-    20,
-    79,
-    4.0,
+    26,
+    120,
+    4.6,
     24,
     0
    ],
    "rec": [
-    2,
-    25,
-    12.5,
+    3,
+    30,
+    10.0,
     18,
     0
    ]
@@ -1164,87 +1167,79 @@ window.SITE_AUTO.football = {
    "Tyree Weathersby": [
     {
      "stat": "Sacks",
-     "rank": 10
+     "rank": 6
     },
     {
      "stat": "Tackles for loss",
-     "rank": 25
-    }
-   ],
-   "Xavier Gilliam": [
-    {
-     "stat": "Tackles for loss",
-     "rank": 4
-    },
-    {
-     "stat": "Sacks",
-     "rank": 19
+     "rank": 27
     }
    ],
    "Amare Campbell": [
     {
      "stat": "Tackles for loss",
-     "rank": 56
+     "rank": 32
     }
    ],
-   "Jeremiah Telander": [
+   "Xavier Gilliam": [
+    {
+     "stat": "Tackles for loss",
+     "rank": 7
+    },
     {
      "stat": "Sacks",
-     "rank": 97
+     "rank": 12
     }
    ],
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 39
-    }
-   ],
-   "Dejuan Lane": [
-    {
-     "stat": "Interceptions",
-     "rank": 8
-    },
-    {
-     "stat": "Passes defended",
-     "rank": 84
+     "rank": 25
     }
    ],
    "Ty Redmond": [
     {
      "stat": "Passes defended",
-     "rank": 15
+     "rank": 3
+    }
+   ],
+   "Dejuan Lane": [
+    {
+     "stat": "Interceptions",
+     "rank": 12
     }
    ],
    "Kayin Lee": [
     {
      "stat": "Interceptions",
-     "rank": 28
+     "rank": 41
     }
    ],
    "Faizon Brandon": [
     {
      "stat": "Passing TD",
-     "rank": 88
+     "rank": 96
     }
    ],
    "Mike Matthews": [
     {
      "stat": "Receiving yards",
-     "rank": 43
+     "rank": 45
     },
     {
      "stat": "Receptions",
-     "rank": 90
-    },
+     "rank": 69
+    }
+   ],
+   "Braylon Staley": [
     {
-     "stat": "Receiving TD",
-     "rank": 94
+     "stat": "Receptions",
+     "rank": 87
     }
    ],
    "DeSean Bishop": [
     {
      "stat": "Rushing yards",
-     "rank": 5
+     "rank": 2
     },
     {
      "stat": "Rushing TD",
@@ -1252,6 +1247,209 @@ window.SITE_AUTO.football = {
     }
    ]
   }
+ },
+ "recruits": {
+  "2027": [
+   {
+    "name": "David Gabriel Georges",
+    "pos": "RB",
+    "hs": "Baylor School",
+    "home": "Chattanooga, TN",
+    "ht": "6-0",
+    "wt": 210,
+    "grade": 99,
+    "stars": 5,
+    "nat": "9"
+   },
+   {
+    "name": "Kesean Bowman",
+    "pos": "WR",
+    "hs": "Brentwood Academy",
+    "home": "Brentwood, TN",
+    "ht": "6-0.5",
+    "wt": 176,
+    "grade": 98,
+    "stars": 4,
+    "nat": "60"
+   },
+   {
+    "name": "Kenneth Simon II",
+    "pos": "LB",
+    "hs": "Brentwood Academy",
+    "home": "Brentwood, TN",
+    "ht": "6-2",
+    "wt": 212,
+    "grade": 94,
+    "stars": 4,
+    "nat": "143"
+   },
+   {
+    "name": "Princeton Uwaifo",
+    "pos": "OT",
+    "hs": "Siegel",
+    "home": "Murfreesboro, TN",
+    "ht": "6-5.5",
+    "wt": 342,
+    "grade": 92,
+    "stars": 4,
+    "nat": "206"
+   },
+   {
+    "name": "Malik Howard",
+    "pos": "TE",
+    "hs": "Oak Ridge",
+    "home": "Oak Ridge, TN",
+    "ht": "6-3.5",
+    "wt": 231,
+    "grade": 92,
+    "stars": 4,
+    "nat": "211"
+   },
+   {
+    "name": "Marcus Jones",
+    "pos": "S",
+    "hs": "The Haverford School",
+    "home": "Haverford, PA",
+    "ht": "6-3",
+    "wt": 190,
+    "grade": 91,
+    "stars": 4,
+    "nat": "283"
+   },
+   {
+    "name": "Niko Kampas",
+    "pos": "OT",
+    "hs": "NFL Academy",
+    "home": "London, EN",
+    "ht": "6-7.5",
+    "wt": 294,
+    "grade": 90,
+    "stars": 4,
+    "nat": "323"
+   },
+   {
+    "name": "Q'Mari Hudson",
+    "pos": "OT",
+    "hs": "Western Branch",
+    "home": "Chesapeake, VA",
+    "ht": "6-4.5",
+    "wt": 330,
+    "grade": 90,
+    "stars": 4,
+    "nat": "387"
+   },
+   {
+    "name": "Dylan Haley",
+    "pos": "ATH",
+    "hs": "Cherokee Bluff",
+    "home": "Flowery Branch, GA",
+    "ht": "6-1",
+    "wt": 180,
+    "grade": 89,
+    "stars": 3,
+    "nat": "526"
+   },
+   {
+    "name": "Asa Barnes",
+    "pos": "RB",
+    "hs": "Westview",
+    "home": "Martin, TN",
+    "ht": "5-11",
+    "wt": 200,
+    "grade": 88,
+    "stars": 3,
+    "nat": "554"
+   },
+   {
+    "name": "JP Peace",
+    "pos": "LB",
+    "hs": "Maryville",
+    "home": "Maryville, TN",
+    "ht": "6-3",
+    "wt": 220,
+    "grade": 88,
+    "stars": 3,
+    "nat": "598"
+   },
+   {
+    "name": "Jaden Butler",
+    "pos": "ATH",
+    "hs": "Haywood",
+    "home": "Brownsville, TN",
+    "ht": "6-1",
+    "wt": 190,
+    "grade": 88,
+    "stars": 3,
+    "nat": "598"
+   },
+   {
+    "name": "Brandon Leavell",
+    "pos": "ATH",
+    "hs": "Goodpasture Christian School",
+    "home": "Madison, TN",
+    "ht": "6-0.5",
+    "wt": 165,
+    "grade": 88,
+    "stars": 3,
+    "nat": "629"
+   },
+   {
+    "name": "Dayon Cooper",
+    "pos": "ATH",
+    "hs": "South Pittsburg",
+    "home": "South Pittsburg, TN",
+    "ht": "6-1",
+    "wt": 183,
+    "grade": 88,
+    "stars": 3,
+    "nat": "705"
+   },
+   {
+    "name": "Derrick Baker",
+    "pos": "QB",
+    "hs": "Milton",
+    "home": "Alpharetta, GA",
+    "ht": "6-1",
+    "wt": 226,
+    "grade": 88,
+    "stars": 3,
+    "nat": "805"
+   },
+   {
+    "name": "Carter Jamison",
+    "pos": "S",
+    "hs": "Creekside",
+    "home": "Fairburn, GA",
+    "ht": "5-10",
+    "wt": 180,
+    "grade": 87,
+    "stars": 3,
+    "nat": "1166"
+   },
+   {
+    "name": "Ford Fehling",
+    "pos": "K",
+    "hs": "Marvin Ridge",
+    "home": "Waxhaw, NC",
+    "ht": "6-1",
+    "wt": 195,
+    "grade": 80,
+    "stars": 3,
+    "nat": "2149"
+   },
+   {
+    "name": "Sam McKeown",
+    "pos": "LS",
+    "hs": "Jenks",
+    "home": "Jenks, OK",
+    "ht": "6-4",
+    "wt": 225,
+    "grade": 80,
+    "stars": 3,
+    "nat": "2157"
+   }
+  ],
+  "2028": []
  },
  "espn": {
   "Furman": {
@@ -1284,32 +1482,27 @@ window.SITE_AUTO.football = {
   },
   "South Carolina": {
    "tv": "ESPN/Disney+",
-   "kick": "2026-10-24T19:30Z",
-   "line": "SC -2.5",
-   "ou": 50.5,
-   "ml": "+114",
-   "book": "Draft Kings",
-   "win": 59.5
+   "kick": "2026-10-24T19:30Z"
   },
   "Kentucky": {
    "tv": null,
    "kick": "2026-11-07T05:00Z",
-   "win": 71.1
+   "win": 66.9
   },
   "Texas A&M": {
    "tv": null,
    "kick": "2026-11-14T05:00Z",
-   "win": 56.0
+   "win": 52.3
   },
   "LSU": {
    "tv": null,
    "kick": "2026-11-21T05:00Z",
-   "win": 41.9
+   "win": 35.5
   },
   "Vanderbilt": {
    "tv": null,
    "kick": "2026-11-28T05:00Z",
-   "win": 86.8
+   "win": 85.9
   }
  },
  "teamSheet": {
@@ -1320,17 +1513,17 @@ window.SITE_AUTO.football = {
     "ppg",
     "Points per game",
     "Total offense",
-    33.4,
-    42,
-    7,
+    32.2,
+    48,
+    8,
     false
    ],
    [
     "ypg",
     "Total yards per game",
     "Total offense",
-    405.1,
-    58,
+    394.5,
+    65,
     9,
     false
    ],
@@ -1338,8 +1531,8 @@ window.SITE_AUTO.football = {
     "ypp",
     "Yards per play",
     "Total offense",
-    5.84,
-    70,
+    5.65,
+    86,
     10,
     false
    ],
@@ -1347,8 +1540,8 @@ window.SITE_AUTO.football = {
     "passYpg",
     "Passing yards per game",
     "Passing",
-    188.0,
-    111,
+    181.5,
+    116,
     16,
     false
    ],
@@ -1356,18 +1549,18 @@ window.SITE_AUTO.football = {
     "cmpPct",
     "Completion %",
     "Passing",
-    63.6,
-    71,
-    11,
+    64.3,
+    57,
+    9,
     false
    ],
    [
     "ypa",
     "Yards per pass attempt",
     "Passing",
-    7.15,
-    86,
-    12,
+    7.01,
+    92,
+    13,
     false
    ],
    [
@@ -1375,8 +1568,8 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     9.0,
-    84,
-    12,
+    103,
+    14,
     false
    ],
    [
@@ -1384,7 +1577,7 @@ window.SITE_AUTO.football = {
     "Interceptions thrown",
     "Passing",
     4.0,
-    47,
+    40,
     3,
     true
    ],
@@ -1392,16 +1585,16 @@ window.SITE_AUTO.football = {
     "sacksAllowed",
     "Sacks allowed",
     "Passing",
-    18.0,
-    120,
-    14,
+    20.0,
+    119,
+    13,
     true
    ],
    [
     "rushYpg",
     "Rushing yards per game",
     "Rushing",
-    217.1,
+    213.0,
     17,
     2,
     false
@@ -1410,8 +1603,8 @@ window.SITE_AUTO.football = {
     "ypc",
     "Yards per carry",
     "Rushing",
-    5.03,
-    37,
+    4.84,
+    41,
     3,
     false
    ],
@@ -1419,17 +1612,17 @@ window.SITE_AUTO.football = {
     "rushTD",
     "Rushing TDs",
     "Rushing",
-    18.0,
-    14,
-    4,
+    21.0,
+    8,
+    2,
     false
    ],
    [
     "recPg",
     "Receptions per game",
     "Receiving",
-    16.7,
-    99,
+    16.6,
+    103,
     16,
     false
    ],
@@ -1437,17 +1630,17 @@ window.SITE_AUTO.football = {
     "ypr",
     "Yards per reception",
     "Receiving",
-    11.25,
-    96,
-    12,
+    10.92,
+    110,
+    15,
     false
    ],
    [
     "fdPg",
     "First downs per game",
     "Downs",
-    22.6,
-    32,
+    22.4,
+    35,
     6,
     false
    ],
@@ -1455,8 +1648,8 @@ window.SITE_AUTO.football = {
     "thirdPct",
     "3rd down conversion %",
     "Downs",
-    36.6,
-    95,
+    37.0,
+    91,
     14,
     false
    ],
@@ -1464,8 +1657,8 @@ window.SITE_AUTO.football = {
     "fourthPct",
     "4th down conversion %",
     "Downs",
-    72.7,
-    17,
+    73.3,
+    11,
     3,
     false
    ],
@@ -1473,8 +1666,8 @@ window.SITE_AUTO.football = {
     "penYpg",
     "Penalty yards per game",
     "Downs",
-    58.1,
-    80,
+    62.1,
+    92,
     9,
     true
    ],
@@ -1482,35 +1675,35 @@ window.SITE_AUTO.football = {
     "top",
     "Time of possession per game (min)",
     "Downs",
-    30.9,
-    48,
-    6,
+    31.3,
+    40,
+    5,
     false
    ],
    [
     "toLost",
     "Turnovers lost",
     "Downs",
-    10.0,
-    93,
-    12,
+    11.0,
+    96,
+    9,
     true
    ],
    [
     "oppg",
     "Points allowed per game",
     "Points allowed",
-    14.7,
-    11,
-    1,
+    16.2,
+    20,
+    3,
     true
    ],
    [
     "oypg",
     "Yards allowed per game",
     "Yards allowed",
-    280.6,
-    14,
+    288.5,
+    16,
     5,
     true
    ],
@@ -1518,8 +1711,8 @@ window.SITE_AUTO.football = {
     "oypp",
     "Yards per play allowed",
     "Yards allowed",
-    4.58,
-    14,
+    4.69,
+    18,
     4,
     true
    ],
@@ -1527,8 +1720,8 @@ window.SITE_AUTO.football = {
     "othirdPct",
     "Opponent 3rd down %",
     "Yards allowed",
-    30.8,
-    16,
+    31.7,
+    24,
     4,
     true
    ],
@@ -1536,8 +1729,8 @@ window.SITE_AUTO.football = {
     "oPassYpg",
     "Passing yards allowed per game",
     "Pass defense",
-    159.3,
-    8,
+    165.6,
+    12,
     2,
     true
    ],
@@ -1545,25 +1738,25 @@ window.SITE_AUTO.football = {
     "oCmpPct",
     "Opponent completion %",
     "Pass defense",
-    63.2,
-    97,
-    11,
+    62.3,
+    78,
+    10,
     true
    ],
    [
     "defInt",
     "Interceptions",
     "Pass defense",
-    7.0,
-    19,
-    4,
+    8.0,
+    17,
+    3,
     false
    ],
    [
     "sacks",
     "Sacks",
     "Pass defense",
-    29.0,
+    34.0,
     1,
     1,
     false
@@ -1572,7 +1765,7 @@ window.SITE_AUTO.football = {
     "oRushYpg",
     "Rushing yards allowed per game",
     "Run defense",
-    121.3,
+    122.9,
     43,
     10,
     true
@@ -1581,16 +1774,16 @@ window.SITE_AUTO.football = {
     "oYpc",
     "Yards per carry allowed",
     "Run defense",
-    3.77,
-    53,
-    11,
+    3.84,
+    60,
+    12,
     true
    ],
    [
     "tfl",
     "Tackles for loss",
     "Run defense",
-    57.0,
+    65.0,
     3,
     1,
     false
@@ -1599,7 +1792,7 @@ window.SITE_AUTO.football = {
     "takeaways",
     "Takeaways",
     "Run defense",
-    13.0,
+    14.0,
     10,
     3,
     false
@@ -1609,7 +1802,7 @@ window.SITE_AUTO.football = {
     "Turnover margin",
     "Run defense",
     3.0,
-    35,
+    36,
     4,
     false
    ],
@@ -1618,7 +1811,7 @@ window.SITE_AUTO.football = {
     "Kick return average",
     "Returning",
     16.2,
-    120,
+    121,
     15,
     false
    ],
@@ -1627,7 +1820,7 @@ window.SITE_AUTO.football = {
     "Punt return average",
     "Returning",
     10.5,
-    57,
+    55,
     7,
     false
    ],
@@ -1636,7 +1829,7 @@ window.SITE_AUTO.football = {
     "Return TDs",
     "Returning",
     1.0,
-    15,
+    17,
     5,
     false
    ]
@@ -1645,15 +1838,15 @@ window.SITE_AUTO.football = {
    "kicking": [
     [
      "Field Goal Made",
-     "10"
-    ],
-    [
-     "Field Goal Attempts",
      "11"
     ],
     [
+     "Field Goal Attempts",
+     "12"
+    ],
+    [
      "Field Goal Percentage",
-     "90.9"
+     "91.7"
     ],
     [
      "Long Field Goal Made",
@@ -1669,7 +1862,7 @@ window.SITE_AUTO.football = {
     ],
     [
      "Field Goal Attempts 30-39",
-     "5"
+     "6"
     ],
     [
      "Field Goal Attempts 40-49",
@@ -1681,11 +1874,11 @@ window.SITE_AUTO.football = {
     ],
     [
      "Extra Points Made",
-     "28"
+     "31"
     ],
     [
      "Extra Point Attempts",
-     "28"
+     "31"
     ],
     [
      "Extra Point Percentage",
@@ -1701,7 +1894,7 @@ window.SITE_AUTO.football = {
     ],
     [
      "Field Goals Made 30-39",
-     "5"
+     "6"
     ],
     [
      "Field Goals Made 40-49",
@@ -1713,11 +1906,11 @@ window.SITE_AUTO.football = {
     ],
     [
      "Total Kicking Points",
-     "58"
+     "64"
     ],
     [
      "Team Games Played",
-     "7"
+     "8"
     ],
     [
      "Touchback Percentage",
@@ -1741,17 +1934,17 @@ window.SITE_AUTO.football = {
     ],
     [
      "FG: Good-Attempts",
-     "10-11"
+     "11-12"
     ]
    ],
    "punting": [
     [
      "Punts",
-     "29"
+     "33"
     ],
     [
      "Punt Yards",
-     "1,253"
+     "1,426"
     ],
     [
      "Long Punt",
@@ -1771,7 +1964,7 @@ window.SITE_AUTO.football = {
     ],
     [
      "Punts Inside 20",
-     "14"
+     "15"
     ],
     [
      "Touchbacks",
@@ -1779,11 +1972,11 @@ window.SITE_AUTO.football = {
     ],
     [
      "Fair Catches",
-     "16"
+     "18"
     ],
     [
      "Punt Returns",
-     "6"
+     "8"
     ],
     [
      "Punt Return Yards",
@@ -1795,14 +1988,1503 @@ window.SITE_AUTO.football = {
     ],
     [
      "Team Games Played",
-     "7"
+     "8"
     ],
     [
      "Punt: Total Yards",
-     "29-1,253"
+     "33-1,426"
     ]
    ]
   }
+ },
+ "ratings": {
+  "Drake Martinez": {
+   "pos": "TE",
+   "num": 44,
+   "year": 1,
+   "hs": {
+    "grade": 83.04,
+    "stars": 3,
+    "nat": 1753,
+    "cls": 2021,
+    "school": "Houston St. Thomas",
+    "committedTo": "Colorado State"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "UT Martin",
+    "season": 2026
+   }
+  },
+  "DJ Burks": {
+   "pos": "DB",
+   "num": 42,
+   "year": 1,
+   "hs": {
+    "grade": 84.44,
+    "stars": 3,
+    "nat": 1433,
+    "cls": 2022,
+    "school": "Maryville",
+    "committedTo": "App State"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "App State",
+    "season": 2026
+   }
+  },
+  "Ethan Davis": {
+   "pos": "TE",
+   "num": 0,
+   "year": 1,
+   "hs": {
+    "grade": 94.01,
+    "stars": 4,
+    "nat": 144,
+    "cls": 2023,
+    "school": "Collins Hill",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Isaiah Hardge": {
+   "pos": "DB",
+   "num": 29,
+   "year": 1,
+   "hs": {
+    "grade": 85.97,
+    "stars": 3,
+    "nat": 1128,
+    "cls": 2023,
+    "school": "St. Thomas Aquinas",
+    "committedTo": "Colorado"
+   },
+   "transfer": {
+    "grade": 86.0,
+    "stars": 3,
+    "origin": "Colorado",
+    "season": 2026
+   }
+  },
+  "TJ Metcalf": {
+   "pos": "DB",
+   "num": 1,
+   "year": 1,
+   "hs": {
+    "grade": 88.42,
+    "stars": 3,
+    "nat": 542,
+    "cls": 2023,
+    "school": "Pinson Valley",
+    "committedTo": "Arkansas"
+   },
+   "transfer": {
+    "grade": 87.0,
+    "stars": 3,
+    "origin": "Michigan",
+    "season": 2026
+   }
+  },
+  "Kayin Lee": {
+   "pos": "DB",
+   "num": 14,
+   "year": 1,
+   "hs": {
+    "grade": 93.86,
+    "stars": 4,
+    "nat": 147,
+    "cls": 2023,
+    "school": "Cedar Grove",
+    "committedTo": "Auburn"
+   },
+   "transfer": {
+    "grade": 88.0,
+    "stars": 3,
+    "origin": "Auburn",
+    "season": 2026
+   }
+  },
+  "Ryan Staub": {
+   "pos": "QB",
+   "num": 8,
+   "year": 1,
+   "hs": {
+    "grade": 87.44,
+    "stars": 3,
+    "nat": 734,
+    "cls": 2023,
+    "school": "West Ranch",
+    "committedTo": "Colorado"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "Colorado",
+    "season": 2026
+   }
+  },
+  "Shamurad Umarov": {
+   "pos": "OL",
+   "num": 74,
+   "year": 1,
+   "hs": {
+    "grade": 90.31,
+    "stars": 4,
+    "nat": 310,
+    "cls": 2023,
+    "school": "Denmark",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Sam Pendleton": {
+   "pos": "OL",
+   "num": 56,
+   "year": 1,
+   "hs": {
+    "grade": 89.33,
+    "stars": 4,
+    "nat": 406,
+    "cls": 2023,
+    "school": "Reagan",
+    "committedTo": "Notre Dame"
+   },
+   "transfer": {
+    "grade": 90.0,
+    "stars": 4,
+    "origin": "Notre Dame",
+    "season": 2025
+   }
+  },
+  "Nathan Robinson": {
+   "pos": "DL",
+   "num": 19,
+   "year": 1,
+   "hs": {
+    "grade": 88.28,
+    "stars": 3,
+    "nat": 559,
+    "cls": 2023,
+    "school": "Greenbrier",
+    "committedTo": "Tennessee"
+   }
+  },
+  "DeSean Bishop": {
+   "pos": "RB",
+   "num": 18,
+   "year": 1,
+   "hs": {
+    "grade": 85.33,
+    "stars": 3,
+    "nat": 1315,
+    "cls": 2023,
+    "school": "Karns",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jeremiah Telander": {
+   "pos": "LB",
+   "num": 22,
+   "year": 1,
+   "hs": {
+    "grade": 87.96,
+    "stars": 3,
+    "nat": 613,
+    "cls": 2023,
+    "school": "Gainesville",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Daevin Hobbs": {
+   "pos": "DL",
+   "num": 5,
+   "year": 1,
+   "hs": {
+    "grade": 97.41,
+    "stars": 4,
+    "nat": 57,
+    "cls": 2023,
+    "school": "Jay M. Robinson",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Tyree Weathersby": {
+   "pos": "DL",
+   "num": 18,
+   "year": 1,
+   "hs": {
+    "grade": 90.47,
+    "stars": 4,
+    "nat": 299,
+    "cls": 2023,
+    "school": "New Manchester",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Dejuan Lane": {
+   "pos": "DB",
+   "num": 10,
+   "year": 1,
+   "hs": {
+    "grade": 90.41,
+    "stars": 4,
+    "nat": 325,
+    "cls": 2024,
+    "school": "Gilman",
+    "committedTo": "Penn State"
+   },
+   "transfer": {
+    "grade": 87.0,
+    "stars": 3,
+    "origin": "Penn State",
+    "season": 2026
+   }
+  },
+  "Mike Matthews": {
+   "pos": "WR",
+   "num": 4,
+   "year": 1,
+   "hs": {
+    "grade": 98.82,
+    "stars": 5,
+    "nat": 24,
+    "cls": 2024,
+    "school": "Parkview",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Edwin Spillman": {
+   "pos": "LB",
+   "num": 13,
+   "year": 1,
+   "hs": {
+    "grade": 90.0,
+    "stars": 4,
+    "nat": 357,
+    "cls": 2024,
+    "school": "Lipscomb Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Ory Williams": {
+   "pos": "OL",
+   "num": 77,
+   "year": 1,
+   "hs": {
+    "grade": 89.35,
+    "stars": 4,
+    "nat": 433,
+    "cls": 2024,
+    "school": "San Marcos",
+    "committedTo": "LSU"
+   },
+   "transfer": {
+    "grade": 86.0,
+    "stars": 3,
+    "origin": "LSU",
+    "season": 2026
+   }
+  },
+  "Hunter Barnes": {
+   "pos": "RB",
+   "num": 24,
+   "year": 1
+  },
+  "Bennett Brady": {
+   "pos": "LS",
+   "num": 48,
+   "year": 1
+  },
+  "Josh Turbyville": {
+   "pos": "PK",
+   "num": 94,
+   "year": 1
+  },
+  "Arion Carter": {
+   "pos": "LB",
+   "num": 7,
+   "year": 1,
+   "hs": {
+    "grade": 94.39,
+    "stars": 4,
+    "nat": 130,
+    "cls": 2023,
+    "school": "Smyrna",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Carson Gentle": {
+   "pos": "DL",
+   "num": 35,
+   "year": 1,
+   "hs": {
+    "grade": 86.97,
+    "stars": 3,
+    "nat": 928,
+    "cls": 2024,
+    "school": "McCallie School",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Donovan Haslam": {
+   "pos": "OL",
+   "num": 69,
+   "year": 1,
+   "transfer": {
+    "grade": 86.0,
+    "stars": 3,
+    "origin": "West Virginia",
+    "season": 2026
+   }
+  },
+  "Wendell Moe Jr.": {
+   "pos": "OL",
+   "num": 75,
+   "year": 1,
+   "hs": {
+    "grade": 82.56,
+    "stars": 3,
+    "nat": 1912,
+    "cls": 2022,
+    "school": "Long Beach Poly",
+    "committedTo": "Arizona"
+   },
+   "transfer": {
+    "grade": 88.0,
+    "stars": 3,
+    "origin": "Arizona",
+    "season": 2025
+   }
+  },
+  "Jadais Richard": {
+   "pos": "DB",
+   "num": 8,
+   "year": 1,
+   "hs": {
+    "grade": 89.59,
+    "stars": 4,
+    "nat": 368,
+    "cls": 2022,
+    "school": "West Monroe",
+    "committedTo": "Vanderbilt"
+   },
+   "transfer": {
+    "grade": 86.0,
+    "stars": 3,
+    "origin": "Miami",
+    "season": 2026
+   }
+  },
+  "Amare Campbell": {
+   "pos": "LB",
+   "num": 0,
+   "year": 1,
+   "hs": {
+    "grade": 85.42,
+    "stars": 3,
+    "nat": 1293,
+    "cls": 2023,
+    "school": "Unity Reed",
+    "committedTo": "North Carolina"
+   },
+   "transfer": {
+    "grade": 87.0,
+    "stars": 3,
+    "origin": "Penn State",
+    "season": 2026
+   }
+  },
+  "Edrees Farooq": {
+   "pos": "DB",
+   "num": 15,
+   "year": 1,
+   "hs": {
+    "grade": 88.33,
+    "stars": 3,
+    "nat": 592,
+    "cls": 2024,
+    "school": "St. Frances Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jackson Ross": {
+   "pos": "P",
+   "num": 98,
+   "year": 1,
+   "hs": {
+    "grade": 78.94,
+    "stars": 2,
+    "nat": 2679,
+    "cls": 2022,
+    "school": "ProKick Australia",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Trent Thomas": {
+   "pos": "TE",
+   "num": 82,
+   "year": 1,
+   "hs": {
+    "grade": 84.37,
+    "stars": 3,
+    "nat": 1622,
+    "cls": 2023,
+    "school": "Cottage Hill Christian Academy",
+    "committedTo": "South Alabama"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "South Alabama",
+    "season": 2026
+   }
+  },
+  "Jordan Norman": {
+   "pos": "DL",
+   "num": 33,
+   "year": 1,
+   "hs": {
+    "grade": 82.96,
+    "stars": 3,
+    "nat": 2016,
+    "cls": 2023,
+    "school": "Hoover",
+    "committedTo": "South Alabama"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "Tulane",
+    "season": 2026
+   }
+  },
+  "Braylon Staley": {
+   "pos": "WR",
+   "num": 14,
+   "year": 1,
+   "hs": {
+    "grade": 95.01,
+    "stars": 4,
+    "nat": 106,
+    "cls": 2024,
+    "school": "Strom Thurmond",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Gage Ginther": {
+   "pos": "OL",
+   "num": 78,
+   "year": 1,
+   "hs": {
+    "grade": 88.17,
+    "stars": 3,
+    "nat": 628,
+    "cls": 2024,
+    "school": "Fossil Ridge",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jesse Perry": {
+   "pos": "OL",
+   "num": 72,
+   "year": 1,
+   "hs": {
+    "grade": 87.39,
+    "stars": 3,
+    "nat": 801,
+    "cls": 2024,
+    "school": "Middle Tennessee Christian School",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Justin Baker": {
+   "pos": "RB",
+   "num": 2,
+   "year": 1,
+   "hs": {
+    "grade": 88.11,
+    "stars": 3,
+    "nat": 619,
+    "cls": 2025,
+    "school": "Buford",
+    "committedTo": "Tennessee"
+   }
+  },
+  "DaSaahn Brame": {
+   "pos": "TE",
+   "num": 7,
+   "year": 1,
+   "hs": {
+    "grade": 96.82,
+    "stars": 4,
+    "nat": 61,
+    "cls": 2025,
+    "school": "Derby",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Isaiah Campbell": {
+   "pos": "DL",
+   "num": 47,
+   "year": 1,
+   "hs": {
+    "grade": 98.32,
+    "stars": 4,
+    "nat": 33,
+    "cls": 2025,
+    "school": "Southern Durham",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jaedon Harmon": {
+   "pos": "LB",
+   "num": 12,
+   "year": 1,
+   "hs": {
+    "grade": 93.1,
+    "stars": 4,
+    "nat": 168,
+    "cls": 2025,
+    "school": "Rome",
+    "committedTo": "Tennessee"
+   }
+  },
+  "George MacIntyre": {
+   "pos": "QB",
+   "num": 12,
+   "year": 1,
+   "hs": {
+    "grade": 93.55,
+    "stars": 4,
+    "nat": 151,
+    "cls": 2025,
+    "school": "Brentwood Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jadon Perlotte": {
+   "pos": "LB",
+   "num": 27,
+   "year": 1,
+   "hs": {
+    "grade": 89.43,
+    "stars": 4,
+    "nat": 417,
+    "cls": 2025,
+    "school": "Buford",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Daune Morris": {
+   "pos": "RB",
+   "num": 17,
+   "year": 1,
+   "hs": {
+    "grade": 89.42,
+    "stars": 4,
+    "nat": 419,
+    "cls": 2025,
+    "school": "Oakland",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Tre Poteat III": {
+   "pos": "DB",
+   "num": 3,
+   "year": 1,
+   "hs": {
+    "grade": 89.5,
+    "stars": 4,
+    "nat": 404,
+    "cls": 2025,
+    "school": "Verona Area",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Ty Redmond": {
+   "pos": "DB",
+   "num": 4,
+   "year": 1,
+   "hs": {
+    "grade": 87.81,
+    "stars": 3,
+    "nat": 702,
+    "cls": 2025,
+    "school": "Milton",
+    "committedTo": "Tennessee"
+   }
+  },
+  "David Sanders Jr.": {
+   "pos": "OL",
+   "num": 70,
+   "year": 1,
+   "hs": {
+    "grade": 99.73,
+    "stars": 5,
+    "nat": 6,
+    "cls": 2025,
+    "school": "Providence Day School",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Ethan Utley": {
+   "pos": "DL",
+   "num": 17,
+   "year": 1,
+   "hs": {
+    "grade": 91.99,
+    "stars": 4,
+    "nat": 219,
+    "cls": 2025,
+    "school": "Ensworth",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jeremias Heard": {
+   "pos": "OL",
+   "num": 51,
+   "year": 1,
+   "hs": {
+    "grade": 88.19,
+    "stars": 3,
+    "nat": 627,
+    "cls": 2024,
+    "school": "Model 9-12",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Tevis Metcalf": {
+   "pos": "DB",
+   "num": 20,
+   "year": 1,
+   "hs": {
+    "grade": 88.42,
+    "stars": 3,
+    "nat": 542,
+    "cls": 2023,
+    "school": "Pinson Valley",
+    "committedTo": "Arkansas"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "Michigan",
+    "season": 2026
+   }
+  },
+  "Xavier Gilliam": {
+   "pos": "DL",
+   "num": 2,
+   "year": 1,
+   "hs": {
+    "grade": 87.58,
+    "stars": 3,
+    "nat": 750,
+    "cls": 2024,
+    "school": "Quince Orchard",
+    "committedTo": "Penn State"
+   },
+   "transfer": {
+    "grade": 94.0,
+    "stars": 4,
+    "origin": "Penn State",
+    "season": 2026
+   }
+  },
+  "Jordan Burns": {
+   "pos": "LB",
+   "num": 11,
+   "year": 1,
+   "hs": {
+    "grade": 89.5,
+    "stars": 4,
+    "nat": 409,
+    "cls": 2024,
+    "school": "Pace Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Ian Duarte": {
+   "pos": "WR",
+   "num": 81,
+   "year": 1,
+   "hs": {
+    "grade": 84.0,
+    "stars": 3,
+    "nat": 1710,
+    "cls": 2023,
+    "school": "Eagle",
+    "committedTo": "Idaho State"
+   },
+   "transfer": {
+    "grade": 85.0,
+    "stars": 3,
+    "origin": "Idaho State",
+    "season": 2026
+   }
+  },
+  "Ed Baker": {
+   "pos": "OL",
+   "num": 71,
+   "year": 1,
+   "hs": {
+    "grade": 87.22,
+    "stars": 3,
+    "nat": 1030,
+    "cls": 2026,
+    "school": "St. Frances Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Hezekiah Harris": {
+   "pos": "DL",
+   "num": 97,
+   "year": 1,
+   "hs": {
+    "grade": 92.4,
+    "stars": 4,
+    "nat": 196,
+    "cls": 2026,
+    "school": "Jemison",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Faizon Brandon": {
+   "pos": "QB",
+   "num": 11,
+   "year": 1,
+   "hs": {
+    "grade": 99.39,
+    "stars": 5,
+    "nat": 10,
+    "cls": 2026,
+    "school": "Grimsley",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Kedric Golston II": {
+   "pos": "DL",
+   "num": 37,
+   "year": 1,
+   "hs": {
+    "grade": 89.11,
+    "stars": 4,
+    "nat": 469,
+    "cls": 2026,
+    "school": "Stone Bridge",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Nathan Roberts": {
+   "pos": "WR",
+   "num": 36,
+   "year": 1
+  },
+  "Zach Groves": {
+   "pos": "DL",
+   "num": 56,
+   "year": 1,
+   "hs": {
+    "grade": 90.53,
+    "stars": 4,
+    "nat": 310,
+    "cls": 2026,
+    "school": "East Robertson",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Tyreek King": {
+   "pos": "WR",
+   "num": 19,
+   "year": 1,
+   "hs": {
+    "grade": 94.55,
+    "stars": 4,
+    "nat": 131,
+    "cls": 2026,
+    "school": "Knoxville Catholic",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Dereon Albert": {
+   "pos": "DL",
+   "num": 59,
+   "year": 1,
+   "hs": {
+    "grade": 89.71,
+    "stars": 4,
+    "nat": 396,
+    "cls": 2026,
+    "school": "Jackson Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Joakim Dodson": {
+   "pos": "WR",
+   "num": 9,
+   "year": 1,
+   "hs": {
+    "grade": 88.17,
+    "stars": 3,
+    "nat": 614,
+    "cls": 2025,
+    "school": "Baylor School",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Tim Merritt": {
+   "pos": "DB",
+   "num": 25,
+   "year": 1,
+   "hs": {
+    "grade": 88.83,
+    "stars": 3,
+    "nat": 507,
+    "cls": 2025,
+    "school": "Parker",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Dylan Lewis": {
+   "pos": "DB",
+   "num": 24,
+   "year": 1,
+   "hs": {
+    "grade": 87.78,
+    "stars": 3,
+    "nat": 706,
+    "cls": 2025,
+    "school": "Milton",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Mariyon Dye": {
+   "pos": "DL",
+   "num": 9,
+   "year": 1,
+   "hs": {
+    "grade": 96.05,
+    "stars": 4,
+    "nat": 77,
+    "cls": 2025,
+    "school": "Elkhart",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Travis Smith Jr.": {
+   "pos": "WR",
+   "num": 1,
+   "year": 1,
+   "hs": {
+    "grade": 95.51,
+    "stars": 4,
+    "nat": 85,
+    "cls": 2025,
+    "school": "Westlake",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jack-Henry Jakobik": {
+   "pos": "WR",
+   "num": 29,
+   "year": 1
+  },
+  "Cooper Ranvier": {
+   "pos": "PK",
+   "num": 28,
+   "year": 1,
+   "transfer": {
+    "grade": null,
+    "stars": null,
+    "origin": "Louisville",
+    "season": 2026
+   }
+  },
+  "Cole Harrison": {
+   "pos": "TE",
+   "num": 80,
+   "year": 1,
+   "hs": {
+    "grade": 86.42,
+    "stars": 3,
+    "nat": 1102,
+    "cls": 2024,
+    "school": "Junipero Serra",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Christian Gass": {
+   "pos": "DL",
+   "num": 44,
+   "year": 1,
+   "hs": {
+    "grade": 92.42,
+    "stars": 4,
+    "nat": 202,
+    "cls": 2025,
+    "school": "Eastside",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Radarious Jackson": {
+   "pos": "WR",
+   "num": 3,
+   "year": 1,
+   "hs": {
+    "grade": 91.11,
+    "stars": 4,
+    "nat": 269,
+    "cls": 2025,
+    "school": "Sheffield",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Nic Moore": {
+   "pos": "OL",
+   "num": 58,
+   "year": 1,
+   "hs": {
+    "grade": 91.18,
+    "stars": 4,
+    "nat": 261,
+    "cls": 2025,
+    "school": "Jefferson County",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Sidney Walton": {
+   "pos": "DB",
+   "num": 23,
+   "year": 1,
+   "hs": {
+    "grade": 87.86,
+    "stars": 3,
+    "nat": 692,
+    "cls": 2025,
+    "school": "Moody",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Joel Wyatt": {
+   "pos": "DB",
+   "num": 31,
+   "year": 1,
+   "hs": {
+    "grade": 96.97,
+    "stars": 4,
+    "nat": 71,
+    "cls": 2026,
+    "school": "Oakland",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Charles House III": {
+   "pos": "DL",
+   "num": 99,
+   "year": 1,
+   "hs": {
+    "grade": 89.25,
+    "stars": 4,
+    "nat": 447,
+    "cls": 2025,
+    "school": "North Mecklenburg",
+    "committedTo": "Tennessee"
+   }
+  },
+  "TK Keys": {
+   "pos": "WR",
+   "num": 5,
+   "year": 1,
+   "hs": {
+    "grade": 99.33,
+    "stars": 5,
+    "nat": 13,
+    "cls": 2026,
+    "school": "Hattiesburg",
+    "committedTo": "Tennessee"
+   }
+  },
+  "TJ White": {
+   "pos": "LB",
+   "num": 51,
+   "year": 1,
+   "hs": {
+    "grade": 96.96,
+    "stars": 4,
+    "nat": 72,
+    "cls": 2026,
+    "school": "Jackson Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Gabriel Osenda": {
+   "pos": "OL",
+   "num": 79,
+   "year": 1,
+   "hs": {
+    "grade": 95.66,
+    "stars": 4,
+    "nat": 102,
+    "cls": 2026,
+    "school": "Baylor School",
+    "committedTo": "Tennessee"
+   }
+  },
+  "KJ McClain": {
+   "pos": "DB",
+   "num": 40,
+   "year": 1,
+   "hs": {
+    "grade": 87.67,
+    "stars": 3,
+    "nat": 833,
+    "cls": 2026,
+    "school": "St. Joseph Regional",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Kamari Blair": {
+   "pos": "OL",
+   "num": 66,
+   "year": 1,
+   "hs": {
+    "grade": 93.64,
+    "stars": 4,
+    "nat": 157,
+    "cls": 2026,
+    "school": "Kirkwood",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Javonte Smith": {
+   "pos": "DB",
+   "num": 30,
+   "year": 1,
+   "hs": {
+    "grade": 88.67,
+    "stars": 3,
+    "nat": 554,
+    "cls": 2026,
+    "school": "Jackson North Side",
+    "committedTo": "Tennessee"
+   }
+  },
+  "CJ Edwards": {
+   "pos": "DL",
+   "num": 85,
+   "year": 1,
+   "hs": {
+    "grade": 88.0,
+    "stars": 3,
+    "nat": 731,
+    "cls": 2026,
+    "school": "St. Joseph",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Antoni Ogumoro": {
+   "pos": "OL",
+   "num": 55,
+   "year": 1,
+   "hs": {
+    "grade": 88.36,
+    "stars": 3,
+    "nat": 573,
+    "cls": 2025,
+    "school": "Elgin",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jackson Mathews": {
+   "pos": "DB",
+   "num": 43,
+   "year": 1,
+   "hs": {
+    "grade": 80.0,
+    "stars": 3,
+    "nat": 2850,
+    "cls": 2024,
+    "school": "Christ Presbyterian Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Ryan Scott": {
+   "pos": "LB",
+   "num": 50,
+   "year": 1
+  },
+  "Grier Short": {
+   "pos": "LB",
+   "num": 57,
+   "year": 1
+  },
+  "Mike Bethea II": {
+   "pos": "DL",
+   "num": 55,
+   "year": 1
+  },
+  "Qua Moss": {
+   "pos": "DB",
+   "num": 6,
+   "year": 1,
+   "transfer": {
+    "grade": 86.0,
+    "stars": 3,
+    "origin": "Kansas State",
+    "season": 2026
+   }
+  },
+  "Doren Sacha": {
+   "pos": "WR",
+   "num": 26,
+   "year": 1
+  },
+  "Michael Kostantonov": {
+   "pos": "OL",
+   "num": 65,
+   "year": 1
+  },
+  "Blake Howard": {
+   "pos": "LS",
+   "num": 53,
+   "year": 1,
+   "transfer": {
+    "grade": null,
+    "stars": null,
+    "origin": "Eastern Kentucky",
+    "season": 2026
+   }
+  },
+  "Carter Gooden": {
+   "pos": "DL",
+   "num": 36,
+   "year": 1,
+   "hs": {
+    "grade": 95.44,
+    "stars": 4,
+    "nat": 106,
+    "cls": 2026,
+    "school": "Tabor Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "JJ Finch": {
+   "pos": "DL",
+   "num": 26,
+   "year": 1,
+   "hs": {
+    "grade": 89.11,
+    "stars": 4,
+    "nat": 469,
+    "cls": 2026,
+    "school": "Warren Central",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Brayden Rouse": {
+   "pos": "LB",
+   "num": 28,
+   "year": 1,
+   "hs": {
+    "grade": 96.65,
+    "stars": 4,
+    "nat": 79,
+    "cls": 2026,
+    "school": "Kell",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Zay Anderson": {
+   "pos": "DB",
+   "num": 34,
+   "year": 1,
+   "hs": {
+    "grade": 92.52,
+    "stars": 4,
+    "nat": 189,
+    "cls": 2026,
+    "school": "Greeneville",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Darryl Rivers": {
+   "pos": "DL",
+   "num": 39,
+   "year": 1,
+   "hs": {
+    "grade": 88.67,
+    "stars": 3,
+    "nat": 554,
+    "cls": 2026,
+    "school": "McEachern",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jamyan Theodore": {
+   "pos": "DB",
+   "num": 21,
+   "year": 1,
+   "hs": {
+    "grade": 88.89,
+    "stars": 3,
+    "nat": 507,
+    "cls": 2026,
+    "school": "Baylor School",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Luca Wolf": {
+   "pos": "TE",
+   "num": 87,
+   "year": 1,
+   "hs": {
+    "grade": 88.55,
+    "stars": 3,
+    "nat": 604,
+    "cls": 2026,
+    "school": "NFL Academy",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Will Rajecki": {
+   "pos": "RB",
+   "num": 34,
+   "year": 1,
+   "hs": {
+    "grade": 86.67,
+    "stars": 3,
+    "nat": 1263,
+    "cls": 2026,
+    "school": "Sequoyah",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jowell Combay": {
+   "pos": "DB",
+   "num": 38,
+   "year": 1,
+   "hs": {
+    "grade": 88.56,
+    "stars": 3,
+    "nat": 586,
+    "cls": 2026,
+    "school": "Kell",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Luke Thompson": {
+   "pos": "WR",
+   "num": 85,
+   "year": 1,
+   "hs": {
+    "grade": 88.22,
+    "stars": 3,
+    "nat": 665,
+    "cls": 2026,
+    "school": "Franklin",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Mason Phillips": {
+   "pos": "QB",
+   "num": 13,
+   "year": 1
+  },
+  "Ben Petermann": {
+   "pos": "WR",
+   "num": 35,
+   "year": 1
+  },
+  "Deon Hardin": {
+   "pos": "WR",
+   "num": 88,
+   "year": 1
+  },
+  "Grady Dangerfield": {
+   "pos": "PK",
+   "num": 93,
+   "year": 1
+  },
+  "Javin Gordon": {
+   "pos": "RB",
+   "num": 6,
+   "year": 1,
+   "hs": {
+    "grade": 86.33,
+    "stars": 3,
+    "nat": 1203,
+    "cls": 2025,
+    "school": "Stephens County",
+    "committedTo": "Tulane"
+   },
+   "transfer": {
+    "grade": 86.0,
+    "stars": 3,
+    "origin": "Tulane",
+    "season": 2026
+   }
+  },
+  "Brayden Carroll": {
+   "pos": "WR",
+   "num": 38,
+   "year": 1,
+   "hs": {
+    "grade": 84.0,
+    "stars": 3,
+    "nat": 2533,
+    "cls": 2026,
+    "school": "Bradley Central",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Charlie Powell III": {
+   "pos": "OL",
+   "num": 59,
+   "year": 1
+  },
+  "Nuk Simmons": {
+   "pos": "DL",
+   "num": 87,
+   "year": 1,
+   "hs": {
+    "grade": 87.22,
+    "stars": 3,
+    "nat": 1030,
+    "cls": 2026,
+    "school": "Carver",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Logan Foley": {
+   "pos": "P",
+   "num": 99,
+   "year": 1,
+   "hs": {
+    "grade": 81.0,
+    "stars": 3,
+    "nat": 3267,
+    "cls": 2026,
+    "school": "ProKick Australia",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Jacolby Cooper": {
+   "pos": "WR",
+   "num": 30,
+   "year": 1,
+   "hs": {
+    "grade": 86.11,
+    "stars": 3,
+    "nat": 1523,
+    "cls": 2026,
+    "school": "Alcoa",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Lane Cope": {
+   "pos": "WR",
+   "num": 31,
+   "year": 1
+  },
+  "Thomas Storm": {
+   "pos": "OL",
+   "num": 60,
+   "year": 1
+  },
+  "Jeremy George-El": {
+   "pos": "OL",
+   "num": 63,
+   "year": 1,
+   "hs": {
+    "grade": 86.5,
+    "stars": 3,
+    "nat": 1336,
+    "cls": 2026,
+    "school": "Knoxville Catholic",
+    "committedTo": "Tennessee"
+   }
+  },
+  "Breeze Carter": {
+   "pos": "DL",
+   "num": 95,
+   "year": 1,
+   "hs": {
+    "grade": 92.63,
+    "stars": 4,
+    "nat": 183,
+    "cls": 2026,
+    "school": "Douglas County",
+    "committedTo": "Tennessee"
+   }
+  }
+ },
+ "talent": {
+  "rank": 13,
+  "score": 885.9,
+  "of": 138,
+  "top": [
+   [
+    "Georgia",
+    1003.67
+   ],
+   [
+    "Texas",
+    985.17
+   ],
+   [
+    "Oregon",
+    984.33
+   ],
+   [
+    "Alabama",
+    973.53
+   ],
+   [
+    "Ohio State",
+    964.27
+   ],
+   [
+    "Notre Dame",
+    953.03
+   ],
+   [
+    "Texas A&M",
+    933.0
+   ],
+   [
+    "LSU",
+    931.76
+   ],
+   [
+    "USC",
+    899.0
+   ],
+   [
+    "Florida",
+    891.07
+   ],
+   [
+    "Michigan",
+    890.02
+   ],
+   [
+    "Miami",
+    885.94
+   ],
+   [
+    "Tennessee",
+    885.9
+   ],
+   [
+    "Ole Miss",
+    885.72
+   ],
+   [
+    "South Carolina",
+    862.87
+   ]
+  ]
  },
  "box": {
   "Furman": {
@@ -10023,6 +11705,2299 @@ window.SITE_AUTO.football = {
      26
     ]
    ]
+  },
+  "South Carolina": {
+   "id": "401856731",
+   "venue": "Williams-Brice Stadium",
+   "attendance": 79193,
+   "teams": [
+    {
+     "abbr": "SC",
+     "name": "South Carolina",
+     "home": true,
+     "score": "27",
+     "lines": [
+      "14",
+      "3",
+      "0",
+      "10"
+     ]
+    },
+    {
+     "abbr": "TENN",
+     "name": "Tennessee",
+     "home": false,
+     "score": "24",
+     "lines": [
+      "0",
+      "21",
+      "0",
+      "3"
+     ]
+    }
+   ],
+   "stats": {
+    "TENN": [
+     [
+      "1st Downs",
+      "21"
+     ],
+     [
+      "3rd down efficiency",
+      "6-15"
+     ],
+     [
+      "4th down efficiency",
+      "3-4"
+     ],
+     [
+      "Total Yards",
+      "320"
+     ],
+     [
+      "Passing",
+      "136"
+     ],
+     [
+      "Comp/Att",
+      "16/23"
+     ],
+     [
+      "Yards per pass",
+      "5.9"
+     ],
+     [
+      "Rushing",
+      "184"
+     ],
+     [
+      "Rushing Attempts",
+      "50"
+     ],
+     [
+      "Yards per rush",
+      "3.7"
+     ],
+     [
+      "Penalties",
+      "12-90"
+     ],
+     [
+      "Turnovers",
+      "1"
+     ],
+     [
+      "Fumbles lost",
+      "1"
+     ],
+     [
+      "Interceptions thrown",
+      "0"
+     ],
+     [
+      "Possession",
+      "34:12"
+     ]
+    ],
+    "SC": [
+     [
+      "1st Downs",
+      "21"
+     ],
+     [
+      "3rd down efficiency",
+      "5-13"
+     ],
+     [
+      "4th down efficiency",
+      "2-3"
+     ],
+     [
+      "Total Yards",
+      "344"
+     ],
+     [
+      "Passing",
+      "210"
+     ],
+     [
+      "Comp/Att",
+      "18/32"
+     ],
+     [
+      "Yards per pass",
+      "6.6"
+     ],
+     [
+      "Rushing",
+      "134"
+     ],
+     [
+      "Rushing Attempts",
+      "31"
+     ],
+     [
+      "Yards per rush",
+      "4.3"
+     ],
+     [
+      "Penalties",
+      "9-71"
+     ],
+     [
+      "Turnovers",
+      "1"
+     ],
+     [
+      "Fumbles lost",
+      "0"
+     ],
+     [
+      "Interceptions thrown",
+      "1"
+     ],
+     [
+      "Possession",
+      "25:48"
+     ]
+    ]
+   },
+   "players": {
+    "TENN": {
+     "passing": {
+      "labels": [
+       "C/ATT",
+       "YDS",
+       "AVG",
+       "TD",
+       "INT",
+       "QBR"
+      ],
+      "rows": [
+       [
+        "George MacIntyre",
+        "16/23",
+        "136",
+        "5.9",
+        "0",
+        "0",
+        "18.9"
+       ]
+      ]
+     },
+     "rushing": {
+      "labels": [
+       "CAR",
+       "YDS",
+       "AVG",
+       "TD",
+       "LONG"
+      ],
+      "rows": [
+       [
+        "DeSean Bishop",
+        "32",
+        "120",
+        "3.8",
+        "1",
+        "20"
+       ],
+       [
+        "Javin Gordon",
+        "6",
+        "41",
+        "6.8",
+        "0",
+        "11"
+       ],
+       [
+        "George MacIntyre",
+        "7",
+        "9",
+        "1.3",
+        "0",
+        "12"
+       ],
+       [
+        "Mike Matthews",
+        "1",
+        "8",
+        "8.0",
+        "1",
+        "8"
+       ],
+       [
+        "Daune Morris",
+        "3",
+        "5",
+        "1.7",
+        "0",
+        "3"
+       ],
+       [
+        "DaSaahn Brame",
+        "1",
+        "1",
+        "1.0",
+        "1",
+        "1"
+       ]
+      ]
+     },
+     "receiving": {
+      "labels": [
+       "REC",
+       "YDS",
+       "AVG",
+       "TD",
+       "LONG"
+      ],
+      "rows": [
+       [
+        "Braylon Staley",
+        "6",
+        "56",
+        "9.3",
+        "0",
+        "27"
+       ],
+       [
+        "Mike Matthews",
+        "5",
+        "47",
+        "9.4",
+        "0",
+        "19"
+       ],
+       [
+        "DaSaahn Brame",
+        "2",
+        "12",
+        "6.0",
+        "0",
+        "7"
+       ],
+       [
+        "DeSean Bishop",
+        "1",
+        "10",
+        "10.0",
+        "0",
+        "10"
+       ],
+       [
+        "Radarious Jackson",
+        "1",
+        "6",
+        "6.0",
+        "0",
+        "6"
+       ],
+       [
+        "Javin Gordon",
+        "1",
+        "5",
+        "5.0",
+        "0",
+        "5"
+       ]
+      ]
+     },
+     "fumbles": {
+      "labels": [
+       "FUM",
+       "LOST",
+       "REC"
+      ],
+      "rows": [
+       [
+        "George MacIntyre",
+        "1",
+        "1",
+        "0"
+       ]
+      ]
+     },
+     "defensive": {
+      "labels": [
+       "TOT",
+       "SOLO",
+       "SACKS",
+       "TFL",
+       "PD",
+       "QB HUR",
+       "TD"
+      ],
+      "rows": [
+       [
+        "Dejuan Lane",
+        "8",
+        "8",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "TJ Metcalf",
+        "7",
+        "4",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Amare Campbell",
+        "6",
+        "5",
+        "1",
+        "1.5",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Ty Redmond",
+        "6",
+        "4",
+        "0",
+        "0",
+        "3",
+        "0",
+        "0"
+       ],
+       [
+        "Jeremiah Telander",
+        "6",
+        "1",
+        "0",
+        "1",
+        "1",
+        "1",
+        "0"
+       ],
+       [
+        "Xavier Gilliam",
+        "3",
+        "1",
+        "1",
+        "1",
+        "0",
+        "3",
+        "0"
+       ],
+       [
+        "Nathan Robinson",
+        "3",
+        "1",
+        "0",
+        "1",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Arion Carter",
+        "3",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Mariyon Dye",
+        "2",
+        "2",
+        "1",
+        "1",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Edwin Spillman",
+        "2",
+        "2",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Qua Moss",
+        "2",
+        "1",
+        "1",
+        "1.5",
+        "0",
+        "2",
+        "0"
+       ],
+       [
+        "Tyree Weathersby",
+        "2",
+        "1",
+        "0.5",
+        "0.5",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "TJ White",
+        "2",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Daevin Hobbs",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Jordan Norman",
+        "1",
+        "0",
+        "0.5",
+        "0.5",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "JJ Finch",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Jamyan Theodore",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ]
+      ]
+     },
+     "interceptions": {
+      "labels": [
+       "INT",
+       "YDS",
+       "TD"
+      ],
+      "rows": [
+       [
+        "TJ Metcalf",
+        "1",
+        "1",
+        "0"
+       ]
+      ]
+     },
+     "kicking": {
+      "labels": [
+       "FG",
+       "PCT",
+       "LONG",
+       "XP",
+       "PTS"
+      ],
+      "rows": [
+       [
+        "Cooper Ranvier",
+        "1/1",
+        "100.0",
+        "37",
+        "3/3",
+        "6"
+       ]
+      ]
+     },
+     "punting": {
+      "labels": [
+       "NO",
+       "YDS",
+       "AVG",
+       "TB",
+       "In 20",
+       "LONG"
+      ],
+      "rows": [
+       [
+        "Jackson Ross",
+        "4",
+        "173",
+        "43.3",
+        "0",
+        "1",
+        "50"
+       ]
+      ]
+     }
+    },
+    "SC": {
+     "passing": {
+      "labels": [
+       "C/ATT",
+       "YDS",
+       "AVG",
+       "TD",
+       "INT",
+       "QBR"
+      ],
+      "rows": [
+       [
+        "LaNorris Sellers",
+        "18/32",
+        "210",
+        "6.6",
+        "1",
+        "1",
+        "77.9"
+       ]
+      ]
+     },
+     "rushing": {
+      "labels": [
+       "CAR",
+       "YDS",
+       "AVG",
+       "TD",
+       "LONG"
+      ],
+      "rows": [
+       [
+        "LaNorris Sellers",
+        "18",
+        "96",
+        "5.3",
+        "2",
+        "31"
+       ],
+       [
+        "Matt Fuller",
+        "9",
+        "28",
+        "3.1",
+        "0",
+        "11"
+       ],
+       [
+        "Jabree Coleman",
+        "4",
+        "10",
+        "2.5",
+        "0",
+        "7"
+       ]
+      ]
+     },
+     "receiving": {
+      "labels": [
+       "REC",
+       "YDS",
+       "AVG",
+       "TD",
+       "LONG"
+      ],
+      "rows": [
+       [
+        "Mazeo Bennett Jr.",
+        "6",
+        "88",
+        "14.7",
+        "1",
+        "39"
+       ],
+       [
+        "DJ Black",
+        "3",
+        "48",
+        "16.0",
+        "0",
+        "27"
+       ],
+       [
+        "Maurice Brown II",
+        "2",
+        "34",
+        "17.0",
+        "0",
+        "28"
+       ],
+       [
+        "Brady Hunt",
+        "1",
+        "18",
+        "18.0",
+        "0",
+        "18"
+       ],
+       [
+        "Jabree Coleman",
+        "2",
+        "10",
+        "5.0",
+        "0",
+        "7"
+       ],
+       [
+        "Donovan Murph",
+        "1",
+        "8",
+        "8.0",
+        "0",
+        "8"
+       ],
+       [
+        "Christian Clark",
+        "1",
+        "2",
+        "2.0",
+        "0",
+        "2"
+       ],
+       [
+        "Matt Fuller",
+        "2",
+        "2",
+        "1.0",
+        "0",
+        "7"
+       ]
+      ]
+     },
+     "fumbles": {
+      "labels": [
+       "FUM",
+       "LOST",
+       "REC"
+      ],
+      "rows": [
+       [
+        "LaNorris Sellers",
+        "1",
+        "0",
+        "0"
+       ],
+       [
+        "Tomiwa Durojaiye",
+        "0",
+        "0",
+        "1"
+       ]
+      ]
+     },
+     "defensive": {
+      "labels": [
+       "TOT",
+       "SOLO",
+       "SACKS",
+       "TFL",
+       "PD",
+       "QB HUR",
+       "TD"
+      ],
+      "rows": [
+       [
+        "Fred Johnson",
+        "14",
+        "10",
+        "0",
+        "0.5",
+        "0",
+        "1",
+        "0"
+       ],
+       [
+        "Justin Okoronkwo",
+        "10",
+        "3",
+        "0",
+        "1.5",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Peyton Williams",
+        "9",
+        "4",
+        "0",
+        "0",
+        "1",
+        "0",
+        "0"
+       ],
+       [
+        "Noah Clark",
+        "8",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Judge Collier",
+        "7",
+        "4",
+        "0",
+        "0",
+        "1",
+        "0",
+        "0"
+       ],
+       [
+        "David Bucey",
+        "4",
+        "3",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Kelby Collins",
+        "4",
+        "1",
+        "0",
+        "0.5",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Kendall Daniels Jr.",
+        "4",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Gerald Kilgore",
+        "3",
+        "2",
+        "0",
+        "0",
+        "1",
+        "0",
+        "0"
+       ],
+       [
+        "Gabriel Brownlow-Dindy",
+        "3",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Tomiwa Durojaiye",
+        "2",
+        "2",
+        "1",
+        "1",
+        "0",
+        "1",
+        "0"
+       ],
+       [
+        "Dylan Stewart",
+        "2",
+        "2",
+        "1",
+        "1",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "J'Zavien Currence",
+        "2",
+        "2",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Caleb Herring",
+        "2",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Anthony Addison",
+        "2",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Vicari Swain",
+        "1",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Aiden Harris",
+        "1",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Julian Walker",
+        "1",
+        "1",
+        "0",
+        "1",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Shawn Murphy",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Malik Clark",
+        "1",
+        "0",
+        "0",
+        "0.5",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Damarcus Leach",
+        "0",
+        "0",
+        "0",
+        "0",
+        "1",
+        "0",
+        "0"
+       ]
+      ]
+     },
+     "puntReturns": {
+      "labels": [
+       "NO",
+       "YDS",
+       "AVG",
+       "LONG",
+       "TD"
+      ],
+      "rows": [
+       [
+        "Donovan Murph",
+        "1",
+        "5",
+        "5.0",
+        "5",
+        "0"
+       ],
+       [
+        "Vicari Swain",
+        "1",
+        "0",
+        "0.0",
+        "0",
+        "0"
+       ]
+      ]
+     },
+     "kicking": {
+      "labels": [
+       "FG",
+       "PCT",
+       "LONG",
+       "XP",
+       "PTS"
+      ],
+      "rows": [
+       [
+        "Malik Orsan",
+        "2/2",
+        "100.0",
+        "48",
+        "3/3",
+        "9"
+       ]
+      ]
+     },
+     "punting": {
+      "labels": [
+       "NO",
+       "YDS",
+       "AVG",
+       "TB",
+       "In 20",
+       "LONG"
+      ],
+      "rows": [
+       [
+        "Mason Love",
+        "3",
+        "131",
+        "43.7",
+        "0",
+        "1",
+        "48"
+       ]
+      ]
+     }
+    }
+   },
+   "scoring": [
+    [
+     1,
+     "10:02",
+     "SC",
+     "Mazeo Bennett Jr. 17 Yd pass from LaNorris Sellers (Malik Orsan Kick)",
+     0,
+     7
+    ],
+    [
+     1,
+     "8:17",
+     "SC",
+     "LaNorris Sellers 31 Yd Run (Malik Orsan Kick)",
+     0,
+     14
+    ],
+    [
+     2,
+     "14:12",
+     "TENN",
+     "DeSean Bishop 1 Yd Run (Cooper Ranvier Kick)",
+     7,
+     14
+    ],
+    [
+     2,
+     "8:06",
+     "TENN",
+     "DaSaahn Brame 1 Yd Run (Cooper Ranvier Kick)",
+     14,
+     14
+    ],
+    [
+     2,
+     "1:44",
+     "SC",
+     "Malik Orsan 22 Yd Field Goal  ",
+     14,
+     17
+    ],
+    [
+     2,
+     "0:24",
+     "TENN",
+     "Mike Matthews 8 Yd Run (Cooper Ranvier Kick)",
+     21,
+     17
+    ],
+    [
+     4,
+     "11:46",
+     "TENN",
+     "Cooper Ranvier 37 Yd Field Goal  ",
+     24,
+     17
+    ],
+    [
+     4,
+     "1:17",
+     "SC",
+     "LaNorris Sellers 4 Yd Run (Malik Orsan Kick)",
+     24,
+     24
+    ],
+    [
+     4,
+     "0:00",
+     "SC",
+     "Malik Orsan 48 Yd Field Goal ",
+     24,
+     27
+    ]
+   ]
+  }
+ },
+ "previews": {
+  "Kentucky": {
+   "record": "7-1",
+   "conf": "SEC",
+   "confRecord": "5-1",
+   "compare": {
+    "ppg": [
+     32.2,
+     32.9
+    ],
+    "ypg": [
+     394.5,
+     386.4
+    ],
+    "ypp": [
+     5.65,
+     6.04
+    ],
+    "passYpg": [
+     181.5,
+     219.4
+    ],
+    "cmpPct": [
+     64.3,
+     68.4
+    ],
+    "ypa": [
+     7.01,
+     7.5
+    ],
+    "passTD": [
+     9.0,
+     14.0
+    ],
+    "intThrown": [
+     4.0,
+     1.0
+    ],
+    "sacksAllowed": [
+     20.0,
+     16.0
+    ],
+    "rushYpg": [
+     213.0,
+     167.0
+    ],
+    "ypc": [
+     4.84,
+     4.81
+    ],
+    "rushTD": [
+     21.0,
+     16.0
+    ],
+    "recPg": [
+     16.6,
+     20.0
+    ],
+    "ypr": [
+     10.92,
+     10.97
+    ],
+    "fdPg": [
+     22.4,
+     20.5
+    ],
+    "thirdPct": [
+     37.0,
+     33.7
+    ],
+    "fourthPct": [
+     73.3,
+     62.5
+    ],
+    "penYpg": [
+     62.1,
+     41.9
+    ],
+    "top": [
+     31.3,
+     29.9
+    ],
+    "toLost": [
+     11.0,
+     5.0
+    ],
+    "oppg": [
+     16.2,
+     24.8
+    ],
+    "oypg": [
+     288.5,
+     362.6
+    ],
+    "oypp": [
+     4.69,
+     5.21
+    ],
+    "othirdPct": [
+     31.7,
+     48.3
+    ],
+    "oPassYpg": [
+     165.6,
+     249.4
+    ],
+    "oCmpPct": [
+     62.3,
+     61.6
+    ],
+    "defInt": [
+     8.0,
+     12.0
+    ],
+    "sacks": [
+     34.0,
+     21.0
+    ],
+    "oRushYpg": [
+     122.9,
+     113.2
+    ],
+    "oYpc": [
+     3.84,
+     3.55
+    ],
+    "tfl": [
+     65.0,
+     43.0
+    ],
+    "takeaways": [
+     14.0,
+     18.0
+    ],
+    "toMargin": [
+     3.0,
+     13.0
+    ],
+    "krAvg": [
+     16.2,
+     17.1
+    ],
+    "prAvg": [
+     10.5,
+     8.3
+    ],
+    "retTD": [
+     1.0,
+     1.0
+    ]
+   },
+   "sp": {
+    "opp": [
+     7.8,
+     45,
+     40,
+     53
+    ],
+    "ut": [
+     17.5,
+     13,
+     24,
+     16
+    ]
+   },
+   "fpi": {
+    "opp": [
+     13.075,
+     24
+    ],
+    "ut": [
+     16.818,
+     12
+    ]
+   },
+   "impact": [
+    {
+     "name": "Kenny Minchey",
+     "pos": "QB",
+     "what": "passing",
+     "line": "1755 pass yds, 14 TD, 1 INT"
+    },
+    {
+     "name": "CJ Baxter Jr.",
+     "pos": "RB",
+     "what": "rushing",
+     "line": "487 rush yds, 8 TD"
+    },
+    {
+     "name": "Kenny Darby",
+     "pos": "WR",
+     "what": "receiving",
+     "line": "507 rec yds, 38 rec, 3 TD"
+    },
+    {
+     "name": "Grant Godfrey",
+     "pos": "LB",
+     "what": "defensive",
+     "line": "72 tackles, 4 TFL"
+    },
+    {
+     "name": "Mi'Quise Grace",
+     "pos": "DL",
+     "what": "defensive",
+     "line": "5 sacks"
+    },
+    {
+     "name": "Jordan Castell",
+     "pos": "DB",
+     "what": "interceptions",
+     "line": "4 INT"
+    }
+   ],
+   "utImpact": [
+    {
+     "name": "George MacIntyre",
+     "pos": "QB",
+     "what": "passing",
+     "line": "728 pass yds, 2 TD, 3 INT"
+    },
+    {
+     "name": "DeSean Bishop",
+     "pos": "RB",
+     "what": "rushing",
+     "line": "957 rush yds, 11 TD"
+    },
+    {
+     "name": "Mike Matthews",
+     "pos": "WR",
+     "what": "receiving",
+     "line": "528 rec yds, 34 rec, 3 TD"
+    },
+    {
+     "name": "Amare Campbell",
+     "pos": "LB",
+     "what": "defensive",
+     "line": "52 tackles, 8 TFL"
+    },
+    {
+     "name": "Tyree Weathersby",
+     "pos": "DL",
+     "what": "defensive",
+     "line": "7 sacks"
+    },
+    {
+     "name": "Dejuan Lane",
+     "pos": "DB",
+     "what": "interceptions",
+     "line": "3 INT"
+    }
+   ],
+   "series": {
+    "w": 84,
+    "l": 25,
+    "t": 9,
+    "first": 1906,
+    "last": [
+     [
+      2020,
+      "Kentucky",
+      "Tennessee",
+      7,
+      "Kentucky",
+      34
+     ],
+     [
+      2021,
+      "Tennessee",
+      "Kentucky",
+      42,
+      "Tennessee",
+      45
+     ],
+     [
+      2022,
+      "Tennessee",
+      "Tennessee",
+      44,
+      "Kentucky",
+      6
+     ],
+     [
+      2023,
+      "Tennessee",
+      "Kentucky",
+      27,
+      "Tennessee",
+      33
+     ],
+     [
+      2024,
+      "Tennessee",
+      "Tennessee",
+      28,
+      "Kentucky",
+      18
+     ],
+     [
+      2025,
+      "Tennessee",
+      "Kentucky",
+      34,
+      "Tennessee",
+      56
+     ]
+    ]
+   }
+  },
+  "Texas A&M": {
+   "record": "4-4",
+   "conf": "SEC",
+   "confRecord": "1-4",
+   "compare": {
+    "ppg": [
+     32.2,
+     28.2
+    ],
+    "ypg": [
+     394.5,
+     347.0
+    ],
+    "ypp": [
+     5.65,
+     5.09
+    ],
+    "passYpg": [
+     181.5,
+     191.4
+    ],
+    "cmpPct": [
+     64.3,
+     56.8
+    ],
+    "ypa": [
+     7.01,
+     6.3
+    ],
+    "passTD": [
+     9.0,
+     10.0
+    ],
+    "intThrown": [
+     4.0,
+     9.0
+    ],
+    "sacksAllowed": [
+     20.0,
+     14.0
+    ],
+    "rushYpg": [
+     213.0,
+     155.6
+    ],
+    "ypc": [
+     4.84,
+     4.12
+    ],
+    "rushTD": [
+     21.0,
+     14.0
+    ],
+    "recPg": [
+     16.6,
+     17.2
+    ],
+    "ypr": [
+     10.92,
+     11.09
+    ],
+    "fdPg": [
+     22.4,
+     20.0
+    ],
+    "thirdPct": [
+     37.0,
+     42.1
+    ],
+    "fourthPct": [
+     73.3,
+     47.1
+    ],
+    "penYpg": [
+     62.1,
+     45.8
+    ],
+    "top": [
+     31.3,
+     32.4
+    ],
+    "toLost": [
+     11.0,
+     11.0
+    ],
+    "oppg": [
+     16.2,
+     18.9
+    ],
+    "oypg": [
+     288.5,
+     315.6
+    ],
+    "oypp": [
+     4.69,
+     5.53
+    ],
+    "othirdPct": [
+     31.7,
+     31.2
+    ],
+    "oPassYpg": [
+     165.6,
+     182.5
+    ],
+    "oCmpPct": [
+     62.3,
+     57.4
+    ],
+    "defInt": [
+     8.0,
+     6.0
+    ],
+    "sacks": [
+     34.0,
+     7.0
+    ],
+    "oRushYpg": [
+     122.9,
+     133.1
+    ],
+    "oYpc": [
+     3.84,
+     3.99
+    ],
+    "tfl": [
+     65.0,
+     36.0
+    ],
+    "takeaways": [
+     14.0,
+     11.0
+    ],
+    "toMargin": [
+     3.0,
+     0.0
+    ],
+    "krAvg": [
+     16.2,
+     18.4
+    ],
+    "prAvg": [
+     10.5,
+     9.8
+    ],
+    "retTD": [
+     1.0,
+     0.0
+    ]
+   },
+   "sp": {
+    "opp": [
+     9.9,
+     33,
+     46,
+     30
+    ],
+    "ut": [
+     17.5,
+     13,
+     24,
+     16
+    ]
+   },
+   "fpi": {
+    "opp": [
+     13.401,
+     22
+    ],
+    "ut": [
+     16.818,
+     12
+    ]
+   },
+   "impact": [
+    {
+     "name": "Marcel Reed",
+     "pos": "QB",
+     "what": "passing",
+     "line": "1388 pass yds, 8 TD, 8 INT"
+    },
+    {
+     "name": "KJ Edwards",
+     "pos": "RB",
+     "what": "rushing",
+     "line": "360 rush yds, 2 TD"
+    },
+    {
+     "name": "Isaiah Horton",
+     "pos": "WR",
+     "what": "receiving",
+     "line": "314 rec yds, 23 rec, 3 TD"
+    },
+    {
+     "name": "Ray Coney",
+     "pos": "LB",
+     "what": "defensive",
+     "line": "41 tackles, 2.5 TFL"
+    },
+    {
+     "name": "Marco Jones",
+     "pos": "DE",
+     "what": "defensive",
+     "line": "2.5 sacks"
+    },
+    {
+     "name": "Julian Humphrey",
+     "pos": "CB",
+     "what": "interceptions",
+     "line": "1 INT"
+    }
+   ],
+   "utImpact": [
+    {
+     "name": "George MacIntyre",
+     "pos": "QB",
+     "what": "passing",
+     "line": "728 pass yds, 2 TD, 3 INT"
+    },
+    {
+     "name": "DeSean Bishop",
+     "pos": "RB",
+     "what": "rushing",
+     "line": "957 rush yds, 11 TD"
+    },
+    {
+     "name": "Mike Matthews",
+     "pos": "WR",
+     "what": "receiving",
+     "line": "528 rec yds, 34 rec, 3 TD"
+    },
+    {
+     "name": "Amare Campbell",
+     "pos": "LB",
+     "what": "defensive",
+     "line": "52 tackles, 8 TFL"
+    },
+    {
+     "name": "Tyree Weathersby",
+     "pos": "DL",
+     "what": "defensive",
+     "line": "7 sacks"
+    },
+    {
+     "name": "Dejuan Lane",
+     "pos": "DB",
+     "what": "interceptions",
+     "line": "3 INT"
+    }
+   ],
+   "series": {
+    "w": 3,
+    "l": 2,
+    "t": 0,
+    "first": 1957,
+    "last": [
+     [
+      1957,
+      "Tennessee",
+      "Tennessee",
+      3,
+      "Texas A&M",
+      0
+     ],
+     [
+      2004,
+      "Tennessee",
+      "Texas A&M",
+      7,
+      "Tennessee",
+      38
+     ],
+     [
+      2016,
+      "Texas A&M",
+      "Texas A&M",
+      45,
+      "Tennessee",
+      38
+     ],
+     [
+      2020,
+      "Texas A&M",
+      "Tennessee",
+      13,
+      "Texas A&M",
+      34
+     ],
+     [
+      2023,
+      "Tennessee",
+      "Tennessee",
+      20,
+      "Texas A&M",
+      13
+     ]
+    ]
+   }
+  },
+  "LSU": {
+   "record": "6-2",
+   "conf": "SEC",
+   "confRecord": "3-2",
+   "compare": {
+    "ppg": [
+     32.2,
+     40.1
+    ],
+    "ypg": [
+     394.5,
+     510.0
+    ],
+    "ypp": [
+     5.65,
+     6.42
+    ],
+    "passYpg": [
+     181.5,
+     317.8
+    ],
+    "cmpPct": [
+     64.3,
+     67.6
+    ],
+    "ypa": [
+     7.01,
+     8.5
+    ],
+    "passTD": [
+     9.0,
+     19.0
+    ],
+    "intThrown": [
+     4.0,
+     8.0
+    ],
+    "sacksAllowed": [
+     20.0,
+     13.0
+    ],
+    "rushYpg": [
+     213.0,
+     192.2
+    ],
+    "ypc": [
+     4.84,
+     4.56
+    ],
+    "rushTD": [
+     21.0,
+     22.0
+    ],
+    "recPg": [
+     16.6,
+     25.2
+    ],
+    "ypr": [
+     10.92,
+     12.58
+    ],
+    "fdPg": [
+     22.4,
+     28.0
+    ],
+    "thirdPct": [
+     37.0,
+     51.7
+    ],
+    "fourthPct": [
+     73.3,
+     81.2
+    ],
+    "penYpg": [
+     62.1,
+     48.2
+    ],
+    "top": [
+     31.3,
+     33.0
+    ],
+    "toLost": [
+     11.0,
+     11.0
+    ],
+    "oppg": [
+     16.2,
+     16.0
+    ],
+    "oypg": [
+     288.5,
+     258.4
+    ],
+    "oypp": [
+     4.69,
+     4.27
+    ],
+    "othirdPct": [
+     31.7,
+     30.7
+    ],
+    "oPassYpg": [
+     165.6,
+     172.8
+    ],
+    "oCmpPct": [
+     62.3,
+     60.0
+    ],
+    "defInt": [
+     8.0,
+     7.0
+    ],
+    "sacks": [
+     34.0,
+     31.0
+    ],
+    "oRushYpg": [
+     122.9,
+     85.6
+    ],
+    "oYpc": [
+     3.84,
+     2.7
+    ],
+    "tfl": [
+     65.0,
+     61.0
+    ],
+    "takeaways": [
+     14.0,
+     9.0
+    ],
+    "toMargin": [
+     3.0,
+     -2.0
+    ],
+    "krAvg": [
+     16.2,
+     18.8
+    ],
+    "prAvg": [
+     10.5,
+     9.8
+    ],
+    "retTD": [
+     1.0,
+     0.0
+    ]
+   },
+   "sp": {
+    "opp": [
+     22.6,
+     6,
+     10,
+     7
+    ],
+    "ut": [
+     17.5,
+     13,
+     24,
+     16
+    ]
+   },
+   "fpi": {
+    "opp": [
+     24.042,
+     7
+    ],
+    "ut": [
+     16.818,
+     12
+    ]
+   },
+   "impact": [
+    {
+     "name": "Sam Leavitt",
+     "pos": "QB",
+     "what": "passing",
+     "line": "2171 pass yds, 17 TD, 8 INT"
+    },
+    {
+     "name": "Dilin Jones",
+     "pos": "RB",
+     "what": "rushing",
+     "line": "659 rush yds, 6 TD"
+    },
+    {
+     "name": "Jackson Harris",
+     "pos": "WR",
+     "what": "receiving",
+     "line": "634 rec yds, 36 rec, 7 TD"
+    },
+    {
+     "name": "TJ Dottery",
+     "pos": "LB",
+     "what": "defensive",
+     "line": "60 tackles, 3 TFL"
+    },
+    {
+     "name": "Princewill Umanmielen",
+     "pos": "DE",
+     "what": "defensive",
+     "line": "9 sacks"
+    },
+    {
+     "name": "Tamarcus Cooley",
+     "pos": "S",
+     "what": "interceptions",
+     "line": "2 INT"
+    }
+   ],
+   "utImpact": [
+    {
+     "name": "George MacIntyre",
+     "pos": "QB",
+     "what": "passing",
+     "line": "728 pass yds, 2 TD, 3 INT"
+    },
+    {
+     "name": "DeSean Bishop",
+     "pos": "RB",
+     "what": "rushing",
+     "line": "957 rush yds, 11 TD"
+    },
+    {
+     "name": "Mike Matthews",
+     "pos": "WR",
+     "what": "receiving",
+     "line": "528 rec yds, 34 rec, 3 TD"
+    },
+    {
+     "name": "Amare Campbell",
+     "pos": "LB",
+     "what": "defensive",
+     "line": "52 tackles, 8 TFL"
+    },
+    {
+     "name": "Tyree Weathersby",
+     "pos": "DL",
+     "what": "defensive",
+     "line": "7 sacks"
+    },
+    {
+     "name": "Dejuan Lane",
+     "pos": "DB",
+     "what": "interceptions",
+     "line": "3 INT"
+    }
+   ],
+   "series": {
+    "w": 21,
+    "l": 10,
+    "t": 3,
+    "first": 1925,
+    "last": [
+     [
+      2006,
+      "LSU",
+      "Tennessee",
+      24,
+      "LSU",
+      28
+     ],
+     [
+      2007,
+      "LSU",
+      "LSU",
+      21,
+      "Tennessee",
+      14
+     ],
+     [
+      2010,
+      "LSU",
+      "LSU",
+      16,
+      "Tennessee",
+      14
+     ],
+     [
+      2011,
+      "LSU",
+      "Tennessee",
+      7,
+      "LSU",
+      38
+     ],
+     [
+      2017,
+      "LSU",
+      "Tennessee",
+      10,
+      "LSU",
+      30
+     ],
+     [
+      2022,
+      "Tennessee",
+      "LSU",
+      13,
+      "Tennessee",
+      40
+     ]
+    ]
+   }
+  },
+  "Vanderbilt": {
+   "record": "3-5",
+   "conf": "SEC",
+   "confRecord": "0-5",
+   "compare": {
+    "ppg": [
+     32.2,
+     22.8
+    ],
+    "ypg": [
+     394.5,
+     342.9
+    ],
+    "ypp": [
+     5.65,
+     5.45
+    ],
+    "passYpg": [
+     181.5,
+     236.6
+    ],
+    "cmpPct": [
+     64.3,
+     62.5
+    ],
+    "ypa": [
+     7.01,
+     7.48
+    ],
+    "passTD": [
+     9.0,
+     9.0
+    ],
+    "intThrown": [
+     4.0,
+     9.0
+    ],
+    "sacksAllowed": [
+     20.0,
+     16.0
+    ],
+    "rushYpg": [
+     213.0,
+     106.2
+    ],
+    "ypc": [
+     4.84,
+     3.4
+    ],
+    "rushTD": [
+     21.0,
+     11.0
+    ],
+    "recPg": [
+     16.6,
+     19.8
+    ],
+    "ypr": [
+     10.92,
+     11.98
+    ],
+    "fdPg": [
+     22.4,
+     18.2
+    ],
+    "thirdPct": [
+     37.0,
+     40.7
+    ],
+    "fourthPct": [
+     73.3,
+     63.2
+    ],
+    "penYpg": [
+     62.1,
+     66.2
+    ],
+    "top": [
+     31.3,
+     30.3
+    ],
+    "toLost": [
+     11.0,
+     14.0
+    ],
+    "oppg": [
+     16.2,
+     30.2
+    ],
+    "oypg": [
+     288.5,
+     366.9
+    ],
+    "oypp": [
+     4.69,
+     5.66
+    ],
+    "othirdPct": [
+     31.7,
+     43.4
+    ],
+    "oPassYpg": [
+     165.6,
+     217.2
+    ],
+    "oCmpPct": [
+     62.3,
+     65.8
+    ],
+    "defInt": [
+     8.0,
+     5.0
+    ],
+    "sacks": [
+     34.0,
+     16.0
+    ],
+    "oRushYpg": [
+     122.9,
+     149.6
+    ],
+    "oYpc": [
+     3.84,
+     4.24
+    ],
+    "tfl": [
+     65.0,
+     30.0
+    ],
+    "takeaways": [
+     14.0,
+     7.0
+    ],
+    "toMargin": [
+     3.0,
+     -7.0
+    ],
+    "krAvg": [
+     16.2,
+     17.6
+    ],
+    "prAvg": [
+     10.5,
+     15.8
+    ],
+    "retTD": [
+     1.0,
+     2.0
+    ]
+   },
+   "sp": {
+    "opp": [
+     0.3,
+     72,
+     64,
+     86
+    ],
+    "ut": [
+     17.5,
+     13,
+     24,
+     16
+    ]
+   },
+   "fpi": {
+    "opp": [
+     0.259,
+     68
+    ],
+    "ut": [
+     16.818,
+     12
+    ]
+   },
+   "impact": [
+    {
+     "name": "Jared Curtis",
+     "pos": "QB",
+     "what": "passing",
+     "line": "1489 pass yds, 8 TD, 8 INT"
+    },
+    {
+     "name": "Sedrick Alexander",
+     "pos": "RB",
+     "what": "rushing",
+     "line": "274 rush yds, 5 TD"
+    },
+    {
+     "name": "Junior Sherrill",
+     "pos": "WR",
+     "what": "receiving",
+     "line": "706 rec yds, 49 rec, 4 TD"
+    },
+    {
+     "name": "C.J. Heard",
+     "pos": "S",
+     "what": "defensive",
+     "line": "62 tackles, 4 TFL"
+    },
+    {
+     "name": "C.J. Heard",
+     "pos": "S",
+     "what": "defensive",
+     "line": "3 sacks"
+    },
+    {
+     "name": "Miles Capers",
+     "pos": "EDGE",
+     "what": "interceptions",
+     "line": "1 INT"
+    }
+   ],
+   "utImpact": [
+    {
+     "name": "George MacIntyre",
+     "pos": "QB",
+     "what": "passing",
+     "line": "728 pass yds, 2 TD, 3 INT"
+    },
+    {
+     "name": "DeSean Bishop",
+     "pos": "RB",
+     "what": "rushing",
+     "line": "957 rush yds, 11 TD"
+    },
+    {
+     "name": "Mike Matthews",
+     "pos": "WR",
+     "what": "receiving",
+     "line": "528 rec yds, 34 rec, 3 TD"
+    },
+    {
+     "name": "Amare Campbell",
+     "pos": "LB",
+     "what": "defensive",
+     "line": "52 tackles, 8 TFL"
+    },
+    {
+     "name": "Tyree Weathersby",
+     "pos": "DL",
+     "what": "defensive",
+     "line": "7 sacks"
+    },
+    {
+     "name": "Dejuan Lane",
+     "pos": "DB",
+     "what": "interceptions",
+     "line": "3 INT"
+    }
+   ],
+   "series": {
+    "w": 81,
+    "l": 31,
+    "t": 4,
+    "first": 1902,
+    "last": [
+     [
+      2020,
+      "Tennessee",
+      "Vanderbilt",
+      17,
+      "Tennessee",
+      42
+     ],
+     [
+      2021,
+      "Tennessee",
+      "Tennessee",
+      45,
+      "Vanderbilt",
+      21
+     ],
+     [
+      2022,
+      "Tennessee",
+      "Vanderbilt",
+      0,
+      "Tennessee",
+      56
+     ],
+     [
+      2023,
+      "Tennessee",
+      "Tennessee",
+      48,
+      "Vanderbilt",
+      24
+     ],
+     [
+      2024,
+      "Tennessee",
+      "Vanderbilt",
+      23,
+      "Tennessee",
+      36
+     ],
+     [
+      2025,
+      "Vanderbilt",
+      "Tennessee",
+      24,
+      "Vanderbilt",
+      45
+     ]
+    ]
+   }
   }
  },
  "pear": {
@@ -10365,68 +14340,68 @@ window.SITE_AUTO.football = {
  },
  "fpi": {
   "Arkansas": [
-   2.2,
-   58
+   2.0,
+   59
   ],
   "Georgia": [
-   26.7,
-   3
+   26.5,
+   4
   ],
   "Ole Miss": [
-   18.8,
-   11
+   18.9,
+   9
   ],
   "Vanderbilt": [
-   0.5,
-   66
+   0.3,
+   68
   ],
   "Alabama": [
-   24.2,
-   6
+   24.5,
+   5
   ],
   "South Carolina": [
-   11.6,
-   29
+   12.4,
+   26
   ],
   "Tennessee": [
-   18.1,
+   16.8,
    12
   ],
   "LSU": [
-   23.0,
-   8
-  ],
-  "Kentucky": [
-   12.7,
-   26
-  ],
-  "Oklahoma": [
-   13.3,
-   22
-  ],
-  "Florida": [
-   14.3,
-   19
-  ],
-  "Texas": [
-   23.6,
+   24.0,
    7
   ],
+  "Kentucky": [
+   13.1,
+   24
+  ],
+  "Oklahoma": [
+   14.1,
+   19
+  ],
+  "Florida": [
+   14.5,
+   17
+  ],
+  "Texas": [
+   24.0,
+   8
+  ],
   "Missouri": [
-   12.3,
-   27
+   12.2,
+   28
   ],
   "Texas A&M": [
-   13.5,
-   20
+   13.4,
+   22
   ],
   "Mississippi State": [
-   9.1,
-   38
+   8.5,
+   40
   ],
   "Auburn": [
-   13.4,
-   21
+   12.1,
+   29
   ]
  },
  "log": [
@@ -10435,3235 +14410,14 @@ window.SITE_AUTO.football = {
   "OK   team per-game numbers and national/SEC ranks",
   "OK   player season stats",
   "OK   national (FBS) ranks for Tennessee players",
-  "SKIP recruiting classes: HTTP Error 502: Bad Gateway",
+  "OK   recruiting classes",
   "OK   ESPN lines, TV and win chances",
   "OK   full team stat sheet with national and SEC ranks",
-  "SKIP 247 ratings for the full roster (HS composite + transfer) and team talent: HTTP Error 502: Bad Gateway",
+  "OK   247 ratings for the full roster (HS composite + transfer) and team talent",
   "OK   box scores for finished games (ESPN)",
-  "SKIP matchup previews for remaining games (CFBD): HTTP Error 502: Bad Gateway",
+  "OK   matchup previews for remaining games (CFBD)",
   "OK   season-by-season schedules and team leaders (cached after the first run)",
   "OK   PEAR ratings (week 8)",
   "OK   FPI ratings and ranks for the SEC (CFBD)"
- ],
- "recruits": {
-  "2027": [
-   {
-    "name": "David Gabriel Georges",
-    "pos": "RB",
-    "hs": "Baylor School",
-    "home": "Chattanooga, TN",
-    "ht": "6-0",
-    "wt": 210,
-    "grade": 99,
-    "stars": 5,
-    "nat": "9"
-   },
-   {
-    "name": "Kesean Bowman",
-    "pos": "WR",
-    "hs": "Brentwood Academy",
-    "home": "Brentwood, TN",
-    "ht": "6-0.5",
-    "wt": 176,
-    "grade": 98,
-    "stars": 4,
-    "nat": "60"
-   },
-   {
-    "name": "Kenneth Simon II",
-    "pos": "LB",
-    "hs": "Brentwood Academy",
-    "home": "Brentwood, TN",
-    "ht": "6-2",
-    "wt": 212,
-    "grade": 94,
-    "stars": 4,
-    "nat": "143"
-   },
-   {
-    "name": "Princeton Uwaifo",
-    "pos": "OT",
-    "hs": "Siegel",
-    "home": "Murfreesboro, TN",
-    "ht": "6-5.5",
-    "wt": 342,
-    "grade": 92,
-    "stars": 4,
-    "nat": "206"
-   },
-   {
-    "name": "Malik Howard",
-    "pos": "TE",
-    "hs": "Oak Ridge",
-    "home": "Oak Ridge, TN",
-    "ht": "6-3.5",
-    "wt": 231,
-    "grade": 92,
-    "stars": 4,
-    "nat": "211"
-   },
-   {
-    "name": "Marcus Jones",
-    "pos": "S",
-    "hs": "The Haverford School",
-    "home": "Haverford, PA",
-    "ht": "6-3",
-    "wt": 190,
-    "grade": 91,
-    "stars": 4,
-    "nat": "283"
-   },
-   {
-    "name": "Niko Kampas",
-    "pos": "OT",
-    "hs": "NFL Academy",
-    "home": "London, EN",
-    "ht": "6-7.5",
-    "wt": 294,
-    "grade": 90,
-    "stars": 4,
-    "nat": "323"
-   },
-   {
-    "name": "Q'Mari Hudson",
-    "pos": "OT",
-    "hs": "Western Branch",
-    "home": "Chesapeake, VA",
-    "ht": "6-4.5",
-    "wt": 330,
-    "grade": 90,
-    "stars": 4,
-    "nat": "387"
-   },
-   {
-    "name": "Dylan Haley",
-    "pos": "ATH",
-    "hs": "Cherokee Bluff",
-    "home": "Flowery Branch, GA",
-    "ht": "6-1",
-    "wt": 180,
-    "grade": 89,
-    "stars": 3,
-    "nat": "526"
-   },
-   {
-    "name": "Asa Barnes",
-    "pos": "RB",
-    "hs": "Westview",
-    "home": "Martin, TN",
-    "ht": "5-11",
-    "wt": 200,
-    "grade": 88,
-    "stars": 3,
-    "nat": "554"
-   },
-   {
-    "name": "JP Peace",
-    "pos": "LB",
-    "hs": "Maryville",
-    "home": "Maryville, TN",
-    "ht": "6-3",
-    "wt": 220,
-    "grade": 88,
-    "stars": 3,
-    "nat": "598"
-   },
-   {
-    "name": "Jaden Butler",
-    "pos": "ATH",
-    "hs": "Haywood",
-    "home": "Brownsville, TN",
-    "ht": "6-1",
-    "wt": 190,
-    "grade": 88,
-    "stars": 3,
-    "nat": "598"
-   },
-   {
-    "name": "Brandon Leavell",
-    "pos": "ATH",
-    "hs": "Goodpasture Christian School",
-    "home": "Madison, TN",
-    "ht": "6-0.5",
-    "wt": 165,
-    "grade": 88,
-    "stars": 3,
-    "nat": "629"
-   },
-   {
-    "name": "Dayon Cooper",
-    "pos": "ATH",
-    "hs": "South Pittsburg",
-    "home": "South Pittsburg, TN",
-    "ht": "6-1",
-    "wt": 183,
-    "grade": 88,
-    "stars": 3,
-    "nat": "705"
-   },
-   {
-    "name": "Derrick Baker",
-    "pos": "QB",
-    "hs": "Milton",
-    "home": "Alpharetta, GA",
-    "ht": "6-1",
-    "wt": 226,
-    "grade": 88,
-    "stars": 3,
-    "nat": "805"
-   },
-   {
-    "name": "Carter Jamison",
-    "pos": "S",
-    "hs": "Creekside",
-    "home": "Fairburn, GA",
-    "ht": "5-10",
-    "wt": 180,
-    "grade": 87,
-    "stars": 3,
-    "nat": "1166"
-   },
-   {
-    "name": "Ford Fehling",
-    "pos": "K",
-    "hs": "Marvin Ridge",
-    "home": "Waxhaw, NC",
-    "ht": "6-1",
-    "wt": 195,
-    "grade": 80,
-    "stars": 3,
-    "nat": "2149"
-   },
-   {
-    "name": "Sam McKeown",
-    "pos": "LS",
-    "hs": "Jenks",
-    "home": "Jenks, OK",
-    "ht": "6-4",
-    "wt": 225,
-    "grade": 80,
-    "stars": 3,
-    "nat": "2157"
-   }
-  ],
-  "2028": []
- },
- "ratings": {
-  "Drake Martinez": {
-   "pos": "TE",
-   "num": 44,
-   "year": 1,
-   "hs": {
-    "grade": 83.04,
-    "stars": 3,
-    "nat": 1753,
-    "cls": 2021,
-    "school": "Houston St. Thomas",
-    "committedTo": "Colorado State"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "UT Martin",
-    "season": 2026
-   }
-  },
-  "DJ Burks": {
-   "pos": "DB",
-   "num": 42,
-   "year": 1,
-   "hs": {
-    "grade": 84.44,
-    "stars": 3,
-    "nat": 1433,
-    "cls": 2022,
-    "school": "Maryville",
-    "committedTo": "App State"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "App State",
-    "season": 2026
-   }
-  },
-  "Ethan Davis": {
-   "pos": "TE",
-   "num": 0,
-   "year": 1,
-   "hs": {
-    "grade": 94.01,
-    "stars": 4,
-    "nat": 144,
-    "cls": 2023,
-    "school": "Collins Hill",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Isaiah Hardge": {
-   "pos": "DB",
-   "num": 29,
-   "year": 1,
-   "hs": {
-    "grade": 85.97,
-    "stars": 3,
-    "nat": 1128,
-    "cls": 2023,
-    "school": "St. Thomas Aquinas",
-    "committedTo": "Colorado"
-   },
-   "transfer": {
-    "grade": 86.0,
-    "stars": 3,
-    "origin": "Colorado",
-    "season": 2026
-   }
-  },
-  "TJ Metcalf": {
-   "pos": "DB",
-   "num": 1,
-   "year": 1,
-   "hs": {
-    "grade": 88.42,
-    "stars": 3,
-    "nat": 542,
-    "cls": 2023,
-    "school": "Pinson Valley",
-    "committedTo": "Arkansas"
-   },
-   "transfer": {
-    "grade": 87.0,
-    "stars": 3,
-    "origin": "Michigan",
-    "season": 2026
-   }
-  },
-  "Kayin Lee": {
-   "pos": "DB",
-   "num": 14,
-   "year": 1,
-   "hs": {
-    "grade": 93.86,
-    "stars": 4,
-    "nat": 147,
-    "cls": 2023,
-    "school": "Cedar Grove",
-    "committedTo": "Auburn"
-   },
-   "transfer": {
-    "grade": 88.0,
-    "stars": 3,
-    "origin": "Auburn",
-    "season": 2026
-   }
-  },
-  "Ryan Staub": {
-   "pos": "QB",
-   "num": 8,
-   "year": 1,
-   "hs": {
-    "grade": 87.44,
-    "stars": 3,
-    "nat": 734,
-    "cls": 2023,
-    "school": "West Ranch",
-    "committedTo": "Colorado"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "Colorado",
-    "season": 2026
-   }
-  },
-  "Shamurad Umarov": {
-   "pos": "OL",
-   "num": 74,
-   "year": 1,
-   "hs": {
-    "grade": 90.31,
-    "stars": 4,
-    "nat": 310,
-    "cls": 2023,
-    "school": "Denmark",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Sam Pendleton": {
-   "pos": "OL",
-   "num": 56,
-   "year": 1,
-   "hs": {
-    "grade": 89.33,
-    "stars": 4,
-    "nat": 406,
-    "cls": 2023,
-    "school": "Reagan",
-    "committedTo": "Notre Dame"
-   },
-   "transfer": {
-    "grade": 90.0,
-    "stars": 4,
-    "origin": "Notre Dame",
-    "season": 2025
-   }
-  },
-  "Nathan Robinson": {
-   "pos": "DL",
-   "num": 19,
-   "year": 1,
-   "hs": {
-    "grade": 88.28,
-    "stars": 3,
-    "nat": 559,
-    "cls": 2023,
-    "school": "Greenbrier",
-    "committedTo": "Tennessee"
-   }
-  },
-  "DeSean Bishop": {
-   "pos": "RB",
-   "num": 18,
-   "year": 1,
-   "hs": {
-    "grade": 85.33,
-    "stars": 3,
-    "nat": 1315,
-    "cls": 2023,
-    "school": "Karns",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jeremiah Telander": {
-   "pos": "LB",
-   "num": 22,
-   "year": 1,
-   "hs": {
-    "grade": 87.96,
-    "stars": 3,
-    "nat": 613,
-    "cls": 2023,
-    "school": "Gainesville",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Daevin Hobbs": {
-   "pos": "DL",
-   "num": 5,
-   "year": 1,
-   "hs": {
-    "grade": 97.41,
-    "stars": 4,
-    "nat": 57,
-    "cls": 2023,
-    "school": "Jay M. Robinson",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Tyree Weathersby": {
-   "pos": "DL",
-   "num": 18,
-   "year": 1,
-   "hs": {
-    "grade": 90.47,
-    "stars": 4,
-    "nat": 299,
-    "cls": 2023,
-    "school": "New Manchester",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Dejuan Lane": {
-   "pos": "DB",
-   "num": 10,
-   "year": 1,
-   "hs": {
-    "grade": 90.41,
-    "stars": 4,
-    "nat": 325,
-    "cls": 2024,
-    "school": "Gilman",
-    "committedTo": "Penn State"
-   },
-   "transfer": {
-    "grade": 87.0,
-    "stars": 3,
-    "origin": "Penn State",
-    "season": 2026
-   }
-  },
-  "Mike Matthews": {
-   "pos": "WR",
-   "num": 4,
-   "year": 1,
-   "hs": {
-    "grade": 98.82,
-    "stars": 5,
-    "nat": 24,
-    "cls": 2024,
-    "school": "Parkview",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Edwin Spillman": {
-   "pos": "LB",
-   "num": 13,
-   "year": 1,
-   "hs": {
-    "grade": 90.0,
-    "stars": 4,
-    "nat": 357,
-    "cls": 2024,
-    "school": "Lipscomb Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Ory Williams": {
-   "pos": "OL",
-   "num": 77,
-   "year": 1,
-   "hs": {
-    "grade": 89.35,
-    "stars": 4,
-    "nat": 433,
-    "cls": 2024,
-    "school": "San Marcos",
-    "committedTo": "LSU"
-   },
-   "transfer": {
-    "grade": 86.0,
-    "stars": 3,
-    "origin": "LSU",
-    "season": 2026
-   }
-  },
-  "Hunter Barnes": {
-   "pos": "RB",
-   "num": 24,
-   "year": 1
-  },
-  "Bennett Brady": {
-   "pos": "LS",
-   "num": 48,
-   "year": 1
-  },
-  "Josh Turbyville": {
-   "pos": "PK",
-   "num": 94,
-   "year": 1
-  },
-  "Arion Carter": {
-   "pos": "LB",
-   "num": 7,
-   "year": 1,
-   "hs": {
-    "grade": 94.39,
-    "stars": 4,
-    "nat": 130,
-    "cls": 2023,
-    "school": "Smyrna",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Carson Gentle": {
-   "pos": "DL",
-   "num": 35,
-   "year": 1,
-   "hs": {
-    "grade": 86.97,
-    "stars": 3,
-    "nat": 928,
-    "cls": 2024,
-    "school": "McCallie School",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Donovan Haslam": {
-   "pos": "OL",
-   "num": 69,
-   "year": 1,
-   "transfer": {
-    "grade": 86.0,
-    "stars": 3,
-    "origin": "West Virginia",
-    "season": 2026
-   }
-  },
-  "Wendell Moe Jr.": {
-   "pos": "OL",
-   "num": 75,
-   "year": 1,
-   "hs": {
-    "grade": 82.56,
-    "stars": 3,
-    "nat": 1912,
-    "cls": 2022,
-    "school": "Long Beach Poly",
-    "committedTo": "Arizona"
-   },
-   "transfer": {
-    "grade": 88.0,
-    "stars": 3,
-    "origin": "Arizona",
-    "season": 2025
-   }
-  },
-  "Jadais Richard": {
-   "pos": "DB",
-   "num": 8,
-   "year": 1,
-   "hs": {
-    "grade": 89.59,
-    "stars": 4,
-    "nat": 368,
-    "cls": 2022,
-    "school": "West Monroe",
-    "committedTo": "Vanderbilt"
-   },
-   "transfer": {
-    "grade": 86.0,
-    "stars": 3,
-    "origin": "Miami",
-    "season": 2026
-   }
-  },
-  "Amare Campbell": {
-   "pos": "LB",
-   "num": 0,
-   "year": 1,
-   "hs": {
-    "grade": 85.42,
-    "stars": 3,
-    "nat": 1293,
-    "cls": 2023,
-    "school": "Unity Reed",
-    "committedTo": "North Carolina"
-   },
-   "transfer": {
-    "grade": 87.0,
-    "stars": 3,
-    "origin": "Penn State",
-    "season": 2026
-   }
-  },
-  "Edrees Farooq": {
-   "pos": "DB",
-   "num": 15,
-   "year": 1,
-   "hs": {
-    "grade": 88.33,
-    "stars": 3,
-    "nat": 592,
-    "cls": 2024,
-    "school": "St. Frances Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jackson Ross": {
-   "pos": "P",
-   "num": 98,
-   "year": 1,
-   "hs": {
-    "grade": 78.94,
-    "stars": 2,
-    "nat": 2679,
-    "cls": 2022,
-    "school": "ProKick Australia",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Trent Thomas": {
-   "pos": "TE",
-   "num": 82,
-   "year": 1,
-   "hs": {
-    "grade": 84.37,
-    "stars": 3,
-    "nat": 1622,
-    "cls": 2023,
-    "school": "Cottage Hill Christian Academy",
-    "committedTo": "South Alabama"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "South Alabama",
-    "season": 2026
-   }
-  },
-  "Jordan Norman": {
-   "pos": "DL",
-   "num": 33,
-   "year": 1,
-   "hs": {
-    "grade": 82.96,
-    "stars": 3,
-    "nat": 2016,
-    "cls": 2023,
-    "school": "Hoover",
-    "committedTo": "South Alabama"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "Tulane",
-    "season": 2026
-   }
-  },
-  "Braylon Staley": {
-   "pos": "WR",
-   "num": 14,
-   "year": 1,
-   "hs": {
-    "grade": 95.01,
-    "stars": 4,
-    "nat": 106,
-    "cls": 2024,
-    "school": "Strom Thurmond",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Gage Ginther": {
-   "pos": "OL",
-   "num": 78,
-   "year": 1,
-   "hs": {
-    "grade": 88.17,
-    "stars": 3,
-    "nat": 628,
-    "cls": 2024,
-    "school": "Fossil Ridge",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jesse Perry": {
-   "pos": "OL",
-   "num": 72,
-   "year": 1,
-   "hs": {
-    "grade": 87.39,
-    "stars": 3,
-    "nat": 801,
-    "cls": 2024,
-    "school": "Middle Tennessee Christian School",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Justin Baker": {
-   "pos": "RB",
-   "num": 2,
-   "year": 1,
-   "hs": {
-    "grade": 88.11,
-    "stars": 3,
-    "nat": 619,
-    "cls": 2025,
-    "school": "Buford",
-    "committedTo": "Tennessee"
-   }
-  },
-  "DaSaahn Brame": {
-   "pos": "TE",
-   "num": 7,
-   "year": 1,
-   "hs": {
-    "grade": 96.82,
-    "stars": 4,
-    "nat": 61,
-    "cls": 2025,
-    "school": "Derby",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Isaiah Campbell": {
-   "pos": "DL",
-   "num": 47,
-   "year": 1,
-   "hs": {
-    "grade": 98.32,
-    "stars": 4,
-    "nat": 33,
-    "cls": 2025,
-    "school": "Southern Durham",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jaedon Harmon": {
-   "pos": "LB",
-   "num": 12,
-   "year": 1,
-   "hs": {
-    "grade": 93.1,
-    "stars": 4,
-    "nat": 168,
-    "cls": 2025,
-    "school": "Rome",
-    "committedTo": "Tennessee"
-   }
-  },
-  "George MacIntyre": {
-   "pos": "QB",
-   "num": 12,
-   "year": 1,
-   "hs": {
-    "grade": 93.55,
-    "stars": 4,
-    "nat": 151,
-    "cls": 2025,
-    "school": "Brentwood Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jadon Perlotte": {
-   "pos": "LB",
-   "num": 27,
-   "year": 1,
-   "hs": {
-    "grade": 89.43,
-    "stars": 4,
-    "nat": 417,
-    "cls": 2025,
-    "school": "Buford",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Daune Morris": {
-   "pos": "RB",
-   "num": 17,
-   "year": 1,
-   "hs": {
-    "grade": 89.42,
-    "stars": 4,
-    "nat": 419,
-    "cls": 2025,
-    "school": "Oakland",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Tre Poteat III": {
-   "pos": "DB",
-   "num": 3,
-   "year": 1,
-   "hs": {
-    "grade": 89.5,
-    "stars": 4,
-    "nat": 404,
-    "cls": 2025,
-    "school": "Verona Area",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Ty Redmond": {
-   "pos": "DB",
-   "num": 4,
-   "year": 1,
-   "hs": {
-    "grade": 87.81,
-    "stars": 3,
-    "nat": 702,
-    "cls": 2025,
-    "school": "Milton",
-    "committedTo": "Tennessee"
-   }
-  },
-  "David Sanders Jr.": {
-   "pos": "OL",
-   "num": 70,
-   "year": 1,
-   "hs": {
-    "grade": 99.73,
-    "stars": 5,
-    "nat": 6,
-    "cls": 2025,
-    "school": "Providence Day School",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Ethan Utley": {
-   "pos": "DL",
-   "num": 17,
-   "year": 1,
-   "hs": {
-    "grade": 91.99,
-    "stars": 4,
-    "nat": 219,
-    "cls": 2025,
-    "school": "Ensworth",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jeremias Heard": {
-   "pos": "OL",
-   "num": 51,
-   "year": 1,
-   "hs": {
-    "grade": 88.19,
-    "stars": 3,
-    "nat": 627,
-    "cls": 2024,
-    "school": "Model 9-12",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Tevis Metcalf": {
-   "pos": "DB",
-   "num": 20,
-   "year": 1,
-   "hs": {
-    "grade": 88.42,
-    "stars": 3,
-    "nat": 542,
-    "cls": 2023,
-    "school": "Pinson Valley",
-    "committedTo": "Arkansas"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "Michigan",
-    "season": 2026
-   }
-  },
-  "Xavier Gilliam": {
-   "pos": "DL",
-   "num": 2,
-   "year": 1,
-   "hs": {
-    "grade": 87.58,
-    "stars": 3,
-    "nat": 750,
-    "cls": 2024,
-    "school": "Quince Orchard",
-    "committedTo": "Penn State"
-   },
-   "transfer": {
-    "grade": 94.0,
-    "stars": 4,
-    "origin": "Penn State",
-    "season": 2026
-   }
-  },
-  "Jordan Burns": {
-   "pos": "LB",
-   "num": 11,
-   "year": 1,
-   "hs": {
-    "grade": 89.5,
-    "stars": 4,
-    "nat": 409,
-    "cls": 2024,
-    "school": "Pace Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Ian Duarte": {
-   "pos": "WR",
-   "num": 81,
-   "year": 1,
-   "hs": {
-    "grade": 84.0,
-    "stars": 3,
-    "nat": 1710,
-    "cls": 2023,
-    "school": "Eagle",
-    "committedTo": "Idaho State"
-   },
-   "transfer": {
-    "grade": 85.0,
-    "stars": 3,
-    "origin": "Idaho State",
-    "season": 2026
-   }
-  },
-  "Ed Baker": {
-   "pos": "OL",
-   "num": 71,
-   "year": 1,
-   "hs": {
-    "grade": 87.22,
-    "stars": 3,
-    "nat": 1030,
-    "cls": 2026,
-    "school": "St. Frances Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Hezekiah Harris": {
-   "pos": "DL",
-   "num": 97,
-   "year": 1,
-   "hs": {
-    "grade": 92.4,
-    "stars": 4,
-    "nat": 196,
-    "cls": 2026,
-    "school": "Jemison",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Faizon Brandon": {
-   "pos": "QB",
-   "num": 11,
-   "year": 1,
-   "hs": {
-    "grade": 99.39,
-    "stars": 5,
-    "nat": 10,
-    "cls": 2026,
-    "school": "Grimsley",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Kedric Golston II": {
-   "pos": "DL",
-   "num": 37,
-   "year": 1,
-   "hs": {
-    "grade": 89.11,
-    "stars": 4,
-    "nat": 469,
-    "cls": 2026,
-    "school": "Stone Bridge",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Nathan Roberts": {
-   "pos": "WR",
-   "num": 36,
-   "year": 1
-  },
-  "Zach Groves": {
-   "pos": "DL",
-   "num": 56,
-   "year": 1,
-   "hs": {
-    "grade": 90.53,
-    "stars": 4,
-    "nat": 310,
-    "cls": 2026,
-    "school": "East Robertson",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Tyreek King": {
-   "pos": "WR",
-   "num": 19,
-   "year": 1,
-   "hs": {
-    "grade": 94.55,
-    "stars": 4,
-    "nat": 131,
-    "cls": 2026,
-    "school": "Knoxville Catholic",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Dereon Albert": {
-   "pos": "DL",
-   "num": 59,
-   "year": 1,
-   "hs": {
-    "grade": 89.71,
-    "stars": 4,
-    "nat": 396,
-    "cls": 2026,
-    "school": "Jackson Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Joakim Dodson": {
-   "pos": "WR",
-   "num": 9,
-   "year": 1,
-   "hs": {
-    "grade": 88.17,
-    "stars": 3,
-    "nat": 614,
-    "cls": 2025,
-    "school": "Baylor School",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Tim Merritt": {
-   "pos": "DB",
-   "num": 25,
-   "year": 1,
-   "hs": {
-    "grade": 88.83,
-    "stars": 3,
-    "nat": 507,
-    "cls": 2025,
-    "school": "Parker",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Dylan Lewis": {
-   "pos": "DB",
-   "num": 24,
-   "year": 1,
-   "hs": {
-    "grade": 87.78,
-    "stars": 3,
-    "nat": 706,
-    "cls": 2025,
-    "school": "Milton",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Mariyon Dye": {
-   "pos": "DL",
-   "num": 9,
-   "year": 1,
-   "hs": {
-    "grade": 96.05,
-    "stars": 4,
-    "nat": 77,
-    "cls": 2025,
-    "school": "Elkhart",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Travis Smith Jr.": {
-   "pos": "WR",
-   "num": 1,
-   "year": 1,
-   "hs": {
-    "grade": 95.51,
-    "stars": 4,
-    "nat": 85,
-    "cls": 2025,
-    "school": "Westlake",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jack-Henry Jakobik": {
-   "pos": "WR",
-   "num": 29,
-   "year": 1
-  },
-  "Cooper Ranvier": {
-   "pos": "PK",
-   "num": 28,
-   "year": 1,
-   "transfer": {
-    "grade": null,
-    "stars": null,
-    "origin": "Louisville",
-    "season": 2026
-   }
-  },
-  "Cole Harrison": {
-   "pos": "TE",
-   "num": 80,
-   "year": 1,
-   "hs": {
-    "grade": 86.42,
-    "stars": 3,
-    "nat": 1102,
-    "cls": 2024,
-    "school": "Junipero Serra",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Christian Gass": {
-   "pos": "DL",
-   "num": 44,
-   "year": 1,
-   "hs": {
-    "grade": 92.42,
-    "stars": 4,
-    "nat": 202,
-    "cls": 2025,
-    "school": "Eastside",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Radarious Jackson": {
-   "pos": "WR",
-   "num": 3,
-   "year": 1,
-   "hs": {
-    "grade": 91.11,
-    "stars": 4,
-    "nat": 269,
-    "cls": 2025,
-    "school": "Sheffield",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Nic Moore": {
-   "pos": "OL",
-   "num": 58,
-   "year": 1,
-   "hs": {
-    "grade": 91.18,
-    "stars": 4,
-    "nat": 261,
-    "cls": 2025,
-    "school": "Jefferson County",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Sidney Walton": {
-   "pos": "DB",
-   "num": 23,
-   "year": 1,
-   "hs": {
-    "grade": 87.86,
-    "stars": 3,
-    "nat": 692,
-    "cls": 2025,
-    "school": "Moody",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Joel Wyatt": {
-   "pos": "DB",
-   "num": 31,
-   "year": 1,
-   "hs": {
-    "grade": 96.97,
-    "stars": 4,
-    "nat": 71,
-    "cls": 2026,
-    "school": "Oakland",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Charles House III": {
-   "pos": "DL",
-   "num": 99,
-   "year": 1,
-   "hs": {
-    "grade": 89.25,
-    "stars": 4,
-    "nat": 447,
-    "cls": 2025,
-    "school": "North Mecklenburg",
-    "committedTo": "Tennessee"
-   }
-  },
-  "TK Keys": {
-   "pos": "WR",
-   "num": 5,
-   "year": 1,
-   "hs": {
-    "grade": 99.33,
-    "stars": 5,
-    "nat": 13,
-    "cls": 2026,
-    "school": "Hattiesburg",
-    "committedTo": "Tennessee"
-   }
-  },
-  "TJ White": {
-   "pos": "LB",
-   "num": 51,
-   "year": 1,
-   "hs": {
-    "grade": 96.96,
-    "stars": 4,
-    "nat": 72,
-    "cls": 2026,
-    "school": "Jackson Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Gabriel Osenda": {
-   "pos": "OL",
-   "num": 79,
-   "year": 1,
-   "hs": {
-    "grade": 95.66,
-    "stars": 4,
-    "nat": 102,
-    "cls": 2026,
-    "school": "Baylor School",
-    "committedTo": "Tennessee"
-   }
-  },
-  "KJ McClain": {
-   "pos": "DB",
-   "num": 40,
-   "year": 1,
-   "hs": {
-    "grade": 87.67,
-    "stars": 3,
-    "nat": 833,
-    "cls": 2026,
-    "school": "St. Joseph Regional",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Kamari Blair": {
-   "pos": "OL",
-   "num": 66,
-   "year": 1,
-   "hs": {
-    "grade": 93.64,
-    "stars": 4,
-    "nat": 157,
-    "cls": 2026,
-    "school": "Kirkwood",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Javonte Smith": {
-   "pos": "DB",
-   "num": 30,
-   "year": 1,
-   "hs": {
-    "grade": 88.67,
-    "stars": 3,
-    "nat": 554,
-    "cls": 2026,
-    "school": "Jackson North Side",
-    "committedTo": "Tennessee"
-   }
-  },
-  "CJ Edwards": {
-   "pos": "DL",
-   "num": 85,
-   "year": 1,
-   "hs": {
-    "grade": 88.0,
-    "stars": 3,
-    "nat": 731,
-    "cls": 2026,
-    "school": "St. Joseph",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Antoni Ogumoro": {
-   "pos": "OL",
-   "num": 55,
-   "year": 1,
-   "hs": {
-    "grade": 88.36,
-    "stars": 3,
-    "nat": 573,
-    "cls": 2025,
-    "school": "Elgin",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jackson Mathews": {
-   "pos": "DB",
-   "num": 43,
-   "year": 1,
-   "hs": {
-    "grade": 80.0,
-    "stars": 3,
-    "nat": 2850,
-    "cls": 2024,
-    "school": "Christ Presbyterian Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Ryan Scott": {
-   "pos": "LB",
-   "num": 50,
-   "year": 1
-  },
-  "Grier Short": {
-   "pos": "LB",
-   "num": 57,
-   "year": 1
-  },
-  "Mike Bethea II": {
-   "pos": "DL",
-   "num": 55,
-   "year": 1
-  },
-  "Qua Moss": {
-   "pos": "DB",
-   "num": 6,
-   "year": 1,
-   "transfer": {
-    "grade": 86.0,
-    "stars": 3,
-    "origin": "Kansas State",
-    "season": 2026
-   }
-  },
-  "Doren Sacha": {
-   "pos": "WR",
-   "num": 26,
-   "year": 1
-  },
-  "Michael Kostantonov": {
-   "pos": "OL",
-   "num": 65,
-   "year": 1
-  },
-  "Blake Howard": {
-   "pos": "LS",
-   "num": 53,
-   "year": 1,
-   "transfer": {
-    "grade": null,
-    "stars": null,
-    "origin": "Eastern Kentucky",
-    "season": 2026
-   }
-  },
-  "Carter Gooden": {
-   "pos": "DL",
-   "num": 36,
-   "year": 1,
-   "hs": {
-    "grade": 95.44,
-    "stars": 4,
-    "nat": 106,
-    "cls": 2026,
-    "school": "Tabor Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "JJ Finch": {
-   "pos": "DL",
-   "num": 26,
-   "year": 1,
-   "hs": {
-    "grade": 89.11,
-    "stars": 4,
-    "nat": 469,
-    "cls": 2026,
-    "school": "Warren Central",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Brayden Rouse": {
-   "pos": "LB",
-   "num": 28,
-   "year": 1,
-   "hs": {
-    "grade": 96.65,
-    "stars": 4,
-    "nat": 79,
-    "cls": 2026,
-    "school": "Kell",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Zay Anderson": {
-   "pos": "DB",
-   "num": 34,
-   "year": 1,
-   "hs": {
-    "grade": 92.52,
-    "stars": 4,
-    "nat": 189,
-    "cls": 2026,
-    "school": "Greeneville",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Darryl Rivers": {
-   "pos": "DL",
-   "num": 39,
-   "year": 1,
-   "hs": {
-    "grade": 88.67,
-    "stars": 3,
-    "nat": 554,
-    "cls": 2026,
-    "school": "McEachern",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jamyan Theodore": {
-   "pos": "DB",
-   "num": 21,
-   "year": 1,
-   "hs": {
-    "grade": 88.89,
-    "stars": 3,
-    "nat": 507,
-    "cls": 2026,
-    "school": "Baylor School",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Luca Wolf": {
-   "pos": "TE",
-   "num": 87,
-   "year": 1,
-   "hs": {
-    "grade": 88.55,
-    "stars": 3,
-    "nat": 604,
-    "cls": 2026,
-    "school": "NFL Academy",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Will Rajecki": {
-   "pos": "RB",
-   "num": 34,
-   "year": 1,
-   "hs": {
-    "grade": 86.67,
-    "stars": 3,
-    "nat": 1263,
-    "cls": 2026,
-    "school": "Sequoyah",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jowell Combay": {
-   "pos": "DB",
-   "num": 38,
-   "year": 1,
-   "hs": {
-    "grade": 88.56,
-    "stars": 3,
-    "nat": 586,
-    "cls": 2026,
-    "school": "Kell",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Luke Thompson": {
-   "pos": "WR",
-   "num": 85,
-   "year": 1,
-   "hs": {
-    "grade": 88.22,
-    "stars": 3,
-    "nat": 665,
-    "cls": 2026,
-    "school": "Franklin",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Mason Phillips": {
-   "pos": "QB",
-   "num": 13,
-   "year": 1
-  },
-  "Ben Petermann": {
-   "pos": "WR",
-   "num": 35,
-   "year": 1
-  },
-  "Deon Hardin": {
-   "pos": "WR",
-   "num": 88,
-   "year": 1
-  },
-  "Grady Dangerfield": {
-   "pos": "PK",
-   "num": 93,
-   "year": 1
-  },
-  "Javin Gordon": {
-   "pos": "RB",
-   "num": 6,
-   "year": 1,
-   "hs": {
-    "grade": 86.33,
-    "stars": 3,
-    "nat": 1203,
-    "cls": 2025,
-    "school": "Stephens County",
-    "committedTo": "Tulane"
-   },
-   "transfer": {
-    "grade": 86.0,
-    "stars": 3,
-    "origin": "Tulane",
-    "season": 2026
-   }
-  },
-  "Brayden Carroll": {
-   "pos": "WR",
-   "num": 38,
-   "year": 1,
-   "hs": {
-    "grade": 84.0,
-    "stars": 3,
-    "nat": 2533,
-    "cls": 2026,
-    "school": "Bradley Central",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Charlie Powell III": {
-   "pos": "OL",
-   "num": 59,
-   "year": 1
-  },
-  "Nuk Simmons": {
-   "pos": "DL",
-   "num": 87,
-   "year": 1,
-   "hs": {
-    "grade": 87.22,
-    "stars": 3,
-    "nat": 1030,
-    "cls": 2026,
-    "school": "Carver",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Logan Foley": {
-   "pos": "P",
-   "num": 99,
-   "year": 1,
-   "hs": {
-    "grade": 81.0,
-    "stars": 3,
-    "nat": 3267,
-    "cls": 2026,
-    "school": "ProKick Australia",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Jacolby Cooper": {
-   "pos": "WR",
-   "num": 30,
-   "year": 1,
-   "hs": {
-    "grade": 86.11,
-    "stars": 3,
-    "nat": 1523,
-    "cls": 2026,
-    "school": "Alcoa",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Lane Cope": {
-   "pos": "WR",
-   "num": 31,
-   "year": 1
-  },
-  "Thomas Storm": {
-   "pos": "OL",
-   "num": 60,
-   "year": 1
-  },
-  "Jeremy George-El": {
-   "pos": "OL",
-   "num": 63,
-   "year": 1,
-   "hs": {
-    "grade": 86.5,
-    "stars": 3,
-    "nat": 1336,
-    "cls": 2026,
-    "school": "Knoxville Catholic",
-    "committedTo": "Tennessee"
-   }
-  },
-  "Breeze Carter": {
-   "pos": "DL",
-   "num": 95,
-   "year": 1,
-   "hs": {
-    "grade": 92.63,
-    "stars": 4,
-    "nat": 183,
-    "cls": 2026,
-    "school": "Douglas County",
-    "committedTo": "Tennessee"
-   }
-  }
- },
- "talent": {
-  "rank": 13,
-  "score": 885.9,
-  "of": 138,
-  "top": [
-   [
-    "Georgia",
-    1003.67
-   ],
-   [
-    "Texas",
-    985.17
-   ],
-   [
-    "Oregon",
-    984.33
-   ],
-   [
-    "Alabama",
-    973.53
-   ],
-   [
-    "Ohio State",
-    964.27
-   ],
-   [
-    "Notre Dame",
-    953.03
-   ],
-   [
-    "Texas A&M",
-    933.0
-   ],
-   [
-    "LSU",
-    931.76
-   ],
-   [
-    "USC",
-    899.0
-   ],
-   [
-    "Florida",
-    891.07
-   ],
-   [
-    "Michigan",
-    890.02
-   ],
-   [
-    "Miami",
-    885.94
-   ],
-   [
-    "Tennessee",
-    885.9
-   ],
-   [
-    "Ole Miss",
-    885.72
-   ],
-   [
-    "South Carolina",
-    862.87
-   ]
-  ]
- },
- "previews": {
-  "South Carolina": {
-   "record": "3-3",
-   "conf": "SEC",
-   "confRecord": "1-3",
-   "compare": {
-    "ppg": [
-     33.4,
-     37.7
-    ],
-    "ypg": [
-     405.1,
-     474.7
-    ],
-    "ypp": [
-     5.84,
-     6.52
-    ],
-    "passYpg": [
-     188.0,
-     242.3
-    ],
-    "cmpPct": [
-     63.6,
-     61.8
-    ],
-    "ypa": [
-     7.15,
-     7.13
-    ],
-    "passTD": [
-     9.0,
-     13.0
-    ],
-    "intThrown": [
-     4.0,
-     4.0
-    ],
-    "sacksAllowed": [
-     18.0,
-     10.0
-    ],
-    "rushYpg": [
-     217.1,
-     232.3
-    ],
-    "ypc": [
-     5.03,
-     5.98
-    ],
-    "rushTD": [
-     18.0,
-     13.0
-    ],
-    "recPg": [
-     16.7,
-     21.0
-    ],
-    "ypr": [
-     11.25,
-     11.54
-    ],
-    "fdPg": [
-     22.6,
-     23.8
-    ],
-    "thirdPct": [
-     36.6,
-     47.7
-    ],
-    "fourthPct": [
-     72.7,
-     61.5
-    ],
-    "penYpg": [
-     58.1,
-     58.5
-    ],
-    "top": [
-     30.9,
-     30.3
-    ],
-    "toLost": [
-     10.0,
-     8.0
-    ],
-    "oppg": [
-     14.7,
-     25.5
-    ],
-    "oypg": [
-     280.6,
-     340.8
-    ],
-    "oypp": [
-     4.58,
-     5.37
-    ],
-    "othirdPct": [
-     30.8,
-     35.9
-    ],
-    "oPassYpg": [
-     159.3,
-     237.2
-    ],
-    "oCmpPct": [
-     63.2,
-     67.6
-    ],
-    "defInt": [
-     7.0,
-     4.0
-    ],
-    "sacks": [
-     29.0,
-     16.0
-    ],
-    "oRushYpg": [
-     121.3,
-     103.7
-    ],
-    "oYpc": [
-     3.77,
-     3.22
-    ],
-    "tfl": [
-     57.0,
-     34.0
-    ],
-    "takeaways": [
-     13.0,
-     5.0
-    ],
-    "toMargin": [
-     3.0,
-     -3.0
-    ],
-    "krAvg": [
-     16.2,
-     21.1
-    ],
-    "prAvg": [
-     10.5,
-     15.2
-    ],
-    "retTD": [
-     1.0,
-     2.0
-    ]
-   },
-   "sp": {
-    "opp": [
-     10,
-     32,
-     29,
-     48
-    ],
-    "ut": [
-     17.5,
-     13,
-     24,
-     16
-    ]
-   },
-   "fpi": {
-    "opp": [
-     11.629,
-     29
-    ],
-    "ut": [
-     18.052,
-     12
-    ]
-   },
-   "impact": [
-    {
-     "name": "Lanorris Sellers",
-     "pos": "QB",
-     "what": "passing",
-     "line": "1338 pass yds, 12 TD, 4 INT"
-    },
-    {
-     "name": "Matthew Fuller",
-     "pos": "RB",
-     "what": "rushing",
-     "line": "485 rush yds, 5 TD"
-    },
-    {
-     "name": "Nyck Harbor",
-     "pos": "WR",
-     "what": "receiving",
-     "line": "278 rec yds, 17 rec, 2 TD"
-    },
-    {
-     "name": "Justin Okoronkwo",
-     "pos": "LB",
-     "what": "defensive",
-     "line": "43 tackles, 1 TFL"
-    },
-    {
-     "name": "Anthony Addison",
-     "pos": "DE",
-     "what": "defensive",
-     "line": "3 sacks"
-    },
-    {
-     "name": "Peyton Williams",
-     "pos": "DB",
-     "what": "interceptions",
-     "line": "1 INT"
-    }
-   ],
-   "utImpact": [
-    {
-     "name": "Faizon Brandon",
-     "pos": "QB",
-     "what": "passing",
-     "line": "697 pass yds, 7 TD, 1 INT"
-    },
-    {
-     "name": "DeSean Bishop",
-     "pos": "RB",
-     "what": "rushing",
-     "line": "837 rush yds, 10 TD"
-    },
-    {
-     "name": "Mike Matthews",
-     "pos": "WR",
-     "what": "receiving",
-     "line": "481 rec yds, 29 rec, 3 TD"
-    },
-    {
-     "name": "Amare Campbell",
-     "pos": "LB",
-     "what": "defensive",
-     "line": "46 tackles, 6.5 TFL"
-    },
-    {
-     "name": "Tyree Weathersby",
-     "pos": "DL",
-     "what": "defensive",
-     "line": "6.5 sacks"
-    },
-    {
-     "name": "Dejuan Lane",
-     "pos": "DB",
-     "what": "interceptions",
-     "line": "3 INT"
-    }
-   ],
-   "series": {
-    "w": 29,
-    "l": 11,
-    "t": 2,
-    "first": 1903,
-    "last": [
-     [
-      2018,
-      "South Carolina",
-      "South Carolina",
-      27,
-      "Tennessee",
-      24
-     ],
-     [
-      2019,
-      "Tennessee",
-      "Tennessee",
-      41,
-      "South Carolina",
-      21
-     ],
-     [
-      2020,
-      "Tennessee",
-      "South Carolina",
-      27,
-      "Tennessee",
-      31
-     ],
-     [
-      2021,
-      "Tennessee",
-      "Tennessee",
-      45,
-      "South Carolina",
-      20
-     ],
-     [
-      2022,
-      "South Carolina",
-      "South Carolina",
-      63,
-      "Tennessee",
-      38
-     ],
-     [
-      2023,
-      "Tennessee",
-      "Tennessee",
-      41,
-      "South Carolina",
-      20
-     ]
-    ]
-   }
-  },
-  "Kentucky": {
-   "record": "6-1",
-   "conf": "SEC",
-   "confRecord": "4-1",
-   "compare": {
-    "ppg": [
-     33.4,
-     32.7
-    ],
-    "ypg": [
-     405.1,
-     387.9
-    ],
-    "ypp": [
-     5.84,
-     6.07
-    ],
-    "passYpg": [
-     188.0,
-     221.7
-    ],
-    "cmpPct": [
-     63.6,
-     67.8
-    ],
-    "ypa": [
-     7.15,
-     7.46
-    ],
-    "passTD": [
-     9.0,
-     13.0
-    ],
-    "intThrown": [
-     4.0,
-     1.0
-    ],
-    "sacksAllowed": [
-     18.0,
-     15.0
-    ],
-    "rushYpg": [
-     217.1,
-     166.1
-    ],
-    "ypc": [
-     5.03,
-     4.87
-    ],
-    "rushTD": [
-     18.0,
-     13.0
-    ],
-    "recPg": [
-     16.7,
-     20.1
-    ],
-    "ypr": [
-     11.25,
-     11.01
-    ],
-    "fdPg": [
-     22.6,
-     20.0
-    ],
-    "thirdPct": [
-     36.6,
-     29.1
-    ],
-    "fourthPct": [
-     72.7,
-     60.0
-    ],
-    "penYpg": [
-     58.1,
-     44.4
-    ],
-    "top": [
-     30.9,
-     29.8
-    ],
-    "toLost": [
-     10.0,
-     5.0
-    ],
-    "oppg": [
-     14.7,
-     25.9
-    ],
-    "oypg": [
-     280.6,
-     377.0
-    ],
-    "oypp": [
-     4.58,
-     5.24
-    ],
-    "othirdPct": [
-     30.8,
-     47.1
-    ],
-    "oPassYpg": [
-     159.3,
-     249.7
-    ],
-    "oCmpPct": [
-     63.2,
-     59.8
-    ],
-    "defInt": [
-     7.0,
-     11.0
-    ],
-    "sacks": [
-     29.0,
-     18.0
-    ],
-    "oRushYpg": [
-     121.3,
-     127.3
-    ],
-    "oYpc": [
-     3.77,
-     3.74
-    ],
-    "tfl": [
-     57.0,
-     35.0
-    ],
-    "takeaways": [
-     13.0,
-     16.0
-    ],
-    "toMargin": [
-     3.0,
-     11.0
-    ],
-    "krAvg": [
-     16.2,
-     17.1
-    ],
-    "prAvg": [
-     10.5,
-     7.9
-    ],
-    "retTD": [
-     1.0,
-     1.0
-    ]
-   },
-   "sp": {
-    "opp": [
-     7.8,
-     45,
-     40,
-     53
-    ],
-    "ut": [
-     17.5,
-     13,
-     24,
-     16
-    ]
-   },
-   "fpi": {
-    "opp": [
-     12.74,
-     26
-    ],
-    "ut": [
-     18.052,
-     12
-    ]
-   },
-   "impact": [
-    {
-     "name": "Kenny Minchey",
-     "pos": "QB",
-     "what": "passing",
-     "line": "1552 pass yds, 13 TD, 1 INT"
-    },
-    {
-     "name": "CJ Baxter Jr.",
-     "pos": "RB",
-     "what": "rushing",
-     "line": "484 rush yds, 8 TD"
-    },
-    {
-     "name": "Kenny Darby",
-     "pos": "WR",
-     "what": "receiving",
-     "line": "436 rec yds, 34 rec, 3 TD"
-    },
-    {
-     "name": "Grant Godfrey",
-     "pos": "LB",
-     "what": "defensive",
-     "line": "67 tackles, 3 TFL"
-    },
-    {
-     "name": "Mi'Quise Grace",
-     "pos": "DL",
-     "what": "defensive",
-     "line": "4 sacks"
-    },
-    {
-     "name": "Jordan Castell",
-     "pos": "DB",
-     "what": "interceptions",
-     "line": "4 INT"
-    }
-   ],
-   "utImpact": [
-    {
-     "name": "Faizon Brandon",
-     "pos": "QB",
-     "what": "passing",
-     "line": "697 pass yds, 7 TD, 1 INT"
-    },
-    {
-     "name": "DeSean Bishop",
-     "pos": "RB",
-     "what": "rushing",
-     "line": "837 rush yds, 10 TD"
-    },
-    {
-     "name": "Mike Matthews",
-     "pos": "WR",
-     "what": "receiving",
-     "line": "481 rec yds, 29 rec, 3 TD"
-    },
-    {
-     "name": "Amare Campbell",
-     "pos": "LB",
-     "what": "defensive",
-     "line": "46 tackles, 6.5 TFL"
-    },
-    {
-     "name": "Tyree Weathersby",
-     "pos": "DL",
-     "what": "defensive",
-     "line": "6.5 sacks"
-    },
-    {
-     "name": "Dejuan Lane",
-     "pos": "DB",
-     "what": "interceptions",
-     "line": "3 INT"
-    }
-   ],
-   "series": {
-    "w": 84,
-    "l": 25,
-    "t": 9,
-    "first": 1906,
-    "last": [
-     [
-      2020,
-      "Kentucky",
-      "Tennessee",
-      7,
-      "Kentucky",
-      34
-     ],
-     [
-      2021,
-      "Tennessee",
-      "Kentucky",
-      42,
-      "Tennessee",
-      45
-     ],
-     [
-      2022,
-      "Tennessee",
-      "Tennessee",
-      44,
-      "Kentucky",
-      6
-     ],
-     [
-      2023,
-      "Tennessee",
-      "Kentucky",
-      27,
-      "Tennessee",
-      33
-     ],
-     [
-      2024,
-      "Tennessee",
-      "Tennessee",
-      28,
-      "Kentucky",
-      18
-     ],
-     [
-      2025,
-      "Tennessee",
-      "Kentucky",
-      34,
-      "Tennessee",
-      56
-     ]
-    ]
-   }
-  },
-  "Texas A&M": {
-   "record": "4-3",
-   "conf": "SEC",
-   "confRecord": "1-3",
-   "compare": {
-    "ppg": [
-     33.4,
-     29.4
-    ],
-    "ypg": [
-     405.1,
-     356.9
-    ],
-    "ypp": [
-     5.84,
-     5.16
-    ],
-    "passYpg": [
-     188.0,
-     195.4
-    ],
-    "cmpPct": [
-     63.6,
-     55.9
-    ],
-    "ypa": [
-     7.15,
-     6.16
-    ],
-    "passTD": [
-     9.0,
-     9.0
-    ],
-    "intThrown": [
-     4.0,
-     7.0
-    ],
-    "sacksAllowed": [
-     18.0,
-     12.0
-    ],
-    "rushYpg": [
-     217.1,
-     161.4
-    ],
-    "ypc": [
-     5.03,
-     4.31
-    ],
-    "rushTD": [
-     18.0,
-     13.0
-    ],
-    "recPg": [
-     16.7,
-     17.7
-    ],
-    "ypr": [
-     11.25,
-     11.03
-    ],
-    "fdPg": [
-     22.6,
-     20.3
-    ],
-    "thirdPct": [
-     36.6,
-     42.7
-    ],
-    "fourthPct": [
-     72.7,
-     50.0
-    ],
-    "penYpg": [
-     58.1,
-     41.7
-    ],
-    "top": [
-     30.9,
-     32.3
-    ],
-    "toLost": [
-     10.0,
-     8.0
-    ],
-    "oppg": [
-     14.7,
-     17.1
-    ],
-    "oypg": [
-     280.6,
-     306.6
-    ],
-    "oypp": [
-     4.58,
-     5.38
-    ],
-    "othirdPct": [
-     30.8,
-     29.8
-    ],
-    "oPassYpg": [
-     159.3,
-     164.1
-    ],
-    "oCmpPct": [
-     63.2,
-     56.2
-    ],
-    "defInt": [
-     7.0,
-     5.0
-    ],
-    "sacks": [
-     29.0,
-     5.0
-    ],
-    "oRushYpg": [
-     121.3,
-     142.4
-    ],
-    "oYpc": [
-     3.77,
-     4.17
-    ],
-    "tfl": [
-     57.0,
-     32.0
-    ],
-    "takeaways": [
-     13.0,
-     10.0
-    ],
-    "toMargin": [
-     3.0,
-     2.0
-    ],
-    "krAvg": [
-     16.2,
-     18.4
-    ],
-    "prAvg": [
-     10.5,
-     9.8
-    ],
-    "retTD": [
-     1.0,
-     0.0
-    ]
-   },
-   "sp": {
-    "opp": [
-     9.9,
-     33,
-     46,
-     30
-    ],
-    "ut": [
-     17.5,
-     13,
-     24,
-     16
-    ]
-   },
-   "fpi": {
-    "opp": [
-     13.505,
-     20
-    ],
-    "ut": [
-     18.052,
-     12
-    ]
-   },
-   "impact": [
-    {
-     "name": "Marcel Reed",
-     "pos": "QB",
-     "what": "passing",
-     "line": "1225 pass yds, 7 TD, 6 INT"
-    },
-    {
-     "name": "KJ Edwards",
-     "pos": "RB",
-     "what": "rushing",
-     "line": "317 rush yds, 2 TD"
-    },
-    {
-     "name": "Isaiah Horton",
-     "pos": "WR",
-     "what": "receiving",
-     "line": "280 rec yds, 20 rec, 3 TD"
-    },
-    {
-     "name": "Ray Coney",
-     "pos": "LB",
-     "what": "defensive",
-     "line": "37 tackles, 2.5 TFL"
-    },
-    {
-     "name": "Marco Jones",
-     "pos": "DE",
-     "what": "defensive",
-     "line": "2 sacks"
-    },
-    {
-     "name": "Julian Humphrey",
-     "pos": "CB",
-     "what": "interceptions",
-     "line": "1 INT"
-    }
-   ],
-   "utImpact": [
-    {
-     "name": "Faizon Brandon",
-     "pos": "QB",
-     "what": "passing",
-     "line": "697 pass yds, 7 TD, 1 INT"
-    },
-    {
-     "name": "DeSean Bishop",
-     "pos": "RB",
-     "what": "rushing",
-     "line": "837 rush yds, 10 TD"
-    },
-    {
-     "name": "Mike Matthews",
-     "pos": "WR",
-     "what": "receiving",
-     "line": "481 rec yds, 29 rec, 3 TD"
-    },
-    {
-     "name": "Amare Campbell",
-     "pos": "LB",
-     "what": "defensive",
-     "line": "46 tackles, 6.5 TFL"
-    },
-    {
-     "name": "Tyree Weathersby",
-     "pos": "DL",
-     "what": "defensive",
-     "line": "6.5 sacks"
-    },
-    {
-     "name": "Dejuan Lane",
-     "pos": "DB",
-     "what": "interceptions",
-     "line": "3 INT"
-    }
-   ],
-   "series": {
-    "w": 3,
-    "l": 2,
-    "t": 0,
-    "first": 1957,
-    "last": [
-     [
-      1957,
-      "Tennessee",
-      "Tennessee",
-      3,
-      "Texas A&M",
-      0
-     ],
-     [
-      2004,
-      "Tennessee",
-      "Texas A&M",
-      7,
-      "Tennessee",
-      38
-     ],
-     [
-      2016,
-      "Texas A&M",
-      "Texas A&M",
-      45,
-      "Tennessee",
-      38
-     ],
-     [
-      2020,
-      "Texas A&M",
-      "Tennessee",
-      13,
-      "Texas A&M",
-      34
-     ],
-     [
-      2023,
-      "Tennessee",
-      "Tennessee",
-      20,
-      "Texas A&M",
-      13
-     ]
-    ]
-   }
-  },
-  "LSU": {
-   "record": "5-2",
-   "conf": "SEC",
-   "confRecord": "2-2",
-   "compare": {
-    "ppg": [
-     33.4,
-     40.4
-    ],
-    "ypg": [
-     405.1,
-     504.0
-    ],
-    "ypp": [
-     5.84,
-     6.35
-    ],
-    "passYpg": [
-     188.0,
-     307.9
-    ],
-    "cmpPct": [
-     63.6,
-     67.2
-    ],
-    "ypa": [
-     7.15,
-     8.52
-    ],
-    "passTD": [
-     9.0,
-     16.0
-    ],
-    "intThrown": [
-     4.0,
-     8.0
-    ],
-    "sacksAllowed": [
-     18.0,
-     12.0
-    ],
-    "rushYpg": [
-     217.1,
-     196.1
-    ],
-    "ypc": [
-     5.03,
-     4.53
-    ],
-    "rushTD": [
-     18.0,
-     20.0
-    ],
-    "recPg": [
-     16.7,
-     24.3
-    ],
-    "ypr": [
-     11.25,
-     12.68
-    ],
-    "fdPg": [
-     22.6,
-     27.9
-    ],
-    "thirdPct": [
-     36.6,
-     53.3
-    ],
-    "fourthPct": [
-     72.7,
-     83.3
-    ],
-    "penYpg": [
-     58.1,
-     48.0
-    ],
-    "top": [
-     30.9,
-     32.9
-    ],
-    "toLost": [
-     10.0,
-     11.0
-    ],
-    "oppg": [
-     14.7,
-     15.9
-    ],
-    "oypg": [
-     280.6,
-     256.6
-    ],
-    "oypp": [
-     4.58,
-     4.29
-    ],
-    "othirdPct": [
-     30.8,
-     30.6
-    ],
-    "oPassYpg": [
-     159.3,
-     168.3
-    ],
-    "oCmpPct": [
-     63.2,
-     59.0
-    ],
-    "defInt": [
-     7.0,
-     7.0
-    ],
-    "sacks": [
-     29.0,
-     24.0
-    ],
-    "oRushYpg": [
-     121.3,
-     88.3
-    ],
-    "oYpc": [
-     3.77,
-     2.82
-    ],
-    "tfl": [
-     57.0,
-     49.0
-    ],
-    "takeaways": [
-     13.0,
-     9.0
-    ],
-    "toMargin": [
-     3.0,
-     -2.0
-    ],
-    "krAvg": [
-     16.2,
-     18.8
-    ],
-    "prAvg": [
-     10.5,
-     9.8
-    ],
-    "retTD": [
-     1.0,
-     0.0
-    ]
-   },
-   "sp": {
-    "opp": [
-     22.6,
-     6,
-     10,
-     7
-    ],
-    "ut": [
-     17.5,
-     13,
-     24,
-     16
-    ]
-   },
-   "fpi": {
-    "opp": [
-     22.965,
-     8
-    ],
-    "ut": [
-     18.052,
-     12
-    ]
-   },
-   "impact": [
-    {
-     "name": "Sam Leavitt",
-     "pos": "QB",
-     "what": "passing",
-     "line": "1784 pass yds, 14 TD, 8 INT"
-    },
-    {
-     "name": "Dilin Jones",
-     "pos": "RB",
-     "what": "rushing",
-     "line": "567 rush yds, 5 TD"
-    },
-    {
-     "name": "Jackson Harris",
-     "pos": "WR",
-     "what": "receiving",
-     "line": "456 rec yds, 27 rec, 5 TD"
-    },
-    {
-     "name": "TJ Dottery",
-     "pos": "LB",
-     "what": "defensive",
-     "line": "54 tackles, 2 TFL"
-    },
-    {
-     "name": "Princewill Umanmielen",
-     "pos": "DE",
-     "what": "defensive",
-     "line": "8 sacks"
-    },
-    {
-     "name": "Tamarcus Cooley",
-     "pos": "S",
-     "what": "interceptions",
-     "line": "2 INT"
-    }
-   ],
-   "utImpact": [
-    {
-     "name": "Faizon Brandon",
-     "pos": "QB",
-     "what": "passing",
-     "line": "697 pass yds, 7 TD, 1 INT"
-    },
-    {
-     "name": "DeSean Bishop",
-     "pos": "RB",
-     "what": "rushing",
-     "line": "837 rush yds, 10 TD"
-    },
-    {
-     "name": "Mike Matthews",
-     "pos": "WR",
-     "what": "receiving",
-     "line": "481 rec yds, 29 rec, 3 TD"
-    },
-    {
-     "name": "Amare Campbell",
-     "pos": "LB",
-     "what": "defensive",
-     "line": "46 tackles, 6.5 TFL"
-    },
-    {
-     "name": "Tyree Weathersby",
-     "pos": "DL",
-     "what": "defensive",
-     "line": "6.5 sacks"
-    },
-    {
-     "name": "Dejuan Lane",
-     "pos": "DB",
-     "what": "interceptions",
-     "line": "3 INT"
-    }
-   ],
-   "series": {
-    "w": 21,
-    "l": 10,
-    "t": 3,
-    "first": 1925,
-    "last": [
-     [
-      2006,
-      "LSU",
-      "Tennessee",
-      24,
-      "LSU",
-      28
-     ],
-     [
-      2007,
-      "LSU",
-      "LSU",
-      21,
-      "Tennessee",
-      14
-     ],
-     [
-      2010,
-      "LSU",
-      "LSU",
-      16,
-      "Tennessee",
-      14
-     ],
-     [
-      2011,
-      "LSU",
-      "Tennessee",
-      7,
-      "LSU",
-      38
-     ],
-     [
-      2017,
-      "LSU",
-      "Tennessee",
-      10,
-      "LSU",
-      30
-     ],
-     [
-      2022,
-      "Tennessee",
-      "LSU",
-      13,
-      "Tennessee",
-      40
-     ]
-    ]
-   }
-  },
-  "Vanderbilt": {
-   "record": "3-4",
-   "conf": "SEC",
-   "confRecord": "0-4",
-   "compare": {
-    "ppg": [
-     33.4,
-     23.6
-    ],
-    "ypg": [
-     405.1,
-     354.4
-    ],
-    "ypp": [
-     5.84,
-     5.51
-    ],
-    "passYpg": [
-     188.0,
-     235.1
-    ],
-    "cmpPct": [
-     63.6,
-     60.4
-    ],
-    "ypa": [
-     7.15,
-     7.59
-    ],
-    "passTD": [
-     9.0,
-     7.0
-    ],
-    "intThrown": [
-     4.0,
-     8.0
-    ],
-    "sacksAllowed": [
-     18.0,
-     13.0
-    ],
-    "rushYpg": [
-     217.1,
-     119.3
-    ],
-    "ypc": [
-     5.03,
-     3.58
-    ],
-    "rushTD": [
-     18.0,
-     11.0
-    ],
-    "recPg": [
-     16.7,
-     18.7
-    ],
-    "ypr": [
-     11.25,
-     12.56
-    ],
-    "fdPg": [
-     22.6,
-     18.7
-    ],
-    "thirdPct": [
-     36.6,
-     38.5
-    ],
-    "fourthPct": [
-     72.7,
-     61.1
-    ],
-    "penYpg": [
-     58.1,
-     65.0
-    ],
-    "top": [
-     30.9,
-     30.5
-    ],
-    "toLost": [
-     10.0,
-     12.0
-    ],
-    "oppg": [
-     14.7,
-     29.7
-    ],
-    "oypg": [
-     280.6,
-     365.6
-    ],
-    "oypp": [
-     4.58,
-     5.64
-    ],
-    "othirdPct": [
-     30.8,
-     40.9
-    ],
-    "oPassYpg": [
-     159.3,
-     219.3
-    ],
-    "oCmpPct": [
-     63.2,
-     64.9
-    ],
-    "defInt": [
-     7.0,
-     5.0
-    ],
-    "sacks": [
-     29.0,
-     15.0
-    ],
-    "oRushYpg": [
-     121.3,
-     146.3
-    ],
-    "oYpc": [
-     3.77,
-     4.21
-    ],
-    "tfl": [
-     57.0,
-     28.0
-    ],
-    "takeaways": [
-     13.0,
-     7.0
-    ],
-    "toMargin": [
-     3.0,
-     -5.0
-    ],
-    "krAvg": [
-     16.2,
-     18.5
-    ],
-    "prAvg": [
-     10.5,
-     12.9
-    ],
-    "retTD": [
-     1.0,
-     2.0
-    ]
-   },
-   "sp": {
-    "opp": [
-     0.3,
-     72,
-     64,
-     86
-    ],
-    "ut": [
-     17.5,
-     13,
-     24,
-     16
-    ]
-   },
-   "fpi": {
-    "opp": [
-     0.452,
-     66
-    ],
-    "ut": [
-     18.052,
-     12
-    ]
-   },
-   "impact": [
-    {
-     "name": "Jared Curtis",
-     "pos": "QB",
-     "what": "passing",
-     "line": "1242 pass yds, 6 TD, 7 INT"
-    },
-    {
-     "name": "Sedrick Alexander",
-     "pos": "RB",
-     "what": "rushing",
-     "line": "270 rush yds, 5 TD"
-    },
-    {
-     "name": "Junior Sherrill",
-     "pos": "WR",
-     "what": "receiving",
-     "line": "628 rec yds, 41 rec, 4 TD"
-    },
-    {
-     "name": "C.J. Heard",
-     "pos": "S",
-     "what": "defensive",
-     "line": "53 tackles, 4 TFL"
-    },
-    {
-     "name": "C.J. Heard",
-     "pos": "S",
-     "what": "defensive",
-     "line": "3 sacks"
-    },
-    {
-     "name": "Miles Capers",
-     "pos": "EDGE",
-     "what": "interceptions",
-     "line": "1 INT"
-    }
-   ],
-   "utImpact": [
-    {
-     "name": "Faizon Brandon",
-     "pos": "QB",
-     "what": "passing",
-     "line": "697 pass yds, 7 TD, 1 INT"
-    },
-    {
-     "name": "DeSean Bishop",
-     "pos": "RB",
-     "what": "rushing",
-     "line": "837 rush yds, 10 TD"
-    },
-    {
-     "name": "Mike Matthews",
-     "pos": "WR",
-     "what": "receiving",
-     "line": "481 rec yds, 29 rec, 3 TD"
-    },
-    {
-     "name": "Amare Campbell",
-     "pos": "LB",
-     "what": "defensive",
-     "line": "46 tackles, 6.5 TFL"
-    },
-    {
-     "name": "Tyree Weathersby",
-     "pos": "DL",
-     "what": "defensive",
-     "line": "6.5 sacks"
-    },
-    {
-     "name": "Dejuan Lane",
-     "pos": "DB",
-     "what": "interceptions",
-     "line": "3 INT"
-    }
-   ],
-   "series": {
-    "w": 81,
-    "l": 31,
-    "t": 4,
-    "first": 1902,
-    "last": [
-     [
-      2020,
-      "Tennessee",
-      "Vanderbilt",
-      17,
-      "Tennessee",
-      42
-     ],
-     [
-      2021,
-      "Tennessee",
-      "Tennessee",
-      45,
-      "Vanderbilt",
-      21
-     ],
-     [
-      2022,
-      "Tennessee",
-      "Vanderbilt",
-      0,
-      "Tennessee",
-      56
-     ],
-     [
-      2023,
-      "Tennessee",
-      "Tennessee",
-      48,
-      "Vanderbilt",
-      24
-     ],
-     [
-      2024,
-      "Tennessee",
-      "Vanderbilt",
-      23,
-      "Tennessee",
-      36
-     ],
-     [
-      2025,
-      "Vanderbilt",
-      "Tennessee",
-      24,
-      "Vanderbilt",
-      45
-     ]
-    ]
-   }
-  }
- }
+ ]
 };
