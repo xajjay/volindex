@@ -5,7 +5,7 @@ window.SITE.baseball = {
  "name": "Baseball",
  "short": "Baseball",
  "season": "2027",
- "updated": "2026-10-12",
+ "updated": "2026-10-25",
  "venue": "Lindsey Nelson Stadium",
  "prevLabel": "2026",
  "header": [
@@ -29,8 +29,9 @@ window.SITE.baseball = {
  "quick": [
   "Year 2 for <b>Josh Elander</b> after a 38-22 debut that ended in the Chapel Hill Regional (0-2).",
   "<b>Six Vols</b> went in the 2026 MLB Draft, led by RHP <b>Tegan Kuhns</b> (1st round, No. 32, Cardinals), and 16 left through the portal.",
+  "Fall ball: Tennessee put up <b>21 runs on 20 hits</b> in its exhibition with Lipscomb at Covenant Health Park after opening against Troy in Nashville. Two more at Chattanooga's Erlanger Park: <b>Kennesaw State Nov. 1</b> and <b>Georgia Tech Nov. 8</b>.",
   "Returning bats: <b>Trent Grindlinger</b> (.345), <b>Blake Grimmer</b>, <b>Levi Clark</b> and <b>Blaine Brown</b> (13 HR each). New arms include Louisville's <b>Parker Detmers</b> and South Carolina's <b>Jake McCoy</b>.",
-  "Baseball America picked Tennessee in its <b>way-too-early 2027 Omaha eight</b> after it signed five of BA's top 36 transfers; PEAR's early ratings have the Vols <b>No. 15</b>. Opening day is <b>Feb. 19</b>."
+  "Baseball America picked Tennessee in its <b>way-too-early 2027 Omaha eight</b>; PEAR's ratings have the Vols <b>No. 10</b>. Opening day is <b>Feb. 19</b>."
  ],
  "staff": [
   [

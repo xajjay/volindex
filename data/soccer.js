@@ -5,7 +5,7 @@ window.SITE.soccer = {
  "name": "Soccer",
  "short": "Lady Vols Soccer",
  "season": "2026",
- "updated": "2026-10-12",
+ "updated": "2026-10-25",
  "venue": "Regal Soccer Stadium",
  "prevLabel": "2025",
  "inSeason": true,
@@ -29,10 +29,11 @@ window.SITE.soccer = {
   ]
  ],
  "quick": [
-  "Tennessee is <b>6-4-4</b> (1-4-3 SEC).",
-  "Preseason: <b>No. 24</b> in the United Soccer Coaches poll (first preseason ranking since 2019) with TopDrawerSoccer's <b>No. 5</b> newcomer class.",
-  "<b>Kylee Simmons</b> leads with 4 goals; <b>Ines Derrien</b> and <b>Shae O'Rourke</b> each have 3 goals and 3 assists. Both forwards are back from 2025 knee injuries.",
-  "Two SEC matches left: at <b>Alabama Oct. 23</b> and <b>Oklahoma Nov. 1</b>. Top 12 teams make the SEC Tournament."
+  "Tennessee is <b>6-5-4</b> (1-5-3 SEC).",
+  "Last time out: a <b>2-1 loss at No. 7 Alabama</b> (Oct. 23). <b>Sophia Prime</b> scored her first career goal; Alabama tied it on a penalty after <b>Shae O'Rourke</b>'s red card, which also rules her out of the next match.",
+  "SEC Tournament: Tennessee is <b>two points outside</b> the 12-team field. It needs to beat <b>Oklahoma on Nov. 1</b> (regular-season finale) and get a draw in LSU-Missouri the same day.",
+  "<b>Kylee Simmons</b> leads with 4 goals; <b>Ines Derrien</b> and <b>Shae O'Rourke</b> each have 3 goals and 3 assists.",
+  "Preseason: <b>No. 24</b> in the United Soccer Coaches poll with TopDrawerSoccer's <b>No. 5</b> newcomer class."
  ],
  "staff": [
   [

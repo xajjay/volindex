@@ -5,17 +5,17 @@ window.SITE.wbb = {
  "name": "Women's Basketball",
  "short": "Lady Vols Hoops",
  "season": "2026-27",
- "updated": "2026-10-12",
+ "updated": "2026-10-25",
  "venue": "Food City Center",
  "prevLabel": "2025-26",
  "header": [
   [
-   "No. 25",
-   "USA Today post-portal top 25"
+   "RV",
+   "AP preseason (32nd in votes)"
   ],
   [
-   "No. 9",
-   "Transfer class (USA Today)"
+   "RV",
+   "Coaches preseason (29th)"
   ],
   [
    "16-14",
@@ -28,9 +28,10 @@ window.SITE.wbb = {
  ],
  "quick": [
   "A full rebuild in Kim Caldwell's third year: <b>no players return</b> from last season's 16-14 team.",
-  "Caldwell added <b>13 transfers</b> (USA Today ranked the class <b>9th nationally</b>) and two freshmen.",
-  "Headliners: <b>Kaylene Smikle</b> (17.2 career ppg, All-Big Ten at Rutgers and Maryland) and <b>Rylie Theuerkauf</b> (40.6% from three at Georgia).",
-  "USA Today's post-portal top 25 has the Lady Vols <b>No. 25</b>. The schedule includes UCLA, UConn and Baylor before SEC play."
+  "Caldwell added <b>13 transfers</b> (USA Today ranked the class <b>9th nationally</b>) and two freshmen, and replaced two assistants with Power Four coaches.",
+  "Preseason polls: <b>unranked</b> but receiving votes (32nd in the AP, 29th in the coaches poll). Seven SEC teams are in the AP top 25, led by No. 1 South Carolina; the SEC media picked Tennessee 8th.",
+  "Headliners: <b>Kaylene Smikle</b> (17.2 career ppg, All-Big Ten at Rutgers and Maryland) and <b>Rylie Theuerkauf</b> (40.6% from three at Georgia). 2027 commit: 4-star wing <b>Maci Pringle</b>.",
+  "First look: exhibition vs. <b>Florida A&M Oct. 27</b>; the opener is <b>Nov. 2 vs. Duquesne</b>. UCLA, UConn and Baylor come before SEC play."
  ],
  "staff": [
   [

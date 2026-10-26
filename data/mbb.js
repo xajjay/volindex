@@ -5,17 +5,17 @@ window.SITE.mbb = {
  "name": "Men's Basketball",
  "short": "Men's Hoops",
  "season": "2026-27",
- "updated": "2026-10-12",
+ "updated": "2026-10-25",
  "venue": "Food City Center",
  "prevLabel": "2025-26",
  "header": [
   [
-   "No. 6",
-   "Blue Ribbon preseason"
+   "No. 8",
+   "AP Top 25 (preseason)"
   ],
   [
-   "No. 15",
-   "CBS Top 25 And 1"
+   "No. 9",
+   "Coaches poll (preseason)"
   ],
   [
    "No. 18",
@@ -28,9 +28,10 @@ window.SITE.mbb = {
  ],
  "quick": [
   "Coming off a <b>25-12</b> season and a third straight <b>Elite Eight</b> (lost to Michigan).",
-  "A near-total reload: Rick Barnes added <b>seven double-digit scorers</b> from the transfer portal, led by Wake Forest's <b>Juke Harris</b> (21.4 ppg).",
-  "The big question is center: Loyola transfer <b>Miles Rubin</b> or sophomore <b>DeWayne Brown II</b>.",
-  "Preseason views: <b>No. 6</b> in the Blue Ribbon Yearbook and Rotowire, <b>No. 15</b> in CBS Sports' Top 25 And 1, <b>No. 18</b> in KenPom. ESPN's way-too-early top 25 left them out before the portal haul."
+  "Preseason polls: <b>No. 8</b> in the AP Top 25 (third-highest preseason AP spot in program history) and <b>No. 9</b> in the coaches poll. Seven SEC teams are ranked, led by No. 1 Florida.",
+  "A near-total reload: Rick Barnes added <b>seven double-digit scorers</b> from the portal, led by Wake Forest's <b>Juke Harris</b> (21.4 ppg), the only newcomer on the preseason First Team All-SEC.",
+  "Exhibitions went badly: an <b>86-70</b> home loss to Xavier and a <b>103-64</b> loss at No. 2 Duke. <b>Terrence Hill Jr.</b> hurt his ankle early at Duke; <b>Jalen Washington</b> is still awaiting eligibility and <b>Tyler Lundblade</b> hasn't played yet (back).",
+  "The opener is <b>Nov. 3 vs. Wofford</b> (SEC Network); Michigan State visits Nov. 17."
  ],
  "staff": [
   [

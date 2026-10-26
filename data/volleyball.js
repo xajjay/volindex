@@ -5,34 +5,34 @@ window.SITE.volleyball = {
  "name": "Volleyball",
  "short": "Lady Vols Volleyball",
  "season": "2026",
- "updated": "2026-10-12",
+ "updated": "2026-10-25",
  "venue": "Food City Center",
  "prevLabel": "2025",
  "inSeason": true,
  "lineupTab": "Starting Lineup",
  "header": [
   [
-   "No. 10",
-   "AVCA poll (Oct. 4)"
+   "No. 9",
+   "AVCA poll"
   ],
   [
-   "12-3",
+   "16-3",
    "2026 record"
   ],
   [
-   "3-2",
+   "7-2",
    "SEC"
   ],
   [
-   ".297",
+   ".292",
    "Team hitting %"
   ]
  ],
  "quick": [
-  "The Lady Vols are <b>14-3</b> (5-2 SEC) and <b>No. 9</b> in the AVCA poll, with wins over No. 21 Indiana and No. 9 Penn State.",
-  "Losses: No. 2 Pitt, No. 7 Texas (in five) and No. 7 Florida. They've won five straight since, the last two on the road at Arkansas and Oklahoma.",
-  "SMU transfer <b>Kennedi Rogers</b> leads with 4.35 kills per set; three-time All-American setter <b>Caroline Kerr</b> runs an offense hitting <b>.297</b>.",
-  "Next: <b>No. 4 Kentucky</b> visits Oct. 21 (SEC Network), then No. 22 Vanderbilt Oct. 25."
+  "The Lady Vols are <b>16-3</b> (7-2 SEC), <b>No. 9</b> in the AVCA poll and on a <b>seven-match winning streak</b>.",
+  "Back-to-back ranked wins at home: <b>No. 4 Kentucky</b> in five sets (Oct. 21) and <b>No. 22 Vanderbilt</b> in four (Oct. 25), the program's first wins over consecutive ranked opponents since 2021.",
+  "SMU transfer <b>Kennedi Rogers</b> leads with 4.19 kills per set (18 kills vs. Vanderbilt); three-time All-American setter <b>Caroline Kerr</b> moved into seventh in program history in double-doubles. The team hits <b>.292</b>.",
+  "Losses: No. 2 Pitt, No. 7 Texas (in five) and No. 7 Florida. Next: at <b>No. 19 Texas A&M Oct. 30</b>, then at Missouri Nov. 1 (ESPN2)."
  ],
  "staff": [
   [
