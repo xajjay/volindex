@@ -22,6 +22,82 @@
     return clash ? { fill: '#FFFFFF', stroke: t.c1, num: t.c1 === '#FFFFFF' ? '#141414' : t.c1 } : { fill: t.c1, stroke: '#FFFFFF', num: ink(t.c1) };
   }
 
+  /* ---------- sound: everything is synthesized with Web Audio (no files), off until you turn it on ---------- */
+  const SND = DYG.sound = (() => {
+    let ac = null, master = null, bed = null, noiseBuf = null;
+    const on = () => DY.G && DY.G.settings.sound === true;
+    function ctx() {
+      if (ac) return ac;
+      const AC = root.AudioContext || root.webkitAudioContext; if (!AC) return null;
+      ac = new AC(); master = ac.createGain(); master.gain.value = 0.55; master.connect(ac.destination);
+      noiseBuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+      const d = noiseBuf.getChannelData(0); let b = 0; for (let i = 0; i < d.length; i++) { b = 0.97 * b + 0.03 * (Math.random() * 2 - 1); d[i] = b * 6 + (Math.random() * 2 - 1) * 0.15; }
+      return ac;
+    }
+    // a crowd: filtered noise with a slow swell
+    function crowd(level, secs, freq, attack) {
+      const a = ctx(); if (!a || !on()) return;
+      const src = a.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+      const bp = a.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = freq || 900; bp.Q.value = 0.6;
+      const g = a.createGain(), t = a.currentTime; g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(level, t + (attack || 0.35)); g.gain.exponentialRampToValueAtTime(0.0001, t + secs);
+      src.connect(bp); bp.connect(g); g.connect(master); src.start(t); src.stop(t + secs + 0.1);
+      // a few whoops on top
+      if (level > 0.5) for (let i = 0; i < 5; i++) tone(700 + Math.random() * 700, t + 0.2 + Math.random() * secs * 0.5, 0.18, 'sawtooth', 0.025, 1.3);
+    }
+    function tone(f, t, dur, type, vol, slide) {
+      const a = ctx(); if (!a || !on()) return;
+      const o = a.createOscillator(), g = a.createGain(); o.type = type || 'triangle'; o.frequency.setValueAtTime(f, t);
+      if (slide) o.frequency.exponentialRampToValueAtTime(f * slide, t + dur);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.12, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+    }
+    function claps(n, gap) {
+      const a = ctx(); if (!a || !on()) return; const t0 = a.currentTime;
+      for (let i = 0; i < n; i++) for (let k = 0; k < 14; k++) {
+        const t = t0 + i * gap + Math.random() * 0.05, src = a.createBufferSource(); src.buffer = noiseBuf;
+        const hp = a.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1400 + Math.random() * 900;
+        const g = a.createGain(); g.gain.setValueAtTime(0.06, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07);
+        src.connect(hp); hp.connect(g); g.connect(master); src.start(t, Math.random()); src.stop(t + 0.09);
+      }
+    }
+    return {
+      unlock() { const a = ctx(); if (a && a.state === 'suspended') a.resume(); },
+      // a low murmur under the whole game
+      bed(start) {
+        const a = ctx(); if (!a) return;
+        if (bed) { try { bed.stop(); } catch (e) { /* already stopped */ } bed = null; }
+        if (!start || !on()) return;
+        const src = a.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+        const lp = a.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520;
+        const g = a.createGain(); g.gain.value = 0.05; src.connect(lp); lp.connect(g); g.connect(master); src.start(); bed = src;
+      },
+      roar() { crowd(0.9, 3.2, 950, 0.25); },
+      cheer() { crowd(0.45, 1.8, 900, 0.2); },
+      groan() { const a = ctx(); if (!a || !on()) return; crowd(0.35, 1.6, 420, 0.15); tone(260, a.currentTime, 0.9, 'sawtooth', 0.03, 0.6); },
+      // the home crowd on a big down when the visitors have the ball
+      loud() { crowd(0.6, 2.6, 1100, 0.8); claps(6, 0.42); },
+      // a touchdown fanfare: a bright brass-like arpeggio
+      fanfare() { const a = ctx(); if (!a || !on()) return; const t = a.currentTime + 0.05; [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(f, t + i * 0.12 + (i > 3 ? 0.1 : 0), i === 5 ? 0.6 : 0.16, 'square', 0.06)); },
+      sting() { const a = ctx(); if (!a || !on()) return; const t = a.currentTime; [880, 660, 440].forEach((f, i) => tone(f, t + i * 0.09, 0.14, 'square', 0.05)); },
+      whistle() { const a = ctx(); if (!a || !on()) return; const t = a.currentTime; tone(2900, t, 0.35, 'sine', 0.05); tone(3100, t + 0.03, 0.3, 'sine', 0.025); },
+      thud() { const a = ctx(); if (!a || !on()) return; tone(90, a.currentTime, 0.18, 'sine', 0.25, 0.5); },
+    };
+  })();
+  // what the crowd does after a play: it is the HOME crowd (Neyland on a Tennessee home game)
+  function soundFor(r, pre) {
+    if (!DY.G.settings.sound) return;
+    const GM = S.GM, home = 'h', good = s => s === home;
+    const big = r.big || (r.anim && Math.abs(r.anim.yards || 0) >= 20);
+    if (r.td) { if (good(r.s)) { SND.roar(); SND.fanfare(); } else SND.groan(); return; }
+    if (r.turnover) { if (good(r.s)) SND.groan(); else { SND.roar(); SND.sting(); } return; }
+    if (r.tag === 'GOOD' || r.tag === 'FIELD GOAL') { if (good(r.s)) SND.cheer(); return; }
+    if (r.r && r.r.kind === 'sack') { if (!good(r.s)) SND.roar(); else SND.groan(); return; }
+    if (big) { if (good(r.s)) SND.roar(); else SND.groan(); return; }
+    if (r.firstDown && good(r.s)) SND.cheer();
+    else if (pre.down >= 3 && !r.firstDown && !good(r.s) && pre.next === 'scrim') SND.cheer();   // a stop on third down
+  }
+
   /* ---------- open / close ---------- */
   DYG.open = (el, x, opts) => {
     opts = opts || {};
@@ -40,9 +116,10 @@
     if (S.ro) S.ro.observe(el.querySelector('.dyg-fieldwrap'));
     renderBoard(); renderTab(); barsMode();
     if (GM.plays.length === 0) showCaption({ tag: GM.rival ? GM.rival.toUpperCase() : 'KICKOFF', text: intro(GM) });
+    if (g.settings.sound) SND.bed(true);
     setTimeout(loop, 300);
   };
-  DYG.close = () => { if (!S) return; clearTimeout(S.timer); cancelAnimationFrame(S.raf); if (S.ro) S.ro.disconnect(); S = null; };
+  DYG.close = () => { if (!S) return; SND.bed(false); document.documentElement.classList.remove('dyg-noscroll'); clearTimeout(S.timer); cancelAnimationFrame(S.raf); if (S.ro) S.ro.disconnect(); S = null; };
   DYG.live = () => S && S.GM;
   function intro(GM) {
     const r = GM.ranks, a = GM.T.a, h = GM.T.h;
@@ -56,6 +133,7 @@
         <div class="dyg-wp" title="Win probability"><span id="dygWp"></span></div>
         <div class="dyg-fieldwrap"><canvas aria-label="Field: live play"></canvas><div class="dyg-banner" id="dygBanner"></div><div class="dyg-noise" id="dygNoise"></div><div class="dyg-pop" id="dygPop"></div><div class="dyg-cap" id="dygCap" aria-live="polite"></div></div>
         <div class="dyg-bars" id="dygBars" hidden></div>
+        <div class="dyg-fullbar"><button data-fullx="1">✕ Exit full screen</button><button data-pause="1" class="dyg-fp-pause">❚❚ / ▶</button><button data-snd="1">Sound</button></div>
       </div>
       <div class="dyg-ctrl" id="dygCtrl"></div>
       <div class="dyg-simbar" id="dygSim"></div>
@@ -110,8 +188,21 @@
     renderPanel('busy');
     const bigThird = pre.next === 'scrim' && pre.down === 3 && GM.big && GM.crowd > 0.7 && pre.poss === 'a' && DY.G.settings.shake !== false && !reduce();
     if (bigThird) noise();
-    play(r, pre, done);
+    // home crowd gets loud on a big down when the visitors have the ball
+    if (DY.G.settings.sound && pre.next === 'scrim' && pre.poss === 'a' && (pre.down >= 3 || (pre.ball >= 80))) SND.loud();
+    play(r, pre, () => { soundFor(r, pre); done(); });
   }
+  // full screen: the field takes the whole screen (best with Watch only on Slow); the caption sits on top of it
+  function toggleFull(on) {
+    if (!S) return;
+    const el = S.el.querySelector('.dyg');
+    el.classList.toggle('dyg-full', on);
+    document.documentElement.classList.toggle('dyg-noscroll', on);
+    try { if (on && el.requestFullscreen && !document.fullscreenElement) el.requestFullscreen().catch(() => {}); else if (!on && document.fullscreenElement) document.exitFullscreen().catch(() => {}); } catch (e) { /* not allowed in this frame */ }
+    if (on && S.speed === 'fast' && S.GM.coach === 'watch') { S.speed = 'slow'; barsMode(); }
+    setTimeout(() => { if (!S) return; sizeCanvas(); if (!S.anim) drawStatic(); }, 120);
+  }
+  document.addEventListener('fullscreenchange', () => { if (S && !document.fullscreenElement && S.el.querySelector('.dyg-full')) toggleFull(false); });
   // record chase: the moment a Tennessee player passes a school record during the game
   function liveRecords() {
     const GM = S.GM, g = DY.G; if (!g.rec || !GM.user) return;
@@ -230,6 +321,8 @@
     sim.innerHTML = need === 'plan' ? '' : `<div class="dyg-sims"><span class="dyg-lab">Sim to</span>${[['drive', 'End of drive'], ['quarter', 'End of quarter'], ['half', 'End of half'], ['big', 'Big moment'], ['end', 'Final']].map(([k, l]) => `<button data-sim="${k}">${l}</button>`).join('')}</div>
       <div class="dyg-speed"><span class="dyg-lab">View</span><button data-speed="slow" aria-pressed="${S.speed === 'slow'}">Slow</button><button data-speed="fast" aria-pressed="${S.speed === 'fast'}">Fast</button>
       <button data-watch="1" aria-pressed="${GM.coach === 'watch'}" title="The CPU calls your plays too">Watch only</button>
+      <button data-snd="1" aria-pressed="${DY.G.settings.sound === true}" title="Crowd noise and sound effects">${DY.G.settings.sound ? '🔊 Sound' : '🔇 Sound'}</button>
+      <button data-full="1" title="Full-screen field">⛶ Full screen</button>
       ${isBars() ? '<button data-watchone="1">Watch next play</button>' : ''}
       ${need === 'off' || need === 'def' || need === 'pat' || need === 'half' ? '' : `<button data-pause="1" class="${S.paused ? 'on' : ''}">${S.paused ? '▶ Resume' : '❚❚ Pause'}</button>`}</div>`;
     if (need === 'busy') { el.innerHTML = `<div class="dyg-wait">${S.lastRes && S.lastRes.play ? esc(S.lastRes.play) + '…' : '…'}</div>`; return; }
@@ -361,6 +454,9 @@
       if (d.pause) { S.paused = !S.paused; if (!S.busy) loop(); else renderPanel('busy'); return; }
       if (d.speed) { S.speed = d.speed; DY.G.settings.speed = S.speed; barsMode(); renderPanel(S.busy ? 'busy' : DY.needs(GM)); if (!S.busy) loop(); return; }
       if (d.watch) { GM.coach = GM.coach === 'watch' ? (DY.G.settings.coachMode === 'watch' ? 'offense' : DY.G.settings.coachMode) : 'watch'; if (GM.coach === 'watch') S.paused = false; barsMode(); if (!S.busy) loop(); return; }
+      if (d.snd) { DY.G.settings.sound = !DY.G.settings.sound; if (DY.G.settings.sound) { SND.unlock(); SND.bed(true); SND.cheer(); } else SND.bed(false); renderPanel(S.busy ? 'busy' : DY.needs(GM)); return; }
+      if (d.full) { toggleFull(true); return; }
+      if (d.fullx) { toggleFull(false); return; }
       if (d.watchone) { S.watchOne = true; barsMode(); clearTimeout(S.timer); if (!S.busy) doStep({}); return; }
       if (S.busy) return;
       if (d.plan) return doStep({ plan: d.plan });
@@ -466,7 +562,8 @@
     let ppy = Math.max(7, w / yards);
     const vw = Math.min(120, w / ppy); ppy = w / vw;
     const vh0 = root.innerHeight || 800;
-    const h = Math.round(Math.min(53.33 * ppy, w < 520 ? Math.max(200, Math.min(vh0 * 0.31, w * 0.62)) : Math.max(260, Math.min(420, vh0 * 0.42))));
+    const full = !!S.el.querySelector('.dyg-full');
+    const h = full ? Math.round(Math.min(53.33 * ppy * 1.0, Math.max(200, vh0 - (w < 520 ? 150 : 175)))) : Math.round(Math.min(53.33 * ppy, w < 520 ? Math.max(200, Math.min(vh0 * 0.31, w * 0.62)) : Math.max(260, Math.min(420, vh0 * 0.42))));
     S.vw = vw; S.vh = h / ppy; S.ppy = ppy; S.cw = w; S.ch = h;
     S.cv.width = Math.round(w * dpr); S.cv.height = Math.round(h * dpr); S.cv.style.height = h + 'px';
     S.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

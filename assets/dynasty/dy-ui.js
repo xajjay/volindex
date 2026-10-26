@@ -57,12 +57,13 @@
   }
   function setup() {
     const s = V.setup;
-    const def = { coach: '', arch: 'motivator', diff: 'heisman', cfp: 'real', coachMode: 'offense', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, speed: 'slow', shake: true, offStyle: 'power', watchSeason: false };
+    const def = { start: 'pre', coach: '', arch: 'motivator', diff: 'heisman', cfp: 'real', coachMode: 'offense', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, speed: 'slow', shake: true, offStyle: 'power', watchSeason: false };
     for (const k in def) if (s[k] == null) s[k] = def[k];
     const seg = (key, opts) => `<div class="gseg" data-key="${key}">${opts.map(([v, l]) => `<button type="button" data-v="${v}" aria-pressed="${String(s[key]) === String(v)}">${esc(l)}</button>`).join('')}</div>`;
     APP.innerHTML = `<div class="wrap games dy"><div class="gcrumb"><a href="#" data-back="1">Vol Dynasty</a> › New dynasty</div>
       <div class="dy-hero"><h1>New dynasty</h1><p>Tennessee, 2026. The real roster, depth chart and schedule; the real 2027 recruiting class already committed.</p></div>
       <div class="box gsetup dy-setup">
+        ${DY.canStartToday() ? (() => { const F = root.SITE_AUTO.football, pl = F.schedule.filter(x => x.result), w = pl.filter(x => x.result === 'W').length; return `<div class="gfield"><div class="glabel">Start</div>${seg('start', [['pre', '2026 preseason'], ['today', `Today: take over at ${w}-${pl.length - w}`]])}<p class="dim small">${s.start === 'today' ? `Take the job this week. Tennessee's real results, scores and player stats so far; every FBS team's real record and the real AP poll (as of ${esc(root.DY_TODAY.asOf)}). The rest of the season is yours.` : 'Start from the first week of the 2026 season.'}</p></div>`; })() : ''}
         <div class="gfield"><div class="glabel">Coach name</div><input id="dyCoach" class="dy-in" maxlength="28" placeholder="Your name" value="${esc(s.coach)}"></div>
         <div class="gfield"><div class="glabel">Coaching style</div><div class="dy-archs">${Object.entries(DY.COACH_ARCH).map(([k, a]) => `<button type="button" class="dy-arch" data-arch="${k}" aria-pressed="${s.arch === k}"><b>${esc(a.name)}</b><small>${esc(a.desc)}</small></button>`).join('')}</div></div>
         <div class="gfield"><div class="glabel">Offensive identity</div>${seg('offStyle', DY.USER_STYLES.map(k => [k, DY.STYLES[k].name]))}<p class="dim small">Tennessee leans on the run and plays at a slower pace this season. You can change it any time in Settings.</p></div>
@@ -89,6 +90,7 @@
         busy('Building the 2026 season: 136 teams, 7,400 players…', () => {
           DY.newDynasty({ coach: s.coach, arch: s.arch, settings: { cfp: s.cfp, coachMode: s.coachMode, recruiting: s.recruiting, portal: s.portal, nil: s.nil, injuries: s.injuries, speed: s.speed, shake: s.shake, difficulty: s.diff, offStyle: s.offStyle, watchSeason: s.watchSeason } });
           G().slot = s.slot; V.tab = 'home';
+          if (s.start === 'today' && DY.canStartToday()) { const err = DY.startToday(); if (err) V.msg = err; }
         });
       }
     };
@@ -332,11 +334,11 @@
     const P = (p, x, y, lab) => p ? `<a href="#" class="dy-fp${p.ovr >= 90 ? ' star' : ''}" data-pid="${p.id}" style="left:${x}%;top:${y}%"><b>${p.ovr}</b><span>${esc(DY.lastName(p))}</span><i>${lab}</i></a>` : '';
     const offHtml = [
       P(L.WR[0], 7, 16, 'WR'), P(L.OT[0], 31, 16, 'LT'), P(L.IOL[0], 40.5, 16, 'LG'), P(L.IOL[1], 50, 16, 'C'), P(L.IOL[2], 59.5, 16, 'RG'), P(L.OT[1], 69, 16, 'RT'), P(L.TE[0], 79, 22, 'TE'), P(L.WR[1], 93, 16, 'WR'),
-      P(L.WR[2], 84, 46, 'SLOT'), P(L.QB[0], 50, 48, 'QB'), P(L.RB[0], 50, 78, 'RB'),
+      P(L.WR[2], 17, 42, 'SLOT'), P(L.QB[0], 50, 52, 'QB'), P(L.RB[0], 50, 78, 'RB'),
     ].join('');
     const defHtml = [
-      P(L.CB[0], 7, 72, 'CB'), P(L.EDGE[0], 30, 72, 'EDGE'), P(L.DT[0], 43, 72, 'DT'), P(L.DT[1], 57, 72, 'DT'), P(L.EDGE[1], 70, 72, 'EDGE'), P(L.CB[1], 93, 72, 'CB'),
-      P(L.LB[0], 38, 44, 'LB'), P(L.LB[1], 62, 44, 'LB'), P(L.NB, 82, 50, 'NB'), P(L.S[0], 28, 14, 'S'), P(L.S[1], 72, 14, 'S'),
+      P(L.CB[0], 6, 74, 'CB'), P(L.EDGE[0], 31, 76, 'EDGE'), P(L.DT[0], 43.5, 76, 'DT'), P(L.DT[1], 56.5, 76, 'DT'), P(L.EDGE[1], 69, 76, 'EDGE'), P(L.CB[1], 94, 74, 'CB'),
+      P(L.LB[0], 40, 46, 'LB'), P(L.LB[1], 60, 46, 'LB'), P(L.NB, 19, 62, 'NB'), P(L.S[0], 27, 15, 'FS'), P(L.S[1], 73, 15, 'SS'),
     ].join('');
     const o = DY.teamOvr(ut);
     return `<div class="box"><div class="glabel">Starters <span class="gseg dy-seg-sm"><button data-dview="off" aria-pressed="${off}">Offense ${o.off}</button><button data-dview="def" aria-pressed="${!off}">Defense ${o.def}</button></span></div>
@@ -473,7 +475,7 @@
       const startersLeaving = (ut.depth[pos] || []).slice(0, DY.STARTERS[pos]).map(DY.P).filter(p => p && p.el <= 1);
       return { pos, n: ps.length, commits, need, by, leaving, startersLeaving, thin: ps.length + commits < need };
     });
-    const SLOT = { QB: ['QB1'], RB: ['RB1'], WR: ['X', 'Z', 'Slot'], TE: ['TE1'], OT: ['LT', 'RT'], IOL: ['LG', 'C', 'RG'], EDGE: ['Edge L', 'Edge R'], DT: ['3-tech', 'Nose'], LB: ['Mike', 'Will'], CB: ['CB1', 'CB2', 'Nickel'], S: ['FS', 'SS'], K: ['K'], P: ['P'] };
+    const SLOT = { QB: ['QB1'], RB: ['RB1'], WR: ['X', 'Z', 'Slot'], TE: ['TE1'], OT: ['LT', 'RT'], IOL: ['LG', 'C', 'RG'], EDGE: ['Edge L', 'Edge R'], DT: ['DT', 'DT'], LB: ['Mike', 'Will'], CB: ['CB1', 'CB2', 'Nickel'], S: ['FS', 'SS'], K: ['K'], P: ['P'] };
     const offs = g.phase === 'offseason';
     const proj = V.dproj != null ? V.dproj : offs;
     const PJ = proj ? DY.projRoster() : null;
@@ -483,11 +485,13 @@
     const projBar = `<div class="dy-niltabs"><button data-dproj="0" aria-pressed="${!proj}">Current depth chart</button><button data-dproj="1" aria-pressed="${proj}">Projected ${g.season + 1}</button></div>${proj ? `<p class="small dim">Projected ${g.season + 1} roster: <b>${PJ.n}</b> players (limit ${DY.rosterMax()}). ${PJ.out} leaving or gone${PJ.inc ? `, ${PJ.inc} commits coming` : ''}. Updates as players decide to stay or go, transfers commit and recruits sign. Ratings are today's (before offseason growth).</p>` : ''}`;
     const unit = V.dunit || 'off';
     const UNITS = { off: ['QB', 'RB', 'WR', 'TE', 'OT', 'IOL'], def: ['EDGE', 'DT', 'LB', 'CB', 'S'], st: ['K', 'P'] };
+    // the starters where they line up on the field
+    const fp = (pos, i, x, y, lab) => { const p = D(pos)[i]; return p ? `<a href="#" class="dy-fp${p.ovr >= 90 ? ' star' : ''}${isNew(p) ? ' nw' : ''}" data-pid="${p.id}" style="left:${x}%;top:${y}%"><b>${p.ovr}</b><span>${esc(DY.lastName(p))}</span><i>${lab}</i></a>` : `<span class="dy-fp empty" style="left:${x}%;top:${y}%"><b>—</b><i>${lab}</i></span>`; };
     const lineup = unit === 'off'
-      ? `<div class="dy-lu"><div class="dy-lu-row">${at('WR', 0)}${at('OT', 0)}${at('IOL', 0)}${at('IOL', 1)}${at('IOL', 2)}${at('OT', 1)}${at('TE', 0)}${at('WR', 1)}</div><div class="dy-lu-row">${at('WR', 2)}${at('QB', 0)}</div><div class="dy-lu-row">${at('RB', 0)}</div></div>`
+      ? `<div class="dy-field o dy-lufield"><div class="dy-los"></div>${fp('WR', 0, 6, 20, 'X')}${fp('WR', 2, 17, 42, 'SLOT')}${fp('OT', 0, 31, 20, 'LT')}${fp('IOL', 0, 40.5, 20, 'LG')}${fp('IOL', 1, 50, 20, 'C')}${fp('IOL', 2, 59.5, 20, 'RG')}${fp('OT', 1, 69, 20, 'RT')}${fp('TE', 0, 79, 27, 'TE')}${fp('WR', 1, 94, 20, 'Z')}${fp('QB', 0, 50, 52, 'QB')}${fp('RB', 0, 50, 82, 'RB')}</div>`
       : unit === 'def'
-      ? `<div class="dy-lu"><div class="dy-lu-row">${at('S', 0)}${at('S', 1)}</div><div class="dy-lu-row">${at('CB', 0)}${at('LB', 0)}${at('LB', 1)}${at('CB', 2)}${at('CB', 1)}</div><div class="dy-lu-row">${at('EDGE', 0)}${at('DT', 0)}${at('DT', 1)}${at('EDGE', 1)}</div></div>`
-      : `<div class="dy-lu"><div class="dy-lu-row">${at('K', 0)}${at('P', 0)}</div></div>`;
+      ? `<div class="dy-field d dy-lufield"><div class="dy-los"></div>${fp('CB', 0, 6, 74, 'CB')}${fp('CB', 2, 19, 62, 'NICKEL')}${fp('EDGE', 0, 31, 76, 'EDGE')}${fp('DT', 0, 43.5, 76, 'DT')}${fp('DT', 1, 56.5, 76, 'DT')}${fp('EDGE', 1, 69, 76, 'EDGE')}${fp('CB', 1, 94, 74, 'CB')}${fp('LB', 0, 40, 46, 'MIKE')}${fp('LB', 1, 60, 46, 'WILL')}${fp('S', 0, 27, 15, 'FS')}${fp('S', 1, 73, 15, 'SS')}</div>`
+      : `<div class="dy-field o dy-lufield st"><div class="dy-los"></div>${fp('K', 0, 35, 50, 'K')}${fp('P', 0, 65, 50, 'P')}</div>`;
     const ut2 = ut, risks = ut2.roster.map(DY.P).map(p => ({ p, c: DY.declareChance(p) })).filter(x => x.c >= 0.15).sort((a, b) => b.c - a.c);
     const maxRaise = p => Math.max(0, Math.min(ut2.budget * 1.02 - DY.payroll(ut2), (p.nilV || DY.nilValue(p, ut2)) * 1.5));
     const draftBox = risks.length ? `<div class="box"><div class="glabel">Draft watch: could leave early</div><p class="small dim">Juniors and older with NFL draft grades. If one declares, you get one pitch in the offseason; "even with a raise" is the best case with the biggest raise your budget allows today.</p>
@@ -684,7 +688,8 @@
       <div class="gfield"><div class="glabel">Playoff (from the next selection day)</div>${seg('cfp', [['real', 'Real format'], [2, '2'], [4, '4'], [8, '8'], [12, '12'], [24, '24']])}</div>
       <div class="gfield"><div class="glabel">Difficulty</div>${seg('difficulty', [['freshman', 'Freshman'], ['varsity', 'Varsity'], ['heisman', 'Heisman']])}</div>
       <div class="gfield"><div class="glabel">Injuries</div>${seg('injuries', [[true, 'On'], [false, 'Off']])}</div>
-      <div class="gfield"><div class="glabel">Screen shake</div>${seg('shake', [[true, 'On'], [false, 'Off']])}</div></div></div></div>`;
+      <div class="gfield"><div class="glabel">Screen shake</div>${seg('shake', [[true, 'On'], [false, 'Off']])}</div>
+      <div class="gfield"><div class="glabel">Game sound (crowd and effects)</div>${seg('sound', [[true, 'On'], [false, 'Off']], s.sound === true)}</div></div></div></div>`;
   }
 
   /* ---------- offseason ---------- */

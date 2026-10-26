@@ -302,6 +302,109 @@
     }
     return out;
   };
+  /* ---------- Start Today: take over Tennessee this week of the real season ---------- */
+  // Tennessee's real results, scores, box-score game logs and season stats come from the site's daily data; every other FBS
+  // team's real record comes from DY_TODAY (NCAA standings). Games we don't have (CPU vs CPU) are simulated, then the results are
+  // nudged so each team's record matches the real one, and team strength (Elo) is pulled toward what really happened.
+  const BOXMAP = { passing: (l, r) => { const [c, a] = String(r[1]).split('/').map(Number); l.pc = (l.pc || 0) + c; l.pa = (l.pa || 0) + a; l.py = (l.py || 0) + +r[2]; l.ptd = (l.ptd || 0) + +r[4]; l.pi = (l.pi || 0) + +r[5]; },
+    rushing: (l, r) => { l.ra = (l.ra || 0) + +r[1]; l.ry = (l.ry || 0) + +r[2]; l.rtd = (l.rtd || 0) + +r[4]; l.rlg = Math.max(l.rlg || 0, +r[5] || 0); },
+    receiving: (l, r) => { l.rc = (l.rc || 0) + +r[1]; l.rcy = (l.rcy || 0) + +r[2]; l.rctd = (l.rctd || 0) + +r[4]; l.rclg = Math.max(l.rclg || 0, +r[5] || 0); l.tg = (l.tg || 0) + +r[1]; },
+    defensive: (l, r) => { l.tk = (l.tk || 0) + +r[1]; l.sck = (l.sck || 0) + +r[3]; l.tfl = (l.tfl || 0) + +r[4]; l.pd = (l.pd || 0) + +r[5]; },
+    interceptions: (l, r) => { l.int = (l.int || 0) + +r[1]; },
+    kicking: (l, r) => { const [m, a] = String(r[1]).split('/').map(Number), [xm, xa] = String(r[4]).split('/').map(Number); l.fgm = m; l.fga = a; l.xpm = xm; l.xpa = xa; if (m) l.fglg = +r[3]; },
+    punting: (l, r) => { l.pn = +r[1]; l.pny = +r[2]; l.i20 = +r[5]; },
+    kickReturns: (l, r) => { l.kr = +r[1]; l.kry = +r[2]; },
+    puntReturns: (l, r) => { l.pr = +r[1]; l.pry = +r[2]; } };
+  function realSeason(ps) {
+    const s = { gp: 0 };
+    if (ps.pass) { s.pc = ps.pass[0]; s.pa = ps.pass[1]; s.py = ps.pass[2]; s.ptd = ps.pass[3]; s.pi = ps.pass[4]; }
+    if (ps.rush) { s.ra = ps.rush[0]; s.ry = ps.rush[1]; s.rlg = ps.rush[3]; s.rtd = ps.rush[4]; }
+    if (ps.rec) { s.rc = ps.rec[0]; s.rcy = ps.rec[1]; s.rclg = ps.rec[3]; s.rctd = ps.rec[4]; s.tg = ps.rec[0]; }
+    if (ps.def) { s.tk = ps.def.tot; s.tfl = ps.def.tfl; s.sck = ps.def.sacks; s.int = ps.def.int; s.pd = ps.def.pbu; s.ff = ps.def.ff; }
+    if (ps.kick) { s.fgm = ps.kick[0]; s.fga = ps.kick[1]; s.xpm = ps.kick[2]; s.xpa = ps.kick[3]; s.fglg = ps.kick[4]; }
+    if (ps.punt) { s.pn = ps.punt[0]; s.pny = ps.punt[1]; s.i20 = ps.punt[5] || 0; }
+    if (ps.kr) { s.kr = ps.kr[0]; s.kry = ps.kr[1]; }
+    if (ps.pr) { s.pr = ps.pr[0]; s.pry = ps.pr[1]; }
+    for (const k in s) if (s[k] == null || Number.isNaN(s[k])) delete s[k];
+    return s;
+  }
+  DY.canStartToday = () => { const F = root.SITE_AUTO && root.SITE_AUTO.football; return !!(root.DY_TODAY && F && (F.schedule || []).some(x => x.result)); };
+  DY.startToday = () => {
+    const g = G(), TD = root.DY_TODAY, F = root.SITE_AUTO && root.SITE_AUTO.football;
+    if (!DY.canStartToday()) return 'The current-season data is not available.';
+    const played = F.schedule.filter(x => x.result);
+    const lastWk = DY.weekOfDate(g.season, played[played.length - 1].date);
+    const ut = DY.userT(), real = {};
+    played.forEach(x => { const o = DY.byName(x.opp); if (o) real[o.id] = x; });
+    if (DY.autoCamp) DY.autoCamp();
+    DY.startSeason();
+    const sim0 = {};
+    // play the weeks that already happened
+    let guard = 0;
+    while (g.phase === 'season' && g.week <= lastWk && guard++ < 20) {
+      const ug = DY.userGames(g.week)[0];
+      if (ug && !ug.res) {
+        DY.simGame(ug);
+        const o = ug.h === ut.id ? ug.a : ug.h, rx = real[o];
+        if (rx) {
+          const home = ug.h === ut.id, simWon = home ? ug.res.h > ug.res.a : ug.res.a > ug.res.h, realWon = rx.result === 'W';
+          ug.res = home ? { h: rx.us, a: rx.them, ot: 0 } : { h: rx.them, a: rx.us, ot: 0 };
+          ug.real = true; ug.box = null;
+          if (simWon !== realWon) { const sr = g.series && g.series[DY.T(o).name]; if (sr) { if (realWon) { sr.w++; sr.l--; sr.streak = 1; } else { sr.l++; sr.w--; sr.streak = -1; } } }
+        }
+      }
+      DY.finishWeek();
+    }
+    // match every team's record to the real one: flip simulated CPU results where it helps, then set the records
+    const done = g.sched.filter(x => x.res && x.wk <= lastWk && !x.post);
+    const tgt = {}, cur = {};
+    g.teams.forEach(t => { const r = TD.rec[t.name]; if (!r) return; const [o, c] = r.split('|'); const [w, l] = o.split('-').map(Number), [cw, cl] = c.split('-').map(Number); tgt[t.id] = { w, l, cw, cl }; cur[t.id] = 0; sim0[t.id] = t.w; });
+    done.forEach(x => { const w = x.res.h > x.res.a ? x.h : x.a; if (cur[w] != null) cur[w]++; });
+    for (let pass = 0; pass < 6; pass++) {
+      DY.shuffle(done.slice()).forEach(x => {
+        if (x.real || x.h === ut.id || x.a === ut.id) return;
+        const w = x.res.h > x.res.a ? x.h : x.a, l = w === x.h ? x.a : x.h;
+        const ew = cur[w] != null && tgt[w] ? cur[w] - tgt[w].w : 0, el = cur[l] != null && tgt[l] ? cur[l] - tgt[l].w : 0;
+        if (ew > 0 && el < 0) { x.res = { h: x.res.a, a: x.res.h, ot: x.res.ot }; cur[w]--; cur[l]++; if (x.box) x.box = null; }
+      });
+    }
+    g.teams.forEach(t => {
+      const r = tgt[t.id]; if (!r) return;
+      // strength follows the real season: a team that really won more than we simulated gets stronger
+      t.elo += (r.w - sim0[t.id]) * 28;
+      Object.assign(t, r);
+      t.pf = 0; t.pa = 0;
+    });
+    done.forEach(x => { const H = DY.T(x.h), A = DY.T(x.a); if (H && H.pf != null) { H.pf += x.res.h; H.pa += x.res.a; } if (A && A.pf != null) { A.pf += x.res.a; A.pa += x.res.h; } });
+    // the real AP poll
+    const ap = (F.team && F.team.apTop25) || [];
+    if (ap.length) {
+      const ranked = ap.map(([, n]) => DY.byName(n) || g.teams.find(t => t.name.replace(/State$/, 'St.') === n)).filter(t => t && t.fbs !== false && g.teams.includes(t));
+      const rest = g.teams.filter(t => !ranked.includes(t)).sort((a, b) => DY.apKey(b) - DY.apKey(a));
+      g.polls.ap = ranked.concat(rest).slice(0, 25).map((t, i) => ({ t: t.id, pts: Math.round(1550 - i * 58), fp: 0, prev: null, rec: t.w + '-' + t.l }));
+      g.teams.forEach(t => { t.ap = null; }); g.polls.ap.forEach((x, i) => { DY.T(x.t).ap = i + 1; });
+    }
+    // Tennessee: real season stats and real game logs from the box scores; other teams' players keep simulated stats
+    const PS = F.playerStats || {};
+    ut.roster.map(DY.P).forEach(p => { p.gl = (p.gl || []).filter(x => x.y !== g.season); p.s = PS[p.n] ? realSeason(PS[p.n]) : null; });
+    played.forEach(x => {
+      const b = F.box && F.box[x.opp]; if (!b || !b.players || !b.players.TENN) return;
+      const lines = {};
+      for (const cat in b.players.TENN) { const f = BOXMAP[cat]; if (!f) continue; b.players.TENN[cat].rows.forEach(r => { (lines[r[0]] = lines[r[0]] || {}); f(lines[r[0]], r); }); }
+      const o = DY.byName(x.opp), wk = DY.weekOfDate(g.season, x.date);
+      for (const n in lines) {
+        const p = ut.roster.map(DY.P).find(q => q.n === n); if (!p) continue;
+        (p.gl = p.gl || []).push({ y: g.season, w: wk, o: o ? o.abbr : x.opp, h: x.site === 'H', l: lines[n], r: x.result, sc: x.us + '-' + x.them, real: true });
+        if (p.s) p.s.gp = (p.s.gp || 0) + 1; else p.s = Object.assign({ gp: 1 }, {});
+      }
+    });
+    // records and news start clean: the real record book, then the first headline of your tenure
+    DY.initRecords();
+    g.news = [];
+    g.startToday = { asOf: TD.asOf, week: lastWk, src: TD.source };
+    DY.news('poll', `You take over Tennessee at ${ut.w}-${ut.l} (${ut.cw}-${ut.cl} SEC)`, `The Vols are ${ut.ap ? 'No. ' + ut.ap + ' in the AP poll' : 'unranked'} with ${DY.userGames().filter(x => !x.res && x.wk > lastWk).length} regular-season games left. Records, scores and Tennessee's stats are real through ${DY.dateStr(new Date(played[played.length - 1].date + 'T12:00:00Z'))}.`);
+    return null;
+  };
   DY.simGame = x => { const GM = DY.startGame(x, false); DY.playFull(GM); DY.bankGame(x, GM); return GM; };
 
   /* ---------- the week ---------- */

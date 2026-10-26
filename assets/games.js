@@ -769,7 +769,7 @@
 
   /* ---------- entry ---------- */
   // Vol Dynasty: its own scripts and stylesheet, loaded the first time you open it
-  const DYN_FILES = ['dy-data', 'dy-past', 'dy-core', 'dy-engine', 'dy-sim', 'dy-league', 'dy-off', 'dy-save', 'dy-game', 'dy-ui'];
+  const DYN_FILES = ['dy-data', 'dy-past', 'dy-today', 'dy-core', 'dy-engine', 'dy-sim', 'dy-league', 'dy-off', 'dy-save', 'dy-game', 'dy-ui'];
   function renderDynasty(app) {
     if (!document.querySelector('link[data-dyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/dynasty/dynasty.css?v=2'; l.dataset.dyn = 1; document.head.appendChild(l); }
     if (window.VI_DYN && window.DYG) return window.VI_DYN.render(app);
