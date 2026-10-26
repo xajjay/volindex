@@ -773,24 +773,24 @@
   // Vol Dynasty: its own scripts and stylesheet, loaded the first time you open it
   const DYN_FILES = ['dy-data', 'dy-past', 'dy-today', 'dy-core', 'dy-engine', 'dy-sim', 'dy-league', 'dy-off', 'dy-save', 'dy-game', 'dy-ui'];
   function renderDynasty(app) {
-    if (!document.querySelector('link[data-dyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/dynasty/dynasty.css?v=3'; l.dataset.dyn = 1; document.head.appendChild(l); }
+    if (!document.querySelector('link[data-dyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/dynasty/dynasty.css?v=4'; l.dataset.dyn = 1; document.head.appendChild(l); }
     if (window.VI_DYN && window.DYG) return window.VI_DYN.render(app);
     loading(app, 'Loading Vol Dynasty…');
     let i = 0;
-    const next = () => { if (i >= DYN_FILES.length) return window.VI_DYN.render(app); const f = 'assets/dynasty/' + DYN_FILES[i++] + '.js?v=3'; loadScript(f, () => false, next, () => loading(app, 'Could not load Vol Dynasty. Refresh to try again.')); };
+    const next = () => { if (i >= DYN_FILES.length) return window.VI_DYN.render(app); const f = 'assets/dynasty/' + DYN_FILES[i++] + '.js?v=4'; loadScript(f, () => false, next, () => loading(app, 'Could not load Vol Dynasty. Refresh to try again.')); };
     next();
   }
   // Hoops and Diamond Dynasty (basketball, baseball, softball): one set of scripts for all four, plus the football
   // stylesheet and team colors
-  const SDYN_FILES = ['sd-data', 'sd-core', 'sd-hoops', 'sd-diamond', 'sd-league', 'sd-off', 'sd-save', 'sd-game', 'sd-ui'];
+  const SDYN_FILES = ['sd-data', 'sd-core', 'sd-hoops', 'sd-diamond', 'sd-league', 'sd-off', 'sd-save', 'sd-court', 'sd-game', 'sd-ui'];
   function renderSdyn(app, sport) {
-    if (!document.querySelector('link[data-dyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/dynasty/dynasty.css?v=3'; l.dataset.dyn = 1; document.head.appendChild(l); }
-    if (!document.querySelector('link[data-sdyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/sdyn/sdyn.css?v=2'; l.dataset.sdyn = 1; document.head.appendChild(l); }
+    if (!document.querySelector('link[data-dyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/dynasty/dynasty.css?v=4'; l.dataset.dyn = 1; document.head.appendChild(l); }
+    if (!document.querySelector('link[data-sdyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/sdyn/sdyn.css?v=3'; l.dataset.sdyn = 1; document.head.appendChild(l); }
     if (window.VI_SDYN && window.SDG) return window.VI_SDYN.render(app, sport);
     loading(app, 'Loading the dynasty…');
     const files = (window.DY && window.DY.TEAMS ? [] : ['assets/dynasty/dy-data.js']).concat(SDYN_FILES.map(f => 'assets/sdyn/' + f + '.js'));
     let i = 0;
-    const next = () => { if (i >= files.length) return window.VI_SDYN.render(app, sport); loadScript(files[i++] + '?v=2', () => false, next, () => loading(app, 'Could not load the dynasty. Refresh to try again.')); };
+    const next = () => { if (i >= files.length) return window.VI_SDYN.render(app, sport); loadScript(files[i++] + '?v=3', () => false, next, () => loading(app, 'Could not load the dynasty. Refresh to try again.')); };
     next();
   }
   let last = null;

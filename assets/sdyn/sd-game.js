@@ -30,7 +30,7 @@
     if (watch) GM.user = null;
     if (GM.kind === 'hoops') GM.firstPoss = GM.poss;
     S = { el, x, GM, side, watch, hoops: GM.kind === 'hoops', speed: g.settings.speed || 'slow', paused: false, tab: 'pbp', uc: {}, onDone: o.onDone, done: false, timer: null, raf: null, anim: null, col: teamColors(GM.T.h, GM.T.a), simTo: null, pbp: [] };
-    if (!S.hoops) { S.prevBases = [null, null, null]; S.uc.approach = 'normal'; }
+    if (!S.hoops) { S.prevBases = [null, null, null]; S.uc.approach = 'normal'; S.stepMode = !watch && g.settings.stepMode !== false; }
     shell(); drawIdle(); updateBoard(); controls(); panel();
     S.timer = setTimeout(next, 900);
   };
@@ -98,8 +98,9 @@
     const GM = S.GM, uc = {};
     if (S.hoops) {
       if (S.uc.timeout) { uc.timeout = true; S.uc.timeout = false; }
-      if (S.uc.call && GM.poss === S.side) { uc.call = S.uc.call; S.uc.call = null; }
+      if (S.uc.call && GM.poss === S.side) uc.call = S.uc.call;
       const r = SD.H.step(GM, quiet ? {} : uc);
+      if (r && r.called) { S.uc.call = null; S.lastCall = r.called; }
       return r;
     }
     const bat = SD.B.batting(GM);
@@ -130,6 +131,7 @@
     animate(r, pre, () => {
       updateBoard(); caption(r); panel(); controls();
       if (GM.over) return end();
+      if (!S.hoops && S.stepMode && !S.simTo && r.kind !== 'sub') { S.waiting = true; controls(); return; }
       const pause = S.hoops ? (r.endPer ? 1800 : r.kind === 'to' ? 1200 : 350) : (r.endHalf ? 1600 : 450);
       S.timer = setTimeout(next, S.speed === 'fast' ? pause * 0.35 : pause);
     });
@@ -150,7 +152,20 @@
     else head = `${(r.top ? 'Top ' : 'Bot ') + ord(r.inn)} · ${r.pit ? 'Pitching: ' + esc(r.pit.n) + ` (${(GM.L[r.top ? 'h' : 'a'].pc[r.pit.id] || 0)} pitches)` : ''}`;
     c.innerHTML = `<div class="dyg-head">${head}${r.big ? ' <span class="dyg-tag">BIG</span>' : ''}</div><div class="dyg-text">${esc(r.text)}</div>${!S.hoops && !GM.over ? `<div class="dyg-ev">Up next: ${esc(SD.B.batter(GM).n)} (${esc(SD.B.batter(GM).pos)}, ${SD.B.batter(GM).ovr})</div>` : ''}`;
   }
-  function banner(txt, c) { const b = S.el.querySelector('#sdgBan'); if (!b) return; b.textContent = txt; b.style.setProperty('--bc', c); b.style.setProperty('--bi', ink(c)); b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); }
+  // every at-bat ends with its result on screen; the big ones get the full banner in the team's colors
+  function paResult(r) {
+    const off = S.col[r.s], def = S.col[other(r.s)];
+    if (r.kind === 'sb') return banner('STOLEN BASE', off, true);
+    if (r.kind === 'cs') return banner('CAUGHT STEALING', def, true);
+    const runs = r.pts ? ` · ${r.pts} RUN${r.pts > 1 ? 'S' : ''}` : '';
+    if (r.walkoff) return banner(r.result === 'hr' ? 'WALK-OFF HOME RUN!' : 'WALK-OFF!', off);
+    const big = { hr: /GRAND/.test(r.text) ? 'GRAND SLAM' : 'HOME RUN', '3b': 'TRIPLE', '2b': 'DOUBLE', dp: 'DOUBLE PLAY' }[r.result];
+    if (big) return banner(big + (r.result === 'hr' || r.result === 'dp' ? '' : runs), r.result === 'dp' ? def : off);
+    const out = r.bip ? ({ gb: 'GROUNDOUT', fb: 'FLYOUT', ld: 'LINEOUT', pu: 'POP OUT' })[r.bip.type] : null;
+    const sm = { k: 'STRIKEOUT', bb: 'WALK', ibb: 'INTENTIONAL WALK', hbp: 'HIT BY PITCH', '1b': 'SINGLE', e: 'ERROR', sf: 'SAC FLY', sac: 'SAC BUNT', out: out || 'OUT' }[r.result];
+    if (sm) banner(sm + (r.result === 'out' || r.result === 'k' ? '' : runs), ['k', 'out'].includes(r.result) ? def : off, true);
+  }
+  function banner(txt, c, small) { const b = S.el.querySelector('#sdgBan'); if (!b) return; b.textContent = txt; b.style.setProperty('--bc', c); b.style.setProperty('--bi', ink(c)); b.classList.toggle('sm', !!small); b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); }
   function end() {
     if (!S || S.done && S.ended) return;
     stop(); bank(); S.ended = true;
@@ -174,14 +189,15 @@
     const ctrl = S.el.querySelector('#sdgCtrl'); if (!ctrl || S.ended) return;
     const GM = S.GM, g = SD.G;
     const sims = `<div class="dyg-simbar"><div class="dyg-speed"><span class="dyg-lab">Speed</span><button data-g="slow" aria-pressed="${S.speed === 'slow'}">Slow</button><button data-g="fast" aria-pressed="${S.speed === 'fast'}">Fast</button></div>
+      ${S.hoops ? '' : `<div class="dyg-speed"><span class="dyg-lab">Pace</span><button data-g="stepmode" aria-pressed="${!!S.stepMode}">Batter by batter</button></div>`}
       <div class="dyg-sims"><button data-g="pause">${S.paused ? 'Resume' : 'Pause'}</button>${S.hoops ? '<button data-g="simper">Sim to the end of the period</button>' : '<button data-g="siminn">Sim to the next inning</button>'}<button data-g="simend">Sim to the end</button><button data-g="full">Full screen</button></div></div>`;
-    if (S.watch) { return setCtrl(ctrl, `<div class="dyg-call-h">Watching${S.paused ? ' (paused)' : ''}</div><p class="small dim">Your staff runs the game. Switch to "I coach" in Settings to call it yourself.</p>`, sims); }
+    if (S.watch) { return setCtrl(ctrl, `${!S.hoops && S.waiting ? `<div class="sdg-next"><button class="btn primary big" data-g="nextpa">Next batter</button></div>` : ''}<div class="dyg-call-h">Watching${S.paused ? ' (paused)' : ''}</div><p class="small dim">Your staff runs the game. Switch to "I coach" in Settings to call it yourself.</p>`, sims); }
     if (S.hoops) {
       const c = GM.coach[S.side];
       const seg = (k, opts) => `<div class="dyg-extra"><span class="dyg-lab">${opts.label}</span>${opts.o.map(([v, l]) => `<button data-coach="${k}|${v}" aria-pressed="${String(c[k]) === String(v)}">${esc(l)}</button>`).join('')}</div>`;
       const calls = [['auto', 'Staff call'], ['pnr', 'Pick-and-roll'], ['drive', 'Drive'], ['post', 'Post up'], ['spot', 'Spot-up three'], ['iso', 'Isolation'], ['cut', 'Backdoor cut']];
       return setCtrl(ctrl, `<div class="dyg-call-h">Coach ${esc(g.coach.name)}${S.paused ? ' (paused)' : ''}</div>
-        <div class="dyg-extra"><span class="dyg-lab">Next trip</span>${calls.map(([v, l]) => `<button data-call="${v}" aria-pressed="${(S.uc.call || 'auto') === v}">${l}</button>`).join('')}</div>
+        <p class="small dim" style="margin:0 0 4px">${S.uc.call ? `Queued: <b>${esc((calls.find(c0 => c0[0] === S.uc.call) || [])[1] || '')}</b>, runs on the next dead ball or out of a timeout.` : 'Pick a set to run on the next dead ball (after a make, a foul or a timeout). Off live rebounds and steals your team plays in transition or early offense.'}</p><div class="dyg-extra"><span class="dyg-lab">Play call</span>${calls.map(([v, l]) => `<button data-call="${v}" aria-pressed="${(S.uc.call || 'auto') === v}">${l}</button>`).join('')}</div>
         ${seg('pace', { label: 'Pace', o: [['slow', 'Slow'], ['normal', 'Normal'], ['fast', 'Push']] })}
         ${seg('focus', { label: 'Offense', o: [['bal', 'Balanced'], ['rim', 'Attack the rim'], ['three', 'Threes'], ['post', 'Post'], ['star', 'Ride the star']] })}
         ${seg('def', { label: 'Defense', o: [['man', 'Man'], ['zone', '2-3 zone'], ['press', 'Press']] })}
@@ -190,18 +206,19 @@
       return;
     }
     const bat = SD.B.batting(GM), mine = bat === S.side, L = GM.L[S.side];
+    const nb = S.waiting ? `<div class="sdg-next"><button class="btn primary big" data-g="nextpa">Next batter: ${esc(SD.B.batter(GM).n)}</button></div>` : '';
     if (mine) {
       const b = SD.B.batter(GM), bench = L.bench.map(SD.P).filter(Boolean);
       const calls = [['auto', 'Staff call'], ['swing', 'Swing away'], ['steal', 'Steal'], ['bunt', 'Sacrifice bunt'], ['hr', 'Hit-and-run']];
       const can = v => v === 'steal' ? (GM.bases[0] && !GM.bases[1]) || (GM.bases[1] && !GM.bases[2]) : v === 'bunt' ? GM.outs < 2 && (GM.bases[0] || GM.bases[1]) : v === 'hr' ? !!GM.bases[0] : true;
-      return setCtrl(ctrl, `<div class="dyg-call-h">At the plate: ${esc(b.n)} <small class="dim">${b.pos} · ${b.ovr} · contact ${b.at.con}, power ${b.at.pow}, eye ${b.at.eye}, speed ${b.at.spd}</small></div>
+      return setCtrl(ctrl, `${nb}<div class="dyg-call-h">At the plate: ${esc(b.n)} <small class="dim">${b.pos} · ${b.ovr} · contact ${b.at.con}, power ${b.at.pow}, eye ${b.at.eye}, speed ${b.at.spd}</small></div>
         <div class="dyg-extra"><span class="dyg-lab">The call</span>${calls.map(([v, l]) => `<button data-call="${v}" aria-pressed="${(S.uc.call || 'auto') === v}" ${can(v) ? '' : 'disabled'}>${l}</button>`).join('')}</div>
         <div class="dyg-extra"><span class="dyg-lab">Approach</span>${[['normal', 'Normal'], ['patient', 'Patient'], ['aggressive', 'Aggressive']].map(([v, l]) => `<button data-appr="${v}" aria-pressed="${S.uc.approach === v}">${l}</button>`).join('')}</div>
         ${bench.length ? `<div class="dyg-extra"><span class="dyg-lab">Pinch hit</span><select data-pinch="1"><option value="">${S.uc.pinch ? 'Cancel' : 'Bench…'}</option>${bench.map(p => `<option value="${p.id}" ${S.uc.pinch === p.id ? 'selected' : ''}>${esc(p.n)} (${p.pos}, ${p.ovr})</option>`).join('')}</select></div>` : ''}`, sims);
     } else {
       const p = SD.B.pitcher(GM), pc = L.pc[p.id] || 0, f = SD.B.fatigue(GM), pen = L.pen.filter(id => !L.used.includes(id)).map(SD.P).filter(Boolean);
       const b = SD.B.batter(GM);
-      return setCtrl(ctrl, `<div class="dyg-call-h">In the field: ${esc(p.n)} pitching <small class="dim">${pc} pitches · ${f < 0.15 ? 'fresh' : f < 0.5 ? 'tiring' : 'gassed'}</small></div>
+      return setCtrl(ctrl, `${nb}<div class="dyg-call-h">In the field: ${esc(p.n)} pitching <small class="dim">${pc} pitches · ${f < 0.15 ? 'fresh' : f < 0.5 ? 'tiring' : 'gassed'}</small></div>
         <p class="small dim">Batting: ${esc(b.n)} (${b.pos}, ${b.ovr}).</p>
         <div class="dyg-extra"><span class="dyg-lab">This batter</span><button data-g="ibb" aria-pressed="${!!S.uc.ibb}">Intentional walk</button></div>
         <div class="dyg-extra"><span class="dyg-lab">Bullpen</span>${pen.length ? `<select data-pitch="1"><option value="">${S.uc.pitcher ? 'Cancel' : 'Bring in…'}</option>${pen.map(q => `<option value="${q.id}" ${S.uc.pitcher === q.id ? 'selected' : ''}>${esc(q.n)} (${q.pos}, ${q.ovr}${q.rest > 0 ? ', tired' : ''})</option>`).join('')}</select>` : '<small class="dim">Nobody left.</small>'}
@@ -230,12 +247,14 @@
     if (g === 'pause') { S.paused = !S.paused; if (!S.paused && !S.timer && !S.anim) S.timer = setTimeout(next, 100); controls(); const fb = S.el.querySelector('.dyg-fullbar [data-g="pause"]'); if (fb) fb.textContent = S.paused ? 'Resume' : 'Pause'; return; }
     if (g === 'timeout') { S.uc.timeout = !S.uc.timeout; return controls(); }
     if (g === 'ibb') { S.uc.ibb = !S.uc.ibb; return controls(); }
+    if (g === 'nextpa') { S.waiting = false; controls(); clearTimeout(S.timer); S.timer = setTimeout(next, 60); return; }
+    if (g === 'stepmode') { S.stepMode = !S.stepMode; SD.G.settings.stepMode = S.stepMode; if (!S.stepMode && S.waiting) { S.waiting = false; S.timer = setTimeout(next, 100); } return controls(); }
     if (g === 'autopen') { SD.G.settings.autoPen = SD.G.settings.autoPen === false; return controls(); }
     if (g === 'full') return toggleFull(!S.full);
     if (g === 'simend' || g === 'simper' || g === 'siminn') {
       const per = GM.per, inn = GM.inn;
       S.simTo = g === 'simend' ? () => GM.over : g === 'simper' ? () => GM.over || GM.per !== per : () => GM.over || GM.inn !== inn;
-      S.pbpDirty = 0; S.paused = false;
+      S.pbpDirty = 0; S.paused = false; S.waiting = false;
       if (S.anim) { cancelAnimationFrame(S.raf); S.anim = null; }
       clearTimeout(S.timer); S.timer = setTimeout(next, 0); return;
     }
@@ -300,7 +319,11 @@
 
   /* ---------- drawing ---------- */
   function ctx() { const c = S.cv.getContext('2d'); c.setTransform(S.dpr, 0, 0, S.dpr, 0, 0); return c; }
-  function drawIdle() { if (S.hoops) { const GM = S.GM; drawCourt(ctx()); if (S.lastFrame) drawPlayers(ctx(), S.lastFrame); else { const pos = (s, right) => GM.on[s].map((_, i) => [right ? 47 + 6 + i * 2 : 47 - 6 - i * 2, 10 + i * 7.5]); drawPlayers(ctx(), { s: 'h', o: pos('h', true), d: pos('a', false), ball: [47, 25], z: 0, onO: GM.on.h, onD: GM.on.a }); } } else { drawField(ctx()); drawFielders(ctx(), null); drawRunners(ctx(), S.GM.bases.map((id, i) => id ? { id, at: basePt(i + 1) } : null).filter(Boolean)); } }
+  function drawIdle() { if (S.hoops) { const GM = S.GM, c = ctx(), gg = SDC.court(c, S.W, S.Hh, GM);
+      const side = {}; GM.on.h.forEach(id => { side[id] = 'h'; }); GM.on.a.forEach(id => { side[id] = 'a'; });
+      if (!S.pos) { S.pos = {}; GM.on.h.forEach((id, i) => { S.pos[id] = [47 + 4 + i * 1.5, 13 + i * 6]; }); GM.on.a.forEach((id, i) => { S.pos[id] = [47 - 4 - i * 1.5, 13 + i * 6]; }); S.pos._ball = [47, 25]; }
+      const pos = {}; Object.keys(side).forEach(id => { pos[id] = S.pos[id] || [47, 51]; });
+      SDC.draw(c, gg, { pos, side, s: GM.poss, ball: S.pos._ball || [47, 25], z: 0, hold: null, marks: S.marks, trail: [] }, GM, S.col, ink); } else { drawField(ctx()); drawFielders(ctx(), null); drawRunners(ctx(), S.GM.bases.map((id, i) => id ? { id, at: basePt(i + 1) } : null).filter(Boolean)); } }
 
   // the court: 94 x 50 feet
   function drawCourt(c) {
@@ -358,32 +381,29 @@
     const GM = S.GM;
     const fast = S.speed === 'fast';
     if (S.hoops) {
-      if (!(r.kind === 'shot' || r.kind === 'ft' || r.kind === 'to')) {
-        if (r.kind === 'foul') { try { const oO = GM.on[r.s].slice(), oD = GM.on[other(r.s)].slice(), F0 = SD.H.frames(GM, { s: r.s, per: r.per, kind: 'shot', play: 'iso', type: 'mid', time: 8 }, r.s, oO, oD), f1 = F0.frames[1]; S.lastFrame = { s: r.s, o: f1[1], d: f1[2], ball: f1[3], holder: f1[4], z: 0, onO: oO, onD: oD }; } catch (e) { /* keep the last picture */ } }
-        drawIdle(); return done();
-      }
-      const onO = GM.on[r.s].slice(), onD = GM.on[other(r.s)].slice();
-      const F = SD.H.frames(GM, r, r.s, onO, onD);
-      const scale = fast ? 0.2 : 0.55, total = Math.max(400, F.T * 1000 * scale);
-      const t0 = performance.now();
+      if (r.kind === 'to' && !r.who && !r.thief) { drawIdle(); return done(); }       // a timeout
+      const side = {}; GM.on.h.forEach(id => { side[id] = 'h'; }); GM.on.a.forEach(id => { side[id] = 'a'; });
+      let C; try { C = SDC.choreo(GM, r, S.pos); } catch (e) { console.error(e); drawIdle(); return done(); }
+      const scale = fast ? 0.32 : 0.95, total = Math.max(300, C.T * 1000 * scale), t0 = performance.now();
+      let marked = false; S.trail = [];
       S.anim = true;
       const frame = now => {
         if (!S || !S.anim) return;
-        const t = Math.min(F.T, (now - t0) / total * F.T);
-        let i = 0; while (i < F.frames.length - 2 && F.frames[i + 1][0] <= t) i++;
-        const A = F.frames[i], B = F.frames[Math.min(i + 1, F.frames.length - 1)], span = Math.max(0.01, B[0] - A[0]), u = ease(Math.min(1, Math.max(0, (t - A[0]) / span)));
-        const mix = (P, Q) => P.map((p, j) => [lerp(p[0], Q[j][0], u), lerp(p[1], Q[j][1], u)]);
-        const zz = B[5] ? Math.sin(u * Math.PI) * B[5] : 0;
-        const f = { s: r.s, o: mix(A[1], B[1]), d: mix(A[2], B[2]), ball: [lerp(A[3][0], B[3][0], u), lerp(A[3][1], B[3][1], u)], holder: B[4] === -1 ? -1 : A[4], z: zz, onO, onD };
-        S.lastFrame = Object.assign({}, f, { z: 0 });
-        const c = ctx(); drawCourt(c); drawPlayers(c, f);
-        if (t >= F.T) {
+        const tm = Math.min(C.T, (now - t0) / total * C.T);
+        const st = SDC.state(C, tm, side); st.s = r.s; st.side = side; st.marks = S.marks;
+        S.trail.push([st.ball[0], st.ball[1], st.z]); if (S.trail.length > 14) S.trail.shift(); st.trail = S.trail;
+        if (!marked) { const mk = C.kf.find(k => k.mark && k.t <= tm); if (mk) { marked = true; (S.marks = S.marks || []).push(Object.assign({ born: performance.now() }, mk.mark)); st.marks = S.marks; } }
+        const c = ctx(), gg = SDC.court(c, S.W, S.Hh, GM); SDC.draw(c, gg, st, GM, S.col, ink);
+        S.lastSt = st;
+        if (tm >= C.T) {
           S.anim = null;
+          const end = C.kf[C.kf.length - 1]; S.pos = Object.assign({}, end.pos, { _ball: C.ball });
           if (r.pts >= 3 && r.kind === 'shot') banner(r.and1 ? 'AND ONE!' : 'THREE!', S.col[r.s]);
           else if (r.and1) banner('AND ONE!', S.col[r.s]);
           else if (r.blk && r.big) banner('REJECTED', S.col[other(r.s)]);
           else if (/throws it down/.test(r.text)) banner('SLAM!', S.col[r.s]);
           else if (r.kind === 'to' && r.thief && r.big) banner('STEAL', S.col[other(r.s)]);
+          else if (r.flow === 'trans' && r.pts) banner('FAST BREAK', S.col[r.s], true);
           return done();
         }
         S.raf = requestAnimationFrame(frame);
@@ -422,10 +442,7 @@
       else if (land && r.bip.type !== 'hr') ball(c, land, 0);
       if (t >= 1) {
         S.anim = null;
-        if (r.result === 'hr') banner(/GRAND/.test(r.text) ? 'GRAND SLAM' : 'HOME RUN', S.col[r.s]);
-        else if (r.walkoff) banner('WALK-OFF!', S.col[r.s]);
-        else if (r.result === 'dp') banner('DOUBLE PLAY', S.col[other(r.s)]);
-        else if (r.result === 'k' && r.outs === 0 && r.endHalf && S.GM.user && other(r.s) === S.side) banner('STRIKE THREE', S.col[other(r.s)]);
+        paResult(r);
         drawIdle();
         return done();
       }

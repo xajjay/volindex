@@ -67,7 +67,7 @@
       if (p.visit && p.visit <= g.date && !p.visited) { const x = SD.userGames().find(y => y.d === p.visit); const won = x && x.res && ((x.h === ut.id) === (x.res.h > x.res.a)); pts += won ? 50 : 18; p.visited = true; logs.push(`${p.n} (${p.rec.stars}★ ${p.pos}) took an official visit${won ? ' and saw a win' : ''}.`); }
       p.acts = {};
       pts = 70 * (1 - Math.exp(-pts / 70));
-      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + fitScore(ut, p) * 0.9) * (p.offer ? 1 : 0.5);
+      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + fitScore(ut, p) * 0.9) * (p.offer ? 1 : 0.5) * SD.recruitMult();
     });
     Object.values(R.pool).forEach(p => {
       if (p.commit != null && p.firm) return;
@@ -95,7 +95,10 @@
   function autoRecruit() {
     const g = G(), R = g.recruit, ut = SD.userT();
     const room = SD.CLASS[g.sport] - SD.myCommits().length; if (room <= 0) return;
-    const cand = Object.values(R.pool).filter(p => p.commit == null).sort((a, b) => b.rec.c * 100 + fitScore(ut, b) * 10 - a.rec.c * 100 - fitScore(ut, a) * 10).slice(0, room * 3);
+    // chase who you can get: quality, fit, and how close you are to the leader
+    const winnable = p => { const mine = p.interest[ut.id] || 0, top = Math.max(0, ...Object.entries(p.interest).filter(([t]) => +t !== ut.id).map(([, v]) => v)); return Math.min(1, (mine + 12) / (top + 12)); };
+    const score = p => p.rec.c * 60 + winnable(p) * 45 + fitScore(ut, p) * 10;
+    const cand = Object.values(R.pool).filter(p => p.commit == null || (p.commit === ut.id)).filter(p => p.commit !== ut.id).sort((a, b) => score(b) - score(a)).slice(0, room * 3);
     R.board = SD.myCommits().map(p => p.id).concat(cand.map(p => p.id)).slice(0, 20);
     let hrs = SD.HOURS(), coach = 3;
     cand.forEach(p => { if (!p.offer) p.offer = true; p.acts = {}; if (coach > 0 && hrs >= 7 && p.rec.stars >= 4) { p.acts.coach = 1; hrs -= 7; coach--; } else if (hrs >= 3) { p.acts.call = 1; hrs -= 3; } else if (hrs >= 1) { p.acts.dm = 1; hrs -= 1; } });
@@ -142,13 +145,13 @@
     else if (st === 'portal') { resolvePortal(true); }
     else if (st === 'signing') { signingDay(); }
     else if (st === 'draft') { /* the draft already happened with the departures */ }
-    else if (st === 'progress') { g.teams.forEach(t => t.roster.forEach(id => develop(SD.P(id)))); }
+    else if (st === 'progress') { /* development already happened when the stage opened */ }
     else if (st === 'cuts') { cutDown(); }
     else if (st === 'schedule') { return newSeason(); }
     g.teams.forEach(SD.uniqueNums);
     o.stage = SD.OFF_ORDER[SD.OFF_ORDER.indexOf(st) + 1];
     if (o.stage === 'draft') runDraft();
-    if (o.stage === 'progress') o.prog = progressPreview();
+    if (o.stage === 'progress') { const ut = SD.userT(), before = {}; ut.roster.forEach(id => { before[id] = SD.P(id).ovr; }); g.teams.forEach(t => t.roster.forEach(id => develop(SD.P(id)))); o.prog = ut.roster.map(id => { const p = SD.P(id); return { id, before: before[id], after: p.ovr, why: p.devWhy || [] }; }).sort((a, b) => (b.after - b.before) - (a.after - a.before)); }
   };
   function removeLeavers() {
     const g = G();
@@ -171,11 +174,40 @@
       t.roster.map(SD.P).forEach(p => {
         let c = 0.03; const better = t.roster.map(SD.P).filter(x => x.pos === p.pos && x.ovr > p.ovr).length;
         if (better >= (SD.kind() === 'hoops' ? 1 : 2) && p.ovr >= 70) c += 0.12; if (p.unhappy) c += 0.25; c += (p.tr.ego - 60) / 400 - (p.tr.loyal - 70) / 250;
-        if (chance(clamp(c, 0.005, 0.5)) && pool.filter(id => SD.P(id).portal.from === t.id).length < (SD.kind() === 'hoops' ? 4 : 8)) { p.portal = { from: t.id, offers: {} }; pool.push(p.id); }
+        if (p.pushOut || (chance(clamp(c, 0.005, 0.5)) && pool.filter(id => SD.P(id).portal.from === t.id).length < (SD.kind() === 'hoops' ? 4 : 8))) { p.portal = { from: t.id, offers: {}, pushed: !!p.pushOut }; pool.push(p.id); }
       });
     });
     g.off.portal = { pool, mine: {}, log: [] };
   }
+  SD.encourage = id => {
+    const g = G(), o = g.off, p = SD.P(id), ut = SD.userT();
+    if (!o || !p || p.t !== ut.id) return null;
+    if (p.tin === g.season) return `${SD.SP().he === 'she' ? 'She' : 'He'} just transferred in.`;
+    if (o.portal && o.portal.resolved) return 'The portal window has closed.';
+    if (p.pushOut) { p.pushOut = false; if (o.portal) { o.portal.pool = o.portal.pool.filter(x => x !== id); p.portal = null; } return `${p.n} stays.`; }
+    p.pushOut = true;
+    if (o.portal) { p.portal = { from: ut.id, offers: {}, pushed: true }; if (!o.portal.pool.includes(id)) o.portal.pool.push(id); }
+    return `${p.n} is encouraged to transfer. ${SD.SP().he === 'she' ? 'She' : 'He'} enters the portal${o.portal ? '' : ' when it opens'}.`;
+  };
+  /* ---------- preseason camp: a team focus and three players who get extra reps ---------- */
+  SD.CAMP = {
+    hoops: { shooting: ['Shooting', ['thr', 'mid', 'ft']], defense: ['Defense', ['pdf', 'idf', 'stl', 'blk']], conditioning: ['Conditioning', ['sta', 'ath']], skill: ['Ball skills', ['hnd', 'pas', 'iq']], paint: ['Inside game', ['ins', 'reb']] },
+    diamond: { hitting: ['Hitting', ['con', 'pow', 'eye']], pitching: ['Pitching', ['vel', 'stf', 'ctl', 'sta']], defense: ['Defense', ['fld', 'arm']], speed: ['Speed and baserunning', ['spd']] },
+  };
+  SD.campState = () => { const g = G(); if (!g.camp || g.camp.y !== g.season) g.camp = { y: g.season, focus: Object.keys(SD.CAMP[SD.kind()])[0], picks: [], done: false, res: null }; return g.camp; };
+  SD.runCamp = auto => {
+    const g = G(), C = SD.campState(), ut = SD.userT(); if (C.done) return;
+    if (auto && !C.picks.length) C.picks = ut.roster.map(SD.P).filter(p => p.yr <= 2).sort((a, b) => (b.ceil - b.ovr) - (a.ceil - a.ovr)).slice(0, 3).map(p => p.id);
+    const keys = SD.CAMP[SD.kind()][C.focus][1], res = [];
+    ut.roster.map(SD.P).forEach(p => {
+      const before = p.ovr, extra = C.picks.includes(p.id), wk = (p.tr.work - 70) / 30;
+      keys.forEach(k => { if (p.at[k] != null) p.at[k] = Math.round(clamp(p.at[k] + rr(0.5, 2.2) + wk + (extra ? rr(1, 3) : 0), 40, 99)); });
+      if (extra) Object.keys(p.at).forEach(k => { if (!keys.includes(k)) p.at[k] = Math.round(clamp(p.at[k] + rr(0, 1.5), 40, 99)); });
+      SD.setOvr(p); if (p.ovr !== before || extra) res.push({ id: p.id, before, after: p.ovr, extra });
+    });
+    C.done = true; C.res = res.sort((a, b) => (b.after - b.before) - (a.after - a.before));
+    SD.news('season', `Preseason camp: ${SD.CAMP[SD.kind()][C.focus][0].toLowerCase()} focus`, C.res.slice(0, 3).map(x => `${SD.P(x.id).n} +${x.after - x.before}`).join(', '));
+  };
   SD.portalPlayers = () => { const P = G().off.portal; return P ? P.pool.map(SD.P).filter(p => p && p.portal) : []; };
   SD.newcomers = () => { const g = G(); return (g.recruit && !g.recruit.signed ? Math.min(SD.CLASS[g.sport], SD.myCommits().length) : 0) + Object.keys(g.off && g.off.portal ? g.off.portal.mine : {}).length; };
   SD.NEW_CAP = { mbb: 10, wbb: 10, baseball: 20, softball: 12 };
@@ -189,10 +221,11 @@
   SD.tStars = p => p.ovr >= 82 ? 5 : p.ovr >= 74 ? 4 : 3;
   SD.tRange = p => { const h = (p.id * 2654435761 >>> 0) % 1000 / 1000, w = 5 + Math.round(h * 3), lo = Math.round(p.ovr - 1 - h * (w - 2)); return [Math.max(50, lo), Math.min(99, lo + w)]; };
   function resolvePortal() {
-    const g = G(), P = g.off.portal, ut = SD.userT(); if (!P) return;
+    const g = G(), P = g.off.portal, ut = SD.userT(); if (!P) return; P.resolved = true;
     if (g.settings.portal === 'auto') { const need = SD.LIMIT[g.sport] - ut.roster.length; SD.portalPlayers().filter(p => p.portal.from !== g.user).sort((a, b) => b.ovr - a.ovr).slice(0, Math.max(0, Math.min(3, need))).forEach(p => SD.portalOffer(p.id, SD.nilValue(p, ut))); }
     SD.portalPlayers().forEach(p => {
       g.teams.forEach(t => { if (t.user || t.id === g.user || t.id === p.portal.from) return; if (chance(0.03 * Math.pow(t.prestige / 70, 2) * (p.ovr >= 78 ? 3 : 1))) p.portal.offers[t.id] = Math.round(SD.nilValue(p, t) * rr(0.6, 1.25) / 5000) * 5000; });
+      if (p.portal.pushed && !Object.keys(p.portal.offers).length) { const t2 = pick(g.teams.filter(t => t.id !== p.portal.from && t.prestige < T(p.portal.from).prestige)); if (t2) p.portal.offers[t2.id] = Math.round(SD.nilValue(p, t2) * 0.8 / 5000) * 5000; }
       if (P.mine[p.id] != null) p.portal.offers[g.user] = P.mine[p.id];
       const offers = Object.entries(p.portal.offers);
       if (!offers.length) { p.t = null; p.gone = g.season; p.leave = 'portal'; T(p.portal.from).roster = T(p.portal.from).roster.filter(x => x !== p.id); p.portal = null; return; }
@@ -232,6 +265,7 @@
     const before = p.ovr;
     for (const k in p.at) p.at[k] = Math.round(clamp(p.at[k] + gain * rr(0.6, 1.3), 50, 99));
     SD.setOvr(p); p.yr++; p.lastDelta = p.ovr - before;
+    const why = []; if (p.tr.work >= 82) why.push('work ethic'); if (p.tr.work < 60) why.push('coasting'); if (mins >= 0.7) why.push('big minutes'); else if (mins < 0.15 && p.yr <= 3) why.push('little playing time'); if (room >= 12) why.push('high ceiling'); if (p.yr > 4) why.push('near his ceiling'); if (p.lastDelta >= 6) why.unshift('BREAKOUT'); if (p.lastDelta <= 0) why.unshift('stalled'); p.devWhy = why;
   }
   function progressPreview() { const ut = SD.userT(); return ut.roster.map(id => ({ id, before: SD.P(id).ovr })); }
   SD.cutsNeeded = () => Math.max(0, SD.userT().roster.length - SD.LIMIT[G().sport]);

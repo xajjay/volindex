@@ -17,6 +17,7 @@
     const GM = { kind: 'hoops', T: { h: th, a: ta }, score: { h: 0, a: 0 }, per: 1, nper: sp.periods, perLen: sp.perLen, clock: sp.perLen, shot: sp.shot, poss: chance(0.5) ? 'h' : 'a',
       ps: {}, on: { h: [], a: [] }, en: {}, min: {}, tf: { h: 0, a: 0 }, to: { h: women ? 4 : 4, a: women ? 4 : 4 }, coach: { h: Object.assign({ pace: 'normal', focus: 'bal', def: 'man', depth: 9, star: 1 }, th.coach || {}), a: Object.assign({ pace: 'normal', focus: 'bal', def: 'man', depth: 9, star: 1 }, ta.coach || {}) },
       plays: [], lineScore: { h: [], a: [] }, user: o.user || null, mode: o.mode || 'coach', over: false, neutral: !!o.neutral, live: !!o.live, women, run: { s: null, n: 0 }, trans: null, lastEvent: null, ot: 0, half: 1, mom: 0, title: o.title || null, crowd: o.neutral ? 0.3 : 0.9 };
+    GM.diff = o.diff || 0; GM.uid = o.uid;
     for (const s of ['h', 'a']) {
       GM.L = GM.L || {}; GM.L[s] = SD.lineup(GM.T[s]);
       GM.L[s].forEach((p, i) => { GM.en[p.id] = 1; GM.min[p.id] = 0; });
@@ -31,7 +32,7 @@
   H.line = line;
   const onP = (GM, s) => GM.on[s].map(SD.P);
   // a rating for this moment: the attribute, fatigue, and a little game-to-game form
-  const R = (GM, p, k) => { const e = GM.en[p.id] == null ? 1 : GM.en[p.id]; const form = GM.form && GM.form[p.id] || 0; return (p.at[k] || 60) * (0.86 + 0.14 * e) + form; };
+  const R = (GM, p, k) => { const e = GM.en[p.id] == null ? 1 : GM.en[p.id]; const form = GM.form && GM.form[p.id] || 0; return ((p.at[k] || 60) + (GM.diff && p.t !== GM.uid ? GM.diff : 0)) * (0.86 + 0.14 * e) + form; };
 
   /* ---------- the rotation ---------- */
   // target minutes by spot in the rotation (stars get more), a depth setting (7, 8, 9 or 10 players) and foul trouble
@@ -76,19 +77,23 @@
     const s = GM.poss, d = other(s);
     const sp = SD.SP();
     // timeouts
-    if (uc.timeout && GM.user && GM.to[GM.user] > 0) { GM.to[GM.user]--; GM.run = { s: null, n: 0 }; GM.mom = 0; ['h', 'a'].forEach(x => onP(GM, x).forEach(p => { GM.en[p.id] = Math.min(1, GM.en[p.id] + 0.08); })); subs(GM, 'h', true); subs(GM, 'a', true); return push(GM, { s: GM.user, kind: 'to', text: `Timeout, ${GM.T[GM.user].name}.`, time: 0 }); }
+    if (uc.timeout && GM.user && GM.to[GM.user] > 0) { GM.to[GM.user]--; GM.run = { s: null, n: 0 }; GM.mom = 0; GM.dead = true; GM.trans = null; GM.early = null; ['h', 'a'].forEach(x => onP(GM, x).forEach(p => { GM.en[p.id] = Math.min(1, GM.en[p.id] + 0.08); })); subs(GM, 'h', true); subs(GM, 'a', true); return push(GM, { s: GM.user, kind: 'to', text: `Timeout, ${GM.T[GM.user].name}.`, time: 0 }); }
     // a CPU timeout to stop a run
     for (const x of ['h', 'a']) if (x !== GM.user && GM.to[x] > 0 && GM.run.s === other(x) && GM.run.n >= 8) { GM.to[x]--; GM.run = { s: null, n: 0 }; GM.mom = 0; subs(GM, x, true); return push(GM, { s: x, kind: 'to', text: `Timeout, ${GM.T[x].name}. ${GM.T[other(x)].name} on a run.`, time: 0 }); }
     // substitutions at dead balls: every few trips, and whenever a period starts
     GM.np = (GM.np || 0) + 1;
     if (GM.np % 4 === 1 || GM.subNow) { subs(GM, 'h'); subs(GM, 'a'); GM.subNow = false; }
-    if (uc.call && GM.user === s) GM.nextCall = uc.call;
+    // the coach's call runs on the next dead-ball possession (after a make, a foul, a violation or a timeout), never off a live rebound
+    const fresh = GM.dead !== false; GM.dead = false;
+    if (uc.call && GM.user === s && fresh) GM.nextCall = uc.call;
     const c = GM.coach[s], cd = GM.coach[d];
     const O = onP(GM, s), D = onP(GM, d);
     const diff = GM.score[s] - GM.score[d], endGame = GM.per >= GM.nper;
     // pace and the late-game clock
-    let dur = { slow: 22, normal: 16.5, fast: 12.5 }[c.pace] + gauss() * 3.5;
+    let dur = { slow: 23.5, normal: 19, fast: 14.5 }[c.pace] + gauss() * 3.5;
     if (GM.trans) dur = rr(4, 7);
+    const early = !GM.trans && GM.early === s; GM.early = null;
+    if (early) dur = rr(7, 11);
     if (endGame && GM.clock < 150 && diff > 0) dur = Math.max(dur, 24 + rr(0, 5));      // milk it
     if (endGame && GM.clock < 90 && diff < 0) dur = Math.min(dur, rr(6, 10));           // hurry
     if (GM.clock < dur + 2 && GM.clock < sp.shot) dur = Math.max(1, GM.clock - rr(0.5, 2)); // the last shot of the period
@@ -113,7 +118,7 @@
       const who = SD.wpick(O, p => (p.pos === 'PG' ? 2.2 : p.pos === 'SG' ? 1.5 : 1) * (100 - p.at.hnd + 20));
       add(GM, who, 'to');
       const steal = chance(0.55);
-      let thief = null; if (steal) { thief = SD.wpick(D, p => Math.pow(p.at.stl, 2)); add(GM, thief, 'stl'); GM.trans = chance(0.62 + (press ? 0.1 : 0)) ? d : null; }
+      let thief = null; if (steal) { thief = SD.wpick(D, p => Math.pow(p.at.stl, 2)); add(GM, thief, 'stl'); GM.trans = chance(0.62 + (press ? 0.1 : 0)) ? d : null; if (!GM.trans) GM.early = d; } else GM.dead = true;
       r.kind = 'to'; r.text = steal ? `${H.last(thief)} steals it from ${H.last(who)}.` : pick([`${H.last(who)} travels.`, `${H.last(who)} throws it away.`, `Offensive foul on ${H.last(who)}.`, `Shot-clock violation, ${GM.T[s].name}.`, `${H.last(who)} steps out of bounds.`]);
       r.who = who; r.thief = thief; r.big = steal && GM.trans === d;
       if (/Offensive foul/.test(r.text)) add(GM, who, 'pf');
@@ -131,21 +136,24 @@
         r.kind = 'ft'; r.pts = made; r.shooter = fouled; r.text = `Foul on ${H.last(fouler)} (bonus). ${H.last(fouled)} makes ${made} at the line.`;
         return finishPoss(GM, r, s, d, made, fouled, null, true, dur * 0.6);
       }
-      r.kind = 'foul'; r.text = `Foul on ${H.last(fouler)}. ${GM.T[s].abbr} ball.`; r.time = dur * 0.4;
+      r.kind = 'foul'; r.text = `Foul on ${H.last(fouler)}. ${GM.T[s].abbr} ball.`; r.time = dur * 0.4; r.fouler = fouler; r.fouled = fouled; GM.dead = true;
       push(GM, r); GM.clock -= r.time; tick(GM, r.time, s); return checkClock(GM, r);
     }
     // the play
-    const zone = cd.def === 'zone', foc = c.focus, call = GM.user === s && GM.nextCall ? GM.nextCall : null; GM.nextCall = null;
+    const zone = cd.def === 'zone', foc = c.focus, call = GM.user === s && GM.nextCall && !trans && !early ? GM.nextCall : null; if (call) r.called = call; GM.nextCall = null;
+    r.flow = trans ? 'trans' : early ? 'early' : call && call !== 'auto' ? 'call' : 'half';
     let play;
     if (trans) play = 'trans';
     else if (call && call !== 'auto') play = call;
     else {
       const bigs = O.filter(p => p.pos === 'C' || p.pos === 'PF'), post = bigs.length ? Math.max(...bigs.map(p => p.at.ins + p.at.reb / 3)) : 0;
-      const w = { pnr: 30, drive: 20, post: post > 110 ? 16 : 8, spot: 20, iso: 10, cut: 6 };
+      const w = early ? { pnr: 12, drive: 34, post: 2, spot: 34, iso: 6, cut: 4 } : { pnr: 26, drive: 18, post: post > 110 ? 14 : 7, spot: 18, iso: 9, cut: 8, motion: 22 };
       if (foc === 'rim') { w.drive += 14; w.post += 8; w.spot -= 8; } if (foc === 'three') { w.spot += 18; w.pnr += 4; w.post -= 4; } if (foc === 'post') { w.post += 16; } if (foc === 'star') w.iso += 16;
       if (zone) { w.spot += 8; w.post += 2; w.drive -= 6; }
       if (endGame && GM.clock < 120 && diff < -6) { w.spot += 16; }
-      const ks = Object.keys(w); play = SD.wpick(ks, k => w[k]);
+      const ks = Object.keys(w); play = SD.wpick(ks, k => Math.max(0, w[k]));
+      // motion offense: the ball moves until someone gets a look (a drive, a kick-out three or a cut)
+      if (play === 'motion') { r.motion = true; play = SD.wpick(['spot', 'drive', 'cut'], k => ({ spot: 45, drive: 35, cut: 20 })[k]); }
     }
     const usage = p => Math.pow(Math.max(55, (p.at.ins + p.at.mid + p.at.thr) / 3 + (p.ovr - 75) * 0.6), 2.6) * (p.tr.ego > 75 ? 1.15 : 1);
     const pickBy = (arr, f) => SD.wpick(arr, f);
@@ -225,11 +233,15 @@
     }
     const rb = SD.wpick(D, p => Math.pow(p.at.reb, 3) * (p.pos === 'C' || p.pos === 'PF' ? 1.6 : 0.7)); add(GM, rb, 'drb');
     r.drb = rb; r.text += ` ${H.last(rb)} rebounds.`;
-    GM.trans = chance(GM.coach[d].pace === 'fast' ? 0.22 : GM.coach[d].pace === 'slow' ? 0.06 : 0.13) ? d : null;
+    // off a defensive rebound the ball is live: push it (transition), attack early, or walk it up
+    const pushK = GM.coach[d].pace === 'fast' ? 1.5 : GM.coach[d].pace === 'slow' ? 0.5 : 1;
+    GM.trans = chance(0.17 * pushK) ? d : null;
+    GM.early = !GM.trans && chance(0.3 * pushK) ? d : null;
     return finishPoss(GM, r, s, d, 0, null, null, false, dur);
   }
   function finishPoss(GM, r, s, d, pts, scorer, ast, ftEnd, dur) {
     dur = dur == null ? r.time : dur; r.time = dur;
+    if (pts > 0 || ftEnd) { GM.dead = true; GM.trans = null; GM.early = null; }
     GM.score[s] += pts; GM.lineScore[s][GM.lineScore[s].length - 1] += pts;
     // plus/minus
     if (pts) { GM.on[s].forEach(id => { const p = SD.P(id); add(GM, p, 'pm', pts); }); GM.on[d].forEach(id => { const p = SD.P(id); add(GM, p, 'pm', -pts); }); }
@@ -271,7 +283,7 @@
     if (ot) { GM.ot++; GM.tf = GM.tf; }
     GM.lineScore.h.push(0); GM.lineScore.a.push(0);
     GM.poss = GM.per % 2 === 0 ? other(GM.firstPoss || 'h') : (GM.firstPoss || 'h');
-    r.endPer = true; GM.subNow = true;
+    r.endPer = true; GM.subNow = true; GM.dead = true; GM.trans = null; GM.early = null;
     ['h', 'a'].forEach(x => GM.L[x].forEach(p => { GM.en[p.id] = Math.min(1, (GM.en[p.id] || 1) + (GM.per === (GM.nper === 2 ? 2 : 3) ? 0.35 : 0.12)); }));
     return r;
   };

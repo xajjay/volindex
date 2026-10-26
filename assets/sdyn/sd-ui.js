@@ -6,7 +6,7 @@
   const UI = root.VI_SDYN = {};
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   let APP = null, SPORT = null;
-  const V = { tab: 'home', msg: null, rpos: 'ALL', statk: null, stab: 'team', nilf: 'risk', ppos: 'ALL', rfind: { pos: 'ALL', stars: 0, q: '' }, more: {}, setup: null };
+  const V = { tab: 'home', msg: null, rpos: 'ALL', statk: null, stab: 'team', nilf: 'all', ppos: 'ALL', rfind: { pos: 'ALL', stars: 0, q: '' }, more: {}, setup: null };
   const G = () => SD.G;
   const T = id => SD.T(id);
   const hoops = () => SD.kind() === 'hoops';
@@ -59,14 +59,15 @@
   }
   function setup() {
     const s = V.setup, sp = SD.SPORTS[SPORT];
-    const def = { team: 'Tennessee', coach: '', mode: 'coach', recruiting: 'manual', portal: 'manual', nil: 'manual', speed: 'slow' };
+    const def = { team: 'Tennessee', diff: 'varsity', coach: '', mode: 'coach', recruiting: 'manual', portal: 'manual', nil: 'manual', speed: 'slow' };
     for (const k in def) if (s[k] == null) s[k] = def[k];
     const seg = (key, opts) => `<div class="gseg" data-key="${key}">${opts.map(([v, l]) => `<button type="button" data-v="${v}" aria-pressed="${String(s[key]) === String(v)}">${esc(l)}</button>`).join('')}</div>`;
     const A = root.SITE_AUTO && root.SITE_AUTO[SPORT], played = A && A.schedule ? A.schedule.filter(x => x.result && !x.exh).length : 0;
     APP.innerHTML = `<div class="wrap games dy"><div class="gcrumb"><a href="#" data-back="1">${esc(sp.title)}</a> › New dynasty</div>
       <div class="dy-hero"><h1>New dynasty</h1><p>${s.team === 'Tennessee' ? `${esc(sp.name)} at Tennessee, ${sp.label(sp.season)}: the real roster and schedule${played ? `, with the ${played} real game${played > 1 ? 's' : ''} already played` : ''}.` : `${esc(sp.name)} at ${esc(s.team)}, ${sp.label(sp.season)}: a generated roster and schedule. Tennessee keeps its real roster as an opponent.`}</p></div>
       <div class="box gsetup dy-setup">
-        <div class="gfield"><div class="glabel">Start</div>${seg('start', [['today', `Today (${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`]])}<p class="dim small">You take over today: the season ${played ? 'is under way, with Tennessee\'s real results so far' : 'has not started yet, so you get it from the first game'}. Preseason rankings are the real ones where they are out.</p></div>
+        <div class="gfield"><div class="glabel">Start</div>${played ? seg('start', [['today', 'Today: take over mid-season']]) + `<p class="dim small">The season is under way: you take over with the real results so far.</p>` : `<p class="dim small" style="margin:0">The ${sp.label(sp.season)} season hasn't started, so you begin in the preseason (camp, then the opener on ${new Date(Date.UTC(sp.season, +sp.start.slice(0, 2) - 1, +sp.start.slice(3))).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}). Preseason rankings are the real ones where they are out.</p>`}</div>
+        <div class="gfield"><div class="glabel">Difficulty</div>${seg('diff', [['freshman', 'Freshman (easier)'], ['varsity', 'Varsity (default)'], ['heisman', 'Heisman (hard)']])}<p class="dim small">Heisman gives CPU teams a boost in your games and makes recruiting tougher.</p></div>
         <div class="gfield"><div class="glabel">Team</div><select id="sdTeam" class="dy-in">${(() => { const ts = SD.teamsFor(SPORT), confs = [...new Set(ts.map(t => t.conf))].sort((a, b) => (a === 'SEC' ? -1 : b === 'SEC' ? 1 : (SD.CONF_NAME[a] || a).localeCompare(SD.CONF_NAME[b] || b))); return confs.map(c => `<optgroup label="${esc(SD.CONF_NAME[c] || c)}">${ts.filter(t => t.conf === c).sort((a, b) => a.name.localeCompare(b.name)).map(t => `<option ${t.name === s.team ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</optgroup>`).join(''); })()}</select><p class="dim small">${s.team === 'Tennessee' ? 'Tennessee comes with its real players, stats and schedule.' : 'Every other school gets generated players and a generated schedule, with no real-life stats or history.'}</p></div>
         <div class="gfield"><div class="glabel">Coach name</div><input id="sdCoach" class="dy-in" maxlength="28" placeholder="Your name" value="${esc(s.coach)}"></div>
         <div class="gfield"><div class="glabel">In games</div>${seg('mode', [['coach', hoops0() ? 'I coach (strategy, timeouts, rotation)' : 'I manage (lineup, bullpen, steals, bunts)'], ['watch', 'Just watch']])}</div>
@@ -85,7 +86,7 @@
       if (b.id === 'sdStart') {
         s.coach = APP.querySelector('#sdCoach').value.trim() || 'Coach';
         busy('Building the season…', () => {
-          SD.newDynasty({ sport: SPORT, coach: s.coach, slot: s.slot, team: s.team, settings: { coachMode: s.mode, recruiting: s.recruiting, portal: s.portal, nil: s.nil, speed: s.speed } });
+          SD.newDynasty({ sport: SPORT, coach: s.coach, slot: s.slot, team: s.team, settings: { difficulty: s.diff, coachMode: s.mode, recruiting: s.recruiting, portal: s.portal, nil: s.nil, speed: s.speed } });
           if (SD.startToday) SD.startToday();
           V.tab = 'home';
         });
@@ -95,7 +96,7 @@
   const hoops0 = () => SD.SPORTS[SPORT].kind === 'hoops';
 
   /* ---------- hub ---------- */
-  const TABS = () => [['home', 'Home'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['lineup', hoops() ? 'Rotation' : 'Lineup'], ['recruit', 'Recruiting'], ['polls', 'Rankings'], ['standings', 'Standings'], ['stats', 'Stats'], ['nil', 'NIL'], ['history', 'History'], ['settings', 'Settings']];
+  const TABS = () => (G() && G().post && G().post.seen !== false ? [['tourney', 'NCAA Tournament']] : []).concat([['home', 'Home'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['lineup', hoops() ? 'Rotation' : 'Lineup'], ['recruit', 'Recruiting'], ['polls', 'Rankings'], ['standings', 'Standings'], ['stats', 'Stats'], ['nil', 'NIL'], ['history', 'History'], ['settings', 'Settings']]);
   function hub() {
     const g = G(); if (!g) return landing();
     const ut = SD.userT(), rk = SD.apRank(ut.id), sp = SD.SP();
@@ -116,15 +117,22 @@
       <div class="dy-modal" id="dyModal" hidden><div class="dy-modal-in" role="dialog" aria-modal="true"><button class="dy-x" data-act="close" aria-label="Close">×</button><div id="dyModalBody"></div></div></div>
     </div>`;
     const body = APP.querySelector('#dyBody');
-    ({ home, schedule, roster, lineup, recruit, polls, standings, stats, nil, history, settings })[V.tab](body);
+    if (V.tab === 'tourney' && !(g.post && g.post.seen !== false)) V.tab = 'home';
+    ({ home, schedule, roster, lineup, recruit, polls, standings, stats, nil, history, settings, tourney })[V.tab](body);
     APP.firstElementChild.onclick = onClick; APP.firstElementChild.onchange = onChange;
     const at = APP.querySelector('.dyh-tabs [aria-selected="true"]'); if (at && at.scrollIntoView && root.innerWidth < 900) at.scrollIntoView({ block: 'nearest', inline: 'center' });
   }
   function primaryAction() {
     const g = G();
     if (g.phase === 'offseason') { const st = g.off.stage; return { label: st === 'schedule' ? `Start the ${SD.SP().label(g.season + 1)} season` : 'Continue: ' + SD.OFF_LABEL[SD.OFF_ORDER[SD.OFF_ORDER.indexOf(st) + 1]], main: () => busy('Working…', () => SD.offNext()) }; }
+    if (g.post && g.post.seen === false) return { label: hoops() ? 'Watch Selection Sunday' : 'Watch the selection show', main: () => { V.tab = 'home'; hub(); } };
     const nx = SD.nextUserGame();
-    if (!nx) return { label: g.phase === 'ncaa' ? 'Play out the tournament' : 'Continue', main: () => busy('Playing out the season…', () => SD.simToEnd('end')) };
+    if (!nx) {
+      if (g.phase === 'ncaa' && !(g.post && g.post.field.includes(g.user) && alive(g.user))) return { label: 'Play out the tournament', main: () => busy('Playing out the tournament…', () => SD.simToEnd('end')) };
+      if (g.phase === 'ncaa') return { label: 'Continue to your next game', main: () => busy('Moving ahead…', () => { SD.advanceToUser(); }) };
+      const lab = g.phase === 'ct' ? (hoops() ? 'Continue to Selection Sunday' : 'Continue to the NCAA field announcement') : g.phase === 'season' ? 'Continue to the conference tournaments' : 'Continue';
+      return { label: lab, main: () => busy('Moving ahead…', () => { SD.advanceToUser(); }) };
+    }
     const o = T(SD.oppOf(nx));
     return { label: `${g.settings.coachMode === 'watch' ? 'Watch' : 'Play'}: ${nx.h === g.user && !nx.neutral ? 'vs' : nx.neutral ? 'vs' : 'at'} ${o.name}`, sim: 'Sim it', x: nx, main: () => { busy('Getting to game day…', () => { SD.advanceToUser(); }, () => { const x = SD.nextUserGame(); if (x) playGame(x); else hub(); }); } };
   }
@@ -142,7 +150,7 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-tab],[data-act],[data-pid],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-ord],[data-gid]'); if (!el) return;
+    const el = e.target.closest('[data-tab],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-ord],[data-gid]'); if (!el) return;
     const d = el.dataset, g = G();
     if (el.tagName === 'A') e.preventDefault();
     if (d.tab) { V.tab = d.tab; V.msg = null; return hub(); }
@@ -152,6 +160,15 @@
     if (d.gid) return boxCard(d.gid);
     if (d.act === 'close') return closeModal();
     if (d.act === 'msgx') { V.msg = null; return hub(); }
+    if (d.act === 'ssdone') { if (g.post) g.post.seen = true; V.tab = 'tourney'; V.treg = null; autosave(); return hub(); }
+    if (d.treg) { V.treg = d.treg; return keep(); }
+    if (d.team) return teamCard(+d.team);
+    if (d.push) { V.msg = SD.encourage(+d.push); V.more.push = true; return keep(); }
+    if (d.ncadd) { const y = g.season + 1, ut = SD.userT(), o = g.teams.filter(t => t.conf !== ut.conf).sort((a, b) => b.prestige - a.prestige)[g.ncPick[y].length * 3]; g.ncPick[y].push({ o: o.id, site: 'H' }); return keep(); }
+    if (d.ncrm != null && d.ncrm !== '') { g.ncPick[g.season + 1].splice(+d.ncrm, 1); return keep(); }
+    if (d.campf) { SD.campState().focus = d.campf; return keep(); }
+    if (d.campp) { const C = SD.campState(), id = +d.campp, i = C.picks.indexOf(id); if (i >= 0) C.picks.splice(i, 1); else if (C.picks.length < 3) C.picks.push(id); else V.msg = 'Three players max: tap one to take him out.'; return keep(); }
+    if (d.act === 'camp') { SD.runCamp(false); autosave(); return keep(); }
     if (d.act === 'main') { const a = primaryAction(); if (a) a.main(); return; }
     if (d.act === 'sim') { return busy('Simming…', () => { const x = SD.simNext(); if (x) { const me = x.h === g.user ? 'h' : 'a'; V.msg = `Final: ${T(x.a).name} ${x.res.a}, ${T(x.h).name} ${x.res.h}.`; } }); }
     if (d.act === 'simmenu') { const m = el.parentNode.querySelector('.dy-menu-in'); m.hidden = !m.hidden; return; }
@@ -188,6 +205,7 @@
   }
   function onChange(e) {
     const el = e.target, g = G(), t = SD.userT();
+    if (el.dataset.ncp) { const [i, k] = el.dataset.ncp.split('|'); const a = g.ncPick[g.season + 1][+i]; a[k] = k === 'o' ? +el.value : el.value; return keep(); }
     if (el.dataset.rnil) { const p = g.recruit.pool[el.dataset.rnil]; p.nilOffer = +el.value; return keep(); }
     if (el.dataset.rvisit) { V.msg = SD.setVisit(+el.dataset.rvisit, el.value) || 'Official visit set.'; return keep(); }
     if (el.dataset.fpos) { const D = SD.diamondLineup(t); const field = Object.fromEntries(Object.entries(D.field).map(([k, p]) => [k, p ? p.id : null])); const pid = +el.value; for (const k in field) if (field[k] === pid) field[k] = null; field[el.dataset.fpos] = pid; t.dl = Object.assign(t.dl || {}, { field, order: null }); return keep(); }
@@ -205,8 +223,10 @@
   function home(b) {
     const g = G(), ut = SD.userT();
     if (g.phase === 'offseason') return offseason(b);
+    if (g.post && g.post.seen === false) return selectionShow(b);
     const L = [], R = [];
     const nx = SD.nextUserGame();
+    if (g.phase === 'preseason') L.push(campCard(), depthPreview());
     if (nx) L.push(nextGameCard(nx));
     if (g.phase === 'ct' || g.phase === 'ncaa') L.push(postCard());
     const last = SD.userGames().filter(x => x.res).slice(-1)[0];
@@ -214,6 +234,167 @@
     L.push(newsCard());
     R.push(pollMini(), standMini(), leadersMini(), recruitMini());
     b.innerHTML = `<div class="dy-grid"><div class="dy-col">${L.join('')}</div><div class="dy-col">${R.join('')}</div></div>`;
+  }
+  /* ---------- the NCAA Tournament: your path, the top seeds and the bracket ---------- */
+  const PAIRS = [[1, 16], [8, 9], [5, 12], [4, 13], [6, 11], [3, 14], [7, 10], [2, 15]];
+  const ncaaGame = (a, b) => G().sched.find(x => x.kind === 'ncaa' && ((x.h === a && x.a === b) || (x.h === b && x.a === a)) && x.res) || null;
+  const winOf = (a, b) => { if (a == null || b == null) return null; const x = ncaaGame(a, b); return x ? (x.res.h > x.res.a ? x.h : x.a) : null; };
+  const netOf = id => (T(id) && T(id).net ? T(id).net.rank : 999);
+  const likely = ids => ids.filter(x => x != null).sort((a, b) => netOf(a) - netOf(b))[0];
+  function hoopsBracket() {
+    const P = G().post, regs = ['East', 'West', 'South', 'Midwest'], seed = {}, out = {};
+    regs.forEach(rg => {
+      const slot = sd => { const x = P.R[rg].find(y => y.seed === sd); if (!x) return null; if (x.ff) x.ff.forEach(t => { seed[t] = sd; }); if (x.t != null) { seed[x.t] = sd; return x.t; } return x.ff ? (winOf(x.ff[0], x.ff[1])) : null; };
+      const r0 = PAIRS.map(([a, b]) => ({ a: slot(a), b: slot(b), sa: a, sb: b, ff: (P.R[rg].find(y => y.seed === a && y.ff) || P.R[rg].find(y => y.seed === b && y.ff) || {}).ff || null }));
+      const rounds = [r0];
+      for (let k = 1; k < 4; k++) { const prev = rounds[k - 1], nx = []; for (let i = 0; i < prev.length; i += 2) { const A = winOf(prev[i].a, prev[i].b), B = winOf(prev[i + 1].a, prev[i + 1].b); nx.push({ a: A, b: B, sa: seed[A], sb: seed[B] }); } rounds.push(nx); }
+      const last = rounds[3][0]; out[rg] = { rounds, champ: winOf(last.a, last.b) };
+    });
+    const f4 = [{ a: out.East.champ, b: out.West.champ }, { a: out.South.champ, b: out.Midwest.champ }];
+    const fin = { a: winOf(f4[0].a, f4[0].b), b: winOf(f4[1].a, f4[1].b) };
+    return { regs, out, f4, fin, seed, champ: P.champ };
+  }
+  // every team inside a block of first-round pairs (to name the likely opponent when it isn't decided yet)
+  const blockTeams = (r0, from, n) => { const ids = []; for (let i = from; i < from + n; i++) { const m = r0[i]; if (!m) continue; [m.a, m.b].concat(m.ff || []).forEach(x => { if (x != null && !ids.includes(x)) ids.push(x); }); } return ids; };
+  const alive = id => {
+    const g = G(), P = g.post; if (!P) return true;
+    if (SD.kind() === 'hoops') return !g.sched.some(x => x.kind === 'ncaa' && x.res && ((x.h === id && x.res.h < x.res.a) || (x.a === id && x.res.a < x.res.h)));
+    // double elimination: two losses in a regional or World Series bracket; a lost super regional or finals series
+    const pods = (P.regs || []).concat(P.ws || []);
+    if (pods.some(R => R.teams.includes(id) && R.de && (R.de.losses[id] || 0) >= 2)) return false;
+    if (P.regs && P.regs.some(R => R.teams.includes(id) && R.champ != null && R.champ !== id)) return false;
+    if (P.sup && P.sup.some(S => (S.a === id || S.b === id) && S.champ != null && S.champ !== id)) return false;
+    if (P.ws && P.ws.some(R => R.teams.includes(id) && R.champ != null && R.champ !== id)) return false;
+    if (P.fin && (P.fin.a === id || P.fin.b === id) && P.fin.champ != null && P.fin.champ !== id) return false;
+    return P.field.includes(id);
+  };
+  function hoopsPath(B) {
+    const g = G(), me = g.user, rg = B.regs.find(r => B.out[r].rounds[0].some(m => m.a === me || m.b === me || (m.ff || []).includes(me)));
+    if (!rg) return null;
+    const r0 = B.out[rg].rounds[0], idx = r0.findIndex(m => m.a === me || m.b === me || (m.ff || []).includes(me)), steps = [];
+    const names = ['First round', 'Second round', 'Sweet 16', 'Elite Eight', 'Final Four', 'National championship'];
+    for (let k = 0; k < 4; k++) {
+      let opp;
+      if (k === 0) { const m = r0[idx]; opp = m.a === me ? m.b : m.a; if (opp == null && m.ff) opp = likely(m.ff.filter(x => x !== me && alive(x))); }
+      else { const size = Math.pow(2, k - 1), blk = Math.floor(idx / size) ^ 1; const ids = blockTeams(r0, blk * size, size).filter(alive); const real = B.out[rg].rounds[k][Math.floor(idx / Math.pow(2, k))]; opp = real ? (real.a === me ? real.b : real.a) : null; if (opp == null) opp = likely(ids); }
+      steps.push({ round: names[k], opp, game: opp != null ? ncaaGame(me, opp) : null, known: k === 0 || B.out[rg].rounds[k][Math.floor(idx / Math.pow(2, k))] && (B.out[rg].rounds[k][Math.floor(idx / Math.pow(2, k))].a === me || B.out[rg].rounds[k][Math.floor(idx / Math.pow(2, k))].b === me) });
+    }
+    const semi = (rg === 'East' || rg === 'West') ? 0 : 1, otherR = ['West', 'East', 'Midwest', 'South'][B.regs.indexOf(rg)];
+    const f4opp = B.out[otherR].champ != null ? B.out[otherR].champ : likely(blockTeams(B.out[otherR].rounds[0], 0, 8).filter(alive));
+    steps.push({ round: names[4], opp: f4opp, game: ncaaGame(me, f4opp), known: B.out[rg].champ === me && B.out[otherR].champ != null });
+    const os = B.f4[1 - semi], fo = B.fin[semi === 0 ? 'b' : 'a'] != null ? B.fin[semi === 0 ? 'b' : 'a'] : likely([os.a, os.b].concat(semi === 0 ? blockTeams(B.out.South.rounds[0], 0, 8).concat(blockTeams(B.out.Midwest.rounds[0], 0, 8)) : blockTeams(B.out.East.rounds[0], 0, 8).concat(blockTeams(B.out.West.rounds[0], 0, 8))).filter(x => x != null && alive(x)));
+    steps.push({ round: names[5], opp: fo, game: ncaaGame(me, fo), known: false });
+    return { rg, steps };
+  }
+  function tourney(b) {
+    const g = G(), P = g.post, me = g.user, ut = SD.userT();
+    if (!P) { b.innerHTML = '<div class="box">The field is announced after the conference tournaments.</div>'; return; }
+    const tbtn = id => id == null ? '<span class="tb-tm tbd">TBD</span>' : `<button class="tb-tm ${id === me ? 'me' : ''} ${alive(id) ? '' : 'out'}" data-team="${id}" style="--tc:${T(id).c1}">${esc(T(id).name)}</button>`;
+    const inField = P.field.includes(me), champ = P.champ != null ? T(P.champ) : null;
+    let status;
+    if (champ && champ.id === me) status = `<b>${esc(ut.name)} are national champions!</b>`;
+    else if (!inField) status = `${esc(ut.name)} missed the field. Follow the bracket below.`;
+    else if (!alive(me)) { const lg = g.sched.filter(x => x.kind === 'ncaa' && (x.h === me || x.a === me) && x.res).pop(); status = `${esc(ut.name)}'s run ended in the ${esc((lg && lg.title || '').replace(/^NCAA (East|West|South|Midwest) /, '').replace('NCAA ', '') || 'tournament')}.`; }
+    else { const nx = SD.nextUserGame(); status = nx ? `Next: ${nx.title ? esc(nx.title.replace(/^NCAA /, '')) + ' · ' : ''}${SD.dayStr(nx.d)} vs ${esc(T(SD.oppOf(nx)).name)}` : 'Still alive. Waiting on the next round.'; }
+    let hero = `<div class="tb-hero"><div><span class="glabel">${hoops() ? 'Road to the Final Four' : 'Road to ' + esc(SD.SP().ncaa.wsSite)}${champ ? ' · Champion: ' + esc(champ.name) : ' · ' + esc(P.label || '')}</span><h2>${inField ? (hoops() ? `No. ${P.seedOf[me] || '?'} seed${P.regionOf[me] ? ', ' + esc(P.regionOf[me]) + ' Region' : ''}` : `No. ${P.seedOf[me]} overall seed`) : 'Not in the field'}</h2><p>${status}</p></div>${inField && alive(me) && !champ ? '<span class="tb-alive">Alive</span>' : ''}</div>`;
+    let tops = '', path = '', bracket = '';
+    if (hoops()) {
+      const B = hoopsBracket();
+      const ones = B.regs.map(r => ({ r, t: B.out[r].rounds[0][0].a }));
+      tops = `<div class="box"><div class="glabel">The No. 1 seeds</div><div class="tb-tops">${ones.map((o, i) => o.t == null ? '' : `<button class="tb-top ${o.t === me ? 'me' : ''} ${alive(o.t) ? '' : 'out'}" data-team="${o.t}" style="--tc:${T(o.t).c1}"><small>${o.r}${i === 0 && P.field[0] === o.t ? ' · overall No. 1' : ''}</small><b>${esc(T(o.t).name)}</b><span>${T(o.t).w}-${T(o.t).l} · NET ${netOf(o.t)}</span></button>`).join('')}</div></div>`;
+      const PA = inField ? hoopsPath(B) : null;
+      if (PA) path = `<div class="box"><div class="glabel">${esc(ut.name)}'s path</div><ol class="tb-path">${PA.steps.map(st0 => { const x = st0.game, won = x && ((x.h === me) === (x.res.h > x.res.a)); return `<li class="${x ? (won ? 'won' : 'lost') : ''}"><span class="tb-rd">${st0.round}</span>${st0.opp != null ? `${x ? '' : `<small>${st0.known ? 'vs' : 'likely'}</small> `}${tbtn(st0.opp)} <small>(${B.seed[st0.opp] || '?'})</small>` : '<span class="tbd">TBD</span>'}${x ? ` <b>${won ? 'W' : 'L'} ${x.h === me ? x.res.h + '-' + x.res.a : x.res.a + '-' + x.res.h}</b>` : ''}</li>`; }).join('')}</ol></div>`;
+      const myR = PA ? PA.rg : null, sel = V.treg && (B.regs.includes(V.treg) || V.treg === 'F4') ? V.treg : (myR || 'East');
+      const match = (m, k, i, onPath) => { const x = m.a != null && m.b != null ? ncaaGame(m.a, m.b) : null, w = x ? (x.res.h > x.res.a ? x.h : x.a) : null, sc = id => x ? (x.h === id ? x.res.h : x.res.a) : '';
+        const row = (id, sd, ff) => `<div class="tb-row ${w != null && id === w ? 'w' : ''} ${w != null && id !== w ? 'l' : ''}"><span class="tb-sd">${sd || ''}</span>${id == null && ff ? `<span class="tb-tm tbd">${ff.map(t => esc(T(t).abbr)).join(' / ')}</span>` : tbtn(id)}<b>${sc(id)}</b></div>`;
+        return `<div class="tb-m ${onPath ? 'path' : ''}">${row(m.a, m.sa != null ? m.sa : B.seed[m.a], k === 0 && m.ff && m.a == null ? m.ff : null)}${row(m.b, m.sb != null ? m.sb : B.seed[m.b], k === 0 && m.ff && m.b == null ? m.ff : null)}</div>`; };
+      const chips = `<div class="gchips dy-chips">${B.regs.concat(['F4']).map(r => `<button data-treg="${r}" aria-pressed="${sel === r}">${r === 'F4' ? 'Final Four' : r}${r === myR ? ' ★' : ''}</button>`).join('')}</div>`;
+      if (sel === 'F4') {
+        bracket = `<div class="box"><div class="glabel">Final Four & national championship</div>${chips}<div class="tb-br f4"><div class="tb-col"><h4>Final Four</h4>${B.f4.map((m, i) => match(m, 4, i, false)).join('')}</div><div class="tb-col"><h4>Championship</h4>${match(B.fin, 5, 0, false)}${B.champ != null ? `<div class="tb-champ">🏆 ${esc(T(B.champ).name)}</div>` : ''}</div></div></div>`;
+      } else {
+        const R = B.out[sel], idx = myR === sel && PA ? R.rounds[0].findIndex(m => m.a === me || m.b === me || (m.ff || []).includes(me)) : -1;
+        bracket = `<div class="box"><div class="glabel">${sel} Region</div>${chips}<div class="dy-scroll"><div class="tb-br">${R.rounds.map((rd, k) => `<div class="tb-col"><h4>${['First round', 'Second round', 'Sweet 16', 'Elite Eight'][k]}</h4>${rd.map((m, i) => match(m, k, i, idx >= 0 && Math.floor(idx / Math.pow(2, k)) === i)).join('')}</div>`).join('')}<div class="tb-col"><h4>Regional champion</h4><div class="tb-m">${R.champ != null ? `<div class="tb-row w"><span class="tb-sd">${B.seed[R.champ] || ''}</span>${tbtn(R.champ)}<b></b></div>` : '<div class="tb-row"><span class="tb-sd"></span><span class="tb-tm tbd">TBD</span><b></b></div>'}</div></div></div></div></div>`;
+      }
+    } else {
+      const myReg = (P.regs || []).find(R => R.teams.includes(me));
+      tops = `<div class="box"><div class="glabel">The top national seeds</div><div class="tb-tops">${P.field.slice(0, 8).map((t, i) => `<button class="tb-top ${t === me ? 'me' : ''} ${alive(t) ? '' : 'out'}" data-team="${t}" style="--tc:${T(t).c1}"><small>No. ${i + 1} national seed</small><b>${esc(T(t).name)}</b><span>${T(t).w}-${T(t).l} · RPI ${netOf(t)}</span></button>`).join('')}</div></div>`;
+      const pod = R => { const de = R.de || { losses: {} }; return `<div class="tb-pod ${R.teams.includes(me) ? 'mine' : ''}"><div class="glabel">${R.host != null ? esc(T(R.host).name) + ' Regional' + (R.nat ? ' · No. ' + R.nat : '') : 'Bracket'}</div>${R.teams.map((t, i) => { const gs = (de.games || []).filter(x => x.res && (x.h === t || x.a === t)), w = gs.filter(x => (x.h === t) === (x.res.h > x.res.a)).length; return `<div class="tb-row ${de.done === t || R.champ === t ? 'w' : ''} ${(de.losses[t] || 0) >= 2 ? 'l' : ''}"><span class="tb-sd">${i + 1}</span>${tbtn(t)}<b>${gs.length ? w + '-' + (gs.length - w) : ''}</b></div>`; }).join('')}</div>`; };
+      const sups = P.sup ? P.sup.map(S => `<div class="tb-pod ${S.a === me || S.b === me ? 'mine' : ''}"><div class="glabel">Super regional at ${esc(T(S.host).name)}</div>${[S.a, S.b].map(t => `<div class="tb-row ${S.champ === t ? 'w' : ''} ${S.champ != null && S.champ !== t ? 'l' : ''}">${tbtn(t)}<b>${S.wins[t]}</b></div>`).join('')}</div>`).join('') : '';
+      const supOf = i => { const order = [[0, 15], [7, 8], [3, 12], [4, 11], [1, 14], [6, 9], [2, 13], [5, 10]]; return order.findIndex(p => p.includes(i)); };
+      if (myReg) {
+        const ri = P.regs.indexOf(myReg), si = supOf(ri), pr = [[0, 15], [7, 8], [3, 12], [4, 11], [1, 14], [6, 9], [2, 13], [5, 10]][si], other = P.regs[pr[0] === ri ? pr[1] : pr[0]];
+        const supOpp = P.sup ? (P.sup[si].a === me ? P.sup[si].b : P.sup[si].a) : likely(other.teams.filter(alive));
+        const wsSide = si < 4 ? 0 : 1, wsOpps = P.ws ? P.ws[wsSide].teams.filter(t => t !== me) : [];
+        path = `<div class="box"><div class="glabel">${esc(ut.name)}'s path</div><ol class="tb-path"><li class="${myReg.champ === me ? 'won' : (myReg.de && (myReg.de.losses[me] || 0) >= 2) ? 'lost' : ''}"><span class="tb-rd">Regional</span>${myReg.host === me ? 'Hosting the ' : 'At the '}${esc(T(myReg.host).name)} Regional: ${myReg.teams.filter(t => t !== me).map(tbtn).join(', ')}</li>
+          <li class="${P.sup && P.sup[si].champ === me ? 'won' : P.sup && P.sup[si].champ != null ? 'lost' : ''}"><span class="tb-rd">Super regional</span>${P.sup ? 'vs' : '<small>likely</small>'} ${tbtn(supOpp)}${P.sup ? ` <b>${P.sup[si].wins[me] != null ? P.sup[si].wins[me] + '-' + P.sup[si].wins[supOpp] : ''}</b>` : ''}</li>
+          <li><span class="tb-rd">${esc(SD.SP().ncaa.wsName)}</span>${wsOpps.length ? `Bracket ${wsSide + 1}: ${wsOpps.map(tbtn).join(', ')}` : '<span class="tbd">Eight teams in ' + esc(SD.SP().ncaa.wsSite) + '</span>'}</li><li><span class="tb-rd">Finals</span><span class="tbd">Best of three</span></li></ol></div>`;
+      }
+      const sel = V.treg && ['REG', 'SUP', 'WS'].includes(V.treg) ? V.treg : (P.ws ? 'WS' : P.sup ? 'SUP' : 'REG');
+      const chips = `<div class="gchips dy-chips">${[['REG', 'Regionals'], ['SUP', 'Super regionals'], ['WS', SD.SP().ncaa.wsName]].map(([k, l]) => `<button data-treg="${k}" aria-pressed="${sel === k}">${l}</button>`).join('')}</div>`;
+      const body = sel === 'REG' ? `<div class="tb-pods">${P.regs.slice().sort((x, y) => (y.teams.includes(me) ? 1 : 0) - (x.teams.includes(me) ? 1 : 0)).map(pod).join('')}</div>` : sel === 'SUP' ? (sups ? `<div class="tb-pods">${sups}</div>` : '<p class="dim">Set after the regionals.</p>') : (P.ws ? `<div class="tb-pods">${P.ws.map(pod).join('')}${P.fin ? `<div class="tb-pod"><div class="glabel">Finals (best of three)</div>${[P.fin.a, P.fin.b].map(t => `<div class="tb-row ${P.fin.champ === t ? 'w' : ''}">${tbtn(t)}<b>${P.fin.wins[t]}</b></div>`).join('')}</div>` : ''}</div>${P.champ != null ? `<div class="tb-champ">🏆 ${esc(T(P.champ).name)}</div>` : ''}` : '<p class="dim">Eight teams reach the World Series after the supers.</p>');
+      bracket = `<div class="box"><div class="glabel">The bracket</div>${chips}${body}</div>`;
+    }
+    b.innerHTML = `${hero}<div class="dy-grid"><div class="dy-col">${path || tops}</div><div class="dy-col">${path ? tops : ''}</div></div>${bracket}`;
+  }
+  function teamCard(id) {
+    const t = T(id); if (!t) return;
+    const ps = t.roster.map(SD.P).filter(Boolean).sort((a, b) => b.ovr - a.ovr).slice(0, 3);
+    const n = t.net || {};
+    modal(`<div class="dy-pc" style="--tc:${t.c1}"><h3>${esc(t.name)}</h3><p class="dim">${esc(SD.CONF_NAME[t.conf] || t.conf)} · ${t.w}-${t.l} (${t.cw}-${t.cl} conference)${t.confChamp === G().season ? ' · conference champion' : ''}</p>
+      <div class="dy-stats4"><div><b>${n.rank || '—'}</b><small>${SD.netName()}</small></div><div><b>${n.sos || '—'}</b><small>Schedule rank</small></div><div><b>${SD.teamRating(t)}</b><small>Team rating</small></div><div><b>${G().post && G().post.seedOf ? G().post.seedOf[id] || '—' : '—'}</b><small>${hoops() ? 'Seed' : 'National seed'}</small></div></div>
+      ${hoops() && n.q ? `<p class="small">Quad 1: <b>${n.q[0][0]}-${n.q[0][1]}</b> · Quad 2: ${n.q[1][0]}-${n.q[1][1]} · Quad 3: ${n.q[2][0]}-${n.q[2][1]} · Quad 4: ${n.q[3][0]}-${n.q[3][1]}</p>` : ''}
+      <div class="glabel">Best players</div><ul class="dy-mini">${ps.map(p => `<li>${plink(p)} <small>${p.pos} · ${yrLabel(p)} · ${p.ovr}</small></li>`).join('')}</ul></div>`);
+  }
+
+  /* ---------- the selection show ---------- */
+  function selectionShow(b) {
+    const g = G(), P = g.post, me = g.user, ut = SD.userT(), net = t => T(t).net ? T(t).net.rank : '';
+    const line = (seed, tid, ff, i) => {
+      const nm = ff ? ff.map(id => esc(T(id).name)).join(' / ') : esc(T(tid).name), mine = ff ? ff.includes(me) : tid === me;
+      const rec = ff ? 'First Four' : `${T(tid).w}-${T(tid).l} · ${SD.netName()} ${net(tid)}`;
+      return `<li class="ss-ln ${mine ? 'me' : ''}" style="--d:${i}"><span class="ss-sd">${seed}</span><span class="ss-tm" style="--tc:${T(ff ? ff[0] : tid).c1}">${nm}</span><small>${rec}</small></li>`;
+    };
+    let body = '', mineTxt = '', i = 0;
+    if (hoops()) {
+      const regs = ['East', 'West', 'South', 'Midwest'], myR = P.regionOf[me], order = regs.filter(r => r !== myR).concat(myR ? [myR] : []);
+      const ones = order.map(r => P.R[r].find(x => x.seed === 1)).filter(Boolean);
+      body += `<div class="ss-box"><div class="glabel">The No. 1 seeds</div><ol class="ss-list">${ones.map((x, j) => line(1, x.t, x.ff, i++)).join('')}</ol></div>`;
+      body += `<div class="ss-regs">${order.map(r => `<div class="ss-box ${r === myR ? 'mine' : ''}"><div class="glabel">${r} Region</div><ol class="ss-list">${P.R[r].slice().sort((a, b) => a.seed - b.seed).map(x => line(x.seed, x.t, x.ff, i++)).join('')}</ol></div>`).join('')}</div>`;
+      mineTxt = P.field.includes(me) ? `${esc(ut.name)} is a No. ${P.seedOf[me] || (P.R[myR] || []).find(x => x.ff && x.ff.includes(me))?.seed || '?'} seed in the ${myR || (Object.keys(P.R).find(r => P.R[r].some(x => x.ff && x.ff.includes(me))) || '')} Region${P.seedOf[me] ? '' : ' (First Four)'}` : `${esc(ut.name)} is not in the field`;
+    } else {
+      const regs = P.regs.slice(), myR = regs.find(R => R.teams.includes(me)), order = regs.filter(R => R !== myR).concat(myR ? [myR] : []);
+      body += `<div class="ss-regs four">${order.map(R => `<div class="ss-box ${R === myR ? 'mine' : ''}"><div class="glabel">${esc(T(R.host).name)} Regional · No. ${R.nat} national seed</div><ol class="ss-list">${R.teams.map((t, j) => line(j + 1, t, null, i++)).join('')}</ol></div>`).join('')}</div>`;
+      mineTxt = myR ? `${esc(ut.name)} is the No. ${P.seedOf[me]} overall seed${myR.host === me ? ' and hosts a regional' : ` in the ${esc(T(myR.host).name)} Regional`}` : `${esc(ut.name)} is not in the field`;
+    }
+    const bub = P.bubble || { lastIn: [], firstOut: [] };
+    body += `<div class="ss-box"><div class="glabel">On the bubble</div><div class="ss-bub"><div><b>Last four in</b><ol class="ss-list">${bub.lastIn.map(t => line('', t, null, i++)).join('')}</ol></div><div><b>First four out</b><ol class="ss-list">${bub.firstOut.map(t => line('', t, null, i++)).join('')}</ol></div></div></div>`;
+    b.innerHTML = `<div class="ss" id="ssRoot" style="--n:${i}"><div class="ss-hero"><span class="glabel">${hoops() ? 'Selection Sunday' : 'NCAA Tournament selection show'} · ${SD.dateStr(g.date)}</span><h2>${hoops() ? 'The field of 68' : 'The field of 64'}</h2><p>${P.autos.length} automatic bids, ${P.field.length - P.autos.length} at-large picks. The committee ranks teams by the ${SD.netName()}${hoops() ? ' (results by quadrant, scoring margin and strength of schedule)' : ' (winning percentage and strength of schedule, road wins count more)'}.</p><button class="btn" id="ssSkip">Skip to the bracket</button></div>
+      ${body}
+      <div class="ss-me ${P.field.includes(me) ? 'in' : 'out'}"><b>${mineTxt}</b><button class="btn primary big" data-act="ssdone">Open the bracket</button></div></div>`;
+    const root = b.querySelector('#ssRoot');
+    b.querySelector('#ssSkip').onclick = () => root.classList.add('done');
+  }
+  function campCard() {
+    const g = G(), C = SD.campState(), ut = SD.userT(), F = SD.CAMP[SD.kind()];
+    if (C.done) return `<div class="box"><div class="glabel">Preseason camp: ${esc(F[C.focus][0])}</div><ul class="dy-mini">${(C.res || []).slice(0, 8).map(x => `<li>${plink(SD.P(x.id))} <small>${x.before} → <b>${x.after}</b>${x.extra ? ' · extra reps' : ''}</small></li>`).join('')}</ul></div>`;
+    const ps = ut.roster.map(SD.P).sort((a, b) => b.ovr - a.ovr);
+    return `<div class="box"><div class="glabel">Preseason camp</div><p class="small dim">Pick a team focus and up to three players for extra reps (young players with a high ceiling gain the most). Work ethic matters. If you skip it, your staff runs camp when the season starts.</p>
+      <div class="gchips dy-chips">${Object.entries(F).map(([k, v]) => `<button data-campf="${k}" aria-pressed="${C.focus === k}">${esc(v[0])}</button>`).join('')}</div>
+      <div class="dy-scroll" style="max-height:260px"><table class="dyt dy-tight"><tbody>${ps.map(p => `<tr class="${C.picks.includes(p.id) ? 'me' : ''}"><td><button class="dy-ra ${C.picks.includes(p.id) ? 'on' : ''}" data-campp="${p.id}">${C.picks.includes(p.id) ? 'Extra reps ✓' : 'Extra reps'}</button></td><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${ovrB(p.ovr)}</td><td><span class="dy-pot">${p.potG}</span></td><td class="small">Work ${p.tr.work}</td></tr>`).join('')}</tbody></table></div>
+      <div class="grow"><button class="btn primary" data-act="camp">Run camp</button><span class="small dim">${C.picks.length}/3 picked</span></div></div>`;
+  }
+  function depthPreview() {
+    const ut = SD.userT(), o = SD.teamOvr(ut);
+    if (hoops()) {
+      const L = SD.lineup(ut);
+      return `<div class="box"><div class="glabel">Preseason depth chart <button class="glink" data-tab="lineup">Edit rotation</button></div><p class="small">Team rating <b>${SD.teamRating(ut)}</b></p>
+        <div class="dy-depth"><div class="dy-dg"><h4>Starting five</h4><ol>${L.slice(0, 5).map(p => `<li class="st"><span class="dy-dn">${p.pos}</span><span class="dy-dname">${plink(p)} <small>${yrLabel(p)}</small></span>${ovrB(p.ovr)}</li>`).join('')}</ol></div>
+        <div class="dy-dg"><h4>Bench</h4><ol>${L.slice(5, 10).map((p, i) => `<li><span class="dy-dn">${i + 6}</span><span class="dy-dname">${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></span>${ovrB(p.ovr)}</li>`).join('')}</ol></div></div></div>`;
+    }
+    const D = SD.diamondLineup(ut), posOf = p => Object.keys(D.field).find(k => D.field[k] === p) || 'DH';
+    return `<div class="box"><div class="glabel">Preseason depth chart <button class="glink" data-tab="lineup">Edit lineup</button></div><p class="small">Offense <b>${o.off}</b> · Rotation <b>${o.rot}</b> · Bullpen <b>${o.pen}</b></p>
+      <div class="dy-depth"><div class="dy-dg"><h4>Batting order</h4><ol>${D.order.map((p, i) => `<li class="st"><span class="dy-dn">${i + 1}</span><span class="dy-dname">${plink(p)} <small>${posOf(p)}</small></span>${ovrB(p.ovr)}</li>`).join('')}</ol></div>
+      <div class="dy-dg"><h4>${G().sport === 'softball' ? 'The circle' : 'Rotation'}</h4><ol>${D.rotation.slice(0, G().sport === 'softball' ? 3 : 4).map((p, i) => `<li class="st"><span class="dy-dn">${G().sport === 'softball' ? ['Ace', 'No. 2', 'No. 3'][i] : ['Fri', 'Sat', 'Sun', 'Mid'][i]}</span><span class="dy-dname">${plink(p)}</span>${ovrB(p.ovr)}</li>`).join('')}${D.closer ? `<li><span class="dy-dn">CL</span><span class="dy-dname">${plink(D.closer)}</span>${ovrB(D.closer.ovr)}</li>` : ''}</ol></div></div></div>`;
   }
   function nextGameCard(x) {
     const g = G(), ut = SD.userT(), o = T(SD.oppOf(x)), home = x.h === ut.id && !x.neutral;
@@ -304,21 +485,25 @@
         <select data-rnil="${p.id}"><option value="0">No NIL</option>${[10000, 25000, 50000, 100000, 200000, 400000].map(v => `<option value="${v}" ${p.nilOffer === v ? 'selected' : ''}>NIL ${SD.money(v)}</option>`).join('')}</select>
         ${p.visit ? `<small>Visit ${SD.dateStr(p.visit)}</small>` : homeGames.length ? `<select data-rvisit="${p.id}"><option value="">Official visit…</option>${homeGames.slice(0, 8).map(x => `<option value="${x.d}">${SD.dateStr(x.d)} vs ${esc(T(x.a).abbr)}</option>`).join('')}</select>` : ''}
         <button class="dy-ra" data-rrm="${p.id}">Remove</button>`}</td></tr>`; };
-    const pool = Object.values(R.pool).filter(p => !R.board.includes(p.id) && p.commit !== g.user && (F.pos === 'ALL' || p.pos === F.pos) && (!F.stars || p.rec.stars >= F.stars) && (!F.q || p.n.toLowerCase().includes(F.q.toLowerCase()))).sort((a, b) => a.rec.natl - b.rec.natl).slice(0, V.more.rpool ? 120 : 30);
+    const pool = Object.values(R.pool).filter(p => !R.board.includes(p.id) && p.commit !== g.user && (F.pos === 'ALL' || p.pos === F.pos) && (!F.stars || p.rec.stars === F.stars) && (!F.q || p.n.toLowerCase().includes(F.q.toLowerCase()))).sort((a, b) => a.rec.natl - b.rec.natl).slice(0, V.more.rpool ? 120 : 30);
     b.innerHTML = `<div class="box"><div class="glabel">Class of ${R.year}</div><div class="dy-stats4"><div><b>${R.classRank ? 'No. ' + R.classRank : '—'}</b><small>Class rank</small></div><div><b>${commits.length}/${SD.CLASS[g.sport]}</b><small>Commits</small></div><div><b>${SD.HOURS() - SD.hoursUsed()}</b><small>Hours left this week</small></div><div><b>${board.length}/20</b><small>Board</small></div></div>
       ${g.settings.recruiting === 'auto' ? '<p><span class="chip">Auto</span> Your staff runs the board.</p>' : '<p class="small dim">Each week (Mondays) your calls, visits and NIL promises add interest. Four- and five-stars want an official visit to a home game before they commit. Other programs are recruiting the same kids.</p>'}
       ${commits.length ? `<ul class="dy-mini">${commits.map(p => `<li><span class="dy-stars">${stars(p.rec.stars)}</span> ${esc(p.n)} <small>${p.pos} · No. ${p.rec.natl}${p.real ? ' · real commitment' : ''}</small></li>`).join('')}</ul>` : ''}</div>
       <div class="box"><div class="glabel">Your board</div><div class="dy-scroll"><table class="dyt"><tbody>${board.map(card).join('') || '<tr><td class="dim">Add prospects from the list below.</td></tr>'}</tbody></table></div></div>
-      <div class="box"><div class="glabel">Prospects</div><div class="gchips dy-chips">${['ALL'].concat(SD.POS[SD.kind()]).map(x => `<button data-rfind="pos|${x}" aria-pressed="${F.pos === x}">${x === 'ALL' ? 'All' : x}</button>`).join('')} ${[0, 4, 5].map(s => `<button data-rfind="stars|${s}" aria-pressed="${F.stars === s}">${s ? s + '★+' : 'Any'}</button>`).join('')}</div>
+      <div class="box"><div class="glabel">Prospects</div><div class="gchips dy-chips">${['ALL'].concat(SD.POS[SD.kind()]).map(x => `<button data-rfind="pos|${x}" aria-pressed="${F.pos === x}">${x === 'ALL' ? 'All' : x}</button>`).join('')} ${[0, 5, 4, 3, 2].map(s => `<button data-rfind="stars|${s}" aria-pressed="${F.stars === s}">${s ? s + '★' : 'Any'}</button>`).join('')}</div>
         <input id="sdRq" class="dy-in" placeholder="Search by name" value="${esc(F.q)}">
         <div class="dy-scroll"><table class="dyt"><tbody>${pool.map(p => `<tr><td><span class="dy-stars">${stars(p.rec.stars)}</span> ${esc(p.n)} <small>${p.pos} · No. ${p.rec.natl} · ${esc(p.home)}</small></td><td>${p.commit != null ? '<small>Committed to ' + esc(T(p.commit).name) + '</small>' : `<button class="dy-ra" data-radd="${p.id}">Add to board</button>`}</td></tr>`).join('')}</tbody></table></div><button class="glink" data-more="rpool">${V.more.rpool ? 'Fewer' : 'More prospects'}</button></div>`;
   }
 
   /* ---------- rankings, standings ---------- */
   function polls(b) {
-    const g = G(), net = SD.netRank().slice(0, 25);
+    const g = G(), net = SD.netRank(), me = net.findIndex(t => t.id === g.user), n = V.more.net ? 100 : 30;
+    const q = t => t.net.q.map(x => `${x[0]}-${x[1]}`);
+    const rows = net.slice(0, n).concat(me >= n ? [net[me]] : []);
     b.innerHTML = `<div class="dy-grid"><div class="dy-col"><div class="box"><div class="glabel">${hoops() ? 'AP Top 25' : 'Top 25'}</div><ol class="dy-poll">${g.polls.ap.map((x, i) => `<li class="${x.t === g.user ? 'me' : ''}"><span>${i + 1}</span>${tlink(x.t, false)}<small>${T(x.t).w}-${T(x.t).l}${x.prev ? ` · was ${x.prev}` : ''}</small></li>`).join('')}</ol></div></div>
-      <div class="dy-col"><div class="box"><div class="glabel">${hoops() ? 'NET' : 'RPI'} (the committee's ranking)</div><ol class="dy-poll">${net.map((t, i) => `<li class="${t.id === g.user ? 'me' : ''}"><span>${i + 1}</span>${tlink(t.id, false)}<small>${t.w}-${t.l}</small></li>`).join('')}</ol>${SD.netRank().findIndex(t => t.id === g.user) >= 25 ? `<p class="small">Tennessee: No. ${SD.netRank().findIndex(t => t.id === g.user) + 1}</p>` : ''}</div></div></div>`;
+      <div class="dy-col"><div class="box"><div class="glabel">${SD.netName()}: the selection committee's ranking</div><p class="small dim">${hoops() ? 'Built from results by quadrant (who you beat and where), scoring margin adjusted for the opponent, and strength of schedule. Quad 1 is a home game against a top-30 team, neutral top 50, or road top 75.' : 'Rating percentage index: 25% your winning percentage, 50% your opponents\', 25% their opponents\'. Road wins count more. The committee picks at-large teams and seeds from it.'}</p>
+      <div class="dy-scroll"><table class="dyt dy-tight"><thead><tr><th>${SD.netName()}</th><th>Team</th><th>W-L</th><th>SOS</th>${hoops() ? '<th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th>' : ''}</tr></thead><tbody>${rows.map(t => `<tr class="${t.id === g.user ? 'me' : ''}"><td>${t.net.rank}</td><td>${tlink(t.id, false)}</td><td>${t.w}-${t.l}</td><td>${t.net.sos}</td>${hoops() ? q(t).map(x => `<td>${x}</td>`).join('') : ''}</tr>`).join('')}</tbody></table></div>
+      <button class="glink" data-more="net">${V.more.net ? 'Top 30' : 'Top 100'}</button></div></div></div>`;
   }
   function standings(b) {
     const c = V.conf || SD.UC(), st = SD.standings(c);
@@ -369,6 +554,7 @@
     const g = G(), s = g.settings;
     const seg = (k, opts) => `<div class="gseg">${opts.map(([v, l]) => `<button data-set="${k}|${v}" aria-pressed="${String(s[k]) === String(v)}">${esc(l)}</button>`).join('')}</div>`;
     b.innerHTML = `<div class="box gsetup"><div class="glabel">Settings</div>
+      <div class="gfield"><div class="glabel">Difficulty</div>${seg('difficulty', [['freshman', 'Freshman'], ['varsity', 'Varsity (default)'], ['heisman', 'Heisman (hard)']])}</div>
       <div class="gfield"><div class="glabel">In games</div>${seg('coachMode', [['coach', hoops() ? 'I coach' : 'I manage'], ['watch', 'Just watch']])}</div>
       <div class="gfield"><div class="glabel">Game speed</div>${seg('speed', [['slow', 'Slow'], ['fast', 'Fast']])}</div>
       ${hoops() ? '' : `<div class="gfield"><div class="glabel">Bullpen</div>${seg('autoPen', [[true, 'Staff makes pitching changes'], [false, 'I make them']])}</div>`}
@@ -393,7 +579,8 @@
     } else if (st === 'portal') {
       const P = o.portal, mine = SD.portalPlayers().filter(p => p.portal.from === g.user), avail = SD.portalPlayers().filter(p => p.portal.from !== g.user && (V.ppos === 'ALL' || p.pos === V.ppos)).sort((a, b) => SD.tStars(b) - SD.tStars(a) || SD.tRange(b)[1] - SD.tRange(a)[1]).slice(0, 60);
       html = `<div class="box"><div class="glabel">Transfer portal</div><p>Newcomers ${SD.newcomers()} of ${SD.NEW_CAP[g.sport]} · roster ${ut.roster.length} (limit ${SD.LIMIT[g.sport]}: extra players are trimmed at the roster limit stage; new transfers can't be cut).</p>
-        <p class="small">Your players in the portal: ${mine.map(p => esc(p.n) + ' (' + p.pos + ')').join(', ') || 'none'}.</p></div>
+        <p class="small">Your players in the portal: ${mine.map(p => esc(p.n) + ' (' + p.pos + ')' + (p.portal.pushed ? ' <small class="dim">(encouraged)</small>' : '')).join(', ') || 'none'}.</p>
+        <details ${V.more.push ? 'open' : ''}><summary class="small"><b>Encourage players to transfer</b> (frees a roster spot and his NIL money)</summary><div class="dy-scroll"><table class="dyt dy-tight"><tbody>${ut.roster.map(SD.P).filter(p => p.tin !== g.season).sort((a, b) => a.ovr - b.ovr).map(p => `<tr><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${ovrB(p.ovr)}</td><td class="small">${SD.money(p.nil || 0)}</td><td><button class="dy-ra ${p.pushOut ? 'on' : ''}" data-push="${p.id}">${p.pushOut ? 'Encouraged: undo' : 'Encourage to transfer'}</button></td></tr>`).join('')}</tbody></table></div></details></div>
         <div class="box"><div class="gchips dy-chips">${['ALL'].concat(SD.POS[SD.kind()]).map(x => `<button data-ppos="${x}" aria-pressed="${V.ppos === x}">${x === 'ALL' ? 'All' : x}</button>`).join('')}</div><div class="dy-scroll"><table class="dyt"><thead><tr><th>Player</th><th>From</th><th>Transfer rating</th><th>Offer</th></tr></thead><tbody>${avail.map(p => `<tr class="${P.mine[p.id] != null ? 'me' : ''}"><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${tlink(p.portal.from, false)}</td><td><span class="dy-tstars">${'★'.repeat(SD.tStars(p))}</span> <small>${SD.tRange(p).join('-')}</small></td><td>${P.mine[p.id] != null ? `<b>${SD.money(P.mine[p.id])}</b> ` : ''}<select data-pofferamt="${p.id}">${[10000, 25000, 50000, 100000, 250000, 500000, 1000000].map(v => `<option value="${v}">${SD.money(v)}</option>`).join('')}</select><button class="dy-ra" data-poffer="${p.id}">Offer</button></td></tr>`).join('')}</tbody></table></div></div>`;
     } else if (st === 'signing') {
       const c = SD.myCommits();
@@ -402,12 +589,20 @@
       const mine = (o.draft || []).filter(x => x.t === g.user);
       html = `<div class="box"><div class="glabel">${esc(SD.SP().draft)}</div><ul class="dy-mini">${mine.map(x => `<li>No. ${x.pk}: ${plink(SD.P(x.id))} <small>${SD.P(x.id).pos}</small></li>`).join('') || `<li class="dim">No ${esc(SD.UN())} players taken.</li>`}</ul></div>`;
     } else if (st === 'progress') {
-      html = `<div class="box"><div class="glabel">Player development</div><p class="small dim">Growth comes from potential, work ethic and playing time. Continue to see who improved.</p></div>`;
+      const pr = o.prog || [], ch = x => x.after - x.before, avg = pr.length ? (pr.reduce((a, x) => a + ch(x), 0) / pr.length).toFixed(1) : 0;
+      html = `<div class="box"><div class="glabel">Player development</div><div class="dy-stats4"><div><b>${avg > 0 ? '+' : ''}${avg}</b><small>Average change</small></div><div><b>${pr.filter(x => ch(x) > 0).length}</b><small>Improved</small></div><div><b>${pr.filter(x => ch(x) >= 6).length}</b><small>Breakouts</small></div><div><b>${pr.filter(x => ch(x) <= 0).length}</b><small>Stalled</small></div></div>
+        <p class="small dim">Growth comes from potential (room to his ceiling), work ethic and playing time. Seniors and fifth-years grow less.</p>
+        <div class="dy-scroll"><table class="dyt"><thead><tr><th>Player</th><th>Before</th><th>Now</th><th>Change</th><th class="hide-s">Why</th></tr></thead><tbody>${pr.map(x => { const p = SD.P(x.id); if (!p) return ''; const c = ch(x); return `<tr><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${x.before}</td><td>${ovrB(x.after)}</td><td><b class="${c > 0 ? 'dy-w' : c < 0 ? 'dy-l' : ''}">${c > 0 ? '+' : ''}${c}</b></td><td class="hide-s small">${esc((x.why || []).join(', '))}</td></tr>`; }).join('')}</tbody></table></div></div>`;
     } else if (st === 'cuts') {
       const need = SD.cutsNeeded();
       html = `<div class="box"><div class="glabel">Roster limit: ${SD.LIMIT[g.sport]}</div><p>${ut.roster.length} on the roster. ${need ? `Pick ${need} to release, or let the staff do it.` : 'You are under the limit.'}</p>${need ? `<div class="dy-scroll"><table class="dyt"><tbody>${ut.roster.map(SD.P).sort((a, b) => a.ovr - b.ovr).slice(0, 30).map(p => `<tr class="${o.cut.includes(p.id) ? 'cut' : ''}"><td>${p.tin === g.season ? '<small class="dim">New transfer</small>' : `<button class="dy-ra ${o.cut.includes(p.id) ? 'on' : ''}" data-cut="${p.id}">${o.cut.includes(p.id) ? 'Cut' : 'Keep'}</button>`}</td><td>${plink(p)}</td><td>${p.pos}</td><td>${yrLabel(p)}</td><td>${ovrB(p.ovr)}</td></tr>`).join('')}</tbody></table></div>` : ''}</div>`;
     } else if (st === 'schedule') {
-      html = `<div class="box"><div class="glabel">Next season</div><p>Roster set: ${ut.roster.length} players, team rating ${SD.teamRating(ut)}. Continue to build the ${SD.SP().label(g.season + 1)} schedule.</p></div>`;
+      const y = g.season + 1, nmax = hoops() ? 4 : 3; g.ncPick = g.ncPick || {}; const arr = g.ncPick[y] = g.ncPick[y] || [];
+      const opts = g.teams.filter(t => t.conf !== ut.conf).sort((a, b) => b.prestige - a.prestige);
+      const ncHtml = `<div class="box"><div class="glabel">${SD.SP().label(y)} non-conference schedule</div><p class="small dim">Pick up to ${nmax} ${hoops() ? 'marquee games (home, away or neutral site); the rest of the non-conference slate fills in around them' : 'early-season weekend series; midweek games fill in around them'}. Conference games are set by the league.</p>
+        ${arr.map((x, i) => `<div class="dy-nc"><b>${hoops() ? 'Game' : 'Series'} ${i + 1}</b><select data-ncp="${i}|o">${opts.map(t => `<option value="${t.id}" ${t.id === x.o ? 'selected' : ''}>${esc(t.name)} (${esc(t.conf)})</option>`).join('')}</select><select data-ncp="${i}|site">${[['H', 'Home'], ['A', 'Away'], ['N', 'Neutral']].map(([v, l]) => `<option value="${v}" ${x.site === v ? 'selected' : ''}>${l}</option>`).join('')}</select><button class="dy-ra" data-ncrm="${i}">Remove</button></div>`).join('')}
+        ${arr.length < nmax ? `<button class="btn" data-ncadd="1">Add a ${hoops() ? 'game' : 'series'}</button>` : ''}</div>`;
+      html = ncHtml + `<div class="box"><div class="glabel">Next season</div><p>Roster set: ${ut.roster.length} players, team rating ${SD.teamRating(ut)}. Continue to build the ${SD.SP().label(g.season + 1)} schedule.</p></div>`;
     }
     b.innerHTML = `${steps}${html}<div class="grow"><button class="btn primary big" data-act="main">${esc(primaryAction().label)}</button></div>`;
   }
@@ -456,6 +651,7 @@
         ${hideT ? `<div class="dy-pc-ovr"><span class="dy-tstars big">${'★'.repeat(SD.tStars(p))}</span><small>Transfer · OVR ${SD.tRange(p).join('-')}</small></div>` : `<div class="dy-pc-ovr">${ovrB(p.ovr)}<small>OVR</small><span class="dy-pot big">${p.potG}</span><small>Potential</small></div>`}</div>
       <div class="dy-pc-tags"><span class="chip" title="${esc(pd)}">${esc(pl)}</span>${p.rec && !p.rec.walkon ? `<span class="chip">${'★'.repeat(p.rec.stars || 0)}${p.rec.natl ? ' · No. ' + p.rec.natl : ''}</span>` : '<span class="chip">Walk-on</span>'}${p.nil ? `<span class="chip">NIL ${SD.money(p.nil)}</span>` : ''}</div>
       ${p.note ? `<p class="small dim">${esc(p.note)}</p>` : ''}
+      ${g.phase === 'offseason' && p.t === g.user && g.off && ['recap', 'nil', 'portal'].includes(g.off.stage) && p.tin !== g.season ? `<p><button class="btn" data-push="${p.id}">${p.pushOut ? 'Undo: keep him' : 'Encourage to transfer'}</button> <small class="dim">He enters the portal and frees his roster spot and NIL money.</small></p>` : ''}
       ${!p.real ? `<p><button class="btn" data-pedit="${p.id}">Edit player</button> <small class="dim">Name, number and bio. Ratings stay as they are.</small></p>` : ''}
       ${p.aw && p.aw.length ? `<p class="small"><b>Honors:</b> ${p.aw.map(a => a.y + ' ' + ({ POY: 'National Player of the Year', AA1: 'All-American', SEC1: 'All-SEC', SECPOY: 'SEC Player of the Year', SECFR: 'SEC Freshman of the Year' }[a.a] || a.a)).join(' · ')}</p>` : ''}
       <div class="dy-pc-cols"><div><div class="glabel">Ratings</div>${hideT ? '<p class="small dim">In the portal: a star rating and a range until he signs.</p>' : keys.map(k => bar(names[k], p.at[k])).join('')}</div>

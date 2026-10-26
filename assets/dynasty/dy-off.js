@@ -397,13 +397,26 @@
     if (p.el <= 1) c *= 0.7;
     return clamp(c, 0.005, 0.6);
   };
+  // encourage one of your players to transfer: he enters the portal (and his NIL comes off the books when he leaves)
+  DY.encourage = id => {
+    const g = G(), o = g.off, p = DY.P(id), ut = DY.userT();
+    if (!o || !p || p.t !== ut.id) return null;
+    if (p.tin === g.season) return 'He just transferred in.';
+    if (o.portal && o.portal.round > 1) return 'The portal window is closing; it is too late.';
+    if (p.pushOut) { p.pushOut = false; if (o.portal) { o.portal.pool = o.portal.pool.filter(x => x !== id); p.portal = null; } return `${p.n} stays.`; }
+    p.pushOut = true;
+    if (o.portal) { p.portal = { from: ut.id, offers: {}, why: 'Encouraged to transfer', round: 0, pushed: true }; if (!o.portal.pool.includes(id)) o.portal.pool.push(id); }
+    return `${p.n} is encouraged to transfer. He enters the portal${o.portal ? '' : ' when it opens'}.`;
+  };
   DY.openPortal = () => {
     const g = G(), pool = [];
     const userOff = g.settings.portal === 'off';
     g.teams.forEach(t => {
       if (t.user && userOff) return;
       const gone = g.off && t.user ? g.off.leaving.length : 0;
-      const ent = t.roster.map(DY.P).filter(p => chance(DY.portalChance(p, t) * (t.user ? 1 : 0.8)));
+      const pushed = t.roster.map(DY.P).filter(p => p.pushOut);
+      const ent = t.roster.map(DY.P).filter(p => !p.pushOut && chance(DY.portalChance(p, t) * (t.user ? 1 : 0.8)));
+      pushed.forEach(p => { p.portal = { from: t.id, offers: {}, why: 'Encouraged to transfer', round: 0, pushed: true }; pool.push(p.id); });
       // caps: 15 transfers out, 30 departures in all
       ent.sort((a, b) => DY.portalChance(b, t) - DY.portalChance(a, t)).slice(0, Math.max(0, Math.min(DY.CAP.tout, DY.CAP.out - gone))).forEach(p => {
         p.portal = { from: t.id, offers: {}, why: portalWhy(p, t), round: 0 };

@@ -23,7 +23,8 @@
   DY.LAST_WK = 13;
   DY.CFP_WEEKS = [10, 11, 12, 13];
   // difficulty: CPU players get this added to every rating on every snap of your games (Heisman is the balanced default)
-  DY.DIFF = { freshman: -4, varsity: -2, heisman: 0 };
+  // Varsity is the default; Heisman is the hard setting (CPU teams play above their ratings in your games)
+  DY.DIFF = { freshman: -3, varsity: 0, heisman: 3 };
   // playoff size: the real format is 12 teams in 2026 and 24 teams from 2027 (no conference title games)
   DY.cfpSize = () => { const g = G(), c = g.settings.cfp; return c === 'real' || c == null ? (g.season >= 2027 ? 24 : 12) : +c; };     // CFP rankings come out the Tuesday after these weeks (early November on)
 
@@ -34,7 +35,7 @@
     const g = DY.G = {
       v: DY.VERSION, seed, season: 2026, startSeason: 2026, phase: 'preseason', week: 0, P: {}, nextId: 1, teams: [], user: (DY.TEAMS.find(t => t.name === opts.team) || { id: DY.UT_ID }).id,
       coach: { name: opts.coach || 'Coach', arch: opts.arch || 'motivator', w: 0, l: 0, hist: [] },
-      settings: Object.assign({ cfp: 'real', recruiting: 'manual', portal: 'manual', nil: 'manual', coachMode: 'offense', speed: 'slow', injuries: true, shake: true, difficulty: 'heisman', autosave: true, offStyle: 'power', watchSeason: false }, opts.settings || {}),
+      settings: Object.assign({ cfp: 'real', recruiting: 'manual', portal: 'manual', nil: 'manual', coachMode: 'offense', speed: 'slow', injuries: true, shake: true, difficulty: 'varsity', autosave: true, offStyle: 'power', watchSeason: false }, opts.settings || {}),
       sched: [], polls: { ap: [], cfp: null, hist: {} }, news: [], hist: [], awards: {}, rec: null, legacy: {}, post: null, off: null, recruit: null, created: Date.now(),
     };
     g.settings.diffBoost = DY.DIFF[g.settings.difficulty] || 0;

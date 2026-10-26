@@ -13,7 +13,7 @@
 
   B.newGame = (th, ta, o) => {
     o = o || {}; const sp = SD.SP(), soft = G().sport === 'softball';
-    const GM = { kind: 'diamond', soft, T: { h: th, a: ta }, score: { h: 0, a: 0 }, inn: 1, top: true, outs: 0, bases: [null, null, null], ps: {}, plays: [], lineScore: { h: [], a: [] },
+    const GM = { kind: 'diamond', diff: o.diff || 0, uid: o.uid, soft, T: { h: th, a: ta }, score: { h: 0, a: 0 }, inn: 1, top: true, outs: 0, bases: [null, null, null], ps: {}, plays: [], lineScore: { h: [], a: [] },
       maxInn: sp.innings, mercy: o.noMercy ? null : sp.mercy, user: o.user || null, over: false, neutral: !!o.neutral, live: !!o.live, title: o.title || null, L: {}, hits: { h: 0, a: 0 }, err: { h: 0, a: 0 }, lob: { h: 0, a: 0 }, gameNo: o.gameNo || 0, starter: o.starter || {} };
     for (const s of ['h', 'a']) {
       const D = SD.diamondLineup(GM.T[s]);
@@ -104,10 +104,11 @@
       L.idx++; return finishPa(GM, r);
     }
     // the count: strikeout, walk, hit by pitch or the ball in play
-    const st = p.at.stf * (1 - f * 0.22), ct = p.at.ctl * (1 - f * 0.3), ve = p.at.vel * (1 - f * 0.08);
+    const pd = GM.diff && p.t !== GM.uid ? GM.diff : 0, bd = GM.diff && b.t !== GM.uid ? GM.diff : 0;
+    const st = (p.at.stf + pd) * (1 - f * 0.22), ct = (p.at.ctl + pd) * (1 - f * 0.3), ve = p.at.vel * (1 - f * 0.08);
     const pat = GM.user === s && uc.approach === 'patient' ? 1 : GM.user === s && uc.approach === 'aggressive' ? -1 : 0;
-    const kP = clamp((GM.soft ? 0.165 : 0.205) + (st - b.at.con) / 240 + (ve - 72) / 520 + pat * 0.02 - (b.at.eye - 70) / 900, 0.05, 0.45);
-    const bbP = clamp((GM.soft ? 0.095 : 0.1) + (b.at.eye - ct) / 330 + f * 0.04 + pat * 0.025, 0.02, 0.24);
+    const kP = clamp((GM.soft ? 0.165 : 0.205) + (st - (b.at.con + bd)) / 240 + (ve - 72) / 520 + pat * 0.02 - ((b.at.eye + bd) - 70) / 900, 0.05, 0.45);
+    const bbP = clamp((GM.soft ? 0.095 : 0.1) + ((b.at.eye + bd) - ct) / 330 + f * 0.04 + pat * 0.025, 0.02, 0.24);
     const hbpP = GM.soft ? 0.012 : 0.017;
     const u = SD.rnd();
     if (u < kP) { add(GM, b, 'ab'); add(GM, b, 'so'); add(GM, p, 'k'); pitches(GM, p, rr(4, 6.5) | 0); GM.outs++; r.result = 'k'; r.text = `${b.n} strikes out${chance(0.35) ? ' looking' : ' swinging'}.`; L.idx++; return finishPa(GM, r); }
@@ -117,8 +118,8 @@
     // the ball in play
     add(GM, b, 'ab');
     const def = avgFld(GM, d);
-    const hrP = clamp((GM.soft ? 0.05 : 0.048) + (b.at.pow - 70) / 420 - (st - 70) / 1100 + f * 0.02 + (pat < 0 ? 0.006 : 0), 0.004, 0.2);
-    const babip = clamp((GM.soft ? 0.33 : 0.33) + (b.at.con - st) / 520 + (b.at.spd - 70) / 1700 - (def - 70) / 900 + f * 0.03 + (call === 'hr' ? 0.02 : 0), 0.16, 0.48);
+    const hrP = clamp((GM.soft ? 0.05 : 0.048) + ((b.at.pow + bd) - 70) / 420 - (st - 70) / 1100 + f * 0.02 + (pat < 0 ? 0.006 : 0), 0.004, 0.2);
+    const babip = clamp((GM.soft ? 0.33 : 0.33) + ((b.at.con + bd) - st) / 520 + (b.at.spd - 70) / 1700 - (def - 70) / 900 + f * 0.03 + (call === 'hr' ? 0.02 : 0), 0.16, 0.48);
     const ang = clamp(gauss() * 22 + (b.bt && b.bt[0] === 'L' ? 10 : -10), -44, 44);
     if (chance(hrP)) {
       add(GM, b, 'h'); add(GM, b, 'hr'); add(GM, p, 'ha'); add(GM, p, 'hra');

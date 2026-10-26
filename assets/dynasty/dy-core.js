@@ -544,11 +544,13 @@
   };
   // the user's team, when it isn't Tennessee: a full roster (CPU teams carry about 54-60 for speed)
   DY.fillRoster = (team, n) => {
-    const mix = Object.entries(DY.ROSTER_MIX).filter(([pos]) => !['K', 'P', 'LS'].includes(pos));
+    const mix = Object.entries(DY.ROSTER_MIX).filter(([pos]) => !['K', 'P', 'LS'].includes(pos)), pr0 = team.prestige;
+    team.prestige = Math.max(30, pr0 - 18);   // the extra bodies are depth: walk-ons and lower-rated signees
     while (team.roster.length < n) {
       const pos = DY.wpick(mix, x => x[1])[0], yr = DY.wpick(CLASS_DIST, x => x[1])[0];
       const p = DY.genPlayerFor(team, pos, yr, null); DY.G.P[p.id] = p; team.roster.push(p.id);
     }
+    team.prestige = pr0;
     team.depth = DY.autoDepth(team);
   };
   // an FCS team for one game, built from a fixed seed (not saved)

@@ -57,7 +57,7 @@
   }
   function setup() {
     const s = V.setup;
-    const def = { team: 'Tennessee', start: 'pre', coach: '', arch: 'motivator', diff: 'heisman', cfp: 'real', coachMode: 'offense', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, speed: 'slow', shake: true, offStyle: 'power', watchSeason: false };
+    const def = { team: 'Tennessee', start: 'pre', coach: '', arch: 'motivator', diff: 'varsity', cfp: 'real', coachMode: 'offense', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, speed: 'slow', shake: true, offStyle: 'power', watchSeason: false };
     for (const k in def) if (s[k] == null) s[k] = def[k];
     const seg = (key, opts) => `<div class="gseg" data-key="${key}">${opts.map(([v, l]) => `<button type="button" data-v="${v}" aria-pressed="${String(s[key]) === String(v)}">${esc(l)}</button>`).join('')}</div>`;
     APP.innerHTML = `<div class="wrap games dy"><div class="gcrumb"><a href="#" data-back="1">Vol Dynasty</a> › New dynasty</div>
@@ -68,7 +68,7 @@
         <div class="gfield"><div class="glabel">Coach name</div><input id="dyCoach" class="dy-in" maxlength="28" placeholder="Your name" value="${esc(s.coach)}"></div>
         <div class="gfield"><div class="glabel">Coaching style</div><div class="dy-archs">${Object.entries(DY.COACH_ARCH).map(([k, a]) => `<button type="button" class="dy-arch" data-arch="${k}" aria-pressed="${s.arch === k}"><b>${esc(a.name)}</b><small>${esc(a.desc)}</small></button>`).join('')}</div></div>
         <div class="gfield"><div class="glabel">Offensive identity</div>${seg('offStyle', DY.USER_STYLES.map(k => [k, DY.STYLES[k].name]))}${s.team === 'Tennessee' ? '<p class="dim small">Tennessee leans on the run and plays at a slower pace this season. You can change it any time in Settings.</p>' : ''}</div>
-        <div class="gfield"><div class="glabel">Difficulty</div>${seg('diff', [['freshman', 'Freshman'], ['varsity', 'Varsity'], ['heisman', 'Heisman (balanced)']])}<p class="dim small">Heisman is the real thing. Lower levels take a little off CPU players in your games.</p></div>
+        <div class="gfield"><div class="glabel">Difficulty</div>${seg('diff', [['freshman', 'Freshman (easier)'], ['varsity', 'Varsity (default)'], ['heisman', 'Heisman (hard)']])}<p class="dim small">Varsity is balanced. Heisman gives CPU players a boost in your games; Freshman takes a little off.</p></div>
         <div class="gfield"><div class="glabel">Playoff</div>${seg('cfp', [['real', 'Real format (12 in 2026, 24 from 2027)'], [2, '2 teams (BCS)'], [4, '4 teams'], [8, '8 teams'], [12, '12 teams'], [24, '24 teams']])}</div>
         <div class="gfield"><div class="glabel">Play calling</div>${seg('coachMode', [['offense', 'Offense (your DC calls defense)'], ['full', 'Offense and defense'], ['watch', 'Just watch']])}</div>
         <div class="gfield"><div class="glabel">Season watch</div>${seg('watchSeason', [[false, 'Play my games'], [true, 'Sim my games, I run the program']])}</div>
@@ -194,7 +194,7 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-tab],[data-act],[data-pid],[data-pedit],[data-psave],[data-rid],[data-box],[data-sort],[data-rpos],[data-dmove],[data-ract],[data-roffer],[data-radd],[data-rrm],[data-nilans],[data-retain],[data-poffer],[data-conf],[data-ppos],[data-prpos],[data-statk],[data-stab],[data-more],[data-slot],[data-set],[data-rfind],[data-goto],[data-recs],[data-ahead],[data-dview],[data-nilstep],[data-persuade],[data-cut],[data-camp],[data-nilf],[data-dunit],[data-dproj],[data-gside]');
+    const el = e.target.closest('[data-tab],[data-act],[data-pid],[data-pedit],[data-psave],[data-push],[data-rid],[data-box],[data-sort],[data-rpos],[data-dmove],[data-ract],[data-roffer],[data-radd],[data-rrm],[data-nilans],[data-retain],[data-poffer],[data-conf],[data-ppos],[data-prpos],[data-statk],[data-stab],[data-more],[data-slot],[data-set],[data-rfind],[data-goto],[data-recs],[data-ahead],[data-dview],[data-nilstep],[data-persuade],[data-cut],[data-camp],[data-nilf],[data-dunit],[data-dproj],[data-gside]');
     if (!el) { const m = APP.querySelector('.dy-menu-in'); if (m && !m.hidden && !e.target.closest('.dy-menu')) m.hidden = true; return; }
     const g = G(), d = el.dataset;
     if (el.tagName === 'A') e.preventDefault();
@@ -214,6 +214,7 @@
     if (d.act === 'portalround') return busy('Players are making their decisions…', () => DY.resolvePortal(false));
     if (d.act === 'ncauto') { g.nonconfPick[g.season + 1] = DY.autoNonconf(g.season + 1); return keep(); }
     if (d.act === 'autocuts') { g.off.cut = []; const need = DY.cutsNeeded(); DY.userT().roster.map(DY.P).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)).slice(0, need).forEach(p => g.off.cut.push(p.id)); return keep(); }
+    if (d.push) { V.msg = DY.encourage(+d.push); closeModal(); return keep(); }
     if (d.pedit) return editCard(+d.pedit);
     if (d.psave) { V.msg = saveEdit(+d.psave); closeModal(); return keep(); }
     if (d.pid) return playerCard(+d.pid);
@@ -471,6 +472,7 @@
       <div class="dy-pc-head"><div class="dy-pc-num">${p.num}</div><div><h3>${esc(p.n)}${p.captain ? ' <span class="dy-cap">C</span>' : ''}</h3><div class="dim">${esc(DY.POS_NAME[p.pos])}${p.pos0 ? ' (from ' + p.pos0 + ')' : ''} · ${yrLabel(p)} · ${DY.htStr(p.ht)}, ${p.wt} lbs · ${esc(p.home)}${p.hs ? ' · ' + esc(p.hs) : ''}</div><div class="small">${t ? esc(t.name) : 'Left the program'}${p.prev ? ' · previously ' + esc(p.prev) : ''}${p.draft ? ` · Drafted ${p.draft.y}, round ${p.draft.rd} (No. ${p.draft.pk})` : ''}</div></div>
         ${hideT ? `<div class="dy-pc-ovr"><span class="dy-tstars big">${'★'.repeat(DY.tStars(p))}</span><small>Transfer · OVR ${DY.tRange(p).join('-')}</small></div>` : `<div class="dy-pc-ovr">${ovrB(p.ovr)}<small>OVR</small><span class="dy-pot big">${p.potG}</span><small>Potential</small></div>`}</div>
       <div class="dy-pc-tags"><span class="chip">${esc(p.arch)}</span><span class="chip" title="${esc(pd)}">${esc(pl)}</span><span class="chip">${rec}</span>${p.nil ? `<span class="chip">NIL ${DY.money(p.nil)}</span>` : ''}${p.inj && p.inj.wks > 0 ? `<span class="chip dy-l">${esc(p.inj.what)} · ${p.inj.wks} wk</span>` : ''}${p.el ? `<span class="chip">${p.el} season${p.el > 1 ? 's' : ''} of eligibility</span>` : ''}</div>
+      ${g.phase === 'offseason' && p.t === g.user && g.off && ['recap', 'nil', 'portal'].includes(g.off.stage) && p.tin !== g.season && !(g.off.portal && g.off.portal.round > 1) ? `<p><button class="btn" data-push="${p.id}">${p.pushOut ? 'Undo: keep him' : 'Encourage to transfer'}</button> <small class="dim">He enters the portal and frees his roster spot and NIL money.</small></p>` : ''}
       ${!p.real ? `<p><button class="btn" data-pedit="${p.id}">Edit player</button> <small class="dim">Name, number and bio. Ratings stay as they are.</small></p>` : ''}
       <p class="dy-scout"><b>Scouting report:</b> ${esc(DY.scoutReport(p))}${p.note ? ' ' + esc(p.note) : ''} <i>${esc(pd)}</i></p>
       ${p.aw && p.aw.length ? `<p class="small"><b>Honors:</b> ${p.aw.map(a => a.y + ' ' + esc(DY.AWARD_NAME[a.a] || a.a)).join(' · ')}</p>` : ''}
@@ -746,7 +748,7 @@
       <div class="gfield"><div class="glabel">Transfer portal</div>${seg('portal', [['manual', 'Manual'], ['auto', 'Auto'], ['off', 'Off']])}</div>
       <div class="gfield"><div class="glabel">NIL raises</div>${seg('nil', [['manual', 'I decide'], ['auto', 'Auto']])}</div>
       <div class="gfield"><div class="glabel">Playoff (from the next selection day)</div>${seg('cfp', [['real', 'Real format'], [2, '2'], [4, '4'], [8, '8'], [12, '12'], [24, '24']])}</div>
-      <div class="gfield"><div class="glabel">Difficulty</div>${seg('difficulty', [['freshman', 'Freshman'], ['varsity', 'Varsity'], ['heisman', 'Heisman']])}</div>
+      <div class="gfield"><div class="glabel">Difficulty</div>${seg('difficulty', [['freshman', 'Freshman'], ['varsity', 'Varsity (default)'], ['heisman', 'Heisman (hard)']])}</div>
       <div class="gfield"><div class="glabel">Injuries</div>${seg('injuries', [[true, 'On'], [false, 'Off']])}</div>
       <div class="gfield"><div class="glabel">Screen shake</div>${seg('shake', [[true, 'On'], [false, 'Off']])}</div></div></div></div>`;
   }
