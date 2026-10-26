@@ -553,7 +553,7 @@
   function settings(b) {
     const g = G(), s = g.settings;
     const seg = (k, opts) => `<div class="gseg">${opts.map(([v, l]) => `<button data-set="${k}|${v}" aria-pressed="${String(s[k]) === String(v)}">${esc(l)}</button>`).join('')}</div>`;
-    b.innerHTML = `<div class="box gsetup"><div class="glabel">Settings</div>
+    b.innerHTML = `<div class="box"><div class="glabel">Found a bug or have an idea?</div><p class="dim small">Tell me, no sign-in needed. Your team and season are attached so it is easy to fix.</p><div class="grow"><button class="btn primary" data-feedback="bug">Report a bug</button><button class="btn" data-feedback="idea">Suggest an idea</button></div></div><div class="box gsetup"><div class="glabel">Settings</div>
       <div class="gfield"><div class="glabel">Difficulty</div>${seg('difficulty', [['freshman', 'Freshman'], ['varsity', 'Varsity (default)'], ['heisman', 'Heisman (hard)']])}</div>
       <div class="gfield"><div class="glabel">In games</div>${seg('coachMode', [['coach', hoops() ? 'I coach' : 'I manage'], ['watch', 'Just watch']])}</div>
       <div class="gfield"><div class="glabel">Game speed</div>${seg('speed', [['slow', 'Slow'], ['fast', 'Fast']])}</div>

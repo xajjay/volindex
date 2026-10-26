@@ -39,9 +39,9 @@
             <label class="fx-row fx-col" for="fxSrc"><span class="fx-l">Source <em>(optional)</em></span>
               <input id="fxSrc" type="text" placeholder="A link that shows it, like utsports.com or a 247 page"></label>
             <p class="fx-err" id="fxErr" hidden>Write a quick note about what should change first.</p>
-            <div class="fx-send"><button type="submit" class="btn primary" data-via="email">Send by email</button><button type="button" class="btn" data-via="x">Post to @${X}</button></div>
+            <div class="fx-send"><button type="button" class="btn primary" data-via="direct">Send</button><button type="submit" class="btn" data-via="email">Send by email</button><button type="button" class="btn" data-via="x">Post to @${X}</button></div>
           </form>
-          <p class="dim small">Email opens your mail app with the message filled in. Posting to X is public; for a private note, DM <a href="https://x.com/${X}" target="_blank" rel="noopener">@${X}</a>.</p>
+          <p class="dim small">Send goes straight to me, no sign-in needed. Email opens your mail app with the message filled in. Posting to X is public; for a private note, DM <a href="https://x.com/${X}" target="_blank" rel="noopener">@${X}</a>.</p>
         </div>
         <div class="box contactbox" id="contact">
           <div class="eyebrow">Contact</div>
@@ -57,7 +57,13 @@
     }));
     const compose = via => {
       const msg = app.querySelector('#fxMsg').value.trim(), src = app.querySelector('#fxSrc').value.trim(), sport = app.querySelector('#fxSport').value;
-      const err = app.querySelector('#fxErr'); err.hidden = !!msg; if (!msg) { app.querySelector('#fxMsg').focus(); return; }
+      const err = app.querySelector('#fxErr'); err.textContent = 'Write a quick note about what should change first.'; err.hidden = !!msg; if (!msg) { app.querySelector('#fxMsg').focus(); return; }
+      if (via === 'direct' && window.VI_FEEDBACK) {
+        const b = app.querySelector('[data-via="direct"]'); b.disabled = true; b.textContent = 'Sending…';
+        window.VI_FEEDBACK.send({ kind: type === 'Correction' ? 'fix' : type === 'Suggestion' ? 'idea' : 'other', area: sport, message: msg + (src ? '\n\nSource: ' + src : ''), attach: false })
+          .then(r => { b.disabled = false; b.textContent = 'Send'; if (r.ok) { app.querySelector('#fxMsg').value = ''; app.querySelector('#fxSrc').value = ''; err.hidden = false; err.textContent = 'Sent. Thank you!'; } else compose('email'); });
+        return;
+      }
       if (via === 'x') {
         const t = `@${X} ${type} (${sport}): ${msg}${src ? ' ' + src : ''}`.slice(0, 280);
         window.open('https://x.com/intent/post?text=' + encodeURIComponent(t), '_blank', 'noopener');
@@ -68,6 +74,7 @@
     };
     app.querySelector('#fixForm').addEventListener('submit', e => { e.preventDefault(); compose('email'); });
     app.querySelector('[data-via="x"]').addEventListener('click', () => compose('x'));
+    app.querySelector('[data-via="direct"]').addEventListener('click', () => compose('direct'));
     if (tab === 'fix' || tab === 'contact') setTimeout(() => { const f = document.getElementById(tab); f && f.scrollIntoView({ block: 'start' }); }, 0);
     else window.scrollTo(0, 0);
   };
