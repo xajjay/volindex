@@ -25,7 +25,7 @@
   /* ---------- sound: everything is synthesized with Web Audio (no files), off until you turn it on ---------- */
   const SND = DYG.sound = (() => {
     let ac = null, master = null, bed = null, noiseBuf = null;
-    const on = () => DY.G && DY.G.settings.sound === true;
+    const on = () => false;   // sound was removed from Vol Dynasty
     function ctx() {
       if (ac) return ac;
       const AC = root.AudioContext || root.webkitAudioContext; if (!AC) return null;
@@ -116,7 +116,6 @@
     if (S.ro) S.ro.observe(el.querySelector('.dyg-fieldwrap'));
     renderBoard(); renderTab(); barsMode();
     if (GM.plays.length === 0) showCaption({ tag: GM.rival ? GM.rival.toUpperCase() : 'KICKOFF', text: intro(GM) });
-    if (g.settings.sound) SND.bed(true);
     setTimeout(loop, 300);
   };
   DYG.close = () => { if (!S) return; SND.bed(false); document.documentElement.classList.remove('dyg-noscroll'); clearTimeout(S.timer); cancelAnimationFrame(S.raf); if (S.ro) S.ro.disconnect(); S = null; };
@@ -133,7 +132,7 @@
         <div class="dyg-wp" title="Win probability"><span id="dygWp"></span></div>
         <div class="dyg-fieldwrap"><canvas aria-label="Field: live play"></canvas><div class="dyg-banner" id="dygBanner"></div><div class="dyg-noise" id="dygNoise"></div><div class="dyg-pop" id="dygPop"></div><div class="dyg-cap" id="dygCap" aria-live="polite"></div></div>
         <div class="dyg-bars" id="dygBars" hidden></div>
-        <div class="dyg-fullbar"><button data-fullx="1">✕ Exit full screen</button><button data-pause="1" class="dyg-fp-pause">❚❚ / ▶</button><button data-snd="1">Sound</button></div>
+        <div class="dyg-fullbar"><button data-fullx="1">✕ Exit full screen</button><button data-pause="1" class="dyg-fp-pause">❚❚ / ▶</button></div>
       </div>
       <div class="dyg-ctrl" id="dygCtrl"></div>
       <div class="dyg-simbar" id="dygSim"></div>
@@ -189,8 +188,7 @@
     const bigThird = pre.next === 'scrim' && pre.down === 3 && GM.big && GM.crowd > 0.7 && pre.poss === 'a' && DY.G.settings.shake !== false && !reduce();
     if (bigThird) noise();
     // home crowd gets loud on a big down when the visitors have the ball
-    if (DY.G.settings.sound && pre.next === 'scrim' && pre.poss === 'a' && (pre.down >= 3 || (pre.ball >= 80))) SND.loud();
-    play(r, pre, () => { soundFor(r, pre); done(); });
+    play(r, pre, done);
   }
   // full screen: the field takes the whole screen (best with Watch only on Slow); the caption sits on top of it
   function toggleFull(on) {
@@ -321,7 +319,6 @@
     sim.innerHTML = need === 'plan' ? '' : `<div class="dyg-sims"><span class="dyg-lab">Sim to</span>${[['drive', 'End of drive'], ['quarter', 'End of quarter'], ['half', 'End of half'], ['big', 'Big moment'], ['end', 'Final']].map(([k, l]) => `<button data-sim="${k}">${l}</button>`).join('')}</div>
       <div class="dyg-speed"><span class="dyg-lab">View</span><button data-speed="slow" aria-pressed="${S.speed === 'slow'}">Slow</button><button data-speed="fast" aria-pressed="${S.speed === 'fast'}">Fast</button>
       <button data-watch="1" aria-pressed="${GM.coach === 'watch'}" title="The CPU calls your plays too">Watch only</button>
-      <button data-snd="1" aria-pressed="${DY.G.settings.sound === true}" title="Crowd noise and sound effects">${DY.G.settings.sound ? '🔊 Sound' : '🔇 Sound'}</button>
       <button data-full="1" title="Full-screen field">⛶ Full screen</button>
       ${isBars() ? '<button data-watchone="1">Watch next play</button>' : ''}
       ${need === 'off' || need === 'def' || need === 'pat' || need === 'half' ? '' : `<button data-pause="1" class="${S.paused ? 'on' : ''}">${S.paused ? '▶ Resume' : '❚❚ Pause'}</button>`}</div>`;
@@ -473,7 +470,6 @@
       if (d.pause) { S.paused = !S.paused; if (!S.busy) loop(); else renderPanel('busy'); return; }
       if (d.speed) { S.speed = d.speed; DY.G.settings.speed = S.speed; barsMode(); renderPanel(S.busy ? 'busy' : DY.needs(GM)); if (!S.busy) loop(); return; }
       if (d.watch) { GM.coach = GM.coach === 'watch' ? (DY.G.settings.coachMode === 'watch' ? 'offense' : DY.G.settings.coachMode) : 'watch'; if (GM.coach === 'watch') S.paused = false; barsMode(); if (!S.busy) loop(); return; }
-      if (d.snd) { DY.G.settings.sound = !DY.G.settings.sound; if (DY.G.settings.sound) { SND.unlock(); SND.bed(true); SND.cheer(); } else SND.bed(false); renderPanel(S.busy ? 'busy' : DY.needs(GM)); return; }
       if (d.full) { toggleFull(true); return; }
       if (d.fullx) { toggleFull(false); return; }
       if (d.watchone) { S.watchOne = true; barsMode(); clearTimeout(S.timer); if (!S.busy) doStep({}); return; }
