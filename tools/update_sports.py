@@ -299,6 +299,14 @@ RPI_PATH = {"volleyball": ("volleyball-women/d1/ncaa-womens-volleyball-rpi", "NC
             "baseball": ("baseball/d1/rpi", "NCAA RPI"),
             "softball": ("softball/d1/ncaa-softball-rpi", "NCAA RPI")}
 
+def prev_poll(key):
+    """The poll currently published in data/<key>-auto.js (None if missing)."""
+    try:
+        txt = open(os.path.join(ROOT, "data", f"{key}-auto.js"), encoding="utf-8").read()
+        i = txt.index("{", txt.index("'] = "))
+        return json.loads(txt[i:txt.rstrip().rstrip(";").rindex("}") + 1]).get("poll")
+    except Exception: return None
+
 # ---------------------------------------------------------------- one sport
 def run_sport(key):
     cfg = SPORTS[key]; slug = cfg["slug"]
@@ -334,6 +342,10 @@ def run_sport(key):
     if cfg.get("espn") or key in POLL_FN:
         try:
             p = POLL_FN[key]() if key in POLL_FN else espn_poll(cfg["espn"])
+            old = prev_poll(key)
+            # never replace a newer poll (e.g. one entered by hand on poll day) with an older one from a slow source
+            if p and old and old.get("date") and (not p.get("date") or p["date"] < old["date"]):
+                note(f"KEEP poll: {old['poll']} {old['rank']} ({old['date']}) is newer than the source's ({p.get('date')})"); p = old
             if p: out["poll"] = p; note(f"OK   poll: {p['poll']} {p['rank']}")
         except Exception as e: note(f"SKIP poll: {e}")
     if key in RPI_PATH:

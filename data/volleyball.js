@@ -12,7 +12,7 @@ window.SITE.volleyball = {
  "lineupTab": "Starting Lineup",
  "header": [
   [
-   "No. 9",
+   "No. 6",
    "AVCA poll"
   ],
   [
@@ -29,8 +29,9 @@ window.SITE.volleyball = {
   ]
  ],
  "quick": [
-  "The Lady Vols are <b>16-3</b> (7-2 SEC), <b>No. 9</b> in the AVCA poll and on a <b>seven-match winning streak</b>.",
+  "The Lady Vols are <b>16-3</b> (7-2 SEC), up to <b>No. 6</b> in the AVCA poll (from No. 9), their highest ranking since 2005, and on a <b>seven-match winning streak</b>.",
   "Back-to-back ranked wins at home: <b>No. 4 Kentucky</b> in five sets (Oct. 21) and <b>No. 22 Vanderbilt</b> in four (Oct. 25), the program's first wins over consecutive ranked opponents since 2021.",
+  "Middle blocker <b>Chelsea Sutton</b> was named <b>SEC Co-Offensive Player of the Week</b> (Oct. 26): 21 kills on .419 hitting and 7 blocks, including 14 kills at .538 with no errors against Kentucky.",
   "SMU transfer <b>Kennedi Rogers</b> leads with 4.19 kills per set (18 kills vs. Vanderbilt); three-time All-American setter <b>Caroline Kerr</b> moved into seventh in program history in double-doubles. The team hits <b>.292</b>.",
   "Losses: No. 2 Pitt, No. 7 Texas (in five) and No. 7 Florida. Next: at <b>No. 19 Texas A&M Oct. 30</b>, then at Missouri Nov. 1 (ESPN2)."
  ],
@@ -194,7 +195,7 @@ window.SITE.volleyball = {
    "home": "Ponte Vedra Beach, Fla.",
    "hs": "Ponte Vedra HS",
    "prev": null,
-   "note": "Team-high 54 blocks, .353"
+   "note": "Team-high 54 blocks, .353 · SEC Co-Offensive Player of the Week (Oct. 26)"
   },
   {
    "num": 17,
