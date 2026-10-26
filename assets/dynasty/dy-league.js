@@ -33,7 +33,7 @@
     const seed = opts.seed || (Date.now() % 2147483647);
     DY.seed(seed);
     const g = DY.G = {
-      v: DY.VERSION, seed, season: 2026, startSeason: 2026, phase: 'preseason', week: 0, P: {}, nextId: 1, teams: [], user: (DY.TEAMS.find(t => t.name === opts.team) || { id: DY.UT_ID }).id,
+      v: DY.VERSION, seed, season: 2026, startSeason: 2026, startTeam: opts.team || 'Tennessee', phase: 'preseason', week: 0, P: {}, nextId: 1, teams: [], user: (DY.TEAMS.find(t => t.name === opts.team) || { id: DY.UT_ID }).id,
       coach: { name: opts.coach || 'Coach', arch: opts.arch || 'motivator', w: 0, l: 0, hist: [] },
       settings: Object.assign({ cfp: 'real', recruiting: 'manual', portal: 'manual', nil: 'manual', coachMode: 'offense', speed: 'slow', injuries: true, shake: true, difficulty: 'varsity', autosave: true, offStyle: 'power', watchSeason: false }, opts.settings || {}),
       sched: [], polls: { ap: [], cfp: null, hist: {} }, news: [], hist: [], awards: {}, rec: null, legacy: {}, post: null, off: null, recruit: null, created: Date.now(),
@@ -558,7 +558,10 @@
     const field = size >= 12 ? [...new Set([...p4c, ...g6c])] : [];
     for (const t of all) { if (field.length >= size) break; if (!field.includes(t)) field.push(t); }
     field.sort((a, b) => all.indexOf(a) - all.indexOf(b));
-    g.post = { label: 'Selection Day', stage: 'selection', size, seeds: field.map(t => t.id), games: g.post.games, rounds: [], bowls: [] };
+    const autoIds = size >= 12 ? [...new Set([...p4c, ...g6c])].map(t => t.id) : [];
+    const atLarge = field.filter(t => !autoIds.includes(t.id)), out = all.filter(t => !field.includes(t));
+    g.post = { label: 'Selection Day', stage: 'selection', size, seeds: field.map(t => t.id), games: g.post.games, rounds: [], bowls: [], seen: false, autos: autoIds,
+      bubble: { lastIn: atLarge.slice(-3).map(t => t.id), firstOut: out.slice(0, 4).map(t => t.id) }, rank: Object.fromEntries(all.slice(0, 40).map((t, i) => [t.id, i + 1])) };
     // bowls for the rest of the bowl-eligible teams
     const elig = all.filter(t => t.w >= 6 && !field.includes(t));
     const bowls = [], used = new Set();
@@ -618,7 +621,7 @@
     return null;
   };
   DY.finishRound = () => {
-    const g = G(), P = g.post;
+    const g = G(), P = g.post; P.seen = true;
     if (P.rounds.length === 0) P.bowls.filter(x => !x.res).forEach(x => DY.simGame(x));
     P.cur.filter(x => !x.res).forEach(x => DY.simGame(x));
     DY.clearFcs(); DY.healWeek();
@@ -657,7 +660,7 @@
     else if (cfpG.length) { const lastG = cfpG[cfpG.length - 1]; finish = 'Lost ' + lastG.title.replace(/ \(CFP /, ' (').replace('CFP ', 'CFP '); }
     else { const b = P.bowls.find(x => x.h === ut.id || x.a === ut.id); if (b) finish = ((b.h === ut.id) === (b.res.h > b.res.a) ? 'Won ' : 'Lost ') + b.title; }
     const ccg = (P.games || []).find(x => x.post === 'ccg' && (x.h === ut.id || x.a === ut.id));
-    const entry = { y: g.season, w: ut.w, l: ut.l, cw: ut.cw, cl: ut.cl, ap: DY.apRank(ut.id), cfpSeed: P.seeds.indexOf(ut.id) + 1 || null, finish, sec: ut.champ === g.season, ccg: !!ccg,
+    const entry = { y: g.season, team: ut.name, w: ut.w, l: ut.l, cw: ut.cw, cl: ut.cl, ap: DY.apRank(ut.id), cfpSeed: P.seeds.indexOf(ut.id) + 1 || null, finish, sec: ut.champ === g.season, ccg: !!ccg,
       champ: tname(P.champ), heis: g.awards[g.season] && g.awards[g.season].heis ? g.awards[g.season].heis.n : null, recRank: g.recruit && g.recruit.classRank || null,
       games: ug.map(x => ({ w: x.wk, o: DY.T(DY.oppOf(x)).abbr, on: tname(DY.oppOf(x)), h: x.h === ut.id, n: x.neutral, us: x.h === ut.id ? x.res.h : x.res.a, th: x.h === ut.id ? x.res.a : x.res.h, t: x.title || null, ot: x.res.ot })) };
     g.hist.push(entry);

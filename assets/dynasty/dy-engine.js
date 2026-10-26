@@ -76,6 +76,11 @@
     };
     if (garbage && L.OT.length > 2) P.OL[0] = L.OT[2];
     if (garbage && L.IOL.length > 3) P.OL[2] = L.IOL[3];
+    // a thin or injury-hit room never leaves a hole on the field: borrow from the nearest group
+    const pool = { DL: ['DT', 'EDGE', 'LB', 'IOL'], LB: ['LB', 'S', 'EDGE'], CB: ['CB', 'NB', 'S'], S: ['S', 'CB', 'LB'], WR: ['WR', 'TE', 'RB'], OL: ['IOL', 'OT', 'TE'] };
+    Object.keys(pool).forEach(k => { const used = new Set(P[k].filter(Boolean)); P[k] = P[k].map(p => { if (p) return p; const c = pool[k].flatMap(g => L[g] ? [].concat(L[g]) : []).find(x => x && !used.has(x)) || pool[k].flatMap(g => L[g] ? [].concat(L[g]) : []).find(Boolean); if (c) used.add(c); return c; }); });
+    ['RB', 'TE', 'NB', 'TE2', 'WR4', 'WR5', 'FB'].forEach(k => { if (!P[k]) P[k] = P.WR[0] || P.RB; });
+    if (!P.NB) P.NB = P.CB[0];
     return P;
   }
   // snap counts: everyone on the field for the play (by formation), every snap

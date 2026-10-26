@@ -114,14 +114,15 @@
             ${canSimAhead ? `<div class="dy-menu"><button class="btn" data-act="simmenu" aria-haspopup="true">Sim ahead ▾</button><div class="dy-menu-in" hidden><p class="small dim" style="margin:2px 8px 6px">Your games get simmed too.</p>${g.phase === 'season' && g.week < 7 || g.phase === 'preseason' ? '<button data-ahead="mid">To midseason (week 7)</button>' : ''}${g.phase === 'season' || g.phase === 'preseason' ? '<button data-ahead="reg">To end of the regular season</button>' : ''}<button data-ahead="end">To the end of the season</button></div></div>` : ''}
             <button class="btn" data-act="save" title="Save to slot ${g.slot || 1}">Save</button></div>
         </div>
-        <nav class="wrap dyh-tabs" role="tablist">${TABS.map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="${V.tab === k}">${l}${k === 'recruit' && g.phase !== 'offseason' && g.recruit && !g.recruit.signed && !g.recruit.locked && g.settings.recruiting === 'manual' ? ` <small>${DY.HOURS() - DY.hoursUsed()}h</small>` : ''}</button>`).join('')}</nav>
+        <nav class="wrap dyh-tabs" role="tablist">${(g.post && g.post.seeds && g.post.seen !== false ? [['playoff', 'Playoff']] : []).concat(TABS).map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="${V.tab === k}">${l}${k === 'recruit' && g.phase !== 'offseason' && g.recruit && !g.recruit.signed && !g.recruit.locked && g.settings.recruiting === 'manual' ? ` <small>${DY.HOURS() - DY.hoursUsed()}h</small>` : ''}</button>`).join('')}</nav>
       </div>
       ${V.msg ? `<div class="wrap"><div class="gnote dy-msg">${esc(V.msg)} <button class="glink" data-act="msgx">Dismiss</button></div></div>` : ''}
       <div class="wrap dy-body" id="dyBody"></div>
       <div class="dy-modal" id="dyModal" hidden><div class="dy-modal-in" role="dialog" aria-modal="true"><button class="dy-x" data-act="close" aria-label="Close">×</button><div id="dyModalBody"></div></div></div>
     </div>`;
     const body = APP.querySelector('#dyBody');
-    ({ home, schedule, roster, depth, recruit, polls, standings, stats, nil, history, settings })[V.tab](body);
+    if (V.tab === 'playoff' && !(g.post && g.post.seeds && g.post.seen !== false)) V.tab = 'home';
+    ({ home, schedule, roster, depth, recruit, polls, standings, stats, nil, history, settings, playoff })[V.tab](body);
     APP.firstElementChild.onclick = onClick; APP.firstElementChild.onchange = onChange;
     const cq = APP.querySelector('#dyCampQ');
     if (cq) {
@@ -139,6 +140,7 @@
       return { label: `Sim week ${g.week}${x ? '' : ' (bye)'}` };
     }
     if (g.phase === 'ccg') { const x = DY.postUserGame(); return x ? (watch ? { label: `Sim: ${x.title}`, x, simOnly: true, sim: 'Play it instead' } : { label: `Play: ${x.title}`, sim: 'Sim game', x }) : { label: 'Sim championship week' }; }
+    if (g.phase === 'post' && g.post && g.post.seen === false) return { label: 'Watch the Selection Show', main: () => { V.tab = 'home'; hub(); } };
     if (g.phase === 'post') { const x = DY.postUserGame(); if (x) { const nm = x.title.replace(/ \(CFP.*\)/, '') + (/CFP/.test(x.title) ? ' (CFP)' : ''); return watch ? { label: 'Sim: ' + nm, x, simOnly: true, sim: 'Play it instead' } : { label: 'Play: ' + nm, sim: 'Sim game', x }; } return { label: `Sim: ${g.post.label}` }; }
     if (g.phase === 'offseason') { const i = DY.OFF_ORDER.indexOf(g.off.stage); return { label: i >= DY.OFF_ORDER.length - 1 ? `Start ${g.season + 1}` : `Continue: ${DY.OFF_LABEL[DY.OFF_ORDER[i + 1]]}` }; }
     return null;
@@ -155,6 +157,7 @@
     if (g.phase === 'offseason') {
       if (g.off.stage === 'cuts' && DY.cutsNeeded() > (g.off.cut || []).length && !V.cutOk) { V.cutOk = true; V.msg = `You are ${DY.cutsNeeded() - (g.off.cut || []).length} over the ${DY.rosterMax()}-man limit. Pick your cuts, or press Continue again and the staff will cut the lowest-rated players.`; return hub(); }
       V.cutOk = false;
+      if (g.off.stage === 'recap' && g.off.jobs && g.off.jobs.fired && g.off.jobs.taken == null) { V.msg = `You were let go at ${DY.UN()}. Pick one of the open jobs to keep coaching.`; return keep(); }
       return busy('Working…', () => DY.offNext());
     }
     const play = a.x && (a.simOnly ? alt : !alt);
@@ -194,7 +197,7 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-tab],[data-act],[data-pid],[data-pedit],[data-psave],[data-push],[data-rid],[data-box],[data-sort],[data-rpos],[data-dmove],[data-ract],[data-roffer],[data-radd],[data-rrm],[data-nilans],[data-retain],[data-poffer],[data-conf],[data-ppos],[data-prpos],[data-statk],[data-stab],[data-more],[data-slot],[data-set],[data-rfind],[data-goto],[data-recs],[data-ahead],[data-dview],[data-nilstep],[data-persuade],[data-cut],[data-camp],[data-nilf],[data-dunit],[data-dproj],[data-gside]');
+    const el = e.target.closest('[data-tab],[data-act],[data-pid],[data-pedit],[data-psave],[data-push],[data-job],[data-rid],[data-box],[data-sort],[data-rpos],[data-dmove],[data-ract],[data-roffer],[data-radd],[data-rrm],[data-nilans],[data-retain],[data-poffer],[data-conf],[data-ppos],[data-prpos],[data-statk],[data-stab],[data-more],[data-slot],[data-set],[data-rfind],[data-goto],[data-recs],[data-ahead],[data-dview],[data-nilstep],[data-persuade],[data-cut],[data-camp],[data-nilf],[data-dunit],[data-dproj],[data-gside]');
     if (!el) { const m = APP.querySelector('.dy-menu-in'); if (m && !m.hidden && !e.target.closest('.dy-menu')) m.hidden = true; return; }
     const g = G(), d = el.dataset;
     if (el.tagName === 'A') e.preventDefault();
@@ -214,6 +217,8 @@
     if (d.act === 'portalround') return busy('Players are making their decisions…', () => DY.resolvePortal(false));
     if (d.act === 'ncauto') { g.nonconfPick[g.season + 1] = DY.autoNonconf(g.season + 1); return keep(); }
     if (d.act === 'autocuts') { g.off.cut = []; const need = DY.cutsNeeded(); DY.userT().roster.map(DY.P).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)).slice(0, need).forEach(p => g.off.cut.push(p.id)); return keep(); }
+    if (d.job) { const err = DY.takeJob(+d.job); V.msg = err || `Welcome to ${DY.UN()}.`; return keep(); }
+    if (d.act === 'cfpdone') { if (g.post) g.post.seen = true; V.tab = 'playoff'; return hub(); }
     if (d.push) { V.msg = DY.encourage(+d.push); closeModal(); return keep(); }
     if (d.pedit) return editCard(+d.pedit);
     if (d.psave) { V.msg = saveEdit(+d.psave); closeModal(); return keep(); }
@@ -273,6 +278,7 @@
   function home(b) {
     const g = G(), ut = DY.userT();
     if (g.phase === 'offseason') return offseason(b);
+    if (g.phase === 'post' && g.post && g.post.seen === false) return cfpShow(b);
     const L = [], R = [];
     if (g.live && !(root.DYG && root.DYG.live())) L.push(`<div class="box dy-resume"><b>Game in progress</b> <span class="dim">${esc(T(g.live.T.a).name)} ${g.live.score.a}, ${esc(T(g.live.T.h).name)} ${g.live.score.h} · Q${Math.min(4, g.live.q)}</span> <button class="btn primary" data-act="resume">Resume</button></div>`);
     const a = primaryAction();
@@ -380,6 +386,89 @@
     const ut = DY.userT(), caps = ut.roster.map(DY.P).filter(p => p.captain);
     return caps.length ? `<div class="box"><div class="glabel">Team captains</div><ul class="dy-mini">${caps.map(p => `<li>${plink(p)} <small>${p.pos} · ${yrLabel(p)} · leadership ${p.tr.lead}</small></li>`).join('')}</ul><p class="dim small">Captains steady the team in big moments and on the road.</p></div>` : '';
   }
+  /* ---------- the College Football Playoff: the bracket as a tree (seeds and winners of earlier games) ---------- */
+  const S_ = n => ({ s: n }), W_ = n => ({ w: n });
+  const CFP_SPEC = {
+    2: [[[S_(0), S_(1)]]],
+    4: [[[S_(0), S_(3)], [S_(1), S_(2)]], [[W_(0), W_(1)]]],
+    8: [[[0, 7], [3, 4], [1, 6], [2, 5]].map(([a, b]) => [S_(a), S_(b)]), [[W_(0), W_(1)], [W_(2), W_(3)]], [[W_(0), W_(1)]]],
+    12: [[[4, 11], [7, 8], [5, 10], [6, 9]].map(([a, b]) => [S_(a), S_(b)]), [[S_(0), W_(1)], [S_(3), W_(0)], [S_(2), W_(3)], [S_(1), W_(2)]], [[W_(0), W_(1)], [W_(2), W_(3)]], [[W_(0), W_(1)]]],
+    24: [[[15, 16], [8, 23], [12, 19], [11, 20], [14, 17], [9, 22], [13, 18], [10, 21]].map(([a, b]) => [S_(a), S_(b)]), [0, 7, 3, 4, 1, 6, 2, 5].map((sd, i) => [S_(sd), W_(i)]), [[W_(0), W_(1)], [W_(2), W_(3)], [W_(4), W_(5)], [W_(6), W_(7)]], [[W_(0), W_(1)], [W_(2), W_(3)]], [[W_(0), W_(1)]]],
+  };
+  const CFP_NAMES = { 2: ['National Championship'], 4: ['Semifinals', 'National Championship'], 8: ['Quarterfinals', 'Semifinals', 'National Championship'], 12: ['First round', 'Quarterfinals', 'Semifinals', 'National Championship'], 24: ['First round', 'Second round', 'Quarterfinals', 'Semifinals', 'National Championship'] };
+  function cfpTree() {
+    const P = G().post, spec = CFP_SPEC[P.size] || CFP_SPEC[12], tree = [];
+    spec.forEach((rd, r) => {
+      tree.push(rd.map((m, i) => {
+        const game = r < P.rounds.length ? P.rounds[r][i] : (P.cur && r === P.rounds.length ? P.cur[i] : null);
+        const side = x => x.s != null ? { id: P.seeds[x.s], seed: x.s + 1 } : (() => { const prev = tree[r - 1][x.w]; return { id: prev.win, seed: prev.win != null ? P.seeds.indexOf(prev.win) + 1 : null, from: x.w }; })();
+        const a = side(m[0]), b = side(m[1]);
+        const win = game && game.res ? (game.res.h > game.res.a ? game.h : game.a) : null;
+        return { a, b, game, win, spec: m };
+      }));
+    });
+    return tree;
+  }
+  // the matches on the user's road: where his seed enters, then every game his win would feed
+  function cfpPath(tree) {
+    const g = G(), sd = g.post.seeds.indexOf(g.user); if (sd < 0) return new Set();
+    const on = new Set(); let r = -1, i = -1;
+    tree.forEach((rd, rr) => rd.forEach((m, ii) => { if (r < 0 && m.spec.some(x => x.s === sd)) { r = rr; i = ii; } }));
+    while (r >= 0 && r < tree.length) { on.add(r + ':' + i); const nr = r + 1; if (nr >= tree.length) break; const ni = tree[nr].findIndex(m => m.spec.some(x => x.w === i)); if (ni < 0) break; r = nr; i = ni; }
+    return on;
+  }
+  const cfpTeam = (id, sd, extra) => id == null ? '<span class="cf-tm tbd">TBD</span>' : `<span class="cf-tm ${id === G().user ? 'me' : ''}" style="--tc:${T(id).c1}"><i>${sd || ''}</i><b>${esc(T(id).name)}</b><small>${T(id).w}-${T(id).l}${T(id).champ === G().season ? ' · conf. champ' : ''}${extra || ''}</small></span>`;
+  /* ---------- the selection show ---------- */
+  function cfpShow(b) {
+    const g = G(), P = g.post, me = g.user, ut = DY.userT(), tree = cfpTree(), n = P.size, r0 = tree[0], byes = n === 12 ? 4 : n === 24 ? 8 : 0;
+    const items = [];
+    items.push(`<div class="cf-item cf-open on"><span class="glabel">College Football Playoff · Selection Day ${g.season}</span><h2>The ${n}-team field is set</h2><p>${P.autos && P.autos.length ? `${P.autos.length} conference champions get automatic bids. ` : ''}The committee ranks the rest by résumé: record, strength of schedule and how teams look.${byes ? ` The top ${byes} seeds get a first-round bye.` : ''}</p></div>`);
+    items.push(`<div class="cf-item cf-h"><h3>${CFP_NAMES[n][0]}${byes ? ': on campus at the higher seed' : ''}</h3></div>`);
+    r0.forEach(m => { const mine = m.a.id === me || m.b.id === me; items.push(`<div class="cf-item cf-match ${mine ? 'mine' : ''}" data-mine="${mine ? 1 : 0}">${cfpTeam(m.a.id, m.a.seed)}<em>vs</em>${cfpTeam(m.b.id, m.b.seed)}${byes ? `<div class="cf-site">at ${esc(T(m.a.id).name)}</div>` : ''}</div>`); });
+    if (byes) {
+      items.push(`<div class="cf-item cf-h"><h3>First-round byes</h3><p class="small">Counting down to the No. 1 seed.</p></div>`);
+      for (let k = byes - 1; k >= 0; k--) { const id = P.seeds[k], mine = id === me, nx = tree[1].find(m => m.spec.some(x => x.s === k)); const vs = nx ? (() => { const o = nx.spec.find(x => x.w != null); const pm = r0[o.w]; return ` · awaits ${T(pm.a.id).abbr}/${T(pm.b.id).abbr}`; })() : '';
+        items.push(`<div class="cf-item cf-bye ${k === 0 ? 'one' : ''} ${mine ? 'mine' : ''}" data-mine="${mine ? 1 : 0}"><span class="cf-big">${k + 1}</span>${cfpTeam(id, '', vs)}</div>`); }
+    }
+    const bub = P.bubble || { lastIn: [], firstOut: [] };
+    items.push(`<div class="cf-item cf-bub"><div><b>Last in</b>${bub.lastIn.map(id => cfpTeam(id, P.seeds.indexOf(id) + 1)).join('')}</div><div><b>First out</b>${bub.firstOut.map(id => cfpTeam(id, '', P.rank && P.rank[id] ? ' · committee No. ' + P.rank[id] : '')).join('')}</div></div>`);
+    const sd = P.seeds.indexOf(me), bowl = P.bowls.find(x => x.h === me || x.a === me);
+    let fate;
+    if (sd >= 0) { const m = r0.find(z => z.a.id === me || z.b.id === me), opp = m ? (m.a.id === me ? m.b.id : m.a.id) : null; fate = `<span class="cf-big">${sd + 1}</span><div><h3>${esc(ut.name)} is in!</h3><p>${m ? `${CFP_NAMES[n][0]}: ${m.a.id === me ? '' : 'at '}${esc(T(opp).name)} (No. ${P.seeds.indexOf(opp) + 1})${m.a.id === me ? ', on your field' : ''}` : `A first-round bye, then the ${CFP_NAMES[n][1].toLowerCase()}`}</p></div>`; }
+    else fate = `<div><h3>${esc(ut.name)} is out of the playoff</h3><p>${bowl ? `Headed to the ${esc(bowl.title)} vs ${esc(T(bowl.h === me ? bowl.a : bowl.h).name)}.` : 'No bowl this year.'}${P.rank && P.rank[me] ? ` The committee had you No. ${P.rank[me]}.` : ''}</p></div>`;
+    items.push(`<div class="cf-item cf-fate ${sd >= 0 ? 'in' : 'out'}">${fate}<button class="btn primary big" data-act="cfpdone">Open the bracket</button></div>`);
+    b.innerHTML = `<div class="cf-show" id="cfShow"><div class="cf-stage">${items.join('')}</div>
+      <div class="cf-ctrl"><button class="btn primary big" id="cfNext">Reveal next</button><button class="btn" id="cfAuto" aria-pressed="true">Auto</button><button class="btn" id="cfAll">Show everything</button><span class="cf-prog" id="cfProg"></span></div></div>`;
+    const root0 = b.querySelector('#cfShow'), its = [...root0.querySelectorAll('.cf-item')];
+    let k = 1, auto = true, tmr = null;
+    const prog = () => { const pe = root0.querySelector('#cfProg'); if (pe) pe.textContent = `${Math.min(k, its.length)} / ${its.length}`; };
+    const reveal = () => {
+      if (!root0.isConnected) { clearInterval(tmr); return; }
+      if (k >= its.length) { clearInterval(tmr); root0.querySelector('.cf-ctrl').hidden = true; return; }
+      const el = its[k++]; el.classList.add('on');
+      if (el.dataset.mine === '1') { el.classList.add('boom'); auto = false; clearInterval(tmr); root0.querySelector('#cfAuto').setAttribute('aria-pressed', 'false'); }
+      if (el.scrollIntoView && k > 3) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      prog(); if (k >= its.length) root0.querySelector('.cf-ctrl').hidden = true;
+    };
+    root0.querySelector('#cfNext').onclick = reveal;
+    root0.querySelector('#cfAuto').onclick = e => { auto = !auto; e.currentTarget.setAttribute('aria-pressed', String(auto)); clearInterval(tmr); if (auto) tmr = setInterval(reveal, 1500); };
+    root0.querySelector('#cfAll').onclick = () => { clearInterval(tmr); while (k < its.length) its[k++].classList.add('on'); root0.querySelectorAll('.boom').forEach(x => x.classList.remove('boom')); prog(); root0.querySelector('.cf-ctrl').hidden = true; };
+    tmr = setInterval(reveal, 1500); prog();
+  }
+  /* ---------- the Playoff tab ---------- */
+  function playoff(b) {
+    const g = G(), P = g.post, me = g.user, ut = DY.userT(), tree = cfpTree(), path = cfpPath(tree), names = CFP_NAMES[P.size] || CFP_NAMES[12];
+    const sd = P.seeds.indexOf(me), elim = sd >= 0 && tree.some(rd => rd.some(m => m.win != null && (m.a.id === me || m.b.id === me) && m.win !== me));
+    const nx = DY.postUserGame();
+    const status = P.champ === me ? `<b>${esc(ut.name)} are national champions!</b>` : sd < 0 ? `${esc(ut.name)} missed the playoff.` : elim ? `${esc(ut.name)}'s playoff run is over.` : nx ? `Next: ${esc(nx.title)} vs ${esc(T(DY.oppOf(nx)).name)}` : 'Waiting on the next round.';
+    const box = (m, r, i) => { const sc = id => m.game && m.game.res ? (m.game.h === id ? m.game.res.h : m.game.res.a) : '';
+      const row = s0 => `<div class="cf-row ${m.win != null && s0.id === m.win ? 'w' : ''} ${m.win != null && s0.id !== m.win ? 'l' : ''}">${cfpTeam(s0.id, s0.seed)}<b>${sc(s0.id)}</b></div>`;
+      return `<div class="cf-m ${path.has(r + ':' + i) ? 'path' : ''}">${m.game && m.game.title ? `<small class="cf-ti">${esc(m.game.title.replace(/ \(CFP.*\)/, ''))}</small>` : ''}${row(m.a)}${row(m.b)}</div>`; };
+    b.innerHTML = `<div class="tb-hero"><div><span class="glabel">College Football Playoff · ${P.size} teams${P.champ != null ? ' · Champion: ' + esc(T(P.champ).name) : ''}</span><h2>${sd >= 0 ? `No. ${sd + 1} seed` : 'Not in the field'}</h2><p>${status}</p></div>${sd >= 0 && !elim && P.champ == null ? '<span class="tb-alive">Alive</span>' : ''}</div>
+      <div class="box"><div class="glabel">The bracket</div><div class="dy-scroll"><div class="cf-br" style="--cols:${tree.length}">${tree.map((rd, r) => `<div class="cf-col"><h4>${names[r]}</h4>${rd.map((m, i) => box(m, r, i)).join('')}</div>`).join('')}</div></div>${P.champ != null ? `<div class="tb-champ">🏆 ${esc(T(P.champ).name)}</div>` : ''}</div>
+      <div class="box"><div class="glabel">Seeds</div><ol class="dy-seeds">${P.seeds.map((id, i) => `<li class="${id === me ? 'me' : ''}"><span>${i + 1}</span>${tlink(id, false)}<small>${T(id).w}-${T(id).l}${(P.autos || []).includes(id) ? ' · auto bid' : ''}</small></li>`).join('')}</ol></div>`;
+  }
+
   function bracketCard() {
     const g = G(), P = g.post; if (!P) return '';
     if (P.stage === 'ccg') return `<div class="box"><div class="glabel">Championship week</div><ul class="dy-scores">${P.games.map(x => `<li><span>${tlink(x.a)} ${x.res ? x.res.a : ''}</span><span>${tlink(x.h)} ${x.res ? x.res.h : ''}</span><em>${esc(x.title)}</em></li>`).join('')}</ul></div>`;
@@ -722,7 +811,7 @@
     const trophies = Object.entries(g.trophy || {}).map(([k, tid]) => `<li><b>${esc(DY.TROPHIES[k])}</b> <small>${esc(k.replace('|', ' vs '))} · held by ${esc(T(tid).name)}</small></li>`).join('');
     b.innerHTML = `<div class="dy-grid"><div class="dy-col wide">
       <div class="box"><div class="glabel">Coach ${esc(c.name)}</div><div class="dy-stats4"><div><b>${c.w}-${c.l}</b><small>Record</small></div><div><b>${titles}</b><small>National titles</small></div><div><b>${secT}</b><small>${esc(DY.userT().conf)} titles</small></div><div><b>${cfp}</b><small>Playoff trips</small></div></div></div>
-      <div class="box"><div class="glabel">Season by season</div><div class="dy-scroll"><table class="dyt"><thead><tr><th>Year</th><th>Record</th><th>Conf</th><th>AP</th><th>Finish</th><th class="hide-s">Champion</th><th class="hide-s">Heisman</th></tr></thead><tbody>${g.hist.slice().reverse().map(h => `<tr><td>${h.y}</td><td>${h.w}-${h.l}</td><td>${h.cw}-${h.cl}${h.sec ? ' 🏆' : ''}</td><td>${h.ap || '—'}</td><td>${esc(h.finish)}</td><td class="hide-s small">${esc(h.champ)}</td><td class="hide-s small">${esc(h.heis || '')}</td></tr>`).join('') || '<tr><td colspan="7" class="dim">Finish a season to start the history book.</td></tr>'}</tbody></table></div></div>
+      <div class="box"><div class="glabel">Season by season</div><div class="dy-scroll"><table class="dyt"><thead><tr><th>Year</th><th>Record</th><th>Conf</th><th>AP</th><th>Finish</th><th class="hide-s">Champion</th><th class="hide-s">Heisman</th></tr></thead><tbody>${g.hist.slice().reverse().map(h => `<tr><td>${h.y}${h.team && (g.coach.stints || []).length ? ` <small class="dim">${esc(h.team)}</small>` : ''}</td><td>${h.w}-${h.l}</td><td>${h.cw}-${h.cl}${h.sec ? ' 🏆' : ''}</td><td>${h.ap || '—'}</td><td>${esc(h.finish)}</td><td class="hide-s small">${esc(h.champ)}</td><td class="hide-s small">${esc(h.heis || '')}</td></tr>`).join('') || '<tr><td colspan="7" class="dim">Finish a season to start the history book.</td></tr>'}</tbody></table></div></div>
       <div class="box"><div class="glabel">${DY.isTN() ? 'Tennessee records (real record book + your dynasty)' : esc(DY.UN()) + ' records (since you took over)'}</div><div class="gchips dy-chips">${['game', 'season', 'career'].map(s => `<button data-recs="${s}" aria-pressed="${V.recs === s}">${s === 'game' ? 'Single game' : s === 'season' ? 'Season' : 'Career'}</button>`).join('')}</div><table class="dyt"><tbody>${recRows(V.recs)}</tbody></table><p class="small dim">Highlighted rows were set in this dynasty.</p></div>
       </div><div class="dy-col">
       <div class="box"><div class="glabel">Legacy: the best players you've coached</div><ol class="dy-mini">${leg.map(x => `<li>${plink(x.p)} <small>${x.p.pos} · ${x.v} pts${x.p.aw.some(a => a.a === 'AA1') ? ' · All-American' : ''}${x.p.draft ? ' · Rd ' + x.p.draft.rd + ' pick' : ''}</small></li>`).join('') || '<li class="dim">Built from awards, production, peak rating, wins and the draft.</li>'}</ol></div>
@@ -754,11 +843,23 @@
   }
 
   /* ---------- offseason ---------- */
+  // the coaching carousel: offers after a good year, the hot seat, or a firing
+  function jobsCard() {
+    const g = G(), J = g.off.jobs; if (!J) return '';
+    const ut = DY.userT();
+    if (J.taken != null) return `<div class="box dy-jobs taken"><div class="glabel">New job</div><h3>You're the new head coach at ${esc(ut.name)}</h3><p class="small dim">Your recruiting board, roster and NIL budget are now ${esc(ut.name)}'s. Last season's results stay in your coaching record.</p></div>`;
+    const head = J.fired ? `<h3 class="dy-l">You've been fired</h3><p>${esc(ut.name)} expected about ${Math.round(J.exp)} wins. Pick one of these schools to keep coaching.</p>`
+      : J.hot ? `<h3>Hot seat</h3><p>${esc(ut.name)} expected about ${Math.round(J.exp)} wins and you went ${ut.w}-${ut.l}. Another year like that and you're out.</p>`
+      : J.offers.length ? `<h3>Other schools are calling</h3><p>${esc(ut.name)} expected about ${Math.round(J.exp)} wins; you went ${ut.w}-${ut.l}. Take a new job now or stay and keep building.</p>`
+      : `<h3>Job security: ${J.score >= 0 ? 'solid' : 'shaky'}</h3><p>${esc(ut.name)} expected about ${Math.round(J.exp)} wins; you went ${ut.w}-${ut.l}. Win more than expected, win your conference and make the playoff to get better offers.</p>`;
+    const card = id => { const t = T(id), o = DY.teamOvr(t); return `<div class="dy-job" style="--tc:${t.c1}"><div><b>${esc(t.name)}</b><small>${esc(t.conf === 'IND' ? 'Independent' : t.conf)} · ${t.w}-${t.l} last season</small></div><div class="dy-job-st"><span>Prestige <b>${t.prestige}</b> <i class="${t.prestige > ut.prestige ? 'dy-w' : t.prestige < ut.prestige ? 'dy-l' : ''}">${t.prestige > ut.prestige ? '▲' : t.prestige < ut.prestige ? '▼' : '='}</i></span><span>Team <b>${o.ovr}</b></span><span>NIL <b>${DY.money(t.budget)}</b></span></div><button class="btn ${J.fired ? 'primary' : ''}" data-job="${id}">Take the job</button></div>`; };
+    return `<div class="box dy-jobs ${J.fired ? 'fired' : ''}"><div class="glabel">Coaching carousel · ${esc(ut.name)} prestige ${ut.prestige}</div>${head}${J.offers.length ? `<div class="dy-joblist">${J.offers.map(card).join('')}</div>` : ''}</div>`;
+  }
   function offseason(b) {
     const g = G(), o = g.off, ut = DY.userT(), st = o.stage;
     const steps = `<ol class="dy-steps">${DY.OFF_ORDER.map(k => `<li class="${k === st ? 'on' : DY.OFF_ORDER.indexOf(k) < DY.OFF_ORDER.indexOf(st) ? 'done' : ''}">${esc(DY.OFF_LABEL[k])}</li>`).join('')}</ol>`;
     let html = '';
-    if (st === 'recap') html = recapHtml();
+    if (st === 'recap') html = jobsCard() + recapHtml();
     else if (st === 'nil') {
       const ps = ut.roster.map(DY.P).sort((a, b) => (b.nil || 0) - (a.nil || 0));
       const asks = {}; o.nilAsk.forEach(a => { asks[a.id] = a; });

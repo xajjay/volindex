@@ -356,13 +356,13 @@
     };
     let body = '', mineTxt = '', i = 0;
     if (hoops()) {
-      const regs = ['East', 'West', 'South', 'Midwest'], myR = P.regionOf[me], order = regs.filter(r => r !== myR).concat(myR ? [myR] : []);
+      const regs = ['East', 'West', 'South', 'Midwest'], myR = P.regionOf[me], order = regs;
       const ones = order.map(r => P.R[r].find(x => x.seed === 1)).filter(Boolean);
       body += `<div class="ss-box"><div class="glabel">The No. 1 seeds</div><ol class="ss-list">${ones.map((x, j) => line(1, x.t, x.ff, i++)).join('')}</ol></div>`;
       body += `<div class="ss-regs">${order.map(r => `<div class="ss-box ${r === myR ? 'mine' : ''}"><div class="glabel">${r} Region</div><ol class="ss-list">${P.R[r].slice().sort((a, b) => a.seed - b.seed).map(x => line(x.seed, x.t, x.ff, i++)).join('')}</ol></div>`).join('')}</div>`;
       mineTxt = P.field.includes(me) ? `${esc(ut.name)} is a No. ${P.seedOf[me] || (P.R[myR] || []).find(x => x.ff && x.ff.includes(me))?.seed || '?'} seed in the ${myR || (Object.keys(P.R).find(r => P.R[r].some(x => x.ff && x.ff.includes(me))) || '')} Region${P.seedOf[me] ? '' : ' (First Four)'}` : `${esc(ut.name)} is not in the field`;
     } else {
-      const regs = P.regs.slice(), myR = regs.find(R => R.teams.includes(me)), order = regs.filter(R => R !== myR).concat(myR ? [myR] : []);
+      const regs = P.regs.slice(), myR = regs.find(R => R.teams.includes(me)), order = regs;
       body += `<div class="ss-regs four">${order.map(R => `<div class="ss-box ${R === myR ? 'mine' : ''}"><div class="glabel">${esc(T(R.host).name)} Regional · No. ${R.nat} national seed</div><ol class="ss-list">${R.teams.map((t, j) => line(j + 1, t, null, i++)).join('')}</ol></div>`).join('')}</div>`;
       mineTxt = myR ? `${esc(ut.name)} is the No. ${P.seedOf[me]} overall seed${myR.host === me ? ' and hosts a regional' : ` in the ${esc(T(myR.host).name)} Regional`}` : `${esc(ut.name)} is not in the field`;
     }

@@ -274,6 +274,50 @@
     g.off.pitched = {};
     DY.updateLegacy();
     DY.coachSeason();
+    DY.jobReview();
+  };
+  /* ---------- the coaching carousel (dynasties that did not start at Tennessee) ----------
+     Your season is judged against what the program expects (its prestige): win more than expected, win the conference,
+     make the playoff, and better jobs call. Fall well short (or two bad years in a row) and you are fired: you pick from the
+     jobs still open, usually a step down. */
+  DY.expectedWins = t => clamp(3.5 + (t.prestige - 45) / 6.5, 3, 11);
+  DY.jobReview = () => {
+    const g = G(), ut = DY.userT(), o = g.off;
+    o.jobs = null;
+    if ((g.startTeam || 'Tennessee') === 'Tennessee') return;
+    const h = g.hist[g.hist.length - 1] || {}, exp = DY.expectedWins(ut);
+    let score = (ut.w - exp) * 0.9 + (h.sec ? 2 : 0) + (h.cfpSeed ? 2.5 : 0) + (h.finish === 'National champions' ? 5 : 0) + (/Semifinal|Championship/.test(h.finish || '') ? 1.5 : 0);
+    g.coach.perf = (g.coach.perf || []).concat([Math.round(score * 10) / 10]).slice(-4);
+    const last2 = g.coach.perf.slice(-2), years = g.season - (g.coach.since || g.startSeason) + 1;
+    const fired = years >= 2 && (score <= -4.5 || (last2.length === 2 && last2[0] <= -2 && last2[1] <= -2));
+    const hot = !fired && score <= -2;
+    const pool = g.teams.filter(t => t.id !== ut.id && t.fbs !== false);
+    let offers = [];
+    if (fired) offers = DY.shuffle(pool.filter(t => t.prestige <= ut.prestige - 4 && t.prestige >= ut.prestige - 30)).slice(0, 3);
+    else if (score >= 1.5) {
+      const up = Math.min(30, 6 + score * 3.5);
+      offers = DY.shuffle(pool.filter(t => t.prestige > ut.prestige + 2 && t.prestige <= ut.prestige + up)).slice(0, score >= 4 ? 3 : score >= 2.5 ? 2 : 1);
+    } else if (score > -1 && chance(0.35)) offers = DY.shuffle(pool.filter(t => Math.abs(t.prestige - ut.prestige) <= 4)).slice(0, 1);
+    o.jobs = { score: Math.round(score * 10) / 10, exp: Math.round(exp * 10) / 10, fired, hot, offers: offers.map(t => t.id), taken: null };
+    if (fired) DY.news('league', `${g.coach.name} is fired at ${ut.name}`, `${ut.w}-${ut.l} fell short of what ${ut.name} expects. ${offers.length} school${offers.length === 1 ? '' : 's'} want to talk.`);
+    else if (offers.length) DY.news('league', `${g.coach.name} draws interest from ${offers.map(t => t.name).join(', ')}`, 'The coaching carousel is spinning.');
+    else if (hot) DY.news('league', `${g.coach.name} is on the hot seat at ${ut.name}`, `Expected about ${Math.round(exp)} wins; went ${ut.w}-${ut.l}.`);
+  };
+  DY.takeJob = id => {
+    const g = G(), o = g.off, old = DY.userT(), t = DY.T(id);
+    if (!o || !o.jobs || !o.jobs.offers.includes(id) || o.stage !== 'recap') return 'That offer is off the table.';
+    old.user = false; old.coach = DY.coachName(); old.depthEdited = false; DY.refreshDepth(old);
+    (g.coach.stints = g.coach.stints || []).push({ team: old.name, from: g.coach.since || g.startSeason, to: g.season });
+    g.user = t.id; t.user = true; t.coach = g.coach.name; t.depthEdited = false; t.style = g.settings.offStyle || t.style; g.coach.since = g.season + 1; g.coach.perf = [];
+    if (t.id !== DY.UT_ID && t.roster.length < 80) DY.fillRoster(t, 82);
+    DY.initNil(t); DY.pickCaptains(t); DY.refreshDepth(t);
+    // this offseason now belongs to the new school
+    o.leaving = t.roster.filter(x => DY.P(x).leave).map(x => ({ id: x, why: DY.P(x).leave })); o.pitched = {};
+    if (g.recruit) g.recruit.board = DY.myCommits().map(p => p.id);
+    o.jobs.taken = id; o.jobs.offers = [];
+    DY.initRecords();
+    DY.news('league', `${g.coach.name} takes the ${t.name} job`, `Leaving ${old.name} after ${g.season - ((g.coach.stints[g.coach.stints.length - 1] || {}).from || g.startSeason) + 1} season${g.season > ((g.coach.stints[g.coach.stints.length - 1] || {}).from || g.startSeason) ? 's' : ''}.`);
+    return null;
   };
   DY.draftGrade = p => p.ovr + ({ QB: 3, EDGE: 2.5, OT: 2, CB: 2, WR: 1.5, DT: 1, S: 0.5, LB: 0, RB: -0.5, IOL: 0, TE: -0.5, K: -12, P: -12, LS: -20 }[p.pos] || 0) + (p.at.spd >= 90 ? 1 : 0) + p.aw.filter(a => /AA1|HEIS/.test(a.a)).length * 1.5;
   // talk an early entrant into one more year: an NIL raise and his loyalty against his draft stock

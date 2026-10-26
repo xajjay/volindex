@@ -319,8 +319,8 @@
       <header class="ghead"><h1><span aria-hidden="true">${s.icon}</span> ${esc(s.name)} games${s.beta ? ' <span class="gbeta">Beta</span>' : ''}</h1>
         <p>${esc(COVERAGE[sport])}</p></header>
       ${betaNote(sport)}
-      <div class="grid g3 gcards">${s.games.map(g => `<a class="box gcard" href="#games-${sport}-${g}"><div class="gcard-top"><span class="gicon" aria-hidden="true">${gIcon(sport, g)}</span>${g === 'dynasty' ? '<span class="chip new">Preview</span>' : dailyDone(sport, g) ? '<span class="chip new">Today ✓</span>' : '<span class="chip">Daily</span>'}</div>
-          <h3>${esc(gameName(sport, g))}</h3><p>${esc(gameBlurb(sport, g))}</p><span class="btn primary">Play</span></a>`).join('')}
+      <div class="grid g3 gcards">${s.games.slice().sort((a, b) => (a === 'dynasty' && !dynOpen(sport) ? 1 : 0) - (b === 'dynasty' && !dynOpen(sport) ? 1 : 0)).map(g => `<a class="box gcard${g === 'dynasty' && !dynOpen(sport) ? ' soon' : ''}" href="#games-${sport}-${g}"><div class="gcard-top"><span class="gicon" aria-hidden="true">${gIcon(sport, g)}</span>${g === 'dynasty' ? (dynOpen(sport) ? (sport === 'football' ? '<span class="chip new">New</span>' : '<span class="chip new">Preview</span>') : '<span class="chip">Coming soon</span>') : dailyDone(sport, g) ? '<span class="chip new">Today ✓</span>' : '<span class="chip">Daily</span>'}</div>
+          <h3>${esc(gameName(sport, g))}</h3><p>${esc(gameBlurb(sport, g))}</p>${g === 'dynasty' && !dynOpen(sport) ? '<span class="btn">Coming soon</span>' : '<span class="btn primary">Play</span>'}</a>`).join('')}
         ${s.beta ? `<div class="box gcard soon"><div class="gcard-top"><span class="gicon" aria-hidden="true">🔜</span><span class="chip">Soon</span></div><h3>More games</h3><p>Grids, career paths and sims for ${esc(s.name.toLowerCase())} are on the way.</p></div>` : ''}</div>
       <p class="gfoot dim"><a href="#games">← All sports</a> · <a href="#me">My games: streaks and stats ›</a> · <a href="#players-${sport}">${esc(s.name)} player pages ›</a></p></div>`;
   }
@@ -782,6 +782,14 @@
   }
   // Hoops and Diamond Dynasty (basketball, baseball, softball): one set of scripts for all four, plus the football
   // stylesheet and team colors
+  // basketball, baseball and softball dynasties: built, still being tested. Coming soon on the live site.
+  const SDYN_OPEN = false;
+  const dynOpen = sport => sport === 'football' || SDYN_OPEN;
+  function renderSoon(app, sport) {
+    const s = SP(sport);
+    app.innerHTML = `<div class="wrap games"><div class="gcrumb"><a href="#games">Games</a> › <a href="#games-${sport}">${esc(s.name)}</a> › ${esc(gameName(sport, 'dynasty'))}</div>
+      <div class="hub-hero"><div class="eyebrow">Coming soon</div><h1>${esc(gameName(sport, 'dynasty'))}</h1><p>${esc(gameBlurb(sport, 'dynasty'))}</p><p>It's in final testing. In the meantime, try <a href="#games-football-dynasty">Vol Dynasty</a> for football.</p></div></div>`;
+  }
   const SDYN_FILES = ['sd-data', 'sd-core', 'sd-hoops', 'sd-diamond', 'sd-league', 'sd-off', 'sd-save', 'sd-court', 'sd-game', 'sd-ui'];
   function renderSdyn(app, sport) {
     if (!document.querySelector('link[data-dyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/dynasty/dynasty.css?v=4'; l.dataset.dyn = 1; document.head.appendChild(l); }
@@ -804,7 +812,7 @@
     if (!s) return renderHome(app);
     if (game && !s.games.includes(game)) game = null;
     if (sport === 'football' && game === 'dynasty') return renderDynasty(app);
-    if (game === 'dynasty') return renderSdyn(app, sport);
+    if (game === 'dynasty') return dynOpen(sport) ? renderSdyn(app, sport) : renderSoon(app, sport);
     // football data is needed for every football game; beta sports load their own file
     const ready = sport === 'football' ? () => !!window.VI_GAMES_DATA : () => !!(window.VI_GAMES_SPORT && window.VI_GAMES_SPORT[sport]);
     if (!ready()) { loading(app); return loadScript(s.file, ready, () => render(app, sport, game), () => loading(app, 'Could not load the games data. Refresh to try again.')); }
