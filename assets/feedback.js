@@ -119,7 +119,7 @@
     }
     // footer link everywhere
     const foot = document.querySelector('.sitefoot .wrap');
-    if (foot && !foot.querySelector('[data-fbfoot]')) { const a = document.createElement('a'); a.href = '#'; a.dataset.fbfoot = '1'; a.textContent = 'Report a bug'; a.addEventListener('click', e => { e.preventDefault(); open(); }); const first = foot.querySelector('a'); if (first) { foot.insertBefore(document.createTextNode(' · '), first); foot.insertBefore(a, foot.querySelector('a')); } else foot.appendChild(a); }
+    if (foot && !foot.querySelector('[data-fbfoot]')) { const a = document.createElement('a'); a.href = '#'; a.dataset.fbfoot = '1'; a.textContent = 'Report a bug'; a.addEventListener('click', e => { e.preventDefault(); open(); }); const first = foot.querySelector('a'); if (first) { foot.insertBefore(a, first); foot.insertBefore(document.createTextNode(' · '), first); } else foot.appendChild(a); }
   }
   let t = null;
   const soon = () => { clearTimeout(t); t = setTimeout(decorate, 120); };
