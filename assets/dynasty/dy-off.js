@@ -34,10 +34,11 @@
   }
   function prospect(pos, c, o) {
     o = o || {};
+    if (pos === 'K' || pos === 'P' || pos === 'LS') c = Math.min(c, 0.888);   // specialists are never more than three stars
     const g = c * 100;
     // elite prospects arrive closer to ready: a top 5-star lands around 78-83
     const ovr = Math.round(clamp(61.5 + (g - 80) * 0.7 - 1 + Math.max(0, g - 90) * 0.75 + gauss() * (g >= 98 ? 1.7 : 3), 45, 85));
-    const p = DY.makePlayer(pos, ovr, Object.assign({ t: null, yr: 1, el: 5, grade: g, rec: { c, stars: DY.starsOf(c), g } }, o));
+    const p = DY.makePlayer(pos, ovr, Object.assign({ t: null, yr: 1, el: 5, grade: g, rec: { c, stars: DY.starsOf(c, pos), g } }, o));
     p.pros = true; p.interest = {}; p.commit = null; p.pref = prefs(); p.scout = 0; p.acts = {}; p.offer = false; p.visit = null; p.nilOffer = 0;
     // gems and busts: the composite misses on some players
     const exp = ovr + 14 + (g - 85) * 0.35;
@@ -261,7 +262,7 @@
         else if (p.yr >= 3) {
           const dg = DY.draftGrade(p);
           const pr = dg >= 91 ? 0.85 : dg >= 87 ? 0.55 : dg >= 84 ? 0.2 : dg >= 81 ? 0.05 : 0;
-          if (chance(pr * (p.tr.ego > 75 ? 1.15 : 1) * (p.tr.loyal > 85 ? 0.7 : 1))) { p.leave = 'nfl'; p.dg = dg; }
+          if (chance(pr * (p.tr.ego > 75 ? 1.15 : 1) * (p.tr.loyal > 90 ? 0.7 : 1))) { p.leave = 'nfl'; p.dg = dg; }
         }
       });
       // never more than 15 early entries from one school
@@ -291,7 +292,7 @@
   DY.declareChance = p => {
     if (!p || p.el <= 1 || p.yr < 3) return 0;
     const dg = DY.draftGrade(p), pr = dg >= 91 ? 0.85 : dg >= 87 ? 0.55 : dg >= 84 ? 0.2 : dg >= 81 ? 0.05 : 0;
-    return Math.min(0.95, pr * (p.tr.ego > 75 ? 1.15 : 1) * (p.tr.loyal > 85 ? 0.7 : 1));
+    return Math.min(0.95, pr * (p.tr.ego > 75 ? 1.15 : 1) * (p.tr.loyal > 90 ? 0.7 : 1));
   };
   DY.draftProj = p => { const dg = DY.draftGrade(p); return dg >= 91 ? 'Round 1' : dg >= 87 ? 'Rounds 1-2' : dg >= 84 ? 'Rounds 2-3' : 'Day 3'; };
   // the projected roster for next season at any point of the offseason: who is still here, who is coming
@@ -385,7 +386,7 @@
   /* the transfer portal */
   DY.portalChance = (p, t) => {
     const g = G();
-    if (p.tr.loyal >= 88) return 0.01;
+    if (p.tr.loyal >= 93) return 0.01;
     let c = 0.025;
     const depth = (t.depth[p.pos] || []).indexOf(p.id), st = DY.STARTERS[p.pos] || 1;
     if (depth >= st && p.ovr >= 74) c += 0.12 + (p.ovr - 74) / 60;
@@ -587,7 +588,7 @@
     let gr = base0;
     // performance last season vs what you would expect from his rating (players who play and produce grow faster)
     const notes = [], why = [];
-    why.push(`expected path ${base0 >= 0.5 ? '+' + base0.toFixed(1) : '0'} (${p.potG} potential, year ${p.yr}${p.tr.work >= 80 ? ', strong work ethic' : p.tr.work <= 45 ? ', questionable work ethic' : ''})`);
+    why.push(`expected path ${base0 >= 0.5 ? '+' + base0.toFixed(1) : '0'} (${p.potG} potential, year ${p.yr}${p.tr.work >= 86 ? ', strong work ethic' : p.tr.work <= 58 ? ', questionable work ethic' : ''})`);
     if ((p.lastGp || 0) >= 6 && p.lastScore > 0) {
       const exp = { QB: 95, RB: 75, WR: 70, TE: 70, OT: 110, IOL: 110, EDGE: 60, DT: 66, LB: 75, CB: 50, S: 50, K: 50, P: 30 }[p.pos] || 60;
       const z = clamp((p.lastScore - exp * (p.ovr / 82)) / (exp * 0.45), -1.5, 2);
@@ -617,7 +618,7 @@
       const wt = w[k] ? 1 : 0.5;
       let d = gr * wt * rr(0.6, 1.4);
       if ((k === 'spd' || k === 'acc') && p.yr >= 3) d *= 0.4;
-      p.at[k] = Math.round(clamp(p.at[k] + d, 15, 99));
+      p.at[k] = Math.round(clamp(p.at[k] + d, 50, 99));
     }
     DY.setOvr(p);
     if (p.ovr > p.ceil) p.ceil = p.ovr;

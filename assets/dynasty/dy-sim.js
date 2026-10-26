@@ -1118,7 +1118,7 @@
       anim.kind = 'pass'; anim.inc = true;
       const tg = W.target;
       if (W.away) ev.push(`Under pressure, ${last(q.p)} throws it away.`);
-      if (W.drop && tg) ev.push(`DROPPED. ${last(tg.p)} had it in his hands${tg.p.tr.cons < 40 ? ' (Streaky: the focus comes and goes)' : ''}.`);
+      if (W.drop && tg) ev.push(`DROPPED. ${last(tg.p)} had it in his hands${tg.p.tr.cons < 58 ? ' (Streaky: the focus comes and goes)' : ''}.`);
       if (W.pd) ev.push(`Broken up by ${last(W.pd.p)}.`);
       const deep = W.air >= 15;
       return Object.assign(base, { kind: 'inc', t: call.t, passer: q.p, target: tg ? tg.p : null, defender: W.pd ? W.pd.p : null, yards: 0, inc: true, drop: !!W.drop, pressured: !!W.pressure, endL: 0,

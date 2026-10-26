@@ -84,10 +84,10 @@
     const p = { pos, at };
     for (let it = 0; it < 4; it++) {
       let s = 0; for (const k in w) s += w[k] * at[k];
-      const d = target - s; for (const k in w) at[k] = clamp(at[k] + d, 20, 99);
+      const d = target - s; for (const k in w) at[k] = clamp(at[k] + d, 50, 99);
     }
-    for (const [k, off] of DY.EXTRA[pos] || []) at[k] = clamp(target + off + (arch[1][k] || 0) + gauss() * 4, 15, 95);
-    if (!at.spd) at.spd = clamp(target - 25 + gauss() * 4, 25, 80);
+    for (const [k, off] of DY.EXTRA[pos] || []) at[k] = clamp(target + off + (arch[1][k] || 0) + gauss() * 4, 50, 95);
+    if (!at.spd) at.spd = clamp(target - 25 + gauss() * 4, 50, 80);
     if (!at.awr) at.awr = clamp(target - 4 + gauss() * 4, 25, 95);
     if (!at.str) at.str = clamp(target - 10 + gauss() * 5, 25, 95);
     if (!at.tak && DY.SIDE(pos) === 'O') at.tak = clamp(30 + gauss() * 6, 15, 60);
@@ -110,21 +110,22 @@
 
   /* ---------- personality (Burger Town-style traits that explain what happens on the field) ---------- */
   DY.TRAITS = { disc: 'Discipline', clutch: 'Clutch', cons: 'Consistency', ego: 'Ego', lead: 'Leadership', work: 'Work ethic', tough: 'Toughness', loyal: 'Loyalty' };
-  DY.makeTraits = () => { const t = {}; for (const k in DY.TRAITS) t[k] = Math.round(clamp(58 + gauss() * 17, 10, 99)); return t; };
+  // personality on the same 50-99 scale as ratings (about 70 on average); ego is the one where lower is better
+  DY.makeTraits = () => { const t = {}; for (const k in DY.TRAITS) t[k] = k === 'ego' ? Math.round(clamp(52 + gauss() * 14, 20, 95)) : Math.round(clamp(70 + gauss() * 9.5, 50, 99)); return t; };
   DY.persLabel = p => {
     const t = p.tr;
-    if (t.ego >= 80 && t.disc <= 45) return ['Hot Head', 'Plays with an edge that can boil over: personal fouls and taunting flags follow him.'];
-    if (t.clutch >= 82) return ['Ice Water', 'Gets better when the lights are brightest: late, close, third down.'];
-    if (t.lead >= 82 && (p.pos === 'QB' || p.pos === 'LB')) return ['Field General', 'Runs the huddle; his calm keeps the offense on time in hostile stadiums.'];
-    if (t.work >= 84) return ['Gym Rat', 'First one in, last one out. Develops faster than his peers.'];
+    if (t.ego >= 80 && t.disc <= 58) return ['Hot Head', 'Plays with an edge that can boil over: personal fouls and taunting flags follow him.'];
+    if (t.clutch >= 88) return ['Ice Water', 'Gets better when the lights are brightest: late, close, third down.'];
+    if (t.lead >= 88 && (p.pos === 'QB' || p.pos === 'LB')) return ['Field General', 'Runs the huddle; his calm keeps the offense on time in hostile stadiums.'];
+    if (t.work >= 90) return ['Gym Rat', 'First one in, last one out. Develops faster than his peers.'];
     if (t.ego >= 80) return ['Showman', 'Loves the moment and the camera. Big plays, big celebrations, big NIL asks.'];
-    if (t.cons >= 82) return ['Steady', 'You know what you are getting every Saturday.'];
-    if (t.cons <= 32) return ['Streaky', 'Can take over a game or disappear in it.'];
-    if (t.loyal >= 84) return ['Lifer', 'Bleeds his school\'s colors. Will not leave in the portal.'];
-    if (t.loyal <= 30 && t.ego >= 62) return ['Mercenary', 'Follows the money and the playing time.'];
-    if (t.tough >= 84) return ['Iron Man', 'Plays through bumps and bruises.'];
-    if (t.disc >= 82) return ['Quiet Pro', 'Rarely makes the mental mistake.'];
-    if (t.lead >= 78) return ['Captain', 'Teammates follow him.'];
+    if (t.cons >= 88) return ['Steady', 'You know what you are getting every Saturday.'];
+    if (t.cons <= 55) return ['Streaky', 'Can take over a game or disappear in it.'];
+    if (t.loyal >= 90) return ['Lifer', 'Bleeds his school\'s colors. Will not leave in the portal.'];
+    if (t.loyal <= 56 && t.ego >= 62) return ['Mercenary', 'Follows the money and the playing time.'];
+    if (t.tough >= 90) return ['Iron Man', 'Plays through bumps and bruises.'];
+    if (t.disc >= 88) return ['Quiet Pro', 'Rarely makes the mental mistake.'];
+    if (t.lead >= 86) return ['Captain', 'Teammates follow him.'];
     return ['Team First', 'Does his job.'];
   };
 
@@ -159,13 +160,14 @@
       home: ho.home, st: ho.st, hs: opts.hs || DY.makeHS(ho.home), at, arch, ovr: 0, tr: DY.makeTraits(),
       rec: opts.rec || null, nil: 0, s: null, car: {}, aw: [], log: [], inj: null, gp: 0,
     };
+    for (const k in p.at) if (p.at[k] < 50) p.at[k] = 50;   // the scale is 50-99
     DY.setOvr(p);
     DY.setCeil(p, opts.grade || (p.rec ? p.rec.g : 82));
     if (opts.ceil) { p.ceil = Math.max(p.ovr, opts.ceil); p.potG = DY.scoutGrade(p.ceil); }
     return p;
   };
   // 247-style composite (0.7000-1.0000) and stars
-  DY.starsOf = c => c >= 0.9834 ? 5 : c >= 0.89 ? 4 : c >= 0.797 ? 3 : 2;
+  DY.starsOf = (c, pos) => { const st = c >= 0.9834 ? 5 : c >= 0.89 ? 4 : c >= 0.797 ? 3 : 2; return pos === 'K' || pos === 'P' || pos === 'LS' ? Math.min(3, st) : st; };   // specialists top out at three stars
   DY.compStr = c => c.toFixed(4);
 
   /* ---------- NIL ---------- */
@@ -275,6 +277,43 @@
     'Amare Campbell': { ovr: 87, at: { tak: 91, pur: 90 } }, 'Ty Redmond': { ovr: 87, at: { mcv: 88, awr: 86, tak: 82 } },
     'Dejuan Lane': { ovr: 90, at: { zcv: 92, awr: 90, tak: 88 }, tr: { lead: 90 } }, 'Edrees Farooq': { ovr: 85 },
   };
+  // AJ's rating notes (Oct. 26): applied after the overall is set. at/tr = exact values, atd/trd = changes, alt = positions he plays without a penalty
+  DY.UT_POST = {
+    'Xavier Gilliam': { tr: { tough: 80, cons: 90 } },
+    'DeSean Bishop': { at: { spd: 88 }, ovr: 92, tr: { ego: 30, tough: 92, loyal: 95 } },
+    'David Sanders Jr.': { tr: { cons: 90 } },
+    'Mike Matthews': { tr: { tough: 90, cons: 80 } },
+    'Daevin Hobbs': { tr: { work: 92 } },
+    'Dejuan Lane': { tr: { disc: 92, clutch: 92, cons: 92, work: 94, tough: 92 } },
+    'Kayin Lee': { tr: { cons: 88 } },
+    'Amare Campbell': { tr: { disc: 88, clutch: 87, cons: 86, lead: 86, work: 89, tough: 88, loyal: 87, ego: 40 } },
+    'Ty Redmond': { tr: { cons: 95 } },
+    'Tyree Weathersby': { tr: { loyal: 93, clutch: 88, cons: 88, lead: 88, work: 90, tough: 90, ego: 38 } },
+    'Jeremiah Telander': { tr: { tough: 92, work: 94 }, alt: ['LB'] },
+    'DaSaahn Brame': { atd: { spd: 8, elu: 8, acc: 8 } },
+    'Ethan Davis': { atd: { pbk: -4, str: -4, spd: 10, acc: 8, agi: 3, elu: 3 }, tr: { loyal: 95 }, trd: { lead: 8 } },
+    'Daune Morris': { at: { spd: 92 } },
+    'Qua Moss': { atd: { prs: -6, spd: 10, tak: 6, hit: 6, prc: 6, str: 5, awr: 5 } },
+    'Faizon Brandon': { at: { thp: 95, tup: 70, awr: 72, spd: 89, agi: 91, acc: 88 }, tr: { work: 99, tough: 90, loyal: 90 } },
+    'George MacIntyre': { at: { thp: 92, sac: 84, mac: 85, dac: 81, spd: 79, agi: 83, str: 60 }, trd: { cons: 10 }, tr: { loyal: 95 } },
+    'Jesse Perry': { at: { pbk: 78, rbk: 90 }, alt: ['IOL'] },
+    'Shamurad Umarov': { at: { rbk: 75, pbk: 70 }, atd: { agi: -15 } },
+    'Justin Baker': { at: { spd: 95, acc: 93 }, atd: { elu: 6 }, ovrd: 4 },
+    'Javin Gordon': { atd: { spd: 5, elu: 6 } },
+    'TK Keys': { atd: { cit: 8, spc: 8 } },
+    'Wendell Moe Jr.': { ovr: 82 },
+  };
+  DY.applyPost = p => {
+    const x = DY.UT_POST[p.n]; if (!x) return;
+    const o0 = p.ovr;
+    if (x.at) for (const k in x.at) p.at[k] = x.at[k];
+    if (x.atd) for (const k in x.atd) if (p.at[k] != null) p.at[k] = Math.round(clamp(p.at[k] + x.atd[k], 50, 99));
+    if (x.ovr || x.ovrd) { const fixed = Object.assign({}, x.at || {}); for (const k in x.atd || {}) fixed[k] = p.at[k]; DY.fitOvr(p, x.ovr || o0 + x.ovrd, fixed); }
+    if (x.tr) Object.assign(p.tr, x.tr);
+    if (x.trd) for (const k in x.trd) p.tr[k] = Math.round(clamp(p.tr[k] + x.trd[k], 50, 99));
+    if (x.alt) p.alt = x.alt;
+    DY.setOvr(p); if (p.ceil < p.ovr) p.ceil = p.ovr;
+  };
   DY.UT_CUTS = ['Mason Phillips', 'Will Rajecki', 'Cole Harrison', 'Charlie Powell III', 'Thomas Storm', 'Michael Kostantonov', 'CJ Edwards', 'Nuk Simmons', 'Darryl Rivers',
     'Grier Short', 'Ryan Scott', 'Grady Dangerfield', 'Javonte Smith', 'Jackson Mathews', 'Isaiah Hardge', 'Luke Thompson', 'Lane Cope'];
   DY.WR_KEEP = 8;
@@ -285,7 +324,7 @@
       const o = DY.calcOvr(p); const d = target - o; if (Math.abs(d) < 0.5) break;
       const free = Object.keys(w).filter(k => fixed[k] == null);
       const wsum = free.reduce((s, k) => s + w[k], 0) || 1;
-      free.forEach(k => { p.at[k] = Math.round(clamp(p.at[k] + d / wsum * 1, 20, 99)); });
+      free.forEach(k => { p.at[k] = Math.round(clamp(p.at[k] + d / wsum * 1, 50, 99)); });
     }
     DY.setOvr(p);
   };
@@ -328,6 +367,7 @@
       if (fx.tr) Object.assign(p.tr, fx.tr);
       if (fx.at) Object.assign(p.at, fx.at);
       DY.fitOvr(p, ovr, fx.at);
+      DY.applyPost(p);
       if (p.ceil < p.ovr) p.ceil = p.ovr;
       if (fx.ovr && p.ceil < p.ovr + 2 && p.el > 1) { p.ceil = p.ovr + Math.max(2, (p.el - 1) * 2); p.potG = DY.scoutGrade(p.ceil); }
       p.real = rp.id; p.prev = rp.prev || null; p.honReal = rp.honors || []; if (fx.note) p.note = fx.note; if (fx.captain) p.captain = true;
@@ -369,14 +409,14 @@
   // natural moves keep most of a player's value; a defensive tackle at safety does not
   DY.COMPAT = { QB: ['RB', 'WR'], RB: ['WR', 'S', 'LB'], WR: ['RB', 'CB', 'TE'], TE: ['WR', 'OT', 'IOL', 'EDGE', 'LB'], OT: ['IOL', 'TE'], IOL: ['OT', 'DT'],
     EDGE: ['DT', 'LB', 'TE'], DT: ['EDGE', 'IOL'], LB: ['EDGE', 'S', 'RB'], CB: ['S', 'WR'], S: ['CB', 'LB', 'RB'], K: ['P'], P: ['K'], LS: [] };
-  DY.posFit = (p, pos) => { const home = p.pos0 || p.pos; return pos === home ? 'natural' : (DY.COMPAT[home] || []).includes(pos) ? 'ok' : 'poor'; };
+  DY.posFit = (p, pos) => { const home = p.pos0 || p.pos; return pos === home || (p.alt || []).includes(pos) ? 'natural' : (DY.COMPAT[home] || []).includes(pos) ? 'ok' : 'poor'; };
   DY.ovrAt = (p, pos) => {
-    const home = p.pos0 || p.pos, base = p.at0 || p.at, fit = pos === home ? 0 : (DY.COMPAT[home] || []).includes(pos) ? 6 : 20;
+    const home = p.pos0 || p.pos, base = p.at0 || p.at, alt = (p.alt || []).includes(pos), fit = pos === home || alt ? 0 : (DY.COMPAT[home] || []).includes(pos) ? 6 : 20;
     const at = Object.assign({}, base);
-    for (const k in DY.W[pos]) if (at[k] == null) at[k] = Math.round(clamp((p.ovr0 || p.ovr) - 8 - fit + gauss() * 0, 20, 90));
+    for (const k in DY.W[pos]) if (at[k] == null) at[k] = Math.round(clamp((p.ovr0 || p.ovr) - (alt ? 1 : 8) - fit, 50, 92));
     // body: big men lose speed-based value at skill spots, small men lose strength at the line
     let sum = 0; for (const k in DY.W[pos]) sum += DY.W[pos][k] * at[k];
-    return { ovr: Math.round(clamp(sum - (pos === home ? 0 : fit * 0.25), 25, 99)), at };
+    return { ovr: Math.round(clamp(sum - (pos === home || alt ? 0 : fit * 0.25), 40, 99)), at };
   };
   DY.changePos = (p, pos) => {
     if (!DY.W[pos] || pos === p.pos) return;
@@ -469,7 +509,7 @@
     const g = clamp(80 + (team.prestige - 50) / 3.2 + gauss() * 4.5, 70, 99.9);
     const comp = clamp(0.70 + (g - 70) * 0.01, 0.7, 0.9999);
     const st = chance(0.55) ? team.st : undefined;
-    return DY.makePlayer(pos, ovr, Object.assign({ t: team.id, yr, el, grade: g, st, rec: { c: comp, stars: DY.starsOf(comp), g } }, opts));
+    return DY.makePlayer(pos, ovr, Object.assign({ t: team.id, yr, el, grade: g, st, rec: { c: comp, stars: DY.starsOf(comp, pos), g } }, opts));
   };
   DY.genRoster = (team, tmpPrefix) => {
     const ids = [];
