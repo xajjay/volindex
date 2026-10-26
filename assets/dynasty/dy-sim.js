@@ -762,7 +762,7 @@
     // look at the receivers through the progression (with a peek at the next one)
     const look = order.slice(0, idx + 2);
     // the checkdown: when he is pressured or the first reads are taking too long, the back in the flat is always an option
-    if (pressured || t - W.readT > 1.3) order.forEach(r => { if (r && /RB|FB/.test(r.role) && !look.includes(r)) look.push(r); });
+    if (pressured || t - W.readT > 0.9) order.forEach(r => { if (r && /RB|FB/.test(r.role) && !look.includes(r)) look.push(r); });
     let best = null, bestScore = -9;
     for (let i = 0; i < look.length; i++) {
       const r = look[i]; if (!r || r.eng || r.down > 0) continue;
@@ -772,6 +772,7 @@
       let need = depth > 17 ? 2.1 : depth > 8 ? 1.5 : 1.15;
       need -= (t - W.readT) * 0.22 + (pressured ? 0.55 : 0) + gun;
       if (i > idx && !/RB|FB/.test(r.role)) need += 0.6;
+      if (/RB|FB/.test(r.role) && r.route === 'check') need -= 0.3;    // the dump-off is an easy throw
       if (/RB|FB/.test(r.role) && i < order.length - 1) need += 0.25;    // backs are the outlet, not the first read
       if (sticks && depth < sticks - 0.5 && t < W.readT + 1.2) need += 0.75;
       if (depth > W.toGoal + 8) continue;
@@ -950,7 +951,7 @@
             const o = openness(W, rcv); return throwTo(W, rcv, o, false);
           }
         }
-        if (scheme.sch === 'toss' && t >= 0.25 && !pitched) {
+        if (scheme.sch === 'toss' && rb && t >= 0.25 && !pitched) {
           pitched = true; W.ball.holder = null; const to = rb; const tf = 0.35; W.ball.fl = { x0: q.x, y0: q.y, x1: to.x - 0.3, y1: to.y + sgn * 2.5, t0: t, t1: t + tf, to, peak: 0.3, pitch: true }; W.phase = 'pitch';
         }
         if (scheme.sch === 'jet' && t >= 0.3) { handed = true; W.ball.holder = car; W.carrier = car; car.task = 'carry'; car.gdir = 1; }
@@ -1012,7 +1013,7 @@
   }
   // a dropback (quick, medium, deep, play action, screen)
   function passPlayBrain(W, call, ctx) {
-    const GM = W.GM, q = W.qb, C = ctx.concept || SIM.CONCEPT['Curl-Flat'];
+    const GM = W.GM, q = W.qb; let C = ctx.concept || SIM.CONCEPT['Curl-Flat'];
     const t0 = call.t;
     W.phase = 'pass'; W.ball.holder = q;
     const gun = q.x < -3;
@@ -1025,12 +1026,16 @@
     if (t0 === 'pa') W.pa = 0.32 + (ctx.F && ctx.F.pa ? ctx.F.pa * 0.15 : 0);
     // blitz pickup: the back stays in when they bring more than the line can block
     const extraRush = W.rushers.length > 5;
+    // backs are part of the passing game: some calls release him on a swing or into the flat as a real read
+    let relRB = false;
+    if (!C.screen && W.by.RB && (!C.RB || C.RB === 'check') && t0 !== 'deep' && chance(t0 === 'quick' ? 0.4 : 0.32)) { C = Object.assign({}, C, { RB: chance(0.5) ? 'swing' : 'flat' }); relRB = true; }
     routes(W, C);
-    if (extraRush && W.by.RB && W.by.RB.route === 'check' && !C.screen) { W.by.RB.route = 'block'; W.by.RB.path = null; }
+    if (extraRush && !relRB && W.by.RB && W.by.RB.route === 'check' && !C.screen && chance(0.45)) { W.by.RB.route = 'block'; W.by.RB.path = null; }
     if (ctx.F && ctx.F.pro >= 0.45 && W.by.TE2 && W.by.TE2.route && chance(0.5)) { W.by.TE2.route = 'block'; W.by.TE2.path = null; }
     passPro(W);
     W.order = C.ord.map(k => W.by[k]).filter(a => a && a.route && a.route !== 'block');
     if (!W.order.length) W.order = ELIG.map(k => W.by[k]).filter(a => a && a.route && a.route !== 'block');
+    if (relRB) { const rb = W.by.RB, i = W.order.indexOf(rb); if (i > 1) { W.order.splice(i, 1); W.order.splice(Math.min(2, W.order.length), 0, rb); } }
     // screens: the line lets them through, then releases to block in space
     if (C.screen) {
       W.screen = true; W.readT = 1.25; W.dropT = 0.9;

@@ -641,7 +641,7 @@
       { p: O.WR[1], role: 'WR2', cov: D.CB[1], depth: t === 'deep' ? 'd' : t === 'quick' ? 's' : 'm', w: 1.0 },
       { p: O.WR[2], role: 'WR3', cov: D.NB, depth: t === 'quick' ? 's' : t === 'deep' ? 'm' : t === 'pa' ? 'm' : 'm', w: 0.95 },
       { p: O.TE, role: 'TE', cov: D.LB[0], depth: t === 'quick' ? 's' : 'm', w: 0.75 },
-      { p: O.RB, role: 'RB', cov: D.LB[1], depth: 's', w: t === 'deep' || t === 'pa' ? 0.16 : 0.3 },
+      { p: O.RB, role: 'RB', cov: D.LB[1], depth: 's', w: t === 'deep' || t === 'pa' ? 0.08 : 0.15 },
     ] : [];
     // personnel changes who is out on routes
     if (F.wr < 3) { routes.splice(2, 1); if (F.te >= 2) routes.push({ p: O.TE2, role: 'TE2', cov: D.S[1], depth: deepish ? 'm' : 's', w: 0.7 }); }
@@ -662,7 +662,7 @@
       if (rt.depth === 'd') sep -= def.deep * 0.62; else if (rt.depth === 's') sep -= def.short * 0.5; else sep -= (def.short + def.deep) * 0.22;
       if (rt.depth === 'd' && man && p.at.spd > c.at.spd + 3) sep += 0.45;
       if (def.blitz && rt.depth !== 'd') sep += 0.35;
-      if (rt.role === 'RB' || rt.role === 'FB') sep += 0.35;
+      if (rt.role === 'RB' || rt.role === 'FB') sep -= 0.1;
       // the play call against the coverage, personnel, the plan, and a compressed red zone
       sep += ctx.pm * 0.45 + F.sep + (ctx.mo.sep || 0) + (rt.depth === 's' ? (ctx.mo.sepS || 0) - (ctx.md.short || 0) * 0.4 : 0) + (rt.depth === 'd' ? (ctx.mo.sepD || 0) - (ctx.md.deep || 0) * 0.5 : 0) - ctx.dp.cov;
       if (t === 'pa') sep += (F.pa || 0) * 0.5 + (ctx.mo.pa || 0);
@@ -670,7 +670,7 @@
       const depthYds = rt.depth === 'd' ? 20 : rt.depth === 'm' ? 11 : 4;
       rt.sep = sep; rt.view = sep + gauss() * noise + Math.log(rt.w) + (sticks && depthYds >= sticks ? 0.6 : sticks ? -0.4 : 0);
     });
-    if (hurried) routes.forEach(r => { if (r.depth !== 's') r.view -= 0.9; });
+    if (hurried) routes.forEach(r => { if (r.depth !== 's') r.view -= 0.6; });
     return routes.sort((a, b) => b.view - a.view)[0];
   }
   function passPlay(GM, s, O, D, call, dc, def, read, ctx) {
@@ -692,7 +692,7 @@
     const winner = () => weighted(rushers.slice(0, 3).map(x => x.p), p => Math.pow(rushers.find(r => r.p === p).v, 3));
     // screens
     if (t === 'screen') {
-      const tgt = chance(0.55) ? O.RB : chance(0.5) ? O.WR[2] : O.WR[0];
+      const tgt = chance(0.45) ? O.RB : chance(0.5) ? O.WR[2] : O.WR[0];
       const blockers = avg([O.OL[1], O.OL[2], O.OL[3]].map(p => E(GM, p, 'rbk', s)));
       const pursuit = avg(D.LB.map(p => E(GM, p, 'pur', ds) * 0.6 + E(GM, p, 'spd', ds) * 0.4));
       const sniff = (def.blitz ? -1.4 : def.box > 0.5 ? -0.4 : 0.6) + read * 1.2 + (dc.d === 'c2' || dc.d === 't2' ? 0.5 : 0) - ctx.pm * 0.6;
