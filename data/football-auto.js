@@ -1148,6 +1148,106 @@ window.SITE_AUTO.football = {
    }
   }
  },
+ "natRanks": {
+  "stats": [
+   "Rushing yards",
+   "Rushing TD",
+   "Passing yards",
+   "Passing TD",
+   "Receiving yards",
+   "Receiving TD",
+   "Receptions",
+   "Tackles for loss",
+   "Sacks",
+   "Tackles",
+   "Passes defended",
+   "Interceptions"
+  ],
+  "players": {
+   "Tyree Weathersby": [
+    {
+     "stat": "Sacks",
+     "rank": 6
+    },
+    {
+     "stat": "Tackles for loss",
+     "rank": 27
+    }
+   ],
+   "Amare Campbell": [
+    {
+     "stat": "Tackles for loss",
+     "rank": 32
+    }
+   ],
+   "Xavier Gilliam": [
+    {
+     "stat": "Tackles for loss",
+     "rank": 7
+    },
+    {
+     "stat": "Sacks",
+     "rank": 12
+    }
+   ],
+   "Mariyon Dye": [
+    {
+     "stat": "Sacks",
+     "rank": 25
+    }
+   ],
+   "Ty Redmond": [
+    {
+     "stat": "Passes defended",
+     "rank": 3
+    }
+   ],
+   "Dejuan Lane": [
+    {
+     "stat": "Interceptions",
+     "rank": 12
+    }
+   ],
+   "Kayin Lee": [
+    {
+     "stat": "Interceptions",
+     "rank": 41
+    }
+   ],
+   "Faizon Brandon": [
+    {
+     "stat": "Passing TD",
+     "rank": 96
+    }
+   ],
+   "Mike Matthews": [
+    {
+     "stat": "Receiving yards",
+     "rank": 45
+    },
+    {
+     "stat": "Receptions",
+     "rank": 69
+    }
+   ],
+   "Braylon Staley": [
+    {
+     "stat": "Receptions",
+     "rank": 87
+    }
+   ],
+   "DeSean Bishop": [
+    {
+     "stat": "Rushing yards",
+     "rank": 2
+    },
+    {
+     "stat": "Rushing TD",
+     "rank": 6
+    }
+   ]
+  }
+ },
  "recruits": {
   "2027": [
    {
@@ -14306,7 +14406,7 @@ window.SITE_AUTO.football = {
   "OK   AP and Coaches polls",
   "OK   team per-game numbers and national/SEC ranks",
   "OK   player season stats",
-  "SKIP national (FBS) ranks for Tennessee players: HTTP Error 429: Too Many Requests",
+  "OK   national (FBS) ranks for Tennessee players",
   "OK   recruiting classes",
   "OK   ESPN lines, TV and win chances",
   "OK   full team stat sheet with national and SEC ranks",
@@ -14316,105 +14416,5 @@ window.SITE_AUTO.football = {
   "OK   season-by-season schedules and team leaders (cached after the first run)",
   "OK   PEAR ratings (week 9)",
   "OK   FPI ratings and ranks for the SEC (CFBD)"
- ],
- "natRanks": {
-  "stats": [
-   "Rushing yards",
-   "Rushing TD",
-   "Passing yards",
-   "Passing TD",
-   "Receiving yards",
-   "Receiving TD",
-   "Receptions",
-   "Tackles for loss",
-   "Sacks",
-   "Tackles",
-   "Passes defended",
-   "Interceptions"
-  ],
-  "players": {
-   "Tyree Weathersby": [
-    {
-     "stat": "Sacks",
-     "rank": 6
-    },
-    {
-     "stat": "Tackles for loss",
-     "rank": 27
-    }
-   ],
-   "Amare Campbell": [
-    {
-     "stat": "Tackles for loss",
-     "rank": 32
-    }
-   ],
-   "Xavier Gilliam": [
-    {
-     "stat": "Tackles for loss",
-     "rank": 7
-    },
-    {
-     "stat": "Sacks",
-     "rank": 12
-    }
-   ],
-   "Mariyon Dye": [
-    {
-     "stat": "Sacks",
-     "rank": 25
-    }
-   ],
-   "Ty Redmond": [
-    {
-     "stat": "Passes defended",
-     "rank": 3
-    }
-   ],
-   "Dejuan Lane": [
-    {
-     "stat": "Interceptions",
-     "rank": 12
-    }
-   ],
-   "Kayin Lee": [
-    {
-     "stat": "Interceptions",
-     "rank": 41
-    }
-   ],
-   "Faizon Brandon": [
-    {
-     "stat": "Passing TD",
-     "rank": 96
-    }
-   ],
-   "Mike Matthews": [
-    {
-     "stat": "Receiving yards",
-     "rank": 45
-    },
-    {
-     "stat": "Receptions",
-     "rank": 69
-    }
-   ],
-   "Braylon Staley": [
-    {
-     "stat": "Receptions",
-     "rank": 87
-    }
-   ],
-   "DeSean Bishop": [
-    {
-     "stat": "Rushing yards",
-     "rank": 2
-    },
-    {
-     "stat": "Rushing TD",
-     "rank": 6
-    }
-   ]
-  }
- }
+ ]
 };
