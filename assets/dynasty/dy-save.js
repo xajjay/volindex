@@ -72,6 +72,7 @@
     const g = JSON.parse(txt);
     if (!g || g.v !== DY.VERSION || !g.teams) throw new Error('Not a dynasty save from this version.');
     DY.G = g; DY.seed(g.rs || g.seed);
+    if (DY.seedPast) DY.seedPast(g);
     return g;
   };
   DY.deleteSlot = n => { idbDel('slot' + n); try { root.localStorage.removeItem('vi-dynasty-s' + n); } catch (e) { /* */ } const m = DY.readMeta(); delete m[n]; writeMeta(m); };

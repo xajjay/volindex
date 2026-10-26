@@ -65,9 +65,9 @@
       <div class="box gsetup dy-setup">
         <div class="gfield"><div class="glabel">Coach name</div><input id="dyCoach" class="dy-in" maxlength="28" placeholder="Your name" value="${esc(s.coach)}"></div>
         <div class="gfield"><div class="glabel">Coaching style</div><div class="dy-archs">${Object.entries(DY.COACH_ARCH).map(([k, a]) => `<button type="button" class="dy-arch" data-arch="${k}" aria-pressed="${s.arch === k}"><b>${esc(a.name)}</b><small>${esc(a.desc)}</small></button>`).join('')}</div></div>
-        <div class="gfield"><div class="glabel">Offensive identity</div>${seg('offStyle', Object.entries(DY.STYLES).map(([k, st]) => [k, st.name]))}<p class="dim small">Tennessee leans on the run and plays at a slower pace this season. You can change it any time in Settings.</p></div>
+        <div class="gfield"><div class="glabel">Offensive identity</div>${seg('offStyle', DY.USER_STYLES.map(k => [k, DY.STYLES[k].name]))}<p class="dim small">Tennessee leans on the run and plays at a slower pace this season. You can change it any time in Settings.</p></div>
         <div class="gfield"><div class="glabel">Difficulty</div>${seg('diff', [['freshman', 'Freshman'], ['varsity', 'Varsity'], ['heisman', 'Heisman (balanced)']])}<p class="dim small">Heisman is the real thing. Lower levels take a little off CPU players in your games.</p></div>
-        <div class="gfield"><div class="glabel">Playoff</div>${seg('cfp', [['real', 'Real format (12 in 2026, 24 from 2027)'], [12, '12 teams'], [24, '24 teams']])}</div>
+        <div class="gfield"><div class="glabel">Playoff</div>${seg('cfp', [['real', 'Real format (12 in 2026, 24 from 2027)'], [2, '2 teams (BCS)'], [4, '4 teams'], [8, '8 teams'], [12, '12 teams'], [24, '24 teams']])}</div>
         <div class="gfield"><div class="glabel">Play calling</div>${seg('coachMode', [['offense', 'Offense (your DC calls defense)'], ['full', 'Offense and defense'], ['watch', 'Just watch']])}</div>
         <div class="gfield"><div class="glabel">Season watch</div>${seg('watchSeason', [[false, 'Play my games'], [true, 'Sim my games, I run the program']])}</div>
         <div class="gfield"><div class="glabel">Recruiting</div>${seg('recruiting', [['manual', 'I recruit'], ['auto', 'Auto'], ['off', 'Off']])}<p class="dim small">Year one is the real 2027 class, locked in.</p></div>
@@ -107,7 +107,7 @@
           <div class="dyh-id"><span class="dyh-badge">TENN</span><div><div class="dyh-name">${rk ? `<small>No. ${rk}</small> ` : ''}Tennessee</div><div class="dyh-sub">Coach ${esc(g.coach.name)} · ${esc(DY.weekLabel())}</div></div></div>
           <div class="dyh-rec"><b>${ut.w}-${ut.l}</b><small>${ut.cw}-${ut.cl} SEC</small></div>
           <div class="dyh-act">${act ? `<button class="btn primary big" data-act="main">${esc(act.label)}</button>${act.sim ? `<button class="btn" data-act="sim">${esc(act.sim)}</button>` : ''}` : ''}
-            ${canSimAhead ? `<div class="dy-menu"><button class="btn" data-act="simmenu" aria-haspopup="true">Sim ahead ▾</button><div class="dy-menu-in" hidden>${g.phase === 'season' && g.week < 7 || g.phase === 'preseason' ? '<button data-ahead="mid">To midseason (week 7)</button>' : ''}${g.phase === 'season' || g.phase === 'preseason' ? '<button data-ahead="reg">To end of the regular season</button>' : ''}<button data-ahead="end">To the end of the season</button></div></div>` : ''}
+            ${canSimAhead ? `<div class="dy-menu"><button class="btn" data-act="simmenu" aria-haspopup="true">Sim ahead ▾</button><div class="dy-menu-in" hidden><p class="small dim" style="margin:2px 8px 6px">Your games get simmed too.</p>${g.phase === 'season' && g.week < 7 || g.phase === 'preseason' ? '<button data-ahead="mid">To midseason (week 7)</button>' : ''}${g.phase === 'season' || g.phase === 'preseason' ? '<button data-ahead="reg">To end of the regular season</button>' : ''}<button data-ahead="end">To the end of the season</button></div></div>` : ''}
             <button class="btn" data-act="save" title="Save to slot ${g.slot || 1}">Save</button></div>
         </div>
         <nav class="wrap dyh-tabs" role="tablist">${TABS.map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="${V.tab === k}">${l}${k === 'recruit' && g.phase !== 'offseason' && g.recruit && !g.recruit.signed && !g.recruit.locked && g.settings.recruiting === 'manual' ? ` <small>${DY.HOURS() - DY.hoursUsed()}h</small>` : ''}</button>`).join('')}</nav>
@@ -162,7 +162,6 @@
   function simAhead(to) {
     const g = G();
     const lab = { mid: 'midseason', reg: 'the end of the regular season', end: 'the end of the season' }[to];
-    if (!root.confirm(`Sim to ${lab}? Your games will be simmed too.`)) return;
     busy(`Simming to ${lab}…`, () => {
       if (g.phase === 'preseason') { if (DY.autoCamp) DY.autoCamp(); DY.startSeason(); }
       let n = 0;
@@ -191,7 +190,7 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-tab],[data-act],[data-pid],[data-rid],[data-box],[data-sort],[data-rpos],[data-dmove],[data-ract],[data-roffer],[data-radd],[data-rrm],[data-nilans],[data-retain],[data-poffer],[data-conf],[data-ppos],[data-prpos],[data-statk],[data-stab],[data-more],[data-slot],[data-set],[data-rfind],[data-goto],[data-recs],[data-ahead],[data-dview],[data-nilstep],[data-persuade],[data-cut],[data-camp]');
+    const el = e.target.closest('[data-tab],[data-act],[data-pid],[data-rid],[data-box],[data-sort],[data-rpos],[data-dmove],[data-ract],[data-roffer],[data-radd],[data-rrm],[data-nilans],[data-retain],[data-poffer],[data-conf],[data-ppos],[data-prpos],[data-statk],[data-stab],[data-more],[data-slot],[data-set],[data-rfind],[data-goto],[data-recs],[data-ahead],[data-dview],[data-nilstep],[data-persuade],[data-cut],[data-camp],[data-nilf],[data-dunit],[data-dproj]');
     if (!el) { const m = APP.querySelector('.dy-menu-in'); if (m && !m.hidden && !e.target.closest('.dy-menu')) m.hidden = true; return; }
     const g = G(), d = el.dataset;
     if (el.tagName === 'A') e.preventDefault();
@@ -222,6 +221,9 @@
     if (d.stab) { V.stab = d.stab; return keep(); }
     if (d.more) { V.more[d.more] = !V.more[d.more]; return keep(); }
     if (d.recs) { V.recs = d.recs; return keep(); }
+    if (d.nilf) { V.nilf = d.nilf; return keep(); }
+    if (d.dunit) { V.dunit = d.dunit; return keep(); }
+    if (d.dproj) { V.dproj = d.dproj === '1'; return keep(); }
     if (d.dview) { V.dview = d.dview; return keep(); }
     if (d.conf) { V.conf = d.conf; return keep(); }
     if (d.slot) { const n = +d.slot; g.slot = n; return DY.saveSlot(n, null).then(err => { V.msg = err || `Saved to slot ${n}.`; hub(); }); }
@@ -420,7 +422,10 @@
     const bar = (l, v) => `<div class="dy-attr"><span>${esc(l)}</span><div class="dy-ab"><i class="${ovrCls(v)}" style="width:${v}%"></i></div><b>${v}</b></div>`;
     const car = Object.entries(p.car || {}).sort((a, b) => a[0] - b[0]);
     const cols = statCols(p.pos);
-    const seasonRows = car.map(([y, s]) => `<tr><td>${y}</td><td>${esc(s.t || '')}</td><td>${s.gp || 0}</td>${cols.map(c => `<td>${c[1](s)}</td>`).join('')}</tr>`).join('') + (p.s ? `<tr class="cur"><td>${g.season}</td><td>${t ? esc(t.abbr) : ''}</td><td>${p.s.gp || 0}</td>${cols.map(c => `<td>${c[1](p.s)}</td>`).join('')}</tr>` : '');
+    const seasonRows = car.map(([y, s]) => `<tr class="${s.real ? 'real' : ''}"><td>${y}${s.real ? ' <small class="dim">real</small>' : ''}</td><td>${esc(s.t || '')}</td><td>${s.gp || 0}</td>${cols.map(c => `<td>${c[1](s)}</td>`).join('')}</tr>`).join('') + (p.s ? `<tr class="cur"><td>${g.season}</td><td>${t ? esc(t.abbr) : ''}</td><td>${p.s.gp || 0}</td>${cols.map(c => `<td>${c[1](p.s)}</td>`).join('')}</tr>` : '');
+    const totS = {}; car.forEach(([, s]) => { for (const k in s) if (typeof s[k] === 'number') totS[k] = (totS[k] || 0) + s[k]; }); if (p.s) for (const k in p.s) if (typeof p.s[k] === 'number') totS[k] = (totS[k] || 0) + p.s[k];
+    const careerRow = car.length + (p.s ? 1 : 0) > 1 ? `<tr class="tot"><td><b>Career</b></td><td></td><td>${totS.gp || 0}</td>${cols.map(c => `<td><b>${c[1](totS)}</b></td>`).join('')}</tr>` : '';
+    const chase = p.t === g.user && g.rec ? Object.entries(DY.REC_MAP).map(([name, k]) => { const r = g.rec.career[k], v = DY.careerTotal(p, k, true); if (!r || !v) return ''; if (r.pid === p.id) return `<li><b>Tennessee's all-time leader</b> in career ${esc(name.toLowerCase())} (${v}).</li>`; return v >= r.v * 0.45 ? `<li>${v} career ${esc(name.toLowerCase())}: <b>${r.v - v + 1}</b> to pass ${esc(r.n)} (${r.v}) for the school record.</li>` : ''; }).join('') : '';
     const realCar = p.realCar ? Object.entries(p.realCar).filter(([y]) => +y < g.startSeason).map(([y, s]) => `${y}: ${s.pass ? s.pass[2] + ' pass yds' : ''}${s.rush ? ' ' + s.rush[1] + ' rush yds' : ''}${s.rec ? ' ' + s.rec[1] + ' rec yds' : ''}${s.def ? ' ' + s.def[0] + ' tkl' : ''}`).join(' · ') : '';
     const gl = (p.gl || []).filter(x => x.y === g.season).slice(-14);
     const rec = p.rec && !p.rec.walkon ? `${'★'.repeat(p.rec.stars || 0)} ${p.rec.c ? p.rec.c.toFixed(4) : ''}${p.rec.nat ? ' · No. ' + p.rec.nat + ' nationally' : ''}${p.rec.cls ? ' (' + p.rec.cls + ')' : ''}` : 'Walk-on';
@@ -434,7 +439,8 @@
       ${p.draftNote ? `<p class="small dim">Draft outlook (real): ${esc(p.draftNote)}</p>` : ''}
       <div class="dy-pc-cols"><div><div class="glabel">Ratings</div>${keys.map(k => bar(DY.ATTR_NAME[k] || k, p.at[k])).join('')}</div>
       <div><div class="glabel">Personality</div>${Object.keys(DY.TRAITS).map(k => bar(DY.TRAITS[k], p.tr[k])).join('')}</div></div>
-      ${seasonRows ? `<div class="glabel">Stats</div><div class="dy-scroll"><table class="dyt"><thead><tr><th>Year</th><th>Team</th><th>GP</th>${cols.map(c => `<th>${c[0]}</th>`).join('')}</tr></thead><tbody>${seasonRows}</tbody></table></div>` : ''}
+      ${seasonRows ? `<div class="glabel">Stats</div><div class="dy-scroll"><table class="dyt"><thead><tr><th>Year</th><th>Team</th><th>GP</th>${cols.map(c => `<th>${c[0]}</th>`).join('')}</tr></thead><tbody>${seasonRows}${careerRow}</tbody></table></div><p class="small dim">Rows marked real are his actual Tennessee stats (cfbstats.com); the rest are this dynasty.</p>` : ''}
+      ${chase ? `<div class="glabel">Record chase</div><ul class="dy-mini">${chase}</ul>` : ''}
       ${realCar ? `<p class="small dim">Real stats before 2026: ${esc(realCar)}</p>` : ''}
       ${gl.length ? `<div class="glabel">${g.season} game log</div><div class="dy-scroll"><table class="dyt"><thead><tr><th>Wk</th><th>Opp</th><th>Result</th>${cols.map(c => `<th>${c[0]}</th>`).join('')}</tr></thead><tbody>${gl.map(x => `<tr><td>${x.w}</td><td>${x.h ? 'vs' : 'at'} ${esc(x.o)}</td><td>${x.r} ${x.sc}</td>${cols.map(c => `<td>${c[1](x.l)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : ''}
       ${p.why && p.why.length ? `<div class="glabel">Last offseason</div><p class="small">${esc(p.why.join(' · '))}</p>` : ''}
@@ -467,11 +473,33 @@
       const startersLeaving = (ut.depth[pos] || []).slice(0, DY.STARTERS[pos]).map(DY.P).filter(p => p && p.el <= 1);
       return { pos, n: ps.length, commits, need, by, leaving, startersLeaving, thin: ps.length + commits < need };
     });
+    const SLOT = { QB: ['QB1'], RB: ['RB1'], WR: ['X', 'Z', 'Slot'], TE: ['TE1'], OT: ['LT', 'RT'], IOL: ['LG', 'C', 'RG'], EDGE: ['Edge L', 'Edge R'], DT: ['3-tech', 'Nose'], LB: ['Mike', 'Will'], CB: ['CB1', 'CB2', 'Nickel'], S: ['FS', 'SS'], K: ['K'], P: ['P'] };
+    const offs = g.phase === 'offseason';
+    const proj = V.dproj != null ? V.dproj : offs;
+    const PJ = proj ? DY.projRoster() : null;
+    const D = pos => proj ? PJ.by[pos].map(x => x.p) : (ut.depth[pos] || []).map(DY.P).filter(Boolean).filter(x => !(x.inj && x.inj.wks > 0));
+    const isNew = p => proj && PJ.by[p.pos] && PJ.by[p.pos].some(x => x.p === p && x.nw);
+    const at = (pos, i) => { const p = D(pos)[i]; return p ? `<a href="#" data-pid="${p.id}" class="dy-sl ${isNew(p) ? 'nw' : ''}"><i>${SLOT[pos][i]}</i><b>${esc(DY.lastName(p))}</b><small>${p.ovr}${isNew(p) ? ' · new' : ''}</small></a>` : `<span class="dy-sl empty"><i>${SLOT[pos][i]}</i><b>—</b></span>`; };
+    const projBar = `<div class="dy-niltabs"><button data-dproj="0" aria-pressed="${!proj}">Current depth chart</button><button data-dproj="1" aria-pressed="${proj}">Projected ${g.season + 1}</button></div>${proj ? `<p class="small dim">Projected ${g.season + 1} roster: <b>${PJ.n}</b> players (limit ${DY.rosterMax()}). ${PJ.out} leaving or gone${PJ.inc ? `, ${PJ.inc} commits coming` : ''}. Updates as players decide to stay or go, transfers commit and recruits sign. Ratings are today's (before offseason growth).</p>` : ''}`;
+    const unit = V.dunit || 'off';
+    const UNITS = { off: ['QB', 'RB', 'WR', 'TE', 'OT', 'IOL'], def: ['EDGE', 'DT', 'LB', 'CB', 'S'], st: ['K', 'P'] };
+    const lineup = unit === 'off'
+      ? `<div class="dy-lu"><div class="dy-lu-row">${at('WR', 0)}${at('OT', 0)}${at('IOL', 0)}${at('IOL', 1)}${at('IOL', 2)}${at('OT', 1)}${at('TE', 0)}${at('WR', 1)}</div><div class="dy-lu-row">${at('WR', 2)}${at('QB', 0)}</div><div class="dy-lu-row">${at('RB', 0)}</div></div>`
+      : unit === 'def'
+      ? `<div class="dy-lu"><div class="dy-lu-row">${at('S', 0)}${at('S', 1)}</div><div class="dy-lu-row">${at('CB', 0)}${at('LB', 0)}${at('LB', 1)}${at('CB', 2)}${at('CB', 1)}</div><div class="dy-lu-row">${at('EDGE', 0)}${at('DT', 0)}${at('DT', 1)}${at('EDGE', 1)}</div></div>`
+      : `<div class="dy-lu"><div class="dy-lu-row">${at('K', 0)}${at('P', 0)}</div></div>`;
+    const ut2 = ut, risks = ut2.roster.map(DY.P).map(p => ({ p, c: DY.declareChance(p) })).filter(x => x.c >= 0.15).sort((a, b) => b.c - a.c);
+    const maxRaise = p => Math.max(0, Math.min(ut2.budget * 1.02 - DY.payroll(ut2), (p.nilV || DY.nilValue(p, ut2)) * 1.5));
+    const draftBox = risks.length ? `<div class="box"><div class="glabel">Draft watch: could leave early</div><p class="small dim">Juniors and older with NFL draft grades. If one declares, you get one pitch in the offseason; "even with a raise" is the best case with the biggest raise your budget allows today.</p>
+      <div class="dy-scroll"><table class="dyt"><thead><tr><th>Player</th><th>OVR</th><th>Projection</th><th>Chance he declares</th><th>Chance to keep him, even with a raise</th></tr></thead><tbody>${risks.map(({ p, c }) => { const keep = DY.persuadeChance(p, maxRaise(p)); return `<tr><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${ovrB(p.ovr)}</td><td>${DY.draftProj(p)}</td><td><span class="dy-risk ${c >= 0.5 ? 'high' : c >= 0.25 ? 'medium' : 'low'}">${Math.round(c * 100)}%</span></td><td><span class="dy-risk ${keep < 0.25 ? 'high' : keep < 0.45 ? 'medium' : 'low'}">${Math.round(keep * 100)}%</span></td></tr>`; }).join('')}</tbody></table></div></div>` : '';
     b.innerHTML = `<div class="box"><div class="glabel">Depth chart ${ut.depthEdited ? '<span class="chip">Custom</span>' : '<span class="chip">By overall</span>'} <button class="glink" data-act="autodepth">Reset by overall</button> <button class="glink" data-more="mv">${V.more.mv ? 'Done changing positions' : 'Change positions'}</button></div><p class="dim small">Starters are highlighted. Injured players are skipped on game day. Tap Change positions to move a player to another spot: natural moves keep most of his rating; out-of-position moves (a defensive lineman at safety) take a big hit.</p>
-      <div class="dy-depth">${Object.keys(DY.STARTERS).map(pos => `<div class="dy-dg"><h4>${NAMES[pos]}</h4><ol>${(ut.depth[pos] || []).map(DY.P).filter(Boolean).map((p, i, arr) => `<li class="${i < DY.STARTERS[pos] + (pos === 'CB' ? 1 : 0) ? 'st' : ''} ${p.inj && p.inj.wks > 0 ? 'inj' : ''}"><span class="dy-dn">${i + 1}</span><span class="dy-dname">${plink(p)} <small>${yrLabel(p)}${p.pos0 ? ' · from ' + p.pos0 : ''}</small></span>${ovrB(p.ovr)}<span class="dy-dmv"><button data-dmove="${pos}|${p.id}|-1" ${i === 0 ? 'disabled' : ''} aria-label="Move up">▲</button><button data-dmove="${pos}|${p.id}|1" ${i === arr.length - 1 ? 'disabled' : ''} aria-label="Move down">▼</button></span>${V.more.mv ? moveSel(p) : ''}</li>`).join('')}</ol></div>`).join('')}</div></div>
-      <div class="box"><div class="glabel">Next season preview · ${g.season + 1}</div>
+      <div class="dy-niltabs">${[['off', 'Offense'], ['def', 'Defense'], ['st', 'Special teams']].map(([k, l]) => `<button data-dunit="${k}" aria-pressed="${unit === k}">${l}</button>`).join('')}</div>
+      ${projBar}${lineup}
+      ${proj ? `<div class="dy-depth">${UNITS[unit].map(pos => `<div class="dy-dg"><h4>${NAMES[pos]}</h4><ol>${PJ.by[pos].map((x, i) => `<li class="${i < DY.STARTERS[pos] + (pos === 'CB' ? 1 : 0) ? 'st' : ''}"><span class="dy-dn">${SLOT[pos][i] || i + 1}</span><span class="dy-dname">${plink(x.p)} <small>${x.commit ? 'Commit' : yrLabel(x.p)}${x.nw && !x.commit ? ' · new' : ''}</small></span>${ovrB(x.p.ovr)}</li>`).join('') || '<li class="dim">Nobody yet</li>'}</ol></div>`).join('')}</div>` : ''}
+      <div class="dy-depth" ${proj ? 'hidden' : ''}>${UNITS[unit].map(pos => `<div class="dy-dg"><h4>${NAMES[pos]}</h4><ol>${(ut.depth[pos] || []).map(DY.P).filter(Boolean).map((p, i, arr) => `<li class="${i < DY.STARTERS[pos] + (pos === 'CB' ? 1 : 0) ? 'st' : ''} ${p.inj && p.inj.wks > 0 ? 'inj' : ''}"><span class="dy-dn">${SLOT[pos][i] || i + 1}</span><span class="dy-dname">${plink(p)} <small>${yrLabel(p)}${p.pos0 ? ' · from ' + p.pos0 : ''}</small></span>${ovrB(p.ovr)}<span class="dy-dmv"><button data-dmove="${pos}|${p.id}|-1" ${i === 0 ? 'disabled' : ''} aria-label="Move up">▲</button><button data-dmove="${pos}|${p.id}|1" ${i === arr.length - 1 ? 'disabled' : ''} aria-label="Move down">▼</button></span>${V.more.mv ? moveSel(p) : ''}</li>`).join('')}</ol></div>`).join('')}</div></div>
+      ${offs ? '' : `<div class="box"><div class="glabel">Next season preview · ${g.season + 1}</div>
         <p>Roster limit: <b>${DY.rosterMax()}</b>. Now: ${ut.roster.length}. Out of eligibility after this season: ${ut.roster.map(DY.P).filter(p => p.el <= 1).length}. Commits: ${g.recruit && !g.recruit.signed ? DY.myCommits().length : 0} (max ${DY.CAP.hs} high school signees and ${DY.CAP.tin} transfers, ${DY.CAP.newcomers} newcomers in all).</p>
-        <div class="dy-scroll"><table class="dyt"><thead><tr><th>Pos</th><th>Returning</th><th>So</th><th>Jr</th><th>Sr</th><th>5th</th><th>Commits</th><th>Losing</th><th></th></tr></thead><tbody>${next.map(r => `<tr class="${r.thin ? 'thin' : ''}"><td><b>${r.pos}</b></td><td>${r.n}</td>${r.by.map(x => `<td>${x || ''}</td>`).join('')}<td>${r.commits || ''}</td><td class="small">${r.leaving.length ? r.leaving.map(p => esc(DY.lastName(p))).join(', ') : ''}</td><td>${r.thin ? '<b class="dy-l">Thin</b>' : r.startersLeaving.length ? '<span class="dy-warn">Starter leaving</span>' : ''}</td></tr>`).join('')}</tbody></table></div></div>`;
+        <div class="dy-scroll"><table class="dyt"><thead><tr><th>Pos</th><th>Returning</th><th>So</th><th>Jr</th><th>Sr</th><th>5th</th><th>Commits</th><th>Losing</th><th></th></tr></thead><tbody>${next.map(r => `<tr class="${r.thin ? 'thin' : ''}"><td><b>${r.pos}</b></td><td>${r.n}</td>${r.by.map(x => `<td>${x || ''}</td>`).join('')}<td>${r.commits || ''}</td><td class="small">${r.leaving.length ? r.leaving.map(p => esc(DY.lastName(p))).join(', ') : ''}${risks.filter(x => x.p.pos === r.pos && x.c >= 0.25).map(x => `${r.leaving.length ? ', ' : ''}<i title="Could leave for the NFL">${esc(DY.lastName(x.p))} (NFL ${Math.round(x.c * 100)}%)</i>`).join('')}</td><td>${r.thin ? '<b class="dy-l">Thin</b>' : r.startersLeaving.length ? '<span class="dy-warn">Starter leaving</span>' : ''}</td></tr>`).join('')}</tbody></table></div></div>${draftBox}`}`;
   }
 
   /* ---------- recruiting ---------- */
@@ -549,7 +577,7 @@
     const g = G();
     const list = (rows, title, cfp) => `<div class="box"><div class="glabel">${title}</div><table class="dyt"><thead><tr><th>#</th><th>Team</th><th>Rec</th>${cfp ? '' : '<th class="hide-s">Pts</th>'}<th>Prev</th></tr></thead><tbody>${rows.map((x, i) => `<tr class="${x.t === g.user ? 'me' : ''}"><td>${i + 1}</td><td>${tlink(x.t, false)}${!cfp && x.fp ? ` <small class="dim">(${x.fp})</small>` : ''}</td><td>${T(x.t).w}-${T(x.t).l}</td>${cfp ? '' : `<td class="hide-s">${x.pts}</td>`}<td>${x.prev ? (x.prev > i + 1 ? `<span class="dy-w">▲${x.prev - i - 1}</span>` : x.prev < i + 1 ? `<span class="dy-l">▼${i + 1 - x.prev}</span>` : '—') : '<small>NR</small>'}</td></tr>`).join('')}</tbody></table></div>`;
     const others = g.teams.filter(t => !t.ap).sort((a, b) => DY.apKey(b) - DY.apKey(a)).slice(0, 8);
-    b.innerHTML = `<div class="dy-grid"><div class="dy-col">${list(g.polls.ap, 'AP Top 25')}<p class="small dim">Others receiving votes: ${others.map(t => esc(t.name) + ' ' + t.w + '-' + t.l).join(', ')}</p></div><div class="dy-col">${g.polls.cfp ? list(g.polls.cfp, `College Football Playoff rankings${g.polls.cfpWeek === 14 ? ' · final' : ' · after week ' + g.polls.cfpWeek}`, true) : `<div class="box"><div class="glabel">College Football Playoff rankings</div><p class="dim">The committee's first rankings come out the first Tuesday of November (after week ${DY.CFP_WEEKS[0]}).</p><p class="small">Playoff this season: ${DY.cfpSize()} teams${DY.cfpSize() === 24 ? ' (no conference title games; seeds 1-8 get byes, first and second rounds on campus)' : ' (seeds 1-4 get byes, first round on campus)'}.</p></div>`}</div></div>`;
+    b.innerHTML = `<div class="dy-grid"><div class="dy-col">${list(g.polls.ap, 'AP Top 25')}<p class="small dim">Others receiving votes: ${others.map(t => esc(t.name) + ' ' + t.w + '-' + t.l).join(', ')}</p></div><div class="dy-col">${g.polls.cfp ? list(g.polls.cfp, `College Football Playoff rankings${g.polls.cfpWeek === 14 ? ' · final' : ' · after week ' + g.polls.cfpWeek}`, true) : `<div class="box"><div class="glabel">College Football Playoff rankings</div><p class="dim">The committee's first rankings come out the first Tuesday of November (after week ${DY.CFP_WEEKS[0]}).</p><p class="small">Playoff this season: ${DY.cfpSize()} teams${DY.cfpSize() === 24 ? ' (no conference title games; seeds 1-8 get byes, first and second rounds on campus)' : DY.cfpSize() === 12 ? ' (seeds 1-4 get byes, first round on campus)' : DY.cfpSize() === 8 ? ' (the top eight; quarterfinals on campus)' : DY.cfpSize() === 4 ? ' (the top four; semifinals in New Year’s Six bowls)' : ' (No. 1 vs. No. 2 for the title)'}.</p></div>`}</div></div>`;
   }
   function standings(b) {
     const confs = Object.keys(DY.CONF_GAMES);
@@ -597,14 +625,24 @@
   }
 
   /* ---------- NIL ---------- */
+  // NIL filter tabs: at-risk players first, then every position
+  const NIL_TABS = [['risk', 'At risk'], ['all', 'All'], ['QB', 'QB'], ['RB', 'RB'], ['WR', 'WR'], ['TE', 'TE'], ['OT', 'OT'], ['IOL', 'IOL'], ['EDGE', 'EDGE'], ['DT', 'DT'], ['LB', 'LB'], ['CB', 'CB'], ['S', 'S'], ['ST', 'K/P/LS']];
+  function nilFilter(ps, asks) {
+    const f = V.nilf || 'risk', risky = p => (asks && asks[p.id]) || DY.nilRisk(p, p.nil || 0) >= 0.12;
+    const count = k => k === 'risk' ? ps.filter(risky).length : k === 'all' ? ps.length : k === 'ST' ? ps.filter(p => /^(K|P|LS)$/.test(p.pos)).length : ps.filter(p => p.pos === k).length;
+    const bar = `<div class="dy-niltabs" role="tablist">${NIL_TABS.map(([k, l]) => `<button data-nilf="${k}" aria-pressed="${f === k}">${l}<small>${count(k)}</small></button>`).join('')}</div>`;
+    const list = f === 'risk' ? ps.filter(risky).sort((a, b) => DY.nilRisk(b, b.nil || 0) - DY.nilRisk(a, a.nil || 0)) : f === 'all' ? ps : f === 'ST' ? ps.filter(p => /^(K|P|LS)$/.test(p.pos)) : ps.filter(p => p.pos === f);
+    return { bar, list, empty: f === 'risk' && !list.length ? '<p class="dim small">Nobody is at real risk of leaving over money right now.</p>' : '' };
+  }
   function nil(b) {
     const ut = DY.userT(), pay = DY.payroll(ut), ps = ut.roster.map(DY.P).sort((a, b) => (b.nil || 0) - (a.nil || 0));
     ps.forEach(p => { p.nilV = DY.nilValue(p, ut); });
+    const NF = nilFilter(ps, null);
     b.innerHTML = `<div class="box"><div class="glabel">NIL and revenue sharing</div>
       <div class="dy-stats4"><div><b>${DY.money(ut.budget)}</b><small>Budget</small></div><div><b>${DY.money(pay)}</b><small>Committed</small></div><div><b>${DY.money(Math.max(0, ut.budget - pay))}</b><small>Open</small></div><div><b>${ps.filter(p => p.nilV > (p.nil || 0) * 1.35).length}</b><small>Underpaid</small></div></div>
       <div class="dy-ab"><i style="width:${Math.min(100, pay / ut.budget * 100)}%"></i></div>
       <p class="small dim">Budgets combine the House settlement revenue-sharing cap (about $21.6M a school in 2026-27) and collective money; Tennessee's sits in the national top ten. Market values follow On3-style valuations: quarterbacks first, then edge rushers, receivers, tackles and corners. Contracts change in the offseason (NIL & budget stage).</p>
-      <div class="dy-scroll"><table class="dyt"><thead><tr><th>Player</th><th>Pos</th><th>OVR</th><th>Contract</th><th>Market value</th></tr></thead><tbody>${ps.map(p => `<tr><td>${plink(p)}</td><td>${p.pos}</td><td>${ovrB(p.ovr)}</td><td>${DY.money(p.nil || 0)}</td><td class="${p.nilV > (p.nil || 0) * 1.35 ? 'dy-l' : 'dim'}">${DY.money(p.nilV)}</td></tr>`).join('')}</tbody></table></div></div>`;
+      ${NF.bar}${NF.empty}<div class="dy-scroll"><table class="dyt"><thead><tr><th>Player</th><th>Pos</th><th>OVR</th><th>Contract</th><th>Market value</th><th>Risk</th></tr></thead><tbody>${NF.list.map(p => { const rk = DY.riskLabel(DY.nilRisk(p, p.nil || 0)); return `<tr><td>${plink(p)}</td><td>${p.pos}</td><td>${ovrB(p.ovr)}</td><td>${DY.money(p.nil || 0)}</td><td class="${p.nilV > (p.nil || 0) * 1.35 ? 'dy-l' : 'dim'}">${DY.money(p.nilV)}</td><td><span class="dy-risk ${rk.toLowerCase()}">${rk}</span></td></tr>`; }).join('')}</tbody></table></div></div>`;
   }
 
   /* ---------- history ---------- */
@@ -636,14 +674,14 @@
     b.innerHTML = `<div class="dy-grid"><div class="dy-col"><div class="box"><div class="glabel">Save</div>${[1, 2, 3].map(n => `<div class="dy-slotrow"><b>Slot ${n}</b> <span class="dim small">${m[n] ? esc(m[n].coach) + ' · ' + esc(m[n].label) : 'Empty'}</span> <button class="btn" data-slot="${n}">${g.slot === n ? 'Save here (current)' : 'Save here'}</button></div>`).join('')}
       <div class="grow"><button class="btn" data-act="export">Export save file</button><button class="btn" data-act="quit">Quit to menu</button></div><div class="gfield"><div class="glabel">Autosave after every week</div>${seg('autosave', [[true, 'On'], [false, 'Off']])}</div></div></div>
       <div class="dy-col"><div class="box"><div class="glabel">Options</div>
-      <div class="gfield"><div class="glabel">Offensive identity</div>${seg('offStyle', Object.entries(DY.STYLES).map(([k, st]) => [k, st.name]), ut.style)}</div>
+      <div class="gfield"><div class="glabel">Offensive identity</div>${seg('offStyle', DY.USER_STYLES.map(k => [k, DY.STYLES[k].name]), ut.style)}<p class="dim small">${esc((DY.STYLES[ut.style] || {}).desc || '')}</p>${''}</div>
       <div class="gfield"><div class="glabel">Play calling</div>${seg('coachMode', [['offense', 'Offense'], ['full', 'Offense + defense'], ['watch', 'Watch']])}</div>
       <div class="gfield"><div class="glabel">Season watch (sim my games)</div>${seg('watchSeason', [[false, 'Off'], [true, 'On']])}</div>
       <div class="gfield"><div class="glabel">Game speed</div>${seg('speed', [['slow', 'Slow'], ['fast', 'Fast']])}</div>
       <div class="gfield"><div class="glabel">Recruiting</div>${seg('recruiting', [['manual', 'Manual'], ['auto', 'Auto'], ['off', 'Off']])}</div>
       <div class="gfield"><div class="glabel">Transfer portal</div>${seg('portal', [['manual', 'Manual'], ['auto', 'Auto'], ['off', 'Off']])}</div>
       <div class="gfield"><div class="glabel">NIL raises</div>${seg('nil', [['manual', 'I decide'], ['auto', 'Auto']])}</div>
-      <div class="gfield"><div class="glabel">Playoff (from the next selection day)</div>${seg('cfp', [['real', 'Real format'], [12, '12 teams'], [24, '24 teams']])}</div>
+      <div class="gfield"><div class="glabel">Playoff (from the next selection day)</div>${seg('cfp', [['real', 'Real format'], [2, '2'], [4, '4'], [8, '8'], [12, '12'], [24, '24']])}</div>
       <div class="gfield"><div class="glabel">Difficulty</div>${seg('difficulty', [['freshman', 'Freshman'], ['varsity', 'Varsity'], ['heisman', 'Heisman']])}</div>
       <div class="gfield"><div class="glabel">Injuries</div>${seg('injuries', [[true, 'On'], [false, 'Off']])}</div>
       <div class="gfield"><div class="glabel">Screen shake</div>${seg('shake', [[true, 'On'], [false, 'Off']])}</div></div></div></div>`;
@@ -658,9 +696,10 @@
     else if (st === 'nil') {
       const ps = ut.roster.map(DY.P).sort((a, b) => (b.nil || 0) - (a.nil || 0));
       const asks = {}; o.nilAsk.forEach(a => { asks[a.id] = a; });
+      const NF = nilFilter(ps, asks);
       html = `<div class="box"><div class="glabel">NIL: contracts for ${g.season + 1}</div><div class="dy-stats4"><div><b>${DY.money(ut.budget)}</b><small>New budget</small></div><div><b>${DY.money(DY.payroll(ut))}</b><small>Committed</small></div><div><b>${DY.money(Math.max(0, ut.budget - DY.payroll(ut)))}</b><small>Open</small></div><div><b>${o.nilAsk.length}</b><small>Raise requests</small></div></div>
         <p class="small dim">Raise or lower any deal. Players paid well below their value (or cut when they did nothing wrong) may get unhappy and test the portal. Answer the raise requests or they are decided for you when you continue.</p>
-        <div class="dy-scroll"><table class="dyt dy-niltab"><thead><tr><th>Player</th><th>OVR</th><th>Value</th><th>Contract</th><th>Risk</th><th>Request</th></tr></thead><tbody>${ps.map(p => { const a = asks[p.id], risk = DY.nilRisk(p, p.nil); return `<tr class="${a ? 'me' : ''}"><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${ovrB(p.ovr)}</td><td class="small dy-nv">${DY.money(p.nilV || DY.nilValue(p, ut))}</td><td class="dy-nilc"><button class="dy-ra" data-nilstep="${p.id}|-1" aria-label="Lower">−</button><b>${DY.money(p.nil || 0)}</b><button class="dy-ra" data-nilstep="${p.id}|1" aria-label="Raise">+</button></td><td><span class="dy-risk ${DY.riskLabel(risk).toLowerCase()}">${DY.riskLabel(risk)}</span></td><td>${a ? `${DY.money(a.ask)} ${g.settings.nil === 'auto' ? '<small>Auto</small>' : `<button class="dy-ra ${a.ans === true ? 'on' : ''}" data-nilans="${a.id}|1">Pay</button><button class="dy-ra ${a.ans === false ? 'on' : ''}" data-nilans="${a.id}|0">No</button>`}` : ''}</td></tr>`; }).join('')}</tbody></table></div></div>`;
+        ${NF.bar}${NF.empty}<div class="dy-scroll"><table class="dyt dy-niltab"><thead><tr><th>Player</th><th>OVR</th><th>Value</th><th>Contract</th><th>Risk</th><th>Request</th></tr></thead><tbody>${NF.list.map(p => { const a = asks[p.id], risk = DY.nilRisk(p, p.nil); return `<tr class="${a ? 'me' : ''}"><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${ovrB(p.ovr)}</td><td class="small dy-nv">${DY.money(p.nilV || DY.nilValue(p, ut))}</td><td class="dy-nilc"><button class="dy-ra" data-nilstep="${p.id}|-1" aria-label="Lower">−</button><b>${DY.money(p.nil || 0)}</b><button class="dy-ra" data-nilstep="${p.id}|1" aria-label="Raise">+</button></td><td><span class="dy-risk ${DY.riskLabel(risk).toLowerCase()}">${DY.riskLabel(risk)}</span></td><td>${a ? `${DY.money(a.ask)} ${g.settings.nil === 'auto' ? '<small>Auto</small>' : `<button class="dy-ra ${a.ans === true ? 'on' : ''}" data-nilans="${a.id}|1">Pay</button><button class="dy-ra ${a.ans === false ? 'on' : ''}" data-nilans="${a.id}|0">No</button>`}` : ''}</td></tr>`; }).join('')}</tbody></table></div></div>`;
     } else if (st === 'portal') {
       const P = o.portal, mine = DY.portalPlayers().filter(p => p.portal.from === g.user), avail = DY.portalPlayers().filter(p => p.portal.from !== g.user);
       const pf = V.ppos, list = avail.filter(p => pf === 'ALL' || p.pos === pf).sort((a, b) => b.ovr - a.ovr).slice(0, V.more.portal ? 120 : 40);
@@ -702,7 +741,7 @@
         ${arr.map((x, i) => `<div class="dy-nc"><b>Game ${i + 1}</b><select data-nc="${i}|o">${groups.map(([l, ts]) => `<optgroup label="${l}">${ts.map(t => `<option value="${t.id}" ${t.id === x.o ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</optgroup>`).join('')}</select><select data-nc="${i}|home"><option value="1" ${x.home ? 'selected' : ''}>Home</option><option value="0" ${!x.home ? 'selected' : ''}>Away</option></select><select data-nc="${i}|wk">${[0, 1, 2, 3, 4, 5].map(w => `<option value="${w}" ${w === x.wk ? 'selected' : ''}>Week ${w}</option>`).join('')}</select></div>`).join('')}
         <div class="grow"><button class="btn" data-act="ncauto">Auto-generate</button></div>${new Set(arr.map(x => x.wk)).size < 3 ? '<p class="dy-l small">Two games are in the same week; pick different weeks (or they will be moved).</p>' : ''}</div>`;
     }
-    b.innerHTML = `${steps}${html}<div class="grow"><button class="btn primary big" data-act="main">${esc(primaryAction().label)}</button></div>`;
+    b.innerHTML = `${steps}${html}<div class="grow"><button class="btn primary big" data-act="main">${esc(primaryAction().label)}</button><button class="btn" data-goto="depth">Projected ${g.season + 1} depth chart</button></div>`;
   }
   function recapHtml() {
     const g = G(), o = g.off, ut = DY.userT(), h = g.hist[g.hist.length - 1], A = g.awards[g.season] || {};

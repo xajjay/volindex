@@ -400,6 +400,18 @@
     return d;
   };
   // re-sort a CPU depth chart by overall each week; the user's chart keeps its order (injured players skipped at game time)
+  // real Tennessee stats from before the dynasty (2023-25) go into each player's career line, so the record chase is real
+  DY.seedPast = g => {
+    const past = root.DY_PAST; if (!past || !g || g.pastSeeded) return;
+    const start = g.startSeason || 2026;
+    Object.values(g.P).forEach(p => {
+      if (!p || !p.real) return; const rows = past[p.n]; if (!rows) return;
+      p.car = p.car || {};
+      for (const y in rows) if (+y < start && !p.car[y]) p.car[y] = Object.assign({ t: 'TENN', real: true }, rows[y]);
+      const ys = Object.keys(rows).map(Number); if (ys.length) p.firstY = Math.min(p.firstY || 9999, ...ys);
+    });
+    g.pastSeeded = true;
+  };
   DY.refreshDepth = team => {
     const old = team.depth || {};
     for (const pos in DY.STARTERS) {

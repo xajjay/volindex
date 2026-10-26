@@ -41,7 +41,7 @@
     GM.planSet = !GM.user || GM.coach === 'watch';
     GM.cap = {};
     for (const s of ['h', 'a']) { const caps = GM.T[s].roster.map(DY.P).filter(p => p && p.captain); const lead = caps.length ? avg(caps.map(p => p.tr.lead)) : 70; GM.cap[s] = clamp((lead - 75) / 14, 0, 1.4); }
-    GM.wiped = null;
+    GM.wiped = null; GM.by = 26.67; GM.live = !!o.live;
     return GM;
   };
   DY.teamLine = () => ({ plays: 0, yds: 0, ry: 0, ra: 0, py: 0, pa: 0, pc: 0, fd: 0, pen: 0, peny: 0, to: 0, top: 0, c3: 0, a3: 0, c4: 0, a4: 0, sk: 0, pn: 0 });
@@ -90,6 +90,7 @@
   }
   const avg = a => a.reduce((s, x) => s + x, 0) / Math.max(1, a.length);
   DY.SENS = 0.6;
+  DY._E = E; DY._pers = (GM, s) => pers(GM, s);
 
   /* ---------- the CPU coordinators ---------- */
   function predPass(GM, offSide) {
@@ -111,11 +112,15 @@
       ? [['c2', 1.2], ['t2', 0.9], ['c4', 1.1], ['c1', 1], ['c1f', 0.6 * aggr * 2], ['c0', 0.25 * aggr * 2], ['c6', 0.8], ['c3', 0.7]]
       : pp < 0.4 ? [['bear', 1.1], ['c3b', 1.2], ['c1', 1.0], ['c1f', 0.5], ['c3', 0.6], ['c4', 0.35]]
         : [['c3', 1.2], ['c4', 0.9], ['c1', 0.9], ['c3b', 0.8], ['c2', 0.6], ['c1f', 0.5 * aggr * 2], ['c6', 0.6], ['bear', 0.35]];
-    if (GM.ball >= 90) opts.push(['c0', 0.6], ['bear', 0.6]);
+    if (GM.ball >= 90) opts.push(['c0', 0.6], ['bear', 0.6], ['gl', GM.ball >= 96 ? 1.6 : 0.4]);
+    if (pp > 0.55) opts.push(['zb', 0.45 * aggr * 2], ['ncb', 0.3 * aggr * 2], ['c2m', 0.6]);
+    else opts.push(['sfb', 0.25 * aggr * 2]);
     const d = wpick(opts, x => x[1])[0];
     const dirs = GM.tend[offSide].dir, tot = dirs.L + dirs.M + dirs.R;
     const lean = chance(0.55) ? wpick(['L', 'M', 'R'], x => dirs[x] / tot) : pick(['L', 'M', 'R']);
-    return { d, lean, read: repeat ? lc[lc.length - 1] : null };
+    // personnel: goal line inside the 3, dime on obvious passing downs
+    const pkg = d === 'gl' || (GM.ball >= 97 && GM.togo <= 3) ? 'goal' : (GM.down >= 3 && GM.togo >= 9) || d === 'prev' || d === 'dman' ? 'dime' : null;
+    return { d, lean, pkg, read: repeat ? lc[lc.length - 1] : null };
   };
   // modifiers from the game plan and halftime adjustments for one side
   const NOMOD = {};
@@ -173,19 +178,8 @@
     // spike to stop the clock
     if (two && GM.running && GM.to[s] === 0 && GM.clock <= 35 && GM.clock > 4 && GM.down < 4 && lead <= 0) return { k: 'spike' };
     if (GM.down === 4) {
-      const aggr = GM.aggr[s];
-      let go = false;
-      if (GM.q >= 5) go = true;
-      else if (late && lead < 0 && (lead < -3 || fgDist > range)) go = true;
-      else if (GM.q === 4 && GM.clock <= 120 && lead < 0) go = true;
-      else if (GM.togo <= 1 && GM.ball >= 35 && chance(0.45 + aggr * 0.4)) go = true;
-      else if (GM.togo <= 3 && GM.ball >= 55 && fgDist > range && chance(0.4 + aggr * 0.4)) go = true;
-      else if (GM.togo <= 5 && GM.ball >= 60 && GM.ball <= 68 && fgDist > range - 2 && chance(aggr * 0.6)) go = true;
-      if (late && lead > 0 && GM.ball < 60) go = false;
-      if (!go) {
-        if (fgDist <= range - 1 || (GM.ball >= 60 && fgDist <= range + 2)) return { k: 'fg' };
-        return { k: 'punt' };
-      }
+      const dec = DY.fourthDown(GM, s);
+      if (dec !== 'go') return { k: dec };
     }
     // tempo
     if ((GM.q === 4 && lead < 0 && GM.clock <= 420) || two && lead <= 7) out.tempo = 'hurry';
@@ -208,6 +202,10 @@
     pp += (MOD(GM, s).pass || 0);
     pp = clamp(pp, 0.08, 0.96);
     const st = GM.style[s];
+    // run-pass options for spread teams on early downs and short yardage
+    if ((st.rpo || 0) > 0 && GM.down <= 3 && GM.togo <= 10 && GM.ball < 95 && !two && chance(st.rpo * (GM.down === 3 ? 0.5 : 1))) {
+      return Object.assign(out, { k: 'rpo', t: 'rpo', dir: pick(['L', 'M', 'R']) });
+    }
     if (chance(pp) && !(st === DY.STYLES.option && chance(0.5))) {
       let w = { quick: 0.32, med: 0.30, deep: 0.15, screen: 0.10, pa: 0.13 };
       if (GM.down === 3 && GM.togo >= 7) w = { quick: 0.16, med: 0.46, deep: 0.26, screen: 0.08, pa: 0.04 };
@@ -221,11 +219,44 @@
       return Object.assign(out, { k: 'pass', t });
     }
     const qbRun = P.QB && P.QB.at.spd >= 80 ? 0.24 : P.QB && P.QB.at.spd >= 72 ? 0.1 : 0.03;
-    const t = wpick(['in', 'out', 'qb'], x => x === 'in' ? 0.56 : x === 'out' ? 0.30 : qbRun * (st === DY.STYLES.option ? 2.5 : 1));
+    const t = wpick(['in', 'out', 'qb'], x => x === 'in' ? 0.56 : x === 'out' ? 0.30 : qbRun * (st === DY.STYLES.option ? 2.5 : 1) + (st === DY.STYLES.option ? 0.5 : 0));
+    if (st === DY.STYLES.option) { const play = t === 'qb' ? pick(['Triple Option', 'Triple Option', 'Midline Option', 'Speed Option']) : t === 'in' ? pick(['Inside Zone', 'Trap', 'Counter']) : pick(['Rocket Toss', 'Toss Crack', 'Jet Sweep']); return Object.assign(out, { k: 'run', t, dir: pick(['L', 'R']), play }); }
     const ol = P.OL, side = { L: avg([ol[0].at.rbk, ol[1].at.rbk]), M: avg([ol[1].at.rbk, ol[2].at.rbk, ol[3].at.rbk]), R: avg([ol[3].at.rbk, ol[4].at.rbk, (P.TE ? P.TE.at.rbk : 50)]) };
     let dir = wpick(['L', 'M', 'R'], d => Math.pow(1.08, side[d] - 70) * (t === 'out' && d === 'M' ? 0 : 1));
     if (GM.ball >= 97 && t !== 'out') dir = chance(0.5) ? 'M' : dir;
     return Object.assign(out, { k: 'run', t, dir });
+  };
+  /* ---------- fourth down: expected points, then the scoreboard and the clock ---------- */
+  // expected points of a first down at a yard line (own goal line = 0)
+  DY.EP = b => clamp(-1.25 + b * 0.068 + Math.max(0, b - 80) * 0.035, -1.6, 6.3);
+  DY.convProb = (GM, s, togo) => {
+    const base = togo <= 10 ? [0, 0.73, 0.61, 0.54, 0.48, 0.43, 0.39, 0.35, 0.32, 0.29, 0.26][Math.max(1, togo)] : Math.max(0.1, 0.26 - (togo - 10) * 0.012);
+    const edge = (GM.ovr[s].off - GM.ovr[other(s)].def) * 0.008;
+    return clamp(base + edge + (GM.ball >= 95 ? -0.04 : 0), 0.05, 0.9);
+  };
+  DY.fourthDown = (GM, s) => {
+    const P = pers(GM, s), lead = GM.score[s] - GM.score[other(s)], late = GM.q === 4 && GM.clock <= 300;
+    const fgDist = 100 - GM.ball + 17, pFG = fgDist <= 70 ? DY.fgProb(GM, P.K, fgDist) : 0;
+    if (GM.q >= 5) return (GM.ot && GM.ot.needTD) || pFG < 0.35 || lead < -3 ? 'go' : (GM.togo <= 1 && chance(0.4) ? 'go' : 'fg');
+    const p = DY.convProb(GM, s, GM.togo), EP = DY.EP;
+    const kick = -EP(25);                         // the other team's drive after a kickoff
+    const evGo = p * EP(Math.min(99, GM.ball + GM.togo + 1.5)) + (1 - p) * -EP(100 - GM.ball);
+    const net = clamp(39 + ((P.P ? P.P.at.kpw : 65) - 70) * 0.3, 30, 46);
+    const evPunt = 100 - GM.ball <= 38 ? -EP(20) : -EP(100 - Math.min(GM.ball + net, 90));
+    const evFG = fgDist <= 70 ? pFG * (3 + kick) + (1 - pFG) * -EP(100 - Math.max(20, GM.ball - 7)) : -99;
+    let go = evGo + (GM.aggr[s] - 0.55) * 0.8, punt = evPunt, fg = evFG;
+    // the scoreboard and the clock change everything late
+    const rem = GM.q === 4 ? GM.clock : GM.q === 3 ? GM.clock + 900 : 9999;
+    if (rem <= 420 && lead < 0) {
+      const needTD = lead < -3, poss = Math.ceil(rem / 150);
+      if (needTD || rem <= 120) { punt -= 1.5 + (420 - rem) / 120; if (needTD) fg -= 2 + (420 - rem) / 100; }
+      if (-lead > 8 * Math.max(1, poss - 1)) { go += 3; }
+    }
+    if (rem <= 300 && lead > 0) { go -= 0.6 + (lead <= 3 ? 0.3 : 0); if (GM.ball < 50) go -= 1.5; }
+    if (GM.q === 2 && GM.clock <= 25) { fg += pFG > 0.3 ? 1 : 0; }
+    if (late && lead < 0 && GM.clock <= 120) { if (lead >= -3 && pFG >= 0.35) fg += 2; }
+    const best = Math.max(go, punt, fg);
+    return best === go ? 'go' : best === fg ? 'fg' : 'punt';
   };
   DY.aiPat = (GM, s) => {
     const lead = GM.score[s] - GM.score[other(s)];
@@ -318,6 +349,11 @@
     let ret = 0, td = false, fumble = false, tb = false, fc = false;
     if (land <= 0 && chance(0.82)) tb = true;
     else if (land > 0 && land <= 25 && chance(0.35)) fc = true;
+    else if (GM.live && DY.SIM && KR) {
+      const sim = DY.SIM.returnPlay(GM, rs, { kind: 'kick', land: Math.max(1, land), hang: 3.6, returner: KR });
+      ret = sim.ret; td = sim.td; fumble = sim.fum && chance(0.5); GM.liveRet = sim;
+      if (sim.tackler) add(GM, sim.tackler, 'tk');
+    }
     else {
       const rv = KR ? (E(GM, KR, 'spd', rs) * 0.45 + E(GM, KR, 'acc', rs) * 0.2 + E(GM, KR, 'elu', rs) * 0.35) : 60;
       ret = clamp(21 + (rv - 75) / 3.2 + gauss() * 7, 4, 45);
@@ -337,6 +373,8 @@
     }
     GM.running = false;
     anim = { kind: 'kick', from, land, end: td ? 100 : ball, tb, fc, ret, kicking: ks };
+    if (GM.liveRet) { anim.trk = GM.liveRet.trk; GM.liveRet = null; }
+    GM.by = 26.67;
     if (fumble && !td) {
       const rec = chance(0.5);
       text += ` FUMBLE on the return!${rec ? ' ' + GM.T[ks].name + ' recovers!' : ' ' + GM.T[rs].name + ' falls on it.'}`;
@@ -407,10 +445,13 @@
     let toText = '';
     const callTO = side => { if (GM.to[side] > 0 && GM.running) { GM.to[side]--; GM.running = false; toText += `Timeout, ${GM.T[side].name} (${GM.to[side]} left). `; return true; } return false; };
     if (uc.timeout && GM.user) callTO(GM.user);
+    GM.lastRunoff = null;
+    GM.puntRush = GM.user === d && GM.coach === 'full' && uc.dcall && uc.dcall.st === 'block' ? d : null;
     cpuTimeouts(GM, callTO);
     // play clock runoff
     if (GM.running && GM.q <= 4) {
       const ro = tempoSecs(GM, s, GM.user === s ? uc.call : null);
+      GM.lastRunoff = ro;
       if (ro >= GM.clock) { GM.ts[s].top += GM.clock; GM.clock = 0; return endQuarter(GM, toText); }
       GM.clock -= ro; GM.ts[s].top += ro;
     }
@@ -421,7 +462,7 @@
     const ocall = (GM.user === s && GM.coach !== 'watch' && uc.call) ? uc.call : DY.aiOff(GM, s);
     if (GM.user === s && ocall.tempo) { GM.hurry[s] = ocall.tempo === 'hurry'; GM.chew[s] = ocall.tempo === 'chew'; }
     else if (GM.user !== s) { GM.hurry[s] = ocall.tempo === 'hurry'; GM.chew[s] = ocall.tempo === 'chew'; }
-    let dcall = (GM.user === d && GM.coach === 'full' && uc.dcall) ? resolveDcall(uc.dcall) : DY.aiDef(GM, d);
+    let dcall = (GM.user === d && GM.coach === 'full' && uc.dcall) ? resolveDcall(uc.dcall, GM) : DY.aiDef(GM, d);
     if (GM.ot && GM.ot.shootout && ocall.k !== 'run' && ocall.k !== 'pass') { ocall.k = 'pass'; ocall.t = 'quick'; }
     GM.dtend[d][dcall.dgroup || dcall.d] = (GM.dtend[d][dcall.dgroup || dcall.d] || 0) + 1;
     if (dcall.d === 'c0' || dcall.d === 'c1f') GM.dtend[d].blitz = (GM.dtend[d].blitz || 0) + 1;
@@ -441,9 +482,22 @@
     }
     return applyResult(GM, s, r, { ocall, dcall, startBall, startDown, startTogo, startQ, startClock, toText });
   }
-  function resolveDcall(g) {
-    const grp = DY.DCALLS[g] || DY.DCALLS.bal;
-    return { d: pick(grp.keys), lean: pick(['L', 'M', 'R']), dgroup: g };
+  // your defensive call: a group (the staff picks the package) or a specific package
+  function resolveDcall(g, GM) {
+    const key = typeof g === 'string' ? g : g.g, item = typeof g === 'object' && g.k ? g.k : null;
+    const P = DY.DPKG[key];
+    if (P) {
+      let it = item ? P.items.find(x => x.k === item) : null;
+      if (!it) {
+        // auto: fit the down and distance
+        const long = GM && GM.down >= 3 && GM.togo >= 7, short = GM && GM.togo <= 2, goal = GM && GM.ball >= 96;
+        const pool = P.items.filter(x => (x.pkg !== 'goal' || goal || short) && !(key === 'man' && x.d === 'c0' && !short && !goal));
+        it = pool.length ? (long && key === 'zone' ? pool.find(x => x.d === 'c4') || pick(pool) : pick(pool)) : P.items[0];
+      }
+      return { d: it.d, pkg: it.pkg || (GM && GM.down >= 3 && GM.togo >= 9 && key !== 'run' ? 'dime' : null), lean: pick(['L', 'M', 'R']), dgroup: key, dname: it.name };
+    }
+    const grp = DY.DCALLS[key] || DY.DCALLS.bal;
+    return { d: pick(grp.keys), lean: pick(['L', 'M', 'R']), dgroup: key };
   }
   function cpuTimeouts(GM, callTO) {
     if (!GM.running || GM.q > 4) return;
@@ -494,12 +548,27 @@
     const d = other(s), O = pers(GM, s), D = pers(GM, d), def = DY.DEFS[dc.d] || DY.DEFS.c3;
     markSnap(GM, O); markDef(GM, D);
     const read = dc.read && dc.read === call.k + (call.t || '') + (call.dir || '') ? 1 : 0;
+    if (call.k === 'rpo') call.t = 'rpo';
     const fk = call.f && DY.FORMS[call.f] ? call.f : DY.aiForm(GM, s, call);
     const F = DY.FORMS[fk], book = DY.BOOK[call.t] || DY.BOOK.in;
     const pl = (call.play && book.find(b => b.n === call.play)) || pick(book);
+    // a live game on screen: the 22-man simulation plays the snap
+    if (GM.live && DY.SIM && (call.k === 'run' || call.k === 'pass' || call.k === 'rpo')) {
+      let pm0 = pl.beats.includes(dc.d) ? 1 : pl.weak.includes(dc.d) ? -1 : 0;
+      if (pl.counter && dc.lean && dc.lean === call.dir) pm0 = 1.2;
+      const ctx0 = { F, fk, pl, pname: pl.n, pm: pm0, dp: DY.DPERS[dc.pkg || F.dpers] || DY.DPERS.nickel, mo: MOD(GM, s), md: MOD(GM, d) };
+      if (call.k === 'rpo') call.run = pl.run || 'Inside Zone';
+      const r = DY.SIM.play(GM, s, O, D, call, dc, def, ctx0);
+      r.play = pl.n + (call.k === 'run' && call.dir ? ' ' + { L: 'Left', M: 'Middle', R: 'Right' }[call.dir] : ''); r.form = F.name; r.cov = def.name + ' · ' + ctx0.dp.name; r.call = call; r.dcall = dc; r.pm = pm0;
+      r.anim = Object.assign(r.anim || {}, { f: fk });
+      if (pm0 > 0 && chance(0.3)) r.events.push(`${pl.n} was the right call against ${def.name}.`);
+      return r;
+    }
+    // the fast model: an RPO is a run or a quick throw depending on the box
+    if (call.k === 'rpo') { const heavy = def.box >= 0.8; call = Object.assign({}, call, heavy ? { k: 'pass', t: 'quick' } : { k: 'run', t: 'in', dir: call.dir || 'M' }); }
     let pm = pl.beats.includes(dc.d) ? 1 : pl.weak.includes(dc.d) ? -1 : 0;
     if (pl.counter && dc.lean && dc.lean === call.dir) pm = 1.2;
-    const ctx = { F, fk, pl, pm, dp: DY.DPERS[F.dpers], mo: MOD(GM, s), md: MOD(GM, d) };
+    const ctx = { F, fk, pl, pm, dp: DY.DPERS[dc.pkg || F.dpers] || DY.DPERS.nickel, mo: MOD(GM, s), md: MOD(GM, d) };
     const playName = pl.n + (call.k === 'run' && call.dir ? ' ' + { L: 'Left', M: 'Middle', R: 'Right' }[call.dir] : '');
     const r = call.k === 'run' ? runPlay(GM, s, O, D, call, dc, def, read, ctx) : passPlay(GM, s, O, D, call, dc, def, read, ctx);
     r.play = playName; r.form = F.name; r.cov = def.name + ' · ' + ctx.dp.name; r.call = call; r.dcall = dc; r.pm = pm;
@@ -572,7 +641,7 @@
       { p: O.WR[1], role: 'WR2', cov: D.CB[1], depth: t === 'deep' ? 'd' : t === 'quick' ? 's' : 'm', w: 1.0 },
       { p: O.WR[2], role: 'WR3', cov: D.NB, depth: t === 'quick' ? 's' : t === 'deep' ? 'm' : t === 'pa' ? 'm' : 'm', w: 0.95 },
       { p: O.TE, role: 'TE', cov: D.LB[0], depth: t === 'quick' ? 's' : 'm', w: 0.75 },
-      { p: O.RB, role: 'RB', cov: D.LB[1], depth: 's', w: t === 'deep' || t === 'pa' ? 0.25 : 0.5 },
+      { p: O.RB, role: 'RB', cov: D.LB[1], depth: 's', w: t === 'deep' || t === 'pa' ? 0.16 : 0.3 },
     ] : [];
     // personnel changes who is out on routes
     if (F.wr < 3) { routes.splice(2, 1); if (F.te >= 2) routes.push({ p: O.TE2, role: 'TE2', cov: D.S[1], depth: deepish ? 'm' : 's', w: 0.7 }); }
@@ -593,7 +662,7 @@
       if (rt.depth === 'd') sep -= def.deep * 0.62; else if (rt.depth === 's') sep -= def.short * 0.5; else sep -= (def.short + def.deep) * 0.22;
       if (rt.depth === 'd' && man && p.at.spd > c.at.spd + 3) sep += 0.45;
       if (def.blitz && rt.depth !== 'd') sep += 0.35;
-      if (rt.role === 'RB' || rt.role === 'FB') sep += 0.9;
+      if (rt.role === 'RB' || rt.role === 'FB') sep += 0.35;
       // the play call against the coverage, personnel, the plan, and a compressed red zone
       sep += ctx.pm * 0.45 + F.sep + (ctx.mo.sep || 0) + (rt.depth === 's' ? (ctx.mo.sepS || 0) - (ctx.md.short || 0) * 0.4 : 0) + (rt.depth === 'd' ? (ctx.mo.sepD || 0) - (ctx.md.deep || 0) * 0.5 : 0) - ctx.dp.cov;
       if (t === 'pa') sep += (F.pa || 0) * 0.5 + (ctx.mo.pa || 0);
@@ -722,7 +791,8 @@
   /* ---------- kicks from scrimmage ---------- */
   function punt(GM, s) {
     const P = pers(GM, s), R = pers(GM, other(s)), pt = P.P, pr = R.PR;
-    if (chance(0.006)) return { kind: 'puntblk', yards: 0, text: `PUNT BLOCKED! ${GM.T[other(s)].name} gets it at the ${DY.spotName(GM, s, GM.ball)}!`, time: 4, anim: { kind: 'punt', blocked: true }, punter: pt };
+    const rush = GM.puntRush === other(s);
+    if (chance(rush ? 0.035 : 0.006)) return { kind: 'puntblk', yards: 0, text: `PUNT BLOCKED! ${GM.T[other(s)].name} gets it at the ${DY.spotName(GM, s, GM.ball)}!`, time: 4, anim: { kind: 'punt', blocked: true }, punter: pt };
     const gross = clamp(39 + ((pt ? pt.at.kpw : 60) - 62) * 0.33 + gauss() * 5, 22, 66);
     let land = GM.ball + gross; // from the punting team's view
     const result = { kind: 'punt', punter: pt, gross: Math.round(gross), time: 5, events: [] };
@@ -731,8 +801,11 @@
       // aim inside the 20 near midfield
       if (GM.ball >= 50 && land > 94 && chance(0.5 + ((pt ? pt.at.kac : 60) - 70) / 80)) land = rr(88, 97);
       const recv = 100 - land;
-      let ret = 0, fc = chance(recv <= 12 ? 0.75 : 0.36), muff = !fc && chance(0.014), td = false;
-      if (!fc && !muff) { ret = clamp(7 + ((pr ? pr.at.agi + pr.at.spd : 150) - 160) / 6 + gauss() * 6, -2, 40); if (chance(0.006)) { td = true; } }
+      let ret = 0, fc = chance((recv <= 12 ? 0.75 : 0.36) + (rush ? 0.2 : 0)), muff = !fc && chance(0.014), td = false;
+      let liveR = null;
+      if (!fc && !muff && GM.live && DY.SIM && pr) { liveR = DY.SIM.returnPlay(GM, other(s), { kind: 'punt', land: Math.max(1, recv), hang: 4.2, returner: pr }); ret = liveR.ret; td = liveR.td; if (liveR.tackler) add(GM, liveR.tackler, 'tk'); result.trk = liveR.trk; }
+      else if (!fc && !muff) { ret = clamp(7 + ((pr ? pr.at.agi + pr.at.spd : 150) - 160) / 6 + gauss() * 6, -2, 40); if (chance(0.006)) { td = true; } }
+      if (rush && !td) ret = Math.round(ret * 0.55);
       add(GM, pt, 'pn'); add(GM, pt, 'pny', Math.round(gross)); if (recv <= 20) add(GM, pt, 'i20');
       result.text = `${last(pt)} punts ${Math.round(gross)} yards to the ${DY.spotName(GM, other(s), Math.round(recv))}. ` + (fc ? `Fair catch by ${last(pr)}.` : muff ? `MUFFED by ${last(pr)}! ` : td ? `${last(pr)} takes it back... TOUCHDOWN!` : `${last(pr)} returns ${Math.round(ret)} yards.`);
       if (!fc && !muff && !td) { add(GM, pr, 'pr'); add(GM, pr, 'pry', Math.round(ret)); }
@@ -741,7 +814,8 @@
       if (td) add(GM, pr, 'rttd');
       result.time = Math.round(6 + ret / 8);
     }
-    result.anim = { kind: 'punt', gross: result.gross, land: Math.min(100, Math.round(GM.ball + gross)), ret: result.net };
+    result.anim = { kind: 'punt', gross: result.gross, land: Math.min(100, Math.round(GM.ball + gross)), ret: result.net, trk: result.trk || null, fc: !!(result.text && /Fair catch/.test(result.text)) };
+    delete result.trk;
     return result;
   }
   function fieldGoal(GM, s) {
@@ -794,8 +868,10 @@
         if (r.kind === 'run') { add(GM, r.carrier, 'ra'); add(GM, r.carrier, 'ry', y); maxs(GM, r.carrier, 'rlg', y); T.ra++; T.ry += y; }
         if (r.kind === 'pass') { add(GM, r.passer, 'pa'); add(GM, r.passer, 'pc'); add(GM, r.passer, 'py', y); add(GM, r.target, 'rc'); add(GM, r.target, 'rcy', y); maxs(GM, r.target, 'rclg', y); T.pa++; T.pc++; T.py += y; }
         if (r.kind === 'inc' || r.kind === 'int' || r.kind === 'dpi') { add(GM, r.passer, 'pa'); T.pa++; }
+        if (r.sim && r.target && (r.kind === 'pass' || r.kind === 'inc' || r.kind === 'int')) add(GM, r.target, 'tg');
         if (r.kind === 'sack') { add(GM, r.passer, 'sk'); add(GM, r.sackBy, 'sck'); add(GM, r.sackBy, 'tk'); add(GM, r.sackBy, 'tfl'); T.sk++; T.py += y; }
         if (r.tackler && (r.kind === 'run' || r.kind === 'pass') && !r.fum) { add(GM, r.tackler, 'tk'); if (y < 0) add(GM, r.tackler, 'tfl'); }
+        if (r.ast && (r.kind === 'run' || r.kind === 'pass' || r.kind === 'sack') && !r.fum) add(GM, r.ast, 'tk');
         // post-play penalties
         let pen = null;
         if (r.kind === 'run' || r.kind === 'pass') pen = postPenalty(GM, s, r, y);
@@ -827,7 +903,7 @@
             add(GM, r.defender, 'int'); add(GM, r.passer, 'pi'); T.to++;
             const caughtAt = clamp(GM.ball + (r.anim.air || 10), 1, 109);
             let nb = 100 - Math.min(99, caughtAt);
-            if (caughtAt >= 100 && r.ret < 999 && chance(0.6)) { nb = 20; text = `${r.text0} in the end zone. Touchback.`; }
+            if (r.sim ? r.intTB : (caughtAt >= 100 && r.ret < 999 && chance(0.6))) { nb = 20; text = `${r.text0} in the end zone. Touchback.`; }
             else if (r.pick6) { text = `${r.text0} — and he is GONE! PICK-SIX!`; }
             else { nb = clamp(nb + r.ret, 1, 99); text = `${r.text0}, returned ${r.ret} yards to the ${DY.spotName(GM, d, nb)}.`; }
             endDrive(GM, 'INT'); changePoss(GM, nb, 'interception'); turnover = true; swing(GM, d, 0.45); tag = r.pick6 ? 'PICK-SIX' : 'INTERCEPTED'; big = true; stop = true;
@@ -890,6 +966,12 @@
       const pool = [r.carrier, r.target, r.tackler, r.passer].filter(Boolean);
       pool.forEach(p => { if (chance(0.0019 * (1 + (60 - p.tr.tough) / 80))) injure(GM, p, ev); });
     }
+    // where the ball is spotted across the field (between the hashes)
+    if (r.kind === 'run' || r.kind === 'pass' || r.kind === 'sack' || r.kind === 'int') {
+      if (r.sim && r.endL != null) GM.by = clamp(GM.by + r.endL * (s === 'h' ? 1 : -1), 20, 33.33);
+      else if (r.kind !== 'sack') GM.by = clamp(GM.by + gauss() * 5, 20, 33.33);
+    }
+    if (turnover || td || r.kind === 'punt' || r.kind === 'fg') { if (r.kind !== 'int' && r.kind !== 'run' && r.kind !== 'pass') GM.by = clamp(26.67 + gauss() * 3.5, 20, 33.33); }
     if (!stop && !td && !turnover && !safety) GM.running = true; else GM.running = false;
     if (GM.oobRestart) { GM.running = true; GM.oobRestart = false; GM.clock = Math.min(GM.clock + 0, GM.clock); }
     if (r.kind === 'spike' || r.kind === 'inc') GM.running = false;
@@ -922,7 +1004,8 @@
   function endDrivePrev(GM, why) { const dr = GM.drives[GM.drives.length - 2]; if (dr && !dr.res) dr.res = why; }
   function postPenalty(GM, s, r, y) {
     const O = pers(GM, s), D = pers(GM, other(s));
-    const hold = 0.022 + (r.kind === 'run' && y <= 0 ? 0.035 : 0) + (r.kind === 'pass' && r.pressured ? 0.03 : 0);
+    if (r.sim && r.flagHold) { const h = r.flagHold; add(GM, h, 'pen'); return { on: s, text: `holding on #${h.num} ${last(h)} brings it back. 10 yards, replay the down.` }; }
+    const hold = r.sim ? 0 : 0.022 + (r.kind === 'run' && y <= 0 ? 0.035 : 0) + (r.kind === 'pass' && r.pressured ? 0.03 : 0);
     if (chance(hold)) {
       const h = weighted(O.OL, p => 110 - p.tr.disc); add(GM, h, 'pen');
       return { on: s, text: `holding on #${h.num} ${last(h)} brings it back. 10 yards, replay the down.` };

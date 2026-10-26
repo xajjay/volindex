@@ -168,14 +168,20 @@
         p.visited = true;
       }
       p.acts = {};
-      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + DY.fitScore(ut, p)) * (p.offer ? 1 : 0.55);
+      // fairness: stacking everything on one kid has diminishing returns, fit matters, and a crowded position room scares off players who want to play
+      const atPos = DY.myCommits().filter(x => x.pos === p.pos && x !== p).length, room = Math.max(2, Math.round((DY.STARTERS[p.pos] || 1) * 1.5));
+      const crowd = atPos >= room ? (p.pref.top.includes('pt') ? 0.65 : 0.88) : 1;
+      pts = 140 * (1 - Math.exp(-pts / 140));
+      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + DY.fitScore(ut, p)) * (p.offer ? 1 : 0.55) * crowd;
     });
     // everyone else
     Object.values(R.pool).forEach(p => {
       if (p.commit && p.firm) return;
       for (const tid in p.interest) {
         const t = g.teams[tid]; if (t.user) continue;
-        p.interest[tid] += (6 + t.prestige / 9) * (0.45 + DY.fitScore(t, p)) * rr(0.3, 1.5) * (p.rec.stars >= 4 ? 1 : 0.9);
+        // blue-bloods go hardest after the elite kids
+        const heat = p.rec.stars >= 5 ? 1.12 + Math.max(0, t.prestige - 82) / 80 : p.rec.stars === 4 ? 1.04 + Math.max(0, t.prestige - 82) / 150 : 0.9;
+        p.interest[tid] += (6 + t.prestige / 9) * (0.45 + DY.fitScore(t, p)) * rr(0.35, 1.5) * heat;
       }
       // commits
       const order = Object.entries(p.interest).sort((a, b) => b[1] - a[1]);
@@ -183,7 +189,9 @@
       const [lead, lv] = order[0], second = order[1] ? order[1][1] : 0;
       // the bar to commit drops as the season goes (most of a class is done by the early signing period)
       const need = (140 + p.rec.stars * 15 + (w <= 4 ? 40 : 0)) * (1 - Math.min(w, 14) / 24);
-      if (!p.commit && lv >= need && lv >= second * (w >= 10 ? 1.08 : 1.2) && (!g.teams[lead].user || (p.offer && !full))) {
+      // four- and five-stars want to see campus (an official visit) before they commit to you
+      const visitOk = p.rec.stars < 4 || p.visited || w >= (p.rec.stars >= 5 ? 12 : 8);
+      if (!p.commit && lv >= need && lv >= second * (w >= 10 ? 1.08 : 1.2) && (!g.teams[lead].user || (p.offer && !full && visitOk))) {
         p.commit = +lead;
         if (g.teams[lead].user) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos} from ${p.home}, commits to Tennessee!`); DY.news('commit', `${p.rec.stars}-star ${DY.POS_NAME[p.pos].toLowerCase()} ${p.n} commits to Tennessee`, `No. ${p.rec.nat} nationally (${p.rec.c.toFixed(4)} composite). ${p.home}, ${p.hs}.`, { rid: p.id }); }
         else if (p.rec.nat <= 50 && R.board.includes(p.id)) logs.push(`${p.n} (No. ${p.rec.nat}) commits to ${g.teams[lead].name}.`);
@@ -279,6 +287,24 @@
     if (ok) { p.leave = null; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); DY.addLog(p, `Returned for another season (NIL now ${DY.money(p.nil)}).`); DY.news('nil', `${p.n} is coming back to Tennessee`, `He had declared for the NFL Draft.`, { pid: p.id }); }
     return ok ? `${p.n} is coming back!` : `${p.n} is staying in the draft.`;
   };
+  // in-season look ahead: how likely a junior or older is to leave early for the NFL
+  DY.declareChance = p => {
+    if (!p || p.el <= 1 || p.yr < 3) return 0;
+    const dg = DY.draftGrade(p), pr = dg >= 91 ? 0.85 : dg >= 87 ? 0.55 : dg >= 84 ? 0.2 : dg >= 81 ? 0.05 : 0;
+    return Math.min(0.95, pr * (p.tr.ego > 75 ? 1.15 : 1) * (p.tr.loyal > 85 ? 0.7 : 1));
+  };
+  DY.draftProj = p => { const dg = DY.draftGrade(p); return dg >= 91 ? 'Round 1' : dg >= 87 ? 'Rounds 1-2' : dg >= 84 ? 'Rounds 2-3' : 'Day 3'; };
+  // the projected roster for next season at any point of the offseason: who is still here, who is coming
+  DY.projRoster = () => {
+    const g = G(), ut = DY.userT(), o = g.off || {}, cut = new Set(o.cut || []);
+    const inSeason = g.phase !== 'offseason';
+    const stay = ut.roster.map(DY.P).filter(p => p && !p.leave && !(p.portal && p.portal.from === ut.id) && !cut.has(p.id) && !(inSeason && p.el <= 1));
+    const inc = g.recruit && !g.recruit.signed ? DY.myCommits() : [];
+    const all = stay.map(p => ({ p, nw: !!(p.tin === g.season || (p.firstY && p.firstY > g.season)) })).concat(inc.map(p => ({ p, nw: true, commit: true })));
+    const by = {};
+    Object.keys(DY.STARTERS).forEach(pos => { by[pos] = all.filter(x => x.p.pos === pos).sort((a, b) => b.p.ovr - a.p.ovr); });
+    return { by, n: all.length, out: ut.roster.length - stay.length, inc: inc.length };
+  };
   DY.persuadeChance = (p, raise) => { const dg = p.dg || DY.draftGrade(p); return clamp(0.55 - (dg - 82) * 0.06 + (p.tr.loyal - 60) / 140 + (raise || 0) / Math.max(100000, p.nilV || DY.nilValue(p, DY.userT())) * 0.3, 0.02, 0.85); };
   DY.offNext = () => {
     const g = G(), o = g.off, i = DY.OFF_ORDER.indexOf(o.stage);
@@ -328,13 +354,13 @@
   DY.answerNil = (id, yes) => { const a = G().off.nilAsk.find(x => x.id === id); if (a) a.ans = yes; };
   // how likely a player is to be unhappy (and test the portal) at a given salary
   DY.nilRisk = (p, amt) => {
-    const v = p.nilV || DY.nilValue(p, DY.userT()), r = amt / Math.max(10000, v);
+    const v = p.nilV || DY.nilValue(p, DY.userT()), r = amt / Math.max(1000, v);
     let risk = r >= 1 ? 0.03 : r >= 0.85 ? 0.12 : r >= 0.65 ? 0.3 : 0.55;
     if (amt < (p.nil0 != null ? p.nil0 : p.nil)) risk += 0.2;
     risk *= 1 + (p.tr.ego - 60) / 120; risk *= 1 - (p.tr.loyal - 60) / 160;
     return clamp(risk, 0.01, 0.9);
   };
-  DY.riskLabel = r => r < 0.1 ? 'Low' : r < 0.3 ? 'Medium' : 'High';
+  DY.riskLabel = r => r < 0.05 ? 'None' : r < 0.12 ? 'Low' : r < 0.3 ? 'Medium' : 'High';
   DY.adjustNil = (id, amt) => {
     const g = G(), p = DY.P(id), ut = DY.userT();
     amt = Math.max(0, Math.round(amt / 5000) * 5000);
@@ -420,7 +446,7 @@
           if (t.user || t.id === p.portal.from) return;
           if (chance(0.03 * Math.pow(t.prestige / 70, 2) * (p.ovr >= 80 ? 3 : 1))) {
             const L = DY.lineup(t), cur = (L[p.pos] || [])[0];
-            if (!cur || p.ovr > cur.ovr - 2) p.portal.offers[t.id] = Math.round(DY.nilValue(p, t) * rr(0.6, 1.2) / 5000) * 5000;
+            if (!cur || p.ovr > cur.ovr - 2) p.portal.offers[t.id] = Math.round(DY.nilValue(p, t) * (p.ovr >= 84 && t.prestige >= 80 ? rr(0.85, 1.4) : rr(0.6, 1.2)) / 5000) * 5000;
           }
         });
         if (P.mine[id] != null && g.settings.portal !== 'off') p.portal.offers[ut.id] = P.mine[id];
@@ -428,7 +454,8 @@
       left.forEach(id => {
         const p = DY.P(id), offers = Object.entries(p.portal.offers);
         if (!offers.length) { p.portal.round++; return; }
-        const val = ([tid, amt]) => { const t = g.teams[tid]; const f = DY.fit(t, p); return amt / Math.max(30000, DY.nilValue(p, t)) * 0.5 + f.pt * 0.9 + f.brand * 0.5 + f.prox * 0.25 + rr(0, 0.35); };
+        // money talks, but so do playing time, winning and home; the noise keeps anyone from being a lock
+        const val = ([tid, amt]) => { const t = g.teams[tid]; const f = DY.fit(t, p); return Math.min(1.6, amt / Math.max(30000, DY.nilValue(p, t))) * 0.5 + f.pt * 1.0 + f.brand * 0.45 + f.prox * 0.25 + (t.prestige - 75) / 70 + rr(0, 0.5); };
         const best = offers.sort((a, b) => val(b) - val(a))[0];
         if (final || chance(0.55) || +best[0] === ut.id && chance(0.3)) {
           const t = g.teams[best[0]];

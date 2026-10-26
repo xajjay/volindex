@@ -45,6 +45,7 @@
     });
     const ut = DY.userT();
     ut.style = g.settings.offStyle || 'power'; DY.pickCaptains(ut);
+    DY.seedPast(g);
     // NIL: contracts sized to the budget
     DY.initNil(ut);
     g.teams.forEach(t => DY.pickCaptains(t)); g.camp = { y: g.season, list: [] };
@@ -440,7 +441,8 @@
     const champs = all.filter(t => t.champ === g.season);
     const p4c = champs.filter(t => DY.P4.includes(t.conf));
     const g6c = champs.filter(t => !DY.P4.includes(t.conf)).slice(0, 1);
-    const field = [...new Set([...p4c, ...g6c])];
+    // 12 and 24: conference champions get in; 2, 4 and 8: the committee's top teams, period
+    const field = size >= 12 ? [...new Set([...p4c, ...g6c])] : [];
     for (const t of all) { if (field.length >= size) break; if (!field.includes(t)) field.push(t); }
     field.sort((a, b) => all.indexOf(a) - all.indexOf(b));
     g.post = { label: 'Selection Day', stage: 'selection', size, seeds: field.map(t => t.id), games: g.post.games, rounds: [], bowls: [] };
@@ -465,7 +467,16 @@
     let games = [];
     const site = (a, b, campus, name) => { const sa = S.indexOf(a), sb = S.indexOf(b); const h = sa <= sb ? a : b, aw = h === a ? b : a; return { id: g.season + '-cfp-' + r + '-' + games.length, wk: 15 + r, h, a: aw, neutral: !campus, post: 'cfp', round: r, title: name, res: null }; };
     const prevW = r ? P.rounds[r - 1].map(winnerOf) : [];
-    if (n === 12) {
+    if (n === 2) {
+      if (r === 0) games = [site(S[0], S[1], false, 'CFP National Championship')];
+    } else if (n === 4) {
+      if (r === 0) { const b = DY.shuffle(DY.NY6).slice(0, 2); games = [[0, 3], [1, 2]].map(([a, c], i) => site(S[a], S[c], false, b[i] + ' (CFP Semifinal)')); }
+      else if (r === 1) games = [site(prevW[0], prevW[1], false, 'CFP National Championship')];
+    } else if (n === 8) {
+      if (r === 0) games = [[0, 7], [3, 4], [1, 6], [2, 5]].map(([a, c]) => site(S[a], S[c], true, 'CFP Quarterfinal'));
+      else if (r === 1) games = [[0, 1], [2, 3]].map(([a, c], i) => site(prevW[a], prevW[c], false, (i ? 'Cotton Bowl' : 'Orange Bowl') + ' (CFP Semifinal)'));
+      else if (r === 2) games = [site(prevW[0], prevW[1], false, 'CFP National Championship')];
+    } else if (n === 12) {
       if (r === 0) games = [[4, 11], [7, 8], [5, 10], [6, 9]].map(([a, b]) => site(S[a], S[b], true, 'CFP First Round'));
       else if (r === 1) { const bowls = DY.shuffle(DY.NY6).slice(0, 4); games = [[0, 1], [3, 0], [2, 3], [1, 2]].map(([seed, gi], i) => site(S[seed], prevW[gi], false, bowls[i] + ' (CFP Quarterfinal)')); }
       else if (r === 2) games = [[0, 1], [2, 3]].map(([a, b], i) => site(prevW[a], prevW[b], false, (i ? 'Cotton Bowl' : 'Orange Bowl') + ' (CFP Semifinal)'));
@@ -574,7 +585,7 @@
     const give = (p, code) => { p.aw.push({ y, a: code }); };
     const team = (pool, used) => { const out = []; AA_SLOTS.forEach(([pos, n]) => { pool.filter(x => x.p.pos === pos && !used.has(x.p.id)).sort((a, b) => b.sc - a.sc).slice(0, n).forEach(x => { out.push(x.p.id); used.add(x.p.id); }); }); return out; };
     const u1 = new Set(); A.aa1 = team(all, u1); A.aa2 = team(all, u1);
-    const fr = all.filter(x => x.p.el === 4 && x.p.yr <= 2); A.fraa = team(fr, new Set());
+    const fr = all.filter(x => x.p.yr === 1); A.fraa = team(fr, new Set());
     const sec = all.filter(x => x.t.conf === 'SEC'), us = new Set(); A.sec1 = team(sec, us); A.sec2 = team(sec, us);
     A.aa1.forEach(id => give(DY.P(id), 'AA1')); A.aa2.forEach(id => give(DY.P(id), 'AA2')); A.fraa.forEach(id => give(DY.P(id), 'FRAA'));
     A.sec1.forEach(id => give(DY.P(id), 'SEC1')); A.sec2.forEach(id => give(DY.P(id), 'SEC2'));
@@ -590,7 +601,7 @@
     best(x => x.p.pos === 'K', 'GROZA', 'groza'); best(x => x.p.pos === 'P', 'GUY', 'guy');
     best(x => x.t.conf === 'SEC' && DY.SIDE(x.p.pos) === 'O' && x.p.pos !== 'OT' && x.p.pos !== 'IOL', 'SECO', 'seco');
     best(x => x.t.conf === 'SEC' && DY.SIDE(x.p.pos) === 'D', 'SECD', 'secd');
-    best(x => x.t.conf === 'SEC' && x.p.el === 4 && x.p.yr <= 2, 'SECF', 'secf');
+    best(x => x.t.conf === 'SEC' && x.p.yr === 1, 'SECF', 'secf');
     const ut = DY.userT(), mine = g.teams[g.user].roster.map(DY.P).filter(p => p.aw.some(a => a.y === y));
     DY.news('awards', `${H.n} (${tname(H.t)}) wins the Heisman Trophy`, `${H.pos}. Tennessee honorees: ${mine.length ? mine.map(p => p.n + ' (' + p.aw.filter(a => a.y === y).map(a => a.a).join(', ') + ')').join('; ') : 'none'}.`, { pid: H.id });
   };
@@ -607,6 +618,14 @@
     const g = G();
     for (const id in GM.ps) {
       const p = DY.P(+id); if (!p || p.t !== g.user) continue; const l = GM.ps[id];
+      for (const name in REC_MAP) {
+        const k = REC_MAP[name], sv = p.s && p.s[k], cs = g.rec.season[k];
+        if (sv && cs && sv > cs.v && cs.pid !== p.id) { g.rec.season[k] = { v: sv, n: p.n, y: String(g.season), pid: p.id, prev: cs.n }; DY.news('record', `${p.n} breaks Tennessee's season record`, `${sv} ${name.toLowerCase()} and counting, passing ${cs.n} (${cs.v}).`, { pid: p.id }); }
+        else if (sv && cs && cs.pid === p.id && sv > cs.v) cs.v = sv;
+        const cv = DY.careerTotal(p, k, true), cc = g.rec.career[k];
+        if (cv && cc && cv > cc.v && cc.pid !== p.id) { g.rec.career[k] = { v: cv, n: p.n, y: (p.firstY || g.season) + '–' + g.season, pid: p.id, prev: cc.n }; DY.news('record', `${p.n} is Tennessee's all-time leader in ${name.toLowerCase()}`, `${cv} career ${name.toLowerCase()}, passing ${cc.n} (${cc.v}).`, { pid: p.id }); GM.recBroke = (GM.recBroke || []).concat(`${p.n}: Tennessee's career ${name.toLowerCase()} record (${cv})`); }
+        else if (cv && cc && cc.pid === p.id && cv > cc.v) cc.v = cv;
+      }
       for (const name in REC_MAP) { const k = REC_MAP[name], cur = g.rec.game[k]; if (l[k] && cur && l[k] > cur.v) { g.rec.game[k] = { v: l[k], n: p.n, y: String(g.season), note: 'vs. ' + DY.T(DY.oppOf(x)).name, pid: p.id, prev: cur.n }; DY.news('record', `${p.n} sets a Tennessee single-game record`, `${l[k]} ${name.toLowerCase()} against ${DY.T(DY.oppOf(x)).name}, passing ${cur.n} (${cur.v}).`, { pid: p.id }); } }
     }
   };
@@ -616,9 +635,11 @@
       for (const name in REC_MAP) {
         const k = REC_MAP[name];
         const v = p.s && p.s[k], cur = g.rec.season[k];
-        if (v && cur && v > cur.v) { g.rec.season[k] = { v, n: p.n, y: String(g.season), pid: p.id, prev: cur.n }; DY.news('record', `${p.n} breaks a Tennessee season record`, `${v} ${name.toLowerCase()}, passing ${cur.n} (${cur.v}).`, { pid: p.id }); }
+        if (v && cur && cur.pid === p.id) { if (v > cur.v) cur.v = v; }
+        else if (v && cur && v > cur.v) { g.rec.season[k] = { v, n: p.n, y: String(g.season), pid: p.id, prev: cur.n }; DY.news('record', `${p.n} breaks a Tennessee season record`, `${v} ${name.toLowerCase()}, passing ${cur.n} (${cur.v}).`, { pid: p.id }); }
         const cv = DY.careerTotal(p, k, true), cc = g.rec.career[k];
-        if (cv && cc && cv > cc.v) { g.rec.career[k] = { v: cv, n: p.n, y: (p.firstY || g.season) + '–' + g.season, pid: p.id, prev: cc.n }; }
+        if (cv && cc && cc.pid === p.id) { if (cv > cc.v) { cc.v = cv; cc.y = (p.firstY || g.season) + '–' + g.season; } }
+        else if (cv && cc && cv > cc.v) { g.rec.career[k] = { v: cv, n: p.n, y: (p.firstY || g.season) + '–' + g.season, pid: p.id, prev: cc.n }; }
       }
     });
   };

@@ -322,14 +322,49 @@ Sacramento State|SAC|42|#043927|#C4B581|CA`;
     c6: { name: 'Cover 6', box: 0, rush: 0, deep: 1.1, short: 0.4, man: 0, blitz: 0 },
     bear: { name: 'Bear Front Run Blitz', box: 2.6, rush: 1.0, deep: -1.5, short: -0.8, man: 1, blitz: 1 },
     prev: { name: 'Prevent', box: -2, rush: -0.8, deep: 2.6, short: -1.2, man: 0, blitz: 0 },
+    c2m: { name: 'Cover 2 Man', box: -0.2, rush: 0, deep: 1.3, short: 0.9, man: 1, blitz: 0 },
+    ncb: { name: 'Nickel Corner Blitz', box: 1.0, rush: 1.3, deep: -0.6, short: 0.1, man: 1, blitz: 1 },
+    sfb: { name: 'Safety Blitz (Cover 1)', box: 1.4, rush: 1.2, deep: -0.4, short: 0.3, man: 1, blitz: 1 },
+    zb: { name: 'Zone Blitz (Fire 3)', box: 1.1, rush: 1.5, deep: 0.3, short: -0.3, man: 0, blitz: 1 },
+    dman: { name: 'Deep Man (2-Man Prevent)', box: -1.4, rush: -0.4, deep: 2.0, short: 0.4, man: 1, blitz: 0 },
+    gl: { name: 'Goal Line Man', box: 2.4, rush: 1.0, deep: -1.0, short: 0.2, man: 1, blitz: 1 },
+  };
+  // the defensive call sheet: five calls, each with real packages underneath (auto picks the right one for the down and distance)
+  DY.DPKG = {
+    run: { label: 'Stop the run', sub: 'Load the box', items: [
+      { k: 'box8', name: 'Load the box (Cover 1)', d: 'c1', pkg: 'base', note: 'Eight in the box, safety down' },
+      { k: 'bear', name: 'Bear front run blitz', d: 'bear', pkg: 'base', note: 'Linebackers shoot gaps' },
+      { k: 'buzz', name: 'Cover 3 Buzz', d: 'c3b', pkg: 'base', note: 'Safety rolls down into the run fit' },
+      { k: 'goal', name: 'Goal line (6-2)', d: 'gl', pkg: 'goal', note: 'Bigger bodies up front' } ] },
+    man: { label: 'Man coverage', sub: 'Cover 0 / 1 / 2-Man', items: [
+      { k: 'c1', name: 'Cover 1 Robber', d: 'c1', note: 'Press man, a robber in the middle' },
+      { k: 'c2m', name: 'Cover 2 Man', d: 'c2m', note: 'Man underneath, two deep' },
+      { k: 'c0', name: 'Cover 0', d: 'c0', note: 'Everyone in man, no deep help' } ] },
+    zone: { label: 'Zone coverage', sub: 'Cover 2 / 3 / 4', items: [
+      { k: 'c3', name: 'Cover 3 Sky', d: 'c3', note: 'Three deep, four under' },
+      { k: 'c4', name: 'Cover 4 Quarters', d: 'c4', note: 'Four deep: take away the deep ball' },
+      { k: 'c2', name: 'Cover 2', d: 'c2', note: 'Corners squat the flats' },
+      { k: 't2', name: 'Tampa 2', d: 't2', note: 'Mike runs the middle' },
+      { k: 'c6', name: 'Cover 6', d: 'c6', note: 'Quarter-quarter-half' } ] },
+    blitz: { label: 'Blitz', sub: 'Man and zone pressure', items: [
+      { k: 'zb', name: 'Zone blitz (Fire 3)', d: 'zb', note: 'Five rush, a lineman drops' },
+      { k: 'c1f', name: 'Fire zone (LB)', d: 'c1f', note: 'Linebacker blitz, three deep' },
+      { k: 'ncb', name: 'Nickel corner blitz', d: 'ncb', note: 'Pressure off the slot' },
+      { k: 'sfb', name: 'Safety blitz', d: 'sfb', note: 'Man behind it' },
+      { k: 'c0', name: 'Cover 0 all-out', d: 'c0', note: 'Six rush, man everywhere' } ] },
+    prev: { label: 'Prevent', sub: 'Keep it in front', items: [
+      { k: 'prev', name: 'Prevent (deep zone)', d: 'prev', pkg: 'dime', note: 'Three rush, everybody deep' },
+      { k: 'dman', name: 'Deep man (2-Man)', d: 'dman', pkg: 'dime', note: 'Man under, two very deep' } ] },
   };
   // simplified defensive calls the coach can make (each maps to a few real coverages)
   DY.DCALLS = {
     run: { label: 'Stop the run', sub: 'Load the box', keys: ['bear', 'c3b', 'c1'] },
+    man: { label: 'Man coverage', sub: 'Cover 1 / 2-Man', keys: ['c1', 'c2m', 'c1'] },
+    zone: { label: 'Zone coverage', sub: 'Cover 2 / 3 / 4', keys: ['c3', 'c4', 'c2', 't2', 'c6'] },
     bal: { label: 'Balanced', sub: 'Cover 3 / Quarters', keys: ['c3', 'c4', 'c6', 'c3b'] },
-    blitz: { label: 'Blitz', sub: 'Send pressure', keys: ['c0', 'c1f', 'c1f'] },
+    blitz: { label: 'Blitz', sub: 'Send pressure', keys: ['zb', 'c1f', 'ncb', 'sfb', 'c0'] },
     pass: { label: 'Coverage', sub: 'Cover 2 / Tampa', keys: ['c2', 't2', 'c4'] },
-    prev: { label: 'Prevent', sub: 'Keep it in front', keys: ['prev'] },
+    prev: { label: 'Prevent', sub: 'Keep it in front', keys: ['prev', 'dman'] },
   };
   DY.BOWLS = ['Citrus Bowl', 'ReliaQuest Bowl', 'Gator Bowl', 'Music City Bowl', 'Texas Bowl', 'Liberty Bowl', 'Las Vegas Bowl', 'Holiday Bowl', 'Alamo Bowl',
     "Duke's Mayo Bowl", 'Pinstripe Bowl', 'Sun Bowl', 'Pop-Tarts Bowl', 'Armed Forces Bowl', 'Birmingham Bowl', 'Independence Bowl', 'Guaranteed Rate Bowl',
@@ -337,18 +372,19 @@ Sacramento State|SAC|42|#043927|#C4B581|CA`;
     'Cure Bowl', 'Frisco Bowl', 'Myrtle Beach Bowl', 'Arizona Bowl', 'Bahamas Bowl', 'Famous Idaho Potato Bowl', 'New Orleans Bowl', 'Salute to Veterans Bowl'];
   DY.NY6 = ['Rose Bowl', 'Sugar Bowl', 'Orange Bowl', 'Cotton Bowl', 'Fiesta Bowl', 'Peach Bowl'];
   // team identity (offensive style) by school; others are drawn at random
-  DY.STYLE_OF = { Tennessee: 'power', 'Texas Tech': 'air', Army: 'option', Navy: 'option', 'Air Force': 'option', Iowa: 'power', Wisconsin: 'power',
+  DY.STYLE_OF = { Tennessee: 'power', 'Georgia Tech': 'option', 'Kennesaw State': 'option', 'Arizona State': 'tempo', 'Mississippi State': 'tempo', 'Texas Tech': 'air', Army: 'option', Navy: 'option', 'Air Force': 'option', Iowa: 'power', Wisconsin: 'power',
     Georgia: 'pro', Alabama: 'pro', Michigan: 'power', 'Ohio State': 'spread', Oregon: 'tempo', 'Ole Miss': 'tempo', LSU: 'pro', Texas: 'spread',
     'Washington State': 'air', 'Mississippi State': 'air', SMU: 'tempo', 'Kansas State': 'power', Indiana: 'spread' };
   // offensive identities: pass rate, seconds between snaps, and how often each formation is used
   DY.STYLES = {
-    power: { name: 'Power run', pass: 0.43, tempo: 33, forms: { ace12: 0.33, pistol: 0.2, trips: 0.2, iform: 0.14, doubles: 0.13 } },
-    pro: { name: 'Pro style', pass: 0.47, tempo: 34, forms: { ace12: 0.28, iform: 0.24, doubles: 0.18, trips: 0.15, pistol: 0.1, spread: 0.05 } },
-    spread: { name: 'Spread RPO', pass: 0.5, tempo: 31, forms: { trips: 0.36, doubles: 0.3, pistol: 0.14, spread: 0.14, ace12: 0.06 } },
-    tempo: { name: 'Up-tempo spread', pass: 0.52, tempo: 26, forms: { trips: 0.4, doubles: 0.24, spread: 0.2, empty: 0.06, pistol: 0.1 } },
-    air: { name: 'Air Raid', pass: 0.6, tempo: 29, forms: { spread: 0.4, trips: 0.28, empty: 0.15, doubles: 0.17 } },
-    option: { name: 'Triple option', pass: 0.15, tempo: 36, forms: { pistol: 0.35, iform: 0.35, ace12: 0.2, doubles: 0.1 } },
+    power: { name: 'Run heavy', desc: 'Under center and pistol, two tight ends, a standard-to-slow pace. Run first and play action off it.', pass: 0.42, tempo: 34, rpo: 0.06, forms: { ace12: 0.32, pistol: 0.2, trips: 0.18, iform: 0.16, doubles: 0.1, goal: 0.04 } },
+    pro: { name: 'Pro style', desc: 'Balanced and multiple: under center, I-form and 12 personnel, play action, a deliberate pace.', pass: 0.48, tempo: 34, rpo: 0.06, forms: { ace12: 0.28, iform: 0.24, doubles: 0.18, trips: 0.15, pistol: 0.1, spread: 0.05 } },
+    spread: { name: 'Spread offense', desc: 'Shotgun and three or four wide, RPOs, quick game and the QB run.', pass: 0.5, tempo: 31, rpo: 0.2, forms: { trips: 0.36, doubles: 0.3, pistol: 0.14, spread: 0.14, ace12: 0.06 } },
+    tempo: { name: 'Up-tempo', desc: 'No-huddle spread: snap it fast, stress the defense sideline to sideline.', pass: 0.53, tempo: 24, rpo: 0.2, forms: { trips: 0.4, doubles: 0.24, spread: 0.2, empty: 0.06, pistol: 0.1 } },
+    option: { name: 'Triple option', desc: 'Flexbone triple option: dive, keep or pitch, then the play-action shot.', pass: 0.14, tempo: 36, rpo: 0, forms: { flexbone: 0.62, pistol: 0.18, iform: 0.12, ace12: 0.08 } },
+    air: { name: 'Air Raid', desc: 'Four wide, throw it all over the field.', pass: 0.6, tempo: 29, rpo: 0.08, forms: { spread: 0.4, trips: 0.28, empty: 0.15, doubles: 0.17 }, cpu: true },
   };
+  DY.USER_STYLES = ['pro', 'spread', 'tempo', 'option', 'power'];
   // formations: personnel (RB-TE), receivers on the field, and what they do for the run game, protection and the passing game
   DY.FORMS = {
     trips: { name: 'Shotgun Trips', pers: '11', rb: 1, te: 1, wr: 3, run: 0, pro: 0, sep: 0.12, dpers: 'nickel' },
@@ -359,14 +395,16 @@ Sacramento State|SAC|42|#043927|#C4B581|CA`;
     spread: { name: 'Shotgun Spread (10)', pers: '10', rb: 1, te: 0, wr: 4, run: -0.45, pro: -0.3, sep: 0.2, dpers: 'dime' },
     empty: { name: 'Empty', pers: '01', rb: 0, te: 1, wr: 4, run: -1.6, pro: -0.8, sep: 0.28, dpers: 'dime' },
     goal: { name: 'Goal Line (13)', pers: '13', rb: 1, te: 3, wr: 1, run: 1.3, pro: 0.8, sep: -0.35, pa: 0.5, dpers: 'goal' },
+    flexbone: { name: 'Flexbone (30)', pers: '30', rb: 3, te: 0, wr: 2, run: 0.8, pro: 0.2, sep: 0.05, pa: 0.6, dpers: 'base' },
   };
-  DY.DPERS = { base: { name: 'Base 4-3', box: 0.45, cov: -0.12 }, nickel: { name: 'Nickel', box: 0, cov: 0 }, dime: { name: 'Dime', box: -0.5, cov: 0.18 }, goal: { name: 'Goal line', box: 1.1, cov: -0.3 } };
+  DY.DPERS = { base: { name: 'Base 4-3', box: 0.45, cov: -0.12 }, nickel: { name: 'Nickel', box: 0, cov: 0 }, dime: { name: 'Dime', box: -0.5, cov: 0.18 }, goal: { name: 'Goal line 6-2', box: 1.1, cov: -0.3 } };
   // the playbook: each named play beats some coverages/fronts and struggles against others
   DY.BOOK = {
-    in: [{ n: 'Inside Zone', beats: [], weak: [] }, { n: 'Duo', beats: ['c2', 't2', 'c4', 'c6'], weak: ['bear'] }, { n: 'Power', beats: ['c2', 't2', 'prev', 'c4'], weak: ['bear', 'c0'] }, { n: 'Counter', beats: ['c1', 'c3b'], weak: ['c2'], counter: 1 }, { n: 'Trap', beats: ['c0', 'c1f'], weak: ['c3'] }],
-    out: [{ n: 'Outside Zone', beats: ['c2', 'c6'], weak: ['c3b'] }, { n: 'Toss Crack', beats: ['c3', 'c4'], weak: ['bear', 'c1'] }, { n: 'Jet Sweep', beats: ['bear', 'c1f', 'c0'], weak: ['c2', 't2'] }, { n: 'Pin & Pull', beats: ['c3b', 'c4'], weak: ['c0'] }],
-    qb: [{ n: 'Zone Read Keep', beats: ['c1', 'c3b'], weak: ['c0'] }, { n: 'QB Power', beats: ['c2', 't2', 'c4'], weak: ['bear'] }, { n: 'QB Draw', beats: ['c2', 't2', 'c4', 'prev', 'c6'], weak: ['c1f', 'bear'] }, { n: 'Speed Option', beats: ['c0', 'c1f', 'c1'], weak: ['c4', 'c6'] }],
-    quick: [{ n: 'Stick', beats: ['c3', 'c4', 'c6'], weak: ['c1', 'c2'] }, { n: 'Slant-Flat', beats: ['c2', 'c0', 'c1f', 't2'], weak: ['c3b'] }, { n: 'Hitch', beats: ['c3', 'c4', 'prev'], weak: ['c0', 'c1'] }, { n: 'Bubble RPO', beats: ['bear', 'c3b', 'c1'], weak: ['c2', 'c6'] }, { n: 'Snag', beats: ['c3', 'c3b', 'c2'], weak: ['c1'] }],
+    in: [{ n: 'Inside Zone', beats: [], weak: [] }, { n: 'Duo', beats: ['c2', 't2', 'c4', 'c6'], weak: ['bear', 'gl'] }, { n: 'Power', beats: ['c2', 't2', 'prev', 'c4', 'dman'], weak: ['bear', 'c0'] }, { n: 'Counter', beats: ['c1', 'c3b', 'sfb'], weak: ['c2'], counter: 1 }, { n: 'Trap', beats: ['c0', 'c1f', 'zb', 'ncb'], weak: ['c3'] }, { n: 'Iso', beats: ['c2', 'c4', 'c6'], weak: ['bear', 'gl'] }, { n: 'Dart', beats: ['c3', 'c1'], weak: ['zb'] }],
+    out: [{ n: 'Outside Zone', beats: ['c2', 'c6'], weak: ['c3b'] }, { n: 'Toss Crack', beats: ['c3', 'c4', 'gl'], weak: ['bear', 'c1'] }, { n: 'Jet Sweep', beats: ['bear', 'c1f', 'c0', 'gl', 'ncb'], weak: ['c2', 't2'] }, { n: 'Pin & Pull', beats: ['c3b', 'c4'], weak: ['c0'] }, { n: 'Stretch', beats: ['c2', 'c2m', 't2'], weak: ['zb'] }, { n: 'Buck Sweep', beats: ['c4', 'c6', 'dman'], weak: ['bear'] }, { n: 'Rocket Toss', beats: ['c4', 'c6', 'c2'], weak: ['bear', 'c1'] }],
+    qb: [{ n: 'Zone Read Keep', beats: ['c1', 'c3b', 'c2m'], weak: ['c0'] }, { n: 'QB Power', beats: ['c2', 't2', 'c4'], weak: ['bear'] }, { n: 'QB Draw', beats: ['c2', 't2', 'c4', 'prev', 'c6', 'dman', 'c2m'], weak: ['c1f', 'bear', 'zb'] }, { n: 'Speed Option', beats: ['c0', 'c1f', 'c1', 'ncb', 'sfb'], weak: ['c4', 'c6'] }, { n: 'Triple Option', beats: ['c1', 'c3', 'c2m'], weak: ['c4', 'zb'] }, { n: 'Midline Option', beats: ['bear', 'gl', 'c3b'], weak: ['c2'] }, { n: 'QB Counter', beats: ['c1', 'c3b'], weak: ['c2'], counter: 1 }],
+    rpo: [{ n: 'Bubble Read', beats: ['bear', 'c3b', 'c1', 'gl'], weak: ['c2', 'c6'], run: 'Inside Zone' }, { n: 'RPO Glance', beats: ['c3b', 'c1', 'bear', 'c3'], weak: ['c4', 't2'], run: 'Inside Zone' }, { n: 'Slant RPO', beats: ['c3', 'c1', 'bear', 'c0'], weak: ['c2', 'c2m'], run: 'Duo' }, { n: 'Stick RPO', beats: ['c3', 'c4', 'c6', 'buzz'], weak: ['c1', 'c0'], run: 'Inside Zone' }],
+    quick: [{ n: 'Stick', beats: ['c3', 'c4', 'c6'], weak: ['c1', 'c2'] }, { n: 'Slant-Flat', beats: ['c2', 'c0', 'c1f', 't2', 'ncb'], weak: ['c3b'] }, { n: 'Hitch', beats: ['c3', 'c4', 'prev', 'dman'], weak: ['c0', 'c1'] }, { n: 'Quick Out', beats: ['c3', 'c4', 'prev', 'dman'], weak: ['c2', 'c2m'] }, { n: 'Snag', beats: ['c3', 'c3b', 'c2'], weak: ['c1'] }],
     med: [{ n: 'Mesh', beats: ['c1', 'c0', 'c1f'], weak: ['c2', 't2', 'c4'] }, { n: 'Dagger', beats: ['c3', 'c4', 'c6'], weak: ['c1', 'c0'] }, { n: 'Smash', beats: ['c2', 't2', 'c6'], weak: ['c3b', 'c1'] }, { n: 'Curl-Flat', beats: ['c3', 'c3b'], weak: ['c2', 'c1'] }, { n: 'Y-Cross', beats: ['c3', 'c1', 'c4'], weak: ['t2'] }],
     deep: [{ n: 'Four Verticals', beats: ['c3', 'c1', 'c3b', 'c1f'], weak: ['c4', 'c2', 'prev'] }, { n: 'Post-Wheel', beats: ['c3', 'c6', 'c1f'], weak: ['c2', 'prev'] }, { n: 'Go/Fade', beats: ['c0', 'c1', 'c1f', 'bear'], weak: ['c4', 'c2', 'prev'] }, { n: 'Mills', beats: ['c4', 'c6', 'c2'], weak: ['c0', 'c1f'] }, { n: 'Double Move', beats: ['c1', 'c3b', 'c0'], weak: ['c4', 'prev'] }],
     screen: [{ n: 'RB Screen', beats: ['c0', 'c1f', 'bear'], weak: ['c2', 'c4'] }, { n: 'WR Tunnel Screen', beats: ['c3', 'c4', 'prev', 'c1f'], weak: ['c2', 't2'] }, { n: 'Bubble Screen', beats: ['bear', 'c3b', 'c0'], weak: ['c2', 'c6'] }],
