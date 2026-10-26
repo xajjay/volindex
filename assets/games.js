@@ -64,8 +64,8 @@
   const SP = k => SPORTS.find(s => s.key === k);
   const GAME_ICON = { dynasty: '🏟️', run: '🏈', guesser: '🔎', grid: '🟧', career: '🏟️', rankings: '📊', duel: '↕️', trivia: '❓' };
   // the undefeated-run game is named for a perfect season in that sport: 16-0 football, 40-0 basketball
-  // (31 regular season + 3 SEC tournament + 6 NCAA), 69-0 baseball and softball (56 + 3 SEC + 3 regional + 2 super + 3 CWS + 2 finals)
-  const RUN_NAME = { football: '16-0', mbb: '40-0', wbb: '40-0', baseball: '69-0', softball: '69-0' };
+  // (31 regular season + 3 SEC tournament + 6 NCAA), Road to Omaha / Road to OKC for baseball and softball (56 + 3 SEC + 3 regional + 2 super + 3 CWS + 2 finals)
+  const RUN_NAME = { football: '16-0', mbb: '40-0', wbb: '40-0', baseball: 'Road to Omaha', softball: 'Road to OKC' };
   const RUN_ICON = { football: '🏈', mbb: '🏀', wbb: '🏀', baseball: '⚾', softball: '🥎' };
   const gIcon = (sport, g) => g === 'run' ? RUN_ICON[sport] : GAME_ICON[g];
   function gameName(sport, g) {

@@ -20,7 +20,7 @@
   ['volleyball', 'soccer'].forEach(k => { GAMES[k] = ['guesser', 'rankings', 'duel', 'trivia']; });
   const GAME_NAME = { run: '16-0', guesser: 'Vol Guesser', grid: 'Power T Grid', career: 'VFL Career', rankings: 'Rocky Top Rankings', duel: 'Higher or Lower', trivia: 'Vol Trivia' };
   const GAME_ICON = { run: '🏈', guesser: '🔎', grid: '🟧', career: '🏟️', rankings: '📊', duel: '↕️', trivia: '❓' };
-  const RUN_NAME = { football: '16-0', mbb: '40-0', wbb: '40-0', baseball: '69-0', softball: '69-0' }, RUN_ICON = { football: '🏈', mbb: '🏀', wbb: '🏀', baseball: '⚾', softball: '🥎' };
+  const RUN_NAME = { football: '16-0', mbb: '40-0', wbb: '40-0', baseball: 'Road to Omaha', softball: 'Road to OKC' }, RUN_ICON = { football: '🏈', mbb: '🏀', wbb: '🏀', baseball: '⚾', softball: '🥎' };
   const gName = (sp, g) => g === 'run' ? RUN_NAME[sp] : sp === 'wbb' ? GAME_NAME[g].replace(/^Vol /, 'Lady Vol ') : GAME_NAME[g];
   const gIcon = (sp, g) => g === 'run' ? RUN_ICON[sp] : GAME_ICON[g];
 
@@ -71,78 +71,44 @@
     return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   }
   // undefeated-run games, one per sport (names come from the real season length; see assets/games-run-sports.js)
-  const RUNS = [['football', '16-0', '🏈', 'Football'], ['mbb', '40-0', '🏀', "Men's hoops"], ['wbb', '40-0', '🏀', "Women's hoops"], ['baseball', '69-0', '⚾', 'Baseball'], ['softball', '69-0', '🥎', 'Softball']];
-  /* Play today: sample layouts (?pt=a|b|c, remembered in this browser) */
+  const RUNS = [['football', '16-0', '🏈', 'Football'], ['mbb', '40-0', '🏀', "Men's hoops"], ['wbb', '40-0', '🏀', "Women's hoops"], ['baseball', 'Road to Omaha', '⚾', 'Baseball'], ['softball', 'Road to OKC', '🥎', 'Softball']];
+  /* Play today: the football dynasty up top, then a tab for each sport with all of its games */
   const SHORT = { football: 'Football', mbb: "Men's hoops", wbb: "Women's hoops", baseball: 'Baseball', softball: 'Softball', volleyball: 'Volleyball', soccer: 'Soccer' };
   const SPI = { football: '🏈', mbb: '🏀', wbb: '🏀', baseball: '⚾', softball: '🥎', volleyball: '🏐', soccer: '⚽' };
-  function ptVariant() {
-    const q = (/[?&]pt=([a-z]+)/.exec(location.search) || [])[1];
-    if (q) LS.set('vi-pt', q);
-    return q || LS.get('vi-pt') || 'old';
-  }
   function dynSave() { try { const m = JSON.parse(LS.get('vi-dynasty-meta') || '{}') || {}; return Object.values(m).sort((a, b) => (b.at || 0) - (a.at || 0))[0] || null; } catch (e) { return null; } }
-  function dynCard(big) {
+  function dynCard() {
     const sv = dynSave();
-    return `<a class="pt-dyn ${big ? 'big' : ''}" href="${href('games-football-dynasty')}">
+    return `<a class="pt-dyn" href="${href('games-football-dynasty')}">
       <span class="pt-new">New</span>
       <span class="pt-dyn-k">Football · Vol Dynasty</span>
       <b class="pt-dyn-t">Build a dynasty</b>
       <span class="pt-dyn-p">Take any program. Recruit, work the portal and NIL, call plays, sweat out the CFP selection show and field job offers.</span>
-      <span class="pt-dyn-go">${sv ? `Continue: ${esc(sv.team)} · ${esc(sv.season)} · ${esc(sv.rec || '')}` : 'Start your dynasty'} ›</span>
-      ${big ? '<span class="pt-dyn-soon">Coming soon: Hoops, Lady Vols and Diamond dynasties</span>' : ''}</a>`;
+      <span class="pt-dyn-go">${sv ? `Continue: ${esc(sv.team)} · ${esc(sv.season)} · ${esc(sv.rec || '')}` : 'Start your dynasty'} ›</span></a>`;
   }
   const runTile = (sp, name, icon, label, today) => `<a class="pb-run ${doneOn(sp, 'run', today) ? 'done' : ''}" href="${href('games-' + sp + '-run')}"><span class="pb-ic" aria-hidden="true">${icon}</span><span><b>${name}</b><small>${label}</small></span>${doneOn(sp, 'run', today) ? '<i>✓</i>' : ''}</a>`;
-  const trivTile = (sp, today) => `<a class="pb-game ${doneOn(sp, 'trivia', today) ? 'done' : ''}" href="${href('games-' + sp + '-trivia')}"><span aria-hidden="true">${SPI[sp]}</span><b>${esc(SHORT[sp])}</b>${doneOn(sp, 'trivia', today) ? '<i>✓</i>' : ''}</a>`;
   const gameTile = (sp, g, today) => `<a class="pb-game ${doneOn(sp, g, today) ? 'done' : ''}" href="${href('games-' + sp + '-' + g)}"><span aria-hidden="true">${gIcon(sp, g)}</span><b>${esc(gName(sp, g))}</b>${doneOn(sp, g, today) ? '<i>✓</i>' : ''}</a>`;
   const sportDone = (sp, today) => GAMES[sp].filter(g => doneOn(sp, g, today)).length;
-  function ptHead(st) {
-    return `<div class="pb-head"><div><div class="eyebrow">Vol Games · new at midnight Eastern</div><h2>Play today</h2>
-        <p>Same puzzles for everyone, every day${st ? ` · <b class="pb-streak">🔥 ${st}-day streak</b>` : ''} · next set in <b id="pbClock">${untilMidnight()}</b></p></div>
-        <a class="btn" href="${href('me')}">My games &amp; streaks</a></div>`;
-  }
-  const ptFoot = () => `<div class="pb-foot"><a href="${href('games')}">All Vol Games ›</a> · <a href="${href('players')}">Player pages ›</a> · <a href="${href('compare')}">Compare Vols ›</a></div>`;
   window.homeBottom = function () {
-    const v = ptVariant(); if (v === 'old') return oldBottom();
-    const today = etDate(), st = streak(anyOn), runs = RUNS.map(r => runTile(r[0], r[1], r[2], r[3], today)).join('');
-    let body = '';
-    if (v === 'a') {   // Spotlight: dynasty + runs side by side, then trivia and football dailies
-      body = `<div class="pt-a">${dynCard(true)}<div class="pt-side"><div class="pb-label">Run the table <span class="dim">draft legends, go undefeated</span></div><div class="pt-runs-col">${runs}</div></div></div>
-        <div class="pb-label">Daily trivia <span class="dim">${SPORT_ORDER.filter(sp => doneOn(sp, 'trivia', today)).length}/${SPORT_ORDER.length} done</span></div>
-        <div class="pb-games pt-7">${SPORT_ORDER.map(sp => trivTile(sp, today)).join('')}</div>
-        <div class="pb-label">Football dailies <span class="dim">${GAMES.football.filter(g => doneOn('football', g, today)).length}/${GAMES.football.length} done</span></div>
-        <div class="pb-games">${GAMES.football.filter(g => g !== 'run' && g !== 'trivia').map(g => gameTile('football', g, today)).join('')}</div>`;
-    } else if (v === 'b') {   // By sport: slim dynasty banner, then a tab per sport with all of its games
-      body = `${dynCard(false)}
-        <div class="pt-tabs" role="tablist">${SPORT_ORDER.map((sp, i) => `<button type="button" role="tab" data-pt="${sp}" aria-selected="${i === 0}"><span aria-hidden="true">${SPI[sp]}</span> ${esc(SHORT[sp])}<small>${sportDone(sp, today)}/${GAMES[sp].length}</small></button>`).join('')}</div>
-        ${SPORT_ORDER.map((sp, i) => { const r = RUNS.find(x => x[0] === sp); return `<div class="pt-panel" data-ptp="${sp}" ${i ? 'hidden' : ''}>
-          <div class="pt-panel-grid">${r ? runTile(r[0], r[1], r[2], 'Undefeated run', today) : ''}
-          ${sp === 'football' ? `<a class="pb-run pt-dynmini" href="${href('games-football-dynasty')}"><span class="pb-ic" aria-hidden="true">🏟️</span><span><b>Dynasty</b><small>New · play any season</small></span></a>` : ['mbb', 'wbb', 'baseball', 'softball'].includes(sp) ? `<span class="pb-run pt-soon"><span class="pb-ic" aria-hidden="true">🏟️</span><span><b>Dynasty</b><small>Coming soon</small></span></span>` : ''}</div>
-          <div class="pb-games">${GAMES[sp].filter(g => g !== 'run').map(g => gameTile(sp, g, today)).join('')}</div></div>`; }).join('')}`;
-    } else {   // c: Shelves: featured, runs, trivia, every sport
-      body = `<div class="pb-label">Featured</div><div class="pt-feat">${dynCard(false)}<a class="pt-whatsnew" href="${href('games-football-dynasty')}"><span class="pt-new">Just added</span><b>CFP Selection Show</b><span>Watch the committee reveal the 12-team field, then chase the title. Win big and bigger schools come calling.</span></a></div>
-        <div class="pb-label">Run the table <span class="dim">draft Vols legends, try to go undefeated</span></div><div class="pb-runs">${runs}</div>
-        <div class="pb-label">Daily trivia</div><div class="pb-games pt-7">${SPORT_ORDER.map(sp => trivTile(sp, today)).join('')}</div>
-        <div class="pb-label">Every sport's games</div><div class="pt-sports">${SPORT_ORDER.map(sp => `<a class="pt-sport" href="${href('games-' + sp)}"><span class="pt-sp-ic" aria-hidden="true">${SPI[sp]}</span><span><b>${esc(SPORT_NAME[sp])}</b><small>${GAMES[sp].length + (sp === 'football' ? 1 : 0)} games · ${sportDone(sp, today)} played today</small></span><span class="pt-sp-go" aria-hidden="true">›</span></a>`).join('')}</div>`;
-    }
-    return `<section class="wrap pbwrap" aria-label="Today's Vol games"><div class="playband ptv-${v}">${ptHead(st)}${body}${ptFoot()}</div></section>`;
-  };
-  const oldBottom = function () {
     const today = etDate(), st = streak(anyOn);
-    const fb = GAMES.football.filter(g => g !== 'run'), done = GAMES.football.filter(g => doneOn('football', g, today)).length;
-    return `<section class="wrap pbwrap" aria-label="Today's Vol games"><div class="playband">
+    const cur = SPORT_ORDER.includes(LS.get('vi-pt-sport')) ? LS.get('vi-pt-sport') : 'football';
+    return `<section class="wrap pbwrap" aria-label="Today's Vol games"><div class="playband ptv-b">
       <div class="pb-head"><div><div class="eyebrow">Vol Games · new at midnight Eastern</div><h2>Play today</h2>
         <p>Same puzzles for everyone, every day${st ? ` · <b class="pb-streak">🔥 ${st}-day streak</b>` : ''} · next set in <b id="pbClock">${untilMidnight()}</b></p></div>
         <a class="btn" href="${href('me')}">My games &amp; streaks</a></div>
-      <div class="pb-runs">${RUNS.map(([sp, name, icon, label]) => `<a class="pb-run ${doneOn(sp, 'run', today) ? 'done' : ''}" href="${href('games-' + sp + '-run')}"><span class="pb-ic" aria-hidden="true">${icon}</span><span><b>${name}</b><small>${label}${sp === 'football' ? '' : ' · Beta'}</small></span>${doneOn(sp, 'run', today) ? '<i>✓</i>' : ''}</a>`).join('')}</div>
-      <div class="pb-label">Football dailies <span class="dim">${done}/${GAMES.football.length} done</span></div>
-      <div class="pb-games">${fb.map(g => `<a class="pb-game ${doneOn('football', g, today) ? 'done' : ''}" href="${href('games-football-' + g)}"><span aria-hidden="true">${GAME_ICON[g]}</span><b>${esc(GAME_NAME[g])}</b>${doneOn('football', g, today) ? '<i>✓</i>' : ''}</a>`).join('')}</div>
-      <div class="pb-foot"><a href="${href('games')}">Every sport's games ›</a> · <a href="${href('players')}">Player pages ›</a> · <a href="${href('compare')}">Compare Vols ›</a></div>
+      ${dynCard()}
+      <div class="pt-tabs" role="tablist" aria-label="Games by sport">${SPORT_ORDER.map(sp => `<button type="button" role="tab" data-pt="${sp}" aria-selected="${sp === cur}"><span aria-hidden="true">${SPI[sp]}</span> ${esc(SHORT[sp])}<small>${sportDone(sp, today)}/${GAMES[sp].length}</small></button>`).join('')}</div>
+      ${SPORT_ORDER.map(sp => { const r = RUNS.find(x => x[0] === sp); return `<div class="pt-panel" role="tabpanel" data-ptp="${sp}" ${sp === cur ? '' : 'hidden'}>
+        <div class="pt-panel-grid">${r ? runTile(r[0], r[1], r[2], 'Draft legends · go undefeated', today) : ''}
+        ${sp === 'football' ? `<a class="pb-run" href="${href('games-football-dynasty')}"><span class="pb-ic" aria-hidden="true">🏟️</span><span><b>Vol Dynasty</b><small>New · coach any program</small></span></a>` : ['mbb', 'wbb', 'baseball', 'softball'].includes(sp) ? `<span class="pb-run pt-soon"><span class="pb-ic" aria-hidden="true">🏟️</span><span><b>Dynasty</b><small>Coming soon</small></span></span>` : ''}</div>
+        <div class="pb-games">${GAMES[sp].filter(g => g !== 'run').map(g => gameTile(sp, g, today)).join('')}</div></div>`; }).join('')}
+      <div class="pb-foot"><a href="${href('games')}">All Vol Games ›</a> · <a href="${href('players')}">Player pages ›</a> · <a href="${href('compare')}">Compare Vols ›</a></div>
     </div></section>`;
   };
   let clockTimer = null;
   window.wireHome = function (app) {
     clearInterval(clockTimer);
-    app.querySelectorAll('[data-pt]').forEach(b => b.addEventListener('click', () => { app.querySelectorAll('[data-pt]').forEach(x => x.setAttribute('aria-selected', String(x === b))); app.querySelectorAll('[data-ptp]').forEach(p => { p.hidden = p.dataset.ptp !== b.dataset.pt; }); }));
+    app.querySelectorAll('[data-pt]').forEach(b => b.addEventListener('click', () => { LS.set('vi-pt-sport', b.dataset.pt); app.querySelectorAll('[data-pt]').forEach(x => x.setAttribute('aria-selected', String(x === b))); app.querySelectorAll('[data-ptp]').forEach(p => { p.hidden = p.dataset.ptp !== b.dataset.pt; }); }));
+    const tabs = app.querySelector('.pt-tabs'), sel = tabs && tabs.querySelector('[aria-selected="true"]'); if (sel) tabs.scrollLeft = Math.max(0, sel.offsetLeft - tabs.offsetLeft - 16);
     const el = app.querySelector('#pbClock'); if (el) clockTimer = setInterval(() => { if (!el.isConnected) return clearInterval(clockTimer); el.textContent = untilMidnight(); }, 1000);
   };
 
@@ -169,7 +135,7 @@
   const COLS = {
     football: [['pos', 'Pos'], ['cmp', 'Cmp'], ['att', 'Att'], ['yds', 'Pass yds'], ['td', 'Pass TD'], ['int', 'INT thrown'], ['car', 'Car'], ['ryds', 'Rush yds'], ['rtd', 'Rush TD'], ['rec', 'Rec'], ['cyds', 'Rec yds'], ['ctd', 'Rec TD'], ['tot', 'Tackles'], ['tfl', 'TFL'], ['sk', 'Sacks'], ['ints', 'INT'], ['pd', 'PBU'], ['ff', 'FF'], ['ovr', '16-0 OVR']],
     hoops: [['ovr', '40-0 OVR'], ['gp', 'G'], ['pts', 'Pts'], ['ppg', 'PPG'], ['reb', 'Reb'], ['rpg', 'RPG'], ['ast', 'Ast'], ['apg', 'APG'], ['stl', 'Stl'], ['blk', 'Blk'], ['tpm', '3PM'], ['fgp', 'FG%']],
-    diamond: [['ovr', '69-0 OVR'], ['gp', 'G'], ['ab', 'AB'], ['h', 'H'], ['hr', 'HR'], ['rbi', 'RBI'], ['r', 'R'], ['sb', 'SB'], ['avg', 'AVG'], ['app', 'App'], ['w', 'W'], ['l', 'L'], ['era', 'ERA'], ['ip', 'IP'], ['so', 'K'], ['sv', 'SV']],
+    diamond: [['ovr', 'Run OVR'], ['gp', 'G'], ['ab', 'AB'], ['h', 'H'], ['hr', 'HR'], ['rbi', 'RBI'], ['r', 'R'], ['sb', 'SB'], ['avg', 'AVG'], ['app', 'App'], ['w', 'W'], ['l', 'L'], ['era', 'ERA'], ['ip', 'IP'], ['so', 'K'], ['sv', 'SV']],
     volleyball: [['sp', 'Sets'], ['k', 'Kills'], ['a', 'Assists'], ['d', 'Digs'], ['b', 'Blocks'], ['sa', 'Aces'], ['hp', 'Hit %']],
     soccer: [['gp', 'G'], ['g', 'Goals'], ['a', 'Assists'], ['pts', 'Pts'], ['sv', 'Saves'], ['sho', 'SO'], ['gaa', 'GAA'], ['w', 'W']],
   };

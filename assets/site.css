@@ -754,25 +754,15 @@ html.fb-open { overflow: hidden; }
 .fb-msg { margin: 0; white-space: normal; overflow-wrap: anywhere; }
 .fb-meta pre { white-space: pre-wrap; font-size: 12px; }
 .fb-st { text-transform: uppercase; font-weight: 700; letter-spacing: .04em; }
-/* Play today: sample layouts */
+/* Play today (home): dynasty card + games by sport */
 .pt-dyn { position: relative; display: grid; gap: 6px; align-content: start; padding: 16px 18px; border-radius: 12px; text-decoration: none; color: #fff; overflow: hidden;
   background: radial-gradient(120% 140% at 100% 0%, rgba(255,130,0,.55), transparent 55%), linear-gradient(135deg, #15181d, #262b33); border: 1px solid #2f353d; transition: transform .15s, box-shadow .15s; margin-top: 14px; z-index: 1; }
 .pt-dyn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(0,0,0,.25); }
-.pt-dyn.big { padding: 20px 22px; min-height: 100%; box-sizing: border-box; }
 .pt-dyn-k { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #F2D600; }
 .pt-dyn-t { font-family: var(--f-display); font-size: clamp(24px, 3.4vw, 34px); font-weight: 800; line-height: 1; text-transform: uppercase; }
-.pt-dyn.big .pt-dyn-t { font-size: clamp(28px, 4.4vw, 44px); }
 .pt-dyn-p { color: #d5dbe2; font-size: 14.5px; max-width: 52ch; }
 .pt-dyn-go { justify-self: start; margin-top: 4px; background: var(--orange); color: #fff; font-weight: 800; padding: 8px 14px; border-radius: 999px; font-size: 14px; }
-.pt-dyn-soon { color: #9aa4b0; font-size: 12.5px; margin-top: 2px; }
 .pt-new { position: absolute; top: 12px; right: 12px; background: #F2D600; color: #141414; font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; }
-.pt-a { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 14px; position: relative; z-index: 1; }
-.pt-side .pb-label { margin-top: 14px; }
-.pt-runs-col { display: grid; gap: 6px; }
-.pt-runs-col .pb-run { padding: 7px 12px; }
-.pt-runs-col .pb-run b { font-size: 19px; display: inline; margin-right: 8px; }
-.pt-runs-col .pb-run small { display: inline; }
-.pt-7 { grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr)); }
 .pt-tabs { display: flex; gap: 6px; overflow-x: auto; margin: 14px 0 10px; padding-bottom: 2px; scrollbar-width: thin; position: relative; z-index: 1; }
 .pt-tabs button { flex: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 7px 12px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
 .pt-tabs button small { font-size: 11.5px; color: var(--muted); font-weight: 700; }
@@ -780,16 +770,3 @@ html.fb-open { overflow: hidden; }
 .pt-tabs button[aria-selected="true"] small { color: #fff; opacity: .9; }
 .pt-panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 8px; margin-bottom: 8px; }
 .pt-soon { opacity: .6; } .pt-soon b { color: var(--muted) !important; }
-.pt-feat { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 10px; position: relative; z-index: 1; }
-.pt-feat .pt-dyn { margin-top: 0; }
-.pt-whatsnew { position: relative; display: grid; gap: 6px; align-content: start; padding: 16px 18px; border-radius: 12px; text-decoration: none; color: var(--fg); background: color-mix(in srgb, var(--orange) 9%, var(--surface)); border: 1px solid color-mix(in srgb, var(--orange) 35%, var(--line)); }
-.pt-whatsnew b { font-family: var(--f-display); font-size: 22px; font-weight: 800; text-transform: uppercase; line-height: 1.05; padding-right: 80px; }
-.pt-whatsnew span:not(.pt-new) { color: var(--muted); font-size: 14px; }
-.pt-sports { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 8px; }
-.pt-sport { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); text-decoration: none; }
-.pt-sport:hover { border-color: var(--orange); }
-.pt-sp-ic { font-size: 24px; } .pt-sport > span:nth-child(2) { flex: 1; min-width: 0; }
-.pt-sport b { display: block; font-size: 15px; } .pt-sport small { color: var(--muted); font-size: 12.5px; }
-.pt-sp-icons { font-size: 13px; letter-spacing: 2px; opacity: .8; white-space: nowrap; }
-@media (max-width: 760px) { .pt-a, .pt-feat { grid-template-columns: 1fr; } }
-@media (max-width: 560px) { .pt-7 { grid-template-columns: 1fr 1fr; } .pt-sp-icons { display: none; } }

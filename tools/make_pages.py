@@ -65,15 +65,15 @@ for rel, t in (("about", "About"), ("about/fix", "Corrections & suggestions"), (
 
 # games
 page("games", "Vol Games · Daily Tennessee sports games · The Vol Index",
-     "Daily games built on Tennessee history: 16-0, 40-0, 69-0, Vol Guesser, Power T Grid, VFL Career, trivia and more for every Vols sport.", GAMES_IMG, priority="0.9")
+     "Daily games built on Tennessee history: 16-0, 40-0, Road to Omaha, Vol Guesser, Power T Grid, VFL Career, trivia and more for every Vols sport.", GAMES_IMG, priority="0.9")
 GAMES = {"football": ["run", "guesser", "grid", "career", "rankings", "duel", "trivia"]}
 for sp in ["mens-basketball", "womens-basketball", "baseball", "softball"]: GAMES[sp] = ["run", "guesser", "rankings", "duel", "trivia"]
 for sp in ["volleyball", "soccer"]: GAMES[sp] = ["guesser", "rankings", "duel", "trivia"]
 RUN = {"football": ("16-0", GAME_DESC["run"]),
        "mens-basketball": ("40-0", "Draft a starting five from every era of Tennessee basketball, then play 31 real opponents, the SEC Tournament and March Madness. Can you go 40-0?"),
        "womens-basketball": ("40-0", "Draft a Lady Vols starting five from every era, then play 31 real opponents, the SEC Tournament and the NCAA Tournament. Can you go 40-0?"),
-       "baseball": ("69-0", "Draft a Tennessee lineup and pitching staff from every era, then play 56 games, the SEC Tournament, regionals, supers and Omaha. Can you go 69-0?"),
-       "softball": ("69-0", "Draft a Lady Vols lineup and pitching staff from every era, then play 56 games, the SEC Tournament, regionals, supers and the WCWS. Can you go 69-0?")}
+       "baseball": ("Road to Omaha", "Draft a Tennessee lineup and pitching staff from every era, then play 56 games, the SEC Tournament, regionals, supers and Omaha. Can you go perfect?"),
+       "softball": ("Road to OKC", "Draft a Lady Vols lineup and pitching staff from every era, then play 56 games, the SEC Tournament, regionals, supers and the WCWS. Can you go perfect?")}
 for s, games in GAMES.items():
     name = SPORTS[s]
     page(f"games/{s}", f"{name} games · Vol Games · The Vol Index", f"Daily Tennessee {name.lower()} games: " + ", ".join(RUN[s][0] if g == "run" else GAME_NAME[g] for g in games) + ".", GAMES_IMG, priority="0.8")

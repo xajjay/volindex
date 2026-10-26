@@ -342,7 +342,7 @@ button.gt-c:hover, .gt-c.sel { border-color: var(--orange); box-shadow: inset 0 
 .glines tr.ut th { color: var(--orange-ink); }
 .gtable tbody th { position: static; }
 
-/* 40-0 / 69-0 runs */
+/* 40-0 / Road to Omaha runs */
 .gbracket.wide { grid-template-columns: repeat(var(--cols), minmax(150px, 1fr)); }
 @media (max-width: 640px) { .gbracket.wide { grid-template-columns: 1fr; } }
 .gbt .gbn i { font-style: normal; font-size: 11px; }

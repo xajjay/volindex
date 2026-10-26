@@ -2,11 +2,11 @@
    40-0 (men's and women's basketball): spin an era, draft a starting five and a sixth player at their best season, then play
      a 31-game schedule (13 non-conference + 18 SEC) against real teams Tennessee played, the 16-team SEC Tournament
      (seeds 1-4 get a double bye) and the 64-team NCAA Tournament. A perfect run is 31 + 3 + 6 = 40-0.
-   69-0 (baseball and softball): draft a nine-player lineup, then a pitching staff (three weekend starters and a closer in
+   Road to Omaha / Road to OKC (baseball and softball): draft a nine-player lineup, then a pitching staff (three weekend starters and a closer in
      baseball, an ace and a No. 2 in softball). 56 regular-season games (SEC weekend series plus non-conference weekends and
      midweeks), the single-elimination SEC Tournament, a four-team double-elimination regional, a best-of-three super
      regional, the eight-team College World Series (two double-elimination brackets) and the best-of-three finals.
-     A perfect run is 56 + 3 + 3 + 2 + 3 + 2 = 69-0.
+     A perfect run is 56 + 3 + 3 + 2 + 3 + 2 = 69 straight wins (shown as "Perfect season", not the record).
    Players: data/games-<sport>.js season lines (rating = where that season ranks among every Tennessee season in our data).
    Opponents: data/run-opps.js, real team-seasons from Tennessee's schedules (tools/build_run_opps.py).
    Needs assets/games.js (window.VIG). The engine is exposed as window.VI_RUN2_ENGINE for balance testing. */
@@ -25,8 +25,8 @@
   const CONF = {
     mbb: { hoops: true, run: '40-0', icon: '🏀', reg: 31, nonconf: 13, secG: 18, periods: 2, plen: 1200, total: 142, sixth: 'Sixth man', who: 'Vols', lady: false },
     wbb: { hoops: true, run: '40-0', icon: '🏀', reg: 31, nonconf: 15, secG: 16, periods: 4, plen: 600, total: 136, sixth: 'Sixth player', who: 'Lady Vols', lady: true },
-    baseball: { hoops: false, run: '69-0', icon: '⚾', reg: 56, secSeries: 10, inn: 9, base: 5.7, k: 0.16, cws: "Men's College World Series", omaha: 'Omaha', who: 'Vols' },
-    softball: { hoops: false, run: '69-0', icon: '🥎', reg: 56, secSeries: 8, inn: 7, base: 4.3, k: 0.19, cws: "Women's College World Series", omaha: 'Oklahoma City', who: 'Lady Vols' },
+    baseball: { hoops: false, run: 'Road to Omaha', icon: '⚾', reg: 56, secSeries: 10, inn: 9, base: 5.7, k: 0.16, cws: "Men's College World Series", omaha: 'Omaha', who: 'Vols' },
+    softball: { hoops: false, run: 'Road to OKC', icon: '🥎', reg: 56, secSeries: 8, inn: 7, base: 4.3, k: 0.19, cws: "Women's College World Series", omaha: 'Oklahoma City', who: 'Lady Vols' },
   };
   // roster slots: [code, label, side (O lineup / D pitching / X basketball), fits(row)]
   // positions are strict: a player only goes in a spot his listed position allows (a G/F can play guard or forward)
@@ -763,7 +763,7 @@
     data(sport);
     const c = CONF[sport], X = R(sport), today = etDate(), daily = store.get(dkey(sport, 'run'), null);
     const sub = c.hoops ? `Spin an era and draft a starting five plus a ${c.sixth.toLowerCase()}, each at their best season. Then try to run the table: 31 games against real Tennessee opponents, the SEC Tournament and the NCAA Tournament. Perfect is 40-0.`
-      : `Spin an era and draft a lineup, then a pitching staff, each at their best season. Then try to run the table: 56 games against real Tennessee opponents, the SEC Tournament, regionals, supers and the ${c.cws}. Perfect is 69-0.`;
+      : `Spin an era and draft a lineup, then a pitching staff, each at their best season. Then try to run the table: 56 games against real Tennessee opponents, the SEC Tournament, regionals, supers and the ${c.cws}. Perfect means winning every game from opening day to the final out in ${c.omaha}.`;
     const body = frame(app, sport, 'run', sub);
     if (X.mode === 'daily' && daily && daily.final && (!X.st || !X.st.daily || X.st.date !== today || X.st.phase !== 'done')) { X.st = hydrate(daily.final); X.st.phase = 'done'; }
     const ch = V.challenge();
@@ -828,7 +828,7 @@
       <li><b>NCAA Tournament.</b> The committee seeds you from your record. Win six games in your region and at the Final Four. 31 + 3 + 6 = 40-0.</li>`
       : `<li><b>Spin.</b> Each spin lands on a five-season window and deals six players. Lineup first (catcher, first, second, short, third, three outfielders and a ${sport === 'baseball' ? 'DH' : 'DP'}; players listed only as infielders can play any base, and players with no listed position can only ${sport === 'baseball' ? 'DH' : 'DP'}), then the pitching staff (${sport === 'baseball' ? 'three weekend starters and a closer' : 'an ace and a No. 2'}). Three re-spins per run.</li>
       <li><b>Play.</b> 56 games: ${c.secSeries} SEC weekend series plus ${sport === 'softball' ? 'tournament weekends' : 'non-conference weekends'} and midweek games, all real teams Tennessee played since 2000. Play a weekend at a time or sim the season.</li>
-      <li><b>Postseason.</b> The single-elimination SEC Tournament (top four seeds get a double bye: three games), then the NCAA: a four-team double-elimination regional (three wins), a best-of-three super regional (two), the ${c.cws} in ${c.omaha} (three wins in a double-elimination bracket) and the best-of-three finals (two). 56 + 3 + 3 + 2 + 3 + 2 = 69-0.</li>`}
+      <li><b>Postseason.</b> The single-elimination SEC Tournament (top four seeds get a double bye: three games), then the NCAA: a four-team double-elimination regional (three wins), a best-of-three super regional (two), the ${c.cws} in ${c.omaha} (three wins in a double-elimination bracket) and the best-of-three finals (two). 56 + 3 + 3 + 2 + 3 + 2 = 69 games without a loss: a perfect season.</li>`}
     </ol></details>`;
   }
   function board(st, compact) {
@@ -1105,7 +1105,7 @@
       ? allReg(st).map(sq).join('') + (st.post.length ? '\n' + st.post.map(sq).join('') : '')
       : `Regular season ${reg.w}-${reg.l} (SEC ${reg.cw}-${reg.cl}) · Postseason ${st.post.filter(g => g.res.w).length}-${st.post.filter(g => !g.res.w).length}`;
     const rate = c.hoops ? `Team ${Math.round(me.team)}` : `Lineup ${Math.round(me.off)} · Pitching ${Math.round(me.pit)}`;
-    st.share = `${c.icon} ${c.run} ${D.name}${st.daily ? ' ' + st.date : ''}: ${s.wins}-${s.losses} · ${s.tier}\n${body}\n${rate}\n${st.daily ? link : 'Same draft: ' + link}`;
+    st.share = `${c.icon} ${c.run} ${D.name}${st.daily ? ' ' + st.date : ''}: ${!c.hoops && s.perfect ? 'Perfect season' : s.wins + '-' + s.losses} · ${s.tier}\n${body}\n${rate}\n${st.daily ? link : 'Same draft: ' + link}`;
     if (window.VI_TRACK) window.VI_TRACK('finish/' + st.sport + '/run/' + (st.daily ? 'daily' : 'free'));
     const save = JSON.parse(JSON.stringify(st, (k, v) => k === 'fits' ? undefined : v));
     if (st.daily) store.set(dkey(st.sport, 'run', st.date), { final: save, share: st.share });
@@ -1124,7 +1124,7 @@
     const champ = c.hoops && st.ncaa && st.ncaa.champ && !s.title ? teamOf(st, st.ncaa, st.ncaa.champ) : null;
     body.innerHTML = `${modeBar(X.mode, !!(dsv && dsv.final))}
       <div class="box gfinal ${s.title ? 'champ' : ''}"><div class="eyebrow">${st.daily ? 'Daily challenge · ' + esc(st.date) : 'Free play'}</div>
-        <h2>${s.wins}-${s.losses}</h2><div class="gtier">${esc(s.tier)}</div><p>${esc(s.tierText)}</p>
+        <h2>${!c.hoops && s.perfect ? 'Perfect season' : s.wins + '-' + s.losses}</h2><div class="gtier">${esc(s.tier)}</div><p>${esc(s.tierText)}</p>
         ${(st.notes || []).map(n => `<p class="dim">${esc(n)}</p>`).join('')}
         ${s.secChamp ? '<p class="dim">SEC Tournament champions</p>' : ''}
         ${champ ? `<p class="dim">National champion: ${esc(champ)}</p>` : ''}
