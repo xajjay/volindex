@@ -157,8 +157,8 @@
     const GM = S.GM, g = SD.G, won = GM.score[S.side] > GM.score[other(S.side)];
     updateBoard(); panel();
     const ctrl = S.el.querySelector('#sdgCtrl');
-    ctrl.innerHTML = `<div class="dyg-final"><b>${won ? 'Tennessee wins' : 'Tennessee loses'}</b>, ${GM.score[S.side]}-${GM.score[other(S.side)]}${S.hoops ? (GM.ot ? ' in ' + (GM.ot > 1 ? GM.ot + 'OT' : 'overtime') : '') : (GM.inn !== GM.maxInn ? ` (${GM.inn} innings)` : '')}.${topPerf()}<div class="grow" style="margin-top:10px"><button class="btn primary big" data-g="done">Continue</button></div></div>`;
-    if (won) banner(S.hoops ? 'VOLS WIN' : 'VOLS WIN', '#FF8200');
+    ctrl.innerHTML = `<div class="dyg-final"><b>${esc(GM.T[S.side].name)} ${won ? 'wins' : 'loses'}</b>, ${GM.score[S.side]}-${GM.score[other(S.side)]}${S.hoops ? (GM.ot ? ' in ' + (GM.ot > 1 ? GM.ot + 'OT' : 'overtime') : '') : (GM.inn !== GM.maxInn ? ` (${GM.inn} innings)` : '')}.${topPerf()}<div class="grow" style="margin-top:10px"><button class="btn primary big" data-g="done">Continue</button></div></div>`;
+    if (won) banner(SD.isTN() ? 'VOLS WIN' : 'WIN!', S.col[S.side]);
     S.tab = 'box'; tabs(); panel();
   }
   function topPerf() {
@@ -358,7 +358,10 @@
     const GM = S.GM;
     const fast = S.speed === 'fast';
     if (S.hoops) {
-      if (!(r.kind === 'shot' || r.kind === 'ft' || r.kind === 'to')) { if (r.kind === 'to' || r.kind === 'foul') drawIdle(); return done(); }
+      if (!(r.kind === 'shot' || r.kind === 'ft' || r.kind === 'to')) {
+        if (r.kind === 'foul') { try { const oO = GM.on[r.s].slice(), oD = GM.on[other(r.s)].slice(), F0 = SD.H.frames(GM, { s: r.s, per: r.per, kind: 'shot', play: 'iso', type: 'mid', time: 8 }, r.s, oO, oD), f1 = F0.frames[1]; S.lastFrame = { s: r.s, o: f1[1], d: f1[2], ball: f1[3], holder: f1[4], z: 0, onO: oO, onD: oD }; } catch (e) { /* keep the last picture */ } }
+        drawIdle(); return done();
+      }
       const onO = GM.on[r.s].slice(), onD = GM.on[other(r.s)].slice();
       const F = SD.H.frames(GM, r, r.s, onO, onD);
       const scale = fast ? 0.2 : 0.55, total = Math.max(400, F.T * 1000 * scale);

@@ -22,7 +22,7 @@
     })).then(err => {
       if (err) return err;
       const ut = SD.userT(), m = SD.readMeta(g.sport);
-      m[n] = { coach: g.coach.name, label: SD.phaseLabel(), rec: `${ut.w}-${ut.l}`, titles: g.hist.filter(h => h.finish === 'National champions').length, at: g.savedAt };
+      m[n] = { team: ut.name, coach: g.coach.name, label: SD.phaseLabel(), rec: `${ut.w}-${ut.l}`, titles: g.hist.filter(h => h.finish === 'National champions').length, at: g.savedAt };
       writeMeta(g.sport, m); return null;
     });
   };

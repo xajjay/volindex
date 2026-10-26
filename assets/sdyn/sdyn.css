@@ -16,3 +16,5 @@
 .dyg-ls td:first-child { text-align: left; }
 tr.st td:first-child { font-weight: 800; color: var(--orange-ink); }
 @media (max-width: 560px) { .sdg .dyg-extra .dyg-lab { min-width: 0; width: 100%; } .sdg .dyg-sc { font-size: 32px; } }
+.dyg-boxside .dyt td, .dyg-boxside .dyt th { white-space: nowrap; }
+.dyg-boxside .dyt td:first-child { white-space: normal; min-width: 120px; }

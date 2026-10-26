@@ -28,25 +28,57 @@
     SD.seed(o.seed || (Date.now() % 2147483647));
     const g = SD.G = { v: SD.VERSION, sport: o.sport, season: sp.season, coach: { name: o.coach || 'Coach', w: 0, l: 0 }, settings: Object.assign({ coachMode: 'coach', speed: 'slow', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, sound: false, autoPen: true }, o.settings || {}),
       teams: SD.teamsFor(o.sport), P: {}, nextId: 1, guests: {}, sched: [], phase: 'preseason', polls: { ap: [], hist: {} }, news: [], hist: [], awards: {}, recruit: null, off: null, slot: o.slot || 1, created: Date.now(), seed: SD.rstate(), rec: { season: {}, career: {} } };
-    g.user = g.teams.find(t => t.name === 'Tennessee').id;
-    g.teams.forEach(t => { t.w = 0; t.l = 0; t.cw = 0; t.cl = 0; t.pf = 0; t.pa = 0; t.hist = []; t.roster = t.id === g.user ? SD.importTennessee(t) : SD.genRoster(t); t.budget = SD.budgetFor(t); t.coach = t.id === g.user ? g.coach.name : SD.nameOf().split(' ')[1] + ' ' + pick(SD.LAST); });
+    g.user = (g.teams.find(t => t.name === (o.team || 'Tennessee')) || g.teams.find(t => t.name === 'Tennessee')).id;
+    g.teams.forEach(t => { t.w = 0; t.l = 0; t.cw = 0; t.cl = 0; t.pf = 0; t.pa = 0; t.hist = []; t.roster = t.name === 'Tennessee' ? SD.importTennessee(t) : SD.genRoster(t); t.budget = SD.budgetFor(t); t.coach = t.id === g.user ? g.coach.name : SD.nameOf().split(' ')[1] + ' ' + pick(SD.LAST); });
     SD.realPollBoost();
+    SD.preseasonTargets();
+    g.teams.forEach(SD.uniqueNums);
+    if (SD.applyPost) SD.applyPost();
     g.teams.forEach(t => { t.elo = 1500 + (SD.teamRating(t) - 75) * 22; t.preElo = t.elo; });
     SD.initNil();
     SD.buildSchedule();
     SD.initPoll();
     if (SD.initRecruiting) SD.initRecruiting(true);
     g.date = SD.addDays(SD.dateOf(sp.start), -7);
-    SD.news('season', `Coach ${g.coach.name} takes over ${SD.SP().name.toLowerCase()} at Tennessee`, `${SD.SP().label(g.season)} begins ${SD.dateStr(SD.dateOf(sp.start))}.`);
+    SD.news('season', `Coach ${g.coach.name} takes over ${SD.SP().name.toLowerCase()} at ${SD.UN()}`, `${SD.SP().label(g.season)} begins ${SD.dateStr(SD.dateOf(sp.start))}.`);
     return g;
   };
+  // preseason expectations (AJ, Oct. 2026): set team strength for named programs. The whole roster moves together.
+  //   women's hoops: Tennessee middle of the SEC, unranked; baseball: LSU first, Tennessee a close second (top 5);
+  //   softball: Tennessee top 3 with Oklahoma, Texas and Texas Tech.
+  SD.TARGETS = {
+    wbb: { Tennessee: 76 },
+    baseball: { LSU: 88, Tennessee: 87, Arkansas: 85 },
+    softball: { Oklahoma: 90, Texas: 89, Tennessee: 89, 'Texas Tech': 89, Florida: 87, UCLA: 87 },
+  };
+  SD.setTeamTo = (t, want) => {
+    for (let i = 0; i < 10; i++) {
+      const d = want - SD.teamRating(t); if (d === 0) break;
+      const step = Math.sign(d) * Math.max(1, Math.round(Math.abs(d) * 0.9));
+      t.roster.map(SD.P).forEach(p => { for (const k in p.at) p.at[k] = clamp(p.at[k] + step, 45, 99); SD.setOvr(p); });
+    }
+  };
+  // AJ's rating edits for real Tennessee players (from the Vol Ratings Desk): absolute ratings (at), personality (tr) and an
+  // overall target (ovr: the ratings he did not set move together to reach it). Applied after the preseason targets.
+  SD.POST = { mbb: {}, wbb: {}, baseball: {}, softball: {} };
+  SD.applyPost = () => {
+    const g = G(), X = SD.POST[g.sport] || {}, tn = SD.tnT(); if (!tn) return;
+    tn.roster.map(SD.P).forEach(p => {
+      const x = X[p.n]; if (!x) return;
+      if (x.at) for (const k in x.at) if (p.at[k] != null) p.at[k] = clamp(x.at[k], 40, 99);
+      if (x.ovr) { const free = Object.keys(p.at).filter(k => !(x.at && k in x.at)); for (let i = 0; i < 12 && free.length; i++) { SD.setOvr(p); const d = x.ovr - p.ovr; if (!d) break; free.forEach(k => { p.at[k] = clamp(p.at[k] + Math.sign(d) * Math.max(1, Math.round(Math.abs(d) * 0.8)), 40, 99); }); } }
+      if (x.tr) for (const k in x.tr) p.tr[k] = clamp(x.tr[k], 1, 99);
+      SD.setOvr(p);
+    });
+  };
+  SD.preseasonTargets = () => { const g = G(), T0 = SD.TARGETS[g.sport]; if (!T0) return; for (const n in T0) { const t = g.teams.find(x => x.name === n); if (t) SD.setTeamTo(t, T0[n]); } };
   // the real preseason poll: ranked teams get the strength their ranking says they have
   SD.realPollBoost = () => {
     const g = G(), A = root.SITE_AUTO && root.SITE_AUTO[g.sport], P = A && A.poll;
     if (!P || !P.top || SD.kind() !== 'hoops') return;
     if (P.date && P.date < g.season + '-09-01') return;   // last season's final poll: not this season
     P.top.forEach(([rk, name]) => {
-      const t = g.teams.find(x => x.name === name); if (!t || t.id === g.user) return;
+      const t = g.teams.find(x => x.name === name); if (!t || t.name === 'Tennessee') return;
       const want = 86.5 - rk * 0.28, cur = SD.teamRating(t);
       if (cur < want) { const L = SD.lineup(t); L.slice(0, 8).forEach(p => { const d = Math.round(want - cur + gauss()); for (const k in p.at) p.at[k] = clamp(p.at[k] + d, 50, 99); SD.setOvr(p); }); }
       t.realRank = rk;
@@ -54,6 +86,11 @@
   };
   SD.initNil = () => G().teams.forEach(t => { const pay = t.roster.map(SD.P); const tot = pay.reduce((s, p) => s + SD.nilValue(p, t), 0); const k = Math.min(1, t.budget * 0.92 / Math.max(1, tot)); pay.forEach(p => { p.nil = Math.round(SD.nilValue(p, t) * k / 5000) * 5000; }); });
   SD.userT = () => T(G().user);
+  SD.tnT = () => G().teams.find(t => t.name === 'Tennessee');           // the real Tennessee (user or not)
+  SD.UN = () => SD.userT().name;                                          // the user's school
+  SD.UC = () => SD.userT().conf;                                          // and its conference
+  SD.UCN = () => (SD.CONF_NAME[SD.UC()] || SD.UC()).replace(/ Conference$/, '');
+  SD.isTN = () => SD.userT().name === 'Tennessee';
   SD.news = (type, h, b, x) => { const g = G(); g.news.unshift(Object.assign({ type, h, b, y: g.season, d: g.date, ph: g.phase }, x || {})); if (g.news.length > 150) g.news.length = 150; };
 
   /* ---------- schedule ---------- */
@@ -70,7 +107,7 @@
       if (x.exh || x.date < SD.addDays(start, -3) || /SEC Tournament|NCAA|Regional/i.test(x.opp)) return;
       let nm = x.opp.replace(/^#\d+\s+/, '');
       if (/\/| or /.test(nm)) nm = pick(nm.split(/\/| or /).map(s => s.trim()));
-      let o = nm === 'TBD' ? pick(G().teams.filter(t => SD.POWER.includes(t.conf) && t.id !== g.user && t.conf !== 'SEC')) : byName(nm);
+      let o = nm === 'TBD' ? pick(G().teams.filter(t => SD.POWER.includes(t.conf) && t.name !== 'Tennessee' && t.conf !== 'SEC')) : byName(nm);
       if (!o) o = SD.guest(nm);
       out.push({ d: x.date, o: o.id, site: x.site || 'H', conf: !!x.conf || (o.conf === 'SEC' && x.date >= SD.dateOf(SD.kind() === 'hoops' ? '12-28' : '03-01')) });
     });
@@ -96,7 +133,7 @@
   const busyIdx = {};
   function busy(g, tid, d) { return g.sched.some(x => x.d === d && (x.h === tid || x.a === tid)); }
   function buildHoops(g, sp) {
-    const ut = SD.userT(), real = utReal();
+    const ut = SD.tnT(), real = utReal();
     const start = SD.dateOf(sp.start), confStart = SD.dateOf('12-30'), regEnd = SD.addDays(SD.dateOf(sp.ct.SEC.days[0]), -2);
     // Tennessee's real games
     const need = {}, cneed = {}, met = {};
@@ -120,11 +157,18 @@
       const days = c === 'SEC' && utConf.length ? [...new Set(utConf.concat(grid))].sort() : grid;
       for (let pass = 0; pass < 3; pass++) days.forEach(d => pairDay(g, d, ts.filter(t => t.id !== (real ? ut.id : -1)), cneed, met, 2, true));
     });
-    if (!real) { // a generated Tennessee schedule (later seasons): same as everyone, plus a few named games
-    }
+    topUp(g, real ? ut.id : -1, sp.nonConf + sp.confGames - 1, grid, confs);
+  }
+  // small conferences leave some schools short: fill everyone's season out (more conference games first, then anyone free)
+  function topUp(g, skip, target, days, confs) {
+    const cnt = {}; g.sched.forEach(x => { cnt[x.h] = (cnt[x.h] || 0) + 1; cnt[x.a] = (cnt[x.a] || 0) + 1; });
+    const short = {}; g.teams.forEach(t => { short[t.id] = t.id === skip ? 0 : Math.max(0, target - (cnt[t.id] || 0)); });
+    const m2 = {};
+    confs.forEach(c => { const ts = g.teams.filter(t => t.conf === c && short[t.id] > 0); if (ts.length < 2) return; for (let pass = 0; pass < 3; pass++) days.forEach(d => pairDay(g, d, ts, short, m2, 2, true)); });
+    for (let pass = 0; pass < 2; pass++) days.forEach(d => pairDay(g, d, g.teams.filter(t => short[t.id] > 0), short, m2, 1, false));
   }
   function buildDiamond(g, sp) {
-    const ut = SD.userT(), real = utReal(), soft = g.sport === 'softball';
+    const ut = SD.tnT(), real = utReal(), soft = g.sport === 'softball';
     const start = SD.dateOf(sp.start), ctStart = SD.dateOf(sp.ct.SEC.start), regEnd = SD.addDays(ctStart, -2);
     const total = soft ? 54 : 56, need = {}, cneed = {}, met = {};
     g.teams.forEach(t => { cneed[t.id] = (t.conf === 'SEC' ? sp.confSeries : Math.min(sp.confSeries, g.teams.filter(x => x.conf === t.conf).length - 1)) * 3; need[t.id] = total - cneed[t.id]; });
@@ -157,6 +201,12 @@
     // midweeks: Tuesdays (and some Wednesdays), mostly regional opponents
     const mids = []; for (let d = start; d <= regEnd; d = SD.addDays(d, 1)) if (SD.dow(d) === 2 || (SD.dow(d) === 3 && chance(0.3))) mids.push(d);
     for (let pass = 0; pass < 2; pass++) mids.forEach(d => pairDay(g, d, g.teams.filter(t => !(real && !soft && t.id === ut.id)), need, met, 2, false));
+    // short schedules (small conferences): extra weekend series against anyone free, then midweek games
+    const cnt = {}; g.sched.forEach(x => { cnt[x.h] = (cnt[x.h] || 0) + 1; cnt[x.a] = (cnt[x.a] || 0) + 1; });
+    const short = {}; g.teams.forEach(t => { short[t.id] = real && t.id === ut.id ? 0 : Math.max(0, total - 4 - (cnt[t.id] || 0)); });
+    const m2 = {};
+    weekends.forEach(d => { const avail = SD.shuffle(g.teams.filter(t => short[t.id] >= 3 && ![0, 1, 2].some(k => busy(g, t.id, SD.addDays(d, k))))); while (avail.length >= 2) { const a = avail.shift(); let j = avail.findIndex(b => b.conf === a.conf && !m2[a.id + '-' + b.id]); if (j < 0) j = avail.findIndex(b => !m2[a.id + '-' + b.id]); if (j < 0) continue; const b = avail.splice(j, 1)[0], home = chance(0.5) ? a : b; [0, 1, 2].forEach(k => g.sched.push(mk(SD.addDays(d, k), home.id, home === a ? b.id : a.id, { conf: a.conf === b.conf, series: true }))); short[a.id] -= 3; short[b.id] -= 3; m2[a.id + '-' + b.id] = m2[b.id + '-' + a.id] = 1; } });
+    for (let pass = 0; pass < 2; pass++) mids.forEach(d => pairDay(g, d, g.teams.filter(t => short[t.id] > 0), short, m2, 2, false));
   }
 
   /* ---------- the day ---------- */
@@ -167,7 +217,7 @@
   SD.oppOf = x => x.h === G().user ? x.a : x.h;
   SD.isHome = x => x.h === G().user && !x.neutral;
   // jersey numbers: unique on each team (real players keep theirs; generated players move off a taken number)
-  SD.uniqueNums = t => { if (!t.roster) return; const ps = t.roster.map(SD.P).filter(Boolean).sort((a, b) => (b.real ? 1 : 0) - (a.real ? 1 : 0)), used = new Set(); ps.forEach(p => { if (used.has(p.num) || p.num == null) { let n = SD.ri(0, 55), k = 0; while (used.has(n) && k++ < 200) n = (n + 1) % 100; p.num = n; } used.add(p.num); }); };
+  SD.uniqueNums = t => { if (!t.roster) return; const ps = t.roster.map(SD.P).filter(Boolean).sort((a, b) => (b.real ? 1 : 0) - (a.real ? 1 : 0) || b.yr - a.yr || a.id - b.id), used = new Set(); ps.forEach(p => { if (p.num == null || used.has(p.num)) { let free = []; for (let n = 0; n <= 55; n++) if (!used.has(n)) free.push(n); if (!free.length) for (let n = 56; n <= 99; n++) if (!used.has(n)) free.push(n); if (free.length) p.num = pick(free); } used.add(p.num); }); };
   SD.startGame = (x, user) => {
     const g = G(), H = T(x.h), A = T(x.a), k = SD.kind();
     SD.uniqueNums(H); SD.uniqueNums(A);
@@ -222,13 +272,17 @@
     return x.res;
   };
   // play every game before date d (and the user's game too if it is on an earlier date and we are simming)
+  // a safety net: a game left behind on a past date is played today instead of stalling the season
+  SD.fixPast = () => { const g = G(); g.sched.forEach(x => { if (!x.res && x.d < g.date) x.d = g.date; }); };
   SD.simTo = (d, inclUser) => {
-    const g = G(); let guard = 0;
+    const g = G(); let guard = 0; SD.fixPast();
     while (g.date < d && guard++ < 400) {
       const day = g.date;
       SD.gamesOn(day).filter(x => !x.res && (inclUser || (x.h !== g.user && x.a !== g.user))).forEach(x => SD.simGame(x));
       SD.endDay(day);
       g.date = SD.addDays(day, 1);
+      // brackets move every day, whether or not the user played (other conferences' next rounds)
+      if ((g.phase === 'ct' || g.phase === 'ncaa') && !g.sched.some(x => !x.res && x.d <= day && (inclUser || (x.h !== g.user && x.a !== g.user)))) SD.postAfterDay();
     }
   };
   SD.endDay = d => {
@@ -273,13 +327,13 @@
       g.ct[c] = { seeds: st.map(t => t.id).slice(0, size), rounds: [], size, days, champ: null, name: (SD.CONF_NAME[c] || c) + ' Tournament' };
     });
     SD.ctNextRound();
-    SD.news('ct', `Conference tournament week`, `Tennessee is the No. ${(g.ct.SEC ? g.ct.SEC.seeds.indexOf(g.user) + 1 : 0) || '—'} seed in the ${G().sport === 'softball' ? 'SEC Softball' : 'SEC'} Tournament.`);
+    SD.news('ct', `Conference tournament week`, (g.ct[SD.UC()] && g.ct[SD.UC()].seeds.includes(g.user) ? `${SD.UN()} is the No. ${g.ct[SD.UC()].seeds.indexOf(g.user) + 1} seed in the ${g.ct[SD.UC()].name}.` : `${SD.UN()} did not make the ${SD.UCN()} tournament.`));
   };
   // the next round of every conference tournament
   SD.ctNextRound = () => {
     const g = G();
     for (const c in g.ct) {
-      const C = g.ct[c]; if (C.champ != null) continue;
+      const C = g.ct[c]; if (C.champ != null || (C.cur && C.cur.some(x => !x.res))) continue;
       const r = C.rounds.length, S = C.seeds;
       let pairs = [];
       if (r === 0) {
@@ -294,7 +348,8 @@
         else { for (let i = 0; i + 1 < prev.length; i += 2) pairs.push([prev[i], prev[i + 1]]); }
       }
       if (!pairs.length) continue;
-      const day = C.days[Math.min(C.days.length - 1, r + (C.size === 16 ? 0 : C.size === 8 ? 2 : 3))];
+      let day = C.days[Math.min(C.days.length - 1, r + (C.size === 16 ? 0 : C.size === 8 ? 2 : 3))];
+      if (day < g.date) day = g.date;
       const games = pairs.filter(p => p[0] != null && p[1] != null).map(([a, b]) => { const sa = S.indexOf(a), sb = S.indexOf(b), hi = sa < sb ? a : b; return mk(day, hi, hi === a ? b : a, { neutral: true, kind: 'ct', conf: false, title: C.name, ct: c }); });
       C.cur = games; g.sched.push(...games);
     }
@@ -325,7 +380,7 @@
     g.phase = 'ncaa';
     const me = ranked.findIndex(t => t.id === g.user);
     if (hoops) setupMadness(g, ranked); else setupRegionals(g, ranked);
-    SD.news('ncaa', hoops ? 'Selection Sunday' : 'NCAA Tournament field announced', me >= 0 ? (hoops ? `Tennessee is a No. ${g.post.seedOf[g.user]} seed in the ${g.post.regionOf[g.user]} Region.` : `Tennessee is the No. ${me + 1} overall seed${me < 16 ? ' and hosts a regional' : ''}.`) : 'Tennessee is not in the field.');
+    SD.news('ncaa', hoops ? 'Selection Sunday' : 'NCAA Tournament field announced', me >= 0 ? (hoops ? `${SD.UN()} is a No. ${g.post.seedOf[g.user]} seed in the ${g.post.regionOf[g.user]} Region.` : `${SD.UN()} is the No. ${me + 1} overall seed${me < 16 ? ' and hosts a regional' : ''}.`) : `${SD.UN()} is not in the field.`);
   };
   // basketball: 4 regions of 16 (s-curve); First Four for the last four at-large and the four lowest automatic bids
   function setupMadness(g, ranked) {
@@ -493,8 +548,8 @@
       if (P.champ === g.user) finish = 'National champions';
       else { const lastG = g.sched.filter(x => x.kind === 'ncaa' && (x.h === g.user || x.a === g.user) && x.res).pop(); if (lastG) finish = 'Lost in the ' + lastG.title.replace(/^NCAA (East|West|South|Midwest) /, '').replace('NCAA ', ''); }
     }
-    const secC = g.ct && g.ct.SEC && g.ct.SEC.champ === g.user;
-    const entry = { y: g.season, w: ut.w, l: ut.l, cw: ut.cw, cl: ut.cl, ap: SD.apRank(ut.id), seed: P && P.seedOf ? P.seedOf[g.user] || null : null, finish, secReg: SD.standings('SEC')[0] && SD.standings('SEC')[0].id === g.user, secT: secC, champ: P && P.champ != null ? T(P.champ).name : null, poy: A.poy ? SD.P(A.poy).n : null };
+    const secC = g.ct && g.ct[ut.conf] && g.ct[ut.conf].champ === g.user;
+    const entry = { y: g.season, w: ut.w, l: ut.l, cw: ut.cw, cl: ut.cl, ap: SD.apRank(ut.id), seed: P && P.seedOf ? P.seedOf[g.user] || null : null, finish, secReg: SD.standings(ut.conf)[0] && SD.standings(ut.conf)[0].id === g.user, secT: secC, champ: P && P.champ != null ? T(P.champ).name : null, poy: A.poy ? SD.P(A.poy).n : null };
     g.hist.push(entry);
     g.teams.forEach(t => t.hist.push({ y: g.season, w: t.w, l: t.l, ap: t.ap }));
     SD.news('season', `${SD.SP().label(g.season)} in the books: ${ut.w}-${ut.l}`, finish + '.');
@@ -505,7 +560,7 @@
   /* ---------- the primary action: what happens next ---------- */
   // advance the calendar until it is the user's game day (or the season moves to its next stage)
   SD.advanceToUser = () => {
-    const g = G();
+    const g = G(); SD.fixPast();
     if (g.phase === 'preseason') SD.startSeason();
     let guard = 0;
     while (guard++ < 400) {

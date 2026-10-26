@@ -37,7 +37,7 @@
     if (first && R && R.commits) R.commits.forEach(c => {
       const pos = SD.kind() === 'hoops' ? (/wing|SF|forward/i.test(c.pos) ? 'SF' : /PG|point/i.test(c.pos) ? 'PG' : /C|center|post/i.test(c.pos) ? 'C' : 'SG') : /RHP|LHP|P\b/.test(c.pos) ? 'SP' : /C\b/.test(c.pos) ? 'C' : /OF/.test(c.pos) ? 'CF' : 'SS';
       const st = /5-star/.test(c.rank) ? 5 : /4-star|No\. [1-9]\d?\b/.test(c.rank) ? 4 : 3, comp = st === 5 ? 0.99 : st === 4 ? 0.95 : 0.89;
-      const p = prospect(year, Math.round((1 - comp) * 1000), n); p.n = c.name; p.pos = pos; p.rec.c = comp; p.rec.stars = st; p.commit = g.user; p.firm = true; p.real = true; p.home = c.from || p.home;
+      const p = prospect(year, Math.round((1 - comp) * 1000), n); p.n = c.name; p.pos = pos; p.rec.c = comp; p.rec.stars = st; p.commit = SD.tnT().id; p.firm = true; p.real = true; p.home = c.from || p.home;
       SD.setOvr(p); pool[p.id] = p;
     });
   };
@@ -77,10 +77,10 @@
       const need = (130 + p.rec.stars * 15) * (1 - Math.min(20, weekNo()) / 34);
       if (p.commit == null && lv >= need && lv >= second * 1.15 && (!isMe || (p.offer && !full && (p.rec.stars < 4 || p.visited || weekNo() >= 14)))) {
         p.commit = +lead; p.cwk = weekNo();
-        if (isMe) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos}, commits to Tennessee!`); SD.news('commit', `${p.rec.stars}-star ${p.pos} ${p.n} commits to Tennessee`, `No. ${p.rec.natl} nationally.`); }
+        if (isMe) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos}, commits to ${SD.UN()}!`); SD.news('commit', `${p.rec.stars}-star ${p.pos} ${p.n} commits to ${SD.UN()}`, `No. ${p.rec.natl} nationally.`); }
       } else if (p.commit != null && !p.firm && weekNo() - (p.cwk || 0) < 5 && !(p.commit === g.user && p.visited) && +lead !== p.commit && lv >= (p.interest[p.commit] || 0) * 1.35 && (!isMe || p.offer)) {
         const was = p.commit; p.commit = +lead;
-        if (isMe) logs.push(`FLIP: ${p.n} flips to Tennessee!`); else if (was === g.user) logs.push(`DECOMMIT: ${p.n} flips to ${T(+lead).name}.`);
+        if (isMe) logs.push(`FLIP: ${p.n} flips to ${SD.UN()}!`); else if (was === g.user) logs.push(`DECOMMIT: ${p.n} flips to ${T(+lead).name}.`);
       }
     });
     R.log = logs.concat(R.log).slice(0, 50);
@@ -145,6 +145,7 @@
     else if (st === 'progress') { g.teams.forEach(t => t.roster.forEach(id => develop(SD.P(id)))); }
     else if (st === 'cuts') { cutDown(); }
     else if (st === 'schedule') { return newSeason(); }
+    g.teams.forEach(SD.uniqueNums);
     o.stage = SD.OFF_ORDER[SD.OFF_ORDER.indexOf(st) + 1];
     if (o.stage === 'draft') runDraft();
     if (o.stage === 'progress') o.prog = progressPreview();
@@ -199,7 +200,7 @@
       const best = offers.sort((a, b) => val(b) - val(a))[0], t = T(+best[0]);
       T(p.portal.from).roster = T(p.portal.from).roster.filter(x => x !== p.id);
       t.roster.push(p.id); p.t = t.id; p.nil = best[1]; p.tin = g.season; p.prevT = p.portal.from;
-      if (t.id === g.user) { P.log.unshift(`${p.n} (${p.pos}) transfers to Tennessee.`); SD.news('portal', `Transfer: ${p.n} picks Tennessee`, ''); }
+      if (t.id === g.user) { P.log.unshift(`${p.n} (${p.pos}) transfers to ${SD.UN()}.`); SD.news('portal', `Transfer: ${p.n} picks ${SD.UN()}`, ''); }
       else if (p.portal.from === g.user) P.log.unshift(`${p.n} transfers to ${t.name}.`);
       p.portal = null;
     });
@@ -221,7 +222,7 @@
     g.off.draft = out.slice(0, n).map((p, i) => ({ id: p.id, pk: i + 1, t: p.t0 }));
     g.off.draft.forEach(x => { const p = SD.P(x.id); p.draft = { pk: x.pk, y: g.season }; });
     const mine = g.off.draft.filter(x => x.t === g.user);
-    if (mine.length) SD.news('draft', `${mine.length} Tennessee player${mine.length > 1 ? 's' : ''} drafted`, mine.map(x => SD.P(x.id).n + ' (No. ' + x.pk + ')').join(', '));
+    if (mine.length) SD.news('draft', `${mine.length} ${SD.UN()} player${mine.length > 1 ? 's' : ''} drafted`, mine.map(x => SD.P(x.id).n + ' (No. ' + x.pk + ')').join(', '));
   }
   function develop(p) {
     const work = (p.tr.work - 70) / 40, room = Math.max(0, p.ceil - p.ovr);
@@ -256,7 +257,7 @@
     SD.updatePoll();
     SD.initRecruiting(false);
     g.date = SD.addDays(SD.dateOf(SD.SP().start), -7);
-    SD.news('season', `${SD.SP().label(g.season)} preseason`, `Tennessee opens ${SD.apRank(g.user) ? 'at No. ' + SD.apRank(g.user) : 'unranked'}.`);
+    SD.news('season', `${SD.SP().label(g.season)} preseason`, `${SD.UN()} opens ${SD.apRank(g.user) ? 'at No. ' + SD.apRank(g.user) : 'unranked'}.`);
     return true;
   }
 })(typeof window !== 'undefined' ? window : globalThis);

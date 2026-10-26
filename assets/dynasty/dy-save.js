@@ -58,7 +58,7 @@
     })).then(err => {
       if (err) return err;
       const ut = DY.userT(), m = DY.readMeta();
-      m[n] = { coach: g.coach.name, season: g.season, label: DY.weekLabel(), rec: ut.w + '-' + ut.l, natl: g.hist.filter(h => h.finish === 'National champions').length, at: Date.now(), kb: Math.round(txt.length / 1024) };
+      m[n] = { team: ut.name, coach: g.coach.name, season: g.season, label: DY.weekLabel(), rec: ut.w + '-' + ut.l, natl: g.hist.filter(h => h.finish === 'National champions').length, at: Date.now(), kb: Math.round(txt.length / 1024) };
       writeMeta(m); return null;
     });
   };

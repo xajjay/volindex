@@ -210,7 +210,7 @@
       for (const name in DY.REC_MAP) {
         const k = DY.REC_MAP[name]; if (!l[k]) continue;
         for (const scope of ['season', 'career']) {
-          const rec = g.rec[scope][k]; if (!rec || rec.pid === p.id) continue;
+          const rec = g.rec[scope][k]; if (!rec || rec.pid === p.id || rec.blank) continue;
           const tot = (scope === 'career' ? DY.careerTotal(p, k, true) : ((p.s && p.s[k]) || 0)) + l[k];
           const key = scope + k + id;
           if (tot > rec.v && !S.recSeen[key]) {

@@ -66,7 +66,7 @@
         c = Math.round(c * 1e4) / 1e4;
         const hm = /,\s*([A-Za-z.]+)$/.exec(r.home || '');
         const p = prospect(pos, c, { n: r.name, home: r.home, st: hm ? DY.stAbbr(hm[1]) : 'TN', hs: r.hs, ht: htIn(r.ht) || undefined, wt: r.wt || undefined });
-        p.real = true; p.commit = g.user; p.firm = true; p.interest[g.user] = 200; p.offer = true; p.realNat = r.nat ? +r.nat : null;
+        p.real = true; p.commit = DY.UT_ID; p.firm = true; p.interest[DY.UT_ID] = 200; p.offer = true; p.realNat = r.nat ? +r.nat : null;
         out.push(p);
       });
     }
@@ -114,7 +114,7 @@
     const list = DY.genClass(year, withReal);
     const pool = {}; list.forEach(p => { pool[p.id] = p; });
     // year one: the real class is locked in (with NIL promises sized to each player's market value)
-    const locked = !!withReal && year === (g.startSeason || 2026) + 1;
+    const locked = !!withReal && year === (g.startSeason || 2026) + 1 && g.user === DY.UT_ID;
     g.recruit = { year, pool, board: [], hours: DY.HOURS(), log: [], classRank: null, signed: false, locked };
     const ut = DY.userT();
     list.filter(p => p.commit === g.user).forEach(p => { g.recruit.board.push(p.id); p.nilOffer = DY.recruitNil(p); p.nilLocked = true; });
@@ -194,12 +194,12 @@
       const visitOk = p.rec.stars < 4 || p.visited || w >= (p.rec.stars >= 5 ? 12 : 8);
       if (!p.commit && lv >= need && lv >= second * (w >= 10 ? 1.08 : 1.2) && (!g.teams[lead].user || (p.offer && !full && visitOk))) {
         p.commit = +lead;
-        if (g.teams[lead].user) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos} from ${p.home}, commits to Tennessee!`); DY.news('commit', `${p.rec.stars}-star ${DY.POS_NAME[p.pos].toLowerCase()} ${p.n} commits to Tennessee`, `No. ${p.rec.nat} nationally (${p.rec.c.toFixed(4)} composite). ${p.home}, ${p.hs}.`, { rid: p.id }); }
+        if (g.teams[lead].user) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos} from ${p.home}, commits to ${DY.UN()}!`); DY.news('commit', `${p.rec.stars}-star ${DY.POS_NAME[p.pos].toLowerCase()} ${p.n} commits to ${DY.UN()}`, `No. ${p.rec.nat} nationally (${p.rec.c.toFixed(4)} composite). ${p.home}, ${p.hs}.`, { rid: p.id }); }
         else if (p.rec.nat <= 50 && R.board.includes(p.id)) logs.push(`${p.n} (No. ${p.rec.nat}) commits to ${g.teams[lead].name}.`);
       } else if (p.commit && !p.firm && +lead !== p.commit && lv >= (p.interest[p.commit] || 0) * 1.35 && (!g.teams[lead].user || p.offer)) {
         const was = p.commit; p.commit = +lead;
-        if (g.teams[lead].user) { logs.push(`FLIP: ${p.n} flips from ${g.teams[was].name} to Tennessee!`); DY.news('commit', `${p.n} flips to Tennessee`, `The ${p.rec.stars}-star ${p.pos} had been committed to ${g.teams[was].name}.`); }
-        else if (g.teams[was].user) { logs.push(`DECOMMIT: ${p.n} flips to ${g.teams[lead].name}.`); DY.news('commit', `${p.n} flips from Tennessee to ${g.teams[lead].name}`, ''); }
+        if (g.teams[lead].user) { logs.push(`FLIP: ${p.n} flips from ${g.teams[was].name} to ${DY.UN()}!`); DY.news('commit', `${p.n} flips to ${DY.UN()}`, `The ${p.rec.stars}-star ${p.pos} had been committed to ${g.teams[was].name}.`); }
+        else if (g.teams[was].user) { logs.push(`DECOMMIT: ${p.n} flips to ${g.teams[lead].name}.`); DY.news('commit', `${p.n} flips from ${DY.UN()} to ${g.teams[lead].name}`, ''); }
       }
     });
     R.log = logs.concat(R.log).slice(0, 60);
@@ -285,7 +285,7 @@
     const ch = clamp(0.55 - (dg - 82) * 0.06 + (p.tr.loyal - 60) / 140 + raise / Math.max(100000, p.nilV || DY.nilValue(p, ut)) * 0.3, 0.02, 0.85);
     const ok = chance(ch);
     o.pitched[id] = ok;
-    if (ok) { p.leave = null; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); DY.addLog(p, `Returned for another season (NIL now ${DY.money(p.nil)}).`); DY.news('nil', `${p.n} is coming back to Tennessee`, `He had declared for the NFL Draft.`, { pid: p.id }); }
+    if (ok) { p.leave = null; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); DY.addLog(p, `Returned for another season (NIL now ${DY.money(p.nil)}).`); DY.news('nil', `${p.n} is coming back to ${DY.UN()}`, `He had declared for the NFL Draft.`, { pid: p.id }); }
     return ok ? `${p.n} is coming back!` : `${p.n} is staying in the draft.`;
   };
   // in-season look ahead: how likely a junior or older is to leave early for the NFL
@@ -460,7 +460,7 @@
         if (final || chance(0.55) || +best[0] === ut.id && chance(0.3)) {
           const t = g.teams[best[0]];
           p.t = t.id; p.nil = best[1]; t.roster.push(p.id); p.prevT = p.portal.from; p.tin = g.season; DY.addLog(p, `Transferred from ${g.teams[p.portal.from].name} to ${t.name}.`);
-          if (t.user) { P.log.unshift(`${p.n} (${p.pos}, ${p.ovr}) commits to Tennessee from ${g.teams[p.portal.from].name}.`); DY.news('portal', `Transfer: ${p.n} picks Tennessee`, `${p.pos}, ${p.ovr} OVR, from ${g.teams[p.portal.from].name}.`, { pid: p.id }); }
+          if (t.user) { P.log.unshift(`${p.n} (${p.pos}, ${p.ovr}) commits to ${DY.UN()} from ${g.teams[p.portal.from].name}.`); DY.news('portal', `Transfer: ${p.n} picks ${DY.UN()}`, `${p.pos}, ${p.ovr} OVR, from ${g.teams[p.portal.from].name}.`, { pid: p.id }); }
           else if (p.portal.from === ut.id) P.log.unshift(`${p.n} transfers to ${t.name}.`);
           delete P.mine[id];
           p.portal = null;
@@ -544,7 +544,7 @@
       }
     }
     const mine = ut.roster.map(DY.P).filter(p => p.firstY === g.season + 1);
-    DY.news('signing', `Signing day: Tennessee signs ${mine.length}`, `Class rank: No. ${R.classRank || '—'}. Headliners: ${mine.sort((a, b) => b.rec.c - a.rec.c).slice(0, 3).map(p => p.n + ' (' + p.rec.stars + '★ ' + p.pos + ')').join(', ')}.`);
+    DY.news('signing', `Signing day: ${DY.UN()} signs ${mine.length}`, `Class rank: No. ${R.classRank || '—'}. Headliners: ${mine.sort((a, b) => b.rec.c - a.rec.c).slice(0, 3).map(p => p.n + ' (' + p.rec.stars + '★ ' + p.pos + ')').join(', ')}.`);
     g.recruit.signed = true; g.recruit.finalRank = R.classRank;
   };
 
@@ -718,6 +718,7 @@
   };
   DY.newSeason = () => {
     const g = G();
+    g.teams.forEach(DY.fixNums);
     DY.cleanNonconf(g.season + 1);
     g.season++;
     g.teams.forEach(t => {
@@ -739,7 +740,7 @@
     DY.buildSchedule(g.season);
     DY.preseasonPoll();
     DY.initRecruiting(true);
-    DY.news('league', `${g.season} preseason: Tennessee opens at No. ${DY.apRank(ut.id) || 'NR'}`, `AP Top 5: ${g.polls.ap.slice(0, 5).map((x, i) => (i + 1) + '. ' + DY.T(x.t).name).join(', ')}.`);
+    DY.news('league', `${g.season} preseason: ${DY.UN()} opens at No. ${DY.apRank(ut.id) || 'NR'}`, `AP Top 5: ${g.polls.ap.slice(0, 5).map((x, i) => (i + 1) + '. ' + DY.T(x.t).name).join(', ')}.`);
   };
   // keep the save small: players who left CPU teams are dropped unless they won something
   function trimPlayers() {

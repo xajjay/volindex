@@ -215,7 +215,7 @@ Northern Illinois|MAC|0|0|50|52`;
     return out;
   };
   SD.abbrOf = n => { const w = n.replace(/[^A-Za-z ]/g, '').split(' ').filter(Boolean); return (w.length > 1 ? w.map(x => x[0]).join('') : n.slice(0, 4)).toUpperCase().slice(0, 5); };
-  SD.hashColor = n => { let h = 0; for (const c of n) h = (h * 31 + c.charCodeAt(0)) >>> 0; return 'hsl(' + (h % 360) + ',55%,35%)'; };
+  SD.hashColor = n => { let h = 0; for (const c of n) h = (h * 31 + c.charCodeAt(0)) >>> 0; const H = (h % 360) / 60, C = 0.55 * (1 - Math.abs(2 * 0.35 - 1)), X = C * (1 - Math.abs(H % 2 - 1)), m = 0.35 - C / 2; const [r, g, b] = H < 1 ? [C, X, 0] : H < 2 ? [X, C, 0] : H < 3 ? [0, C, X] : H < 4 ? [0, X, C] : H < 5 ? [X, 0, C] : [C, 0, X]; return '#' + [r, g, b].map(v => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join(''); };
 
   /* ---------- the sports ---------- */
   // Men's basketball 2026-27: SEC Tournament Mar. 10-14 (Nashville); Selection Sunday Mar. 14; First Four Mar. 16-17; first and second

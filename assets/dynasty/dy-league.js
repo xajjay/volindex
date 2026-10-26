@@ -8,6 +8,10 @@
   const G = () => DY.G;
   DY.T = id => id >= 1000 ? DY.fcsCache(id) : G().teams[id];
   DY.userT = () => G().teams[G().user];
+  DY.tnT = () => G().teams[DY.UT_ID];                 // the real Tennessee (the user's team or a CPU opponent)
+  DY.isTN = () => G().user === DY.UT_ID;
+  DY.UN = () => DY.userT().name;
+  DY.nick = () => DY.isTN() ? 'the Vols' : DY.UN();
   const tname = id => DY.T(id).name;
 
   /* ---------- dates ---------- */
@@ -28,7 +32,7 @@
     const seed = opts.seed || (Date.now() % 2147483647);
     DY.seed(seed);
     const g = DY.G = {
-      v: DY.VERSION, seed, season: 2026, startSeason: 2026, phase: 'preseason', week: 0, P: {}, nextId: 1, teams: [], user: DY.UT_ID,
+      v: DY.VERSION, seed, season: 2026, startSeason: 2026, phase: 'preseason', week: 0, P: {}, nextId: 1, teams: [], user: (DY.TEAMS.find(t => t.name === opts.team) || { id: DY.UT_ID }).id,
       coach: { name: opts.coach || 'Coach', arch: opts.arch || 'motivator', w: 0, l: 0, hist: [] },
       settings: Object.assign({ cfp: 'real', recruiting: 'manual', portal: 'manual', nil: 'manual', coachMode: 'offense', speed: 'slow', injuries: true, shake: true, difficulty: 'heisman', autosave: true, offStyle: 'power', watchSeason: false }, opts.settings || {}),
       sched: [], polls: { ap: [], cfp: null, hist: {} }, news: [], hist: [], awards: {}, rec: null, legacy: {}, post: null, off: null, recruit: null, created: Date.now(),
@@ -38,23 +42,25 @@
       const t = Object.assign({}, t0, { roster: [], depth: {}, w: 0, l: 0, cw: 0, cl: 0, pf: 0, pa: 0, res: [], hist: [] });
       t.style = DY.STYLE_OF[t.name] || wpick(Object.keys(DY.STYLES).filter(s => s !== 'option'), s => s === 'spread' ? 4 : s === 'pro' ? 3 : s === 'tempo' ? 2 : s === 'air' ? 1 : 1.2);
       t.aggr = clamp(0.5 + gauss() * 0.15, 0.2, 0.9);
-      t.coach = t.id === DY.UT_ID ? g.coach.name : DY.coachName();
+      t.coach = t.id === g.user ? g.coach.name : DY.coachName();
       t.budget = DY.teamBudget(t);
       g.teams.push(t);
-      if (t.id === DY.UT_ID) { t.user = true; DY.importTennessee(t); t.depthEdited = true; } else DY.genRoster(t);
+      if (t.id === g.user) t.user = true;
+      if (t.id === DY.UT_ID) { DY.importTennessee(t); t.depthEdited = t.user; } else { DY.genRoster(t); if (t.user) DY.fillRoster(t, 84); }
     });
+    g.teams.forEach(DY.fixNums);
     const ut = DY.userT();
     ut.style = g.settings.offStyle || 'power'; DY.pickCaptains(ut);
     DY.seedPast(g);
     // NIL: contracts sized to the budget
-    DY.initNil(ut);
+    DY.initNil(ut); if (!DY.isTN()) DY.initNil(DY.tnT());
     g.teams.forEach(t => DY.pickCaptains(t)); g.camp = { y: g.season, list: [] };
     g.teams.forEach(t => { const o = DY.teamOvr(t); t.elo = 1500 + (o.ovr - 76) * 26 + (t.prestige - 70) * 1.2; t.preElo = t.elo; });
     DY.buildSchedule(g.season);
     DY.preseasonPoll();
     if (DY.initRecruiting) DY.initRecruiting(true);
     DY.initRecords();
-    DY.news('league', `${g.coach.name} takes over at Tennessee`, `The ${g.season} season opens ${DY.dateStr(DY.weekDate(g.season, 1))} against ${tname(DY.userGames(1)[0] ? DY.oppOf(DY.userGames(1)[0]) : 0)}. The Vols start the year No. ${DY.apRank(ut.id) || 'NR'} in the preseason AP poll.`);
+    DY.news('league', `${g.coach.name} takes over at ${DY.UN()}`, `The ${g.season} season opens ${DY.dateStr(DY.weekDate(g.season, 1))} against ${tname(DY.userGames(1)[0] ? DY.oppOf(DY.userGames(1)[0]) : 0)}. The Vols start the year No. ${DY.apRank(ut.id) || 'NR'} in the preseason AP poll.`);
     return g;
   };
   DY.initNil = t => {
@@ -240,6 +246,7 @@
   };
   DY.startGame = (x, user) => {
     const g = G();
+    DY.fixNums(DY.T(x.h)); DY.fixNums(DY.T(x.a));
     const GM = DY.newGame(DY.T(x.h), DY.T(x.a), Object.assign(DY.gameOpts(x), user ? { user: x.h === g.user ? 'h' : 'a', coach: g.settings.coachMode } : {}));
     return GM;
   };
@@ -334,7 +341,7 @@
     if (!DY.canStartToday()) return 'The current-season data is not available.';
     const played = F.schedule.filter(x => x.result);
     const lastWk = DY.weekOfDate(g.season, played[played.length - 1].date);
-    const ut = DY.userT(), real = {};
+    const ut = DY.tnT(), me = DY.userT(), real = {};
     played.forEach(x => { const o = DY.byName(x.opp); if (o) real[o.id] = x; });
     if (DY.autoCamp) DY.autoCamp();
     DY.startSeason();
@@ -342,7 +349,9 @@
     // play the weeks that already happened
     let guard = 0;
     while (g.phase === 'season' && g.week <= lastWk && guard++ < 20) {
-      const ug = DY.userGames(g.week)[0];
+      const my = DY.userGames(g.week)[0];
+      if (my && !my.res && my.h !== ut.id && my.a !== ut.id) DY.simGame(my);
+      const ug = G().sched.find(x => x.wk === g.week && (x.h === ut.id || x.a === ut.id));
       if (ug && !ug.res) {
         DY.simGame(ug);
         const o = ug.h === ut.id ? ug.a : ug.h, rx = real[o];
@@ -402,7 +411,7 @@
     DY.initRecords();
     g.news = [];
     g.startToday = { asOf: TD.asOf, week: lastWk, src: TD.source };
-    DY.news('poll', `You take over Tennessee at ${ut.w}-${ut.l} (${ut.cw}-${ut.cl} SEC)`, `The Vols are ${ut.ap ? 'No. ' + ut.ap + ' in the AP poll' : 'unranked'} with ${DY.userGames().filter(x => !x.res && x.wk > lastWk).length} regular-season games left. Records, scores and Tennessee's stats are real through ${DY.dateStr(new Date(played[played.length - 1].date + 'T12:00:00Z'))}.`);
+    DY.news('poll', `You take over ${me.name} at ${me.w}-${me.l} (${me.cw}-${me.cl} ${me.conf})`, `${DY.isTN() ? 'The Vols are' : me.name + ' is'} ${me.ap ? 'No. ' + me.ap + ' in the AP poll' : 'unranked'} with ${DY.userGames().filter(x => !x.res && x.wk > lastWk).length} regular-season games left. Records, scores and Tennessee's stats are real through ${DY.dateStr(new Date(played[played.length - 1].date + 'T12:00:00Z'))}.`);
     return null;
   };
   DY.simGame = x => { const GM = DY.startGame(x, false); DY.playFull(GM); DY.bankGame(x, GM); return GM; };
@@ -510,7 +519,7 @@
       const prev = {}; (g.polls.cfp || []).forEach((x, i) => prev[x.t] = i + 1);
       g.polls.cfp = g.teams.slice().sort((a, b) => DY.cfpKey(b, wk === 14) - DY.cfpKey(a, wk === 14)).slice(0, 25).map(t => ({ t: t.id, prev: prev[t.id] || null, rec: t.w + '-' + t.l }));
       g.polls.cfpWeek = wk;
-      if (wk === DY.CFP_WEEKS[0]) DY.news('poll', `First College Football Playoff rankings are out`, `${g.polls.cfp.slice(0, 4).map((x, i) => (i + 1) + '. ' + tname(x.t)).join(', ')}. Tennessee is ${DY.cfpRank(g.user) ? 'No. ' + DY.cfpRank(g.user) : 'outside the top 25'}.`);
+      if (wk === DY.CFP_WEEKS[0]) DY.news('poll', `First College Football Playoff rankings are out`, `${g.polls.cfp.slice(0, 4).map((x, i) => (i + 1) + '. ' + tname(x.t)).join(', ')}. ${DY.UN()} is ${DY.cfpRank(g.user) ? 'No. ' + DY.cfpRank(g.user) : 'outside the top 25'}.`);
     }
   };
 
@@ -559,7 +568,7 @@
     });
     g.post.bowls = bowls;
     const inField = field.findIndex(t => t.id === g.user);
-    DY.news('cfp', `Selection Day: ${size}-team playoff field set`, `No. 1 seed ${field[0].name}. ${inField >= 0 ? `Tennessee is the No. ${inField + 1} seed.` : `Tennessee is not in the field${bowls.find(x => x.h === g.user || x.a === g.user) ? ' and is headed to the ' + bowls.find(x => x.h === g.user || x.a === g.user).title : ''}.`}`);
+    DY.news('cfp', `Selection Day: ${size}-team playoff field set`, `No. 1 seed ${field[0].name}. ${inField >= 0 ? `${DY.UN()} is the No. ${inField + 1} seed.` : `${DY.UN()} is not in the field${bowls.find(x => x.h === g.user || x.a === g.user) ? ' and is headed to the ' + bowls.find(x => x.h === g.user || x.a === g.user).title : ''}.`}`);
     g.phase = 'post';
     DY.buildRound();
   };
@@ -706,7 +715,7 @@
     best(x => x.t.conf === 'SEC' && DY.SIDE(x.p.pos) === 'D', 'SECD', 'secd');
     best(x => x.t.conf === 'SEC' && x.p.yr === 1, 'SECF', 'secf');
     const ut = DY.userT(), mine = g.teams[g.user].roster.map(DY.P).filter(p => p.aw.some(a => a.y === y));
-    DY.news('awards', `${H.n} (${tname(H.t)}) wins the Heisman Trophy`, `${H.pos}. Tennessee honorees: ${mine.length ? mine.map(p => p.n + ' (' + p.aw.filter(a => a.y === y).map(a => a.a).join(', ') + ')').join('; ') : 'none'}.`, { pid: H.id });
+    DY.news('awards', `${H.n} (${tname(H.t)}) wins the Heisman Trophy`, `${H.pos}. ${DY.UN()} honorees: ${mine.length ? mine.map(p => p.n + ' (' + p.aw.filter(a => a.y === y).map(a => a.a).join(', ') + ')').join('; ') : 'none'}.`, { pid: H.id });
   };
 
   /* ---------- program records (seeded with the real UT record book) ---------- */
@@ -715,6 +724,8 @@
   DY.initRecords = () => {
     const g = G(), R = root.SITE && root.SITE.footballRecords;
     g.rec = { game: {}, season: {}, career: {} };
+    // another school: its record book starts blank and fills in as your players set marks
+    if (!DY.isTN()) { for (const scope of ['game', 'season', 'career']) for (const name in REC_MAP) g.rec[scope][REC_MAP[name]] = { v: 0, n: '—', y: '', note: '', real: true, blank: true }; return; }
     for (const scope of ['game', 'season', 'career']) (R && R[scope] || []).forEach(r => { const k = REC_MAP[r[0]]; if (k) g.rec[scope][k] = { v: r[2], n: r[1], y: r[3], note: r[4] || '', real: true }; });
   };
   DY.checkRecords = (GM, x) => {
@@ -723,13 +734,13 @@
       const p = DY.P(+id); if (!p || p.t !== g.user) continue; const l = GM.ps[id];
       for (const name in REC_MAP) {
         const k = REC_MAP[name], sv = p.s && p.s[k], cs = g.rec.season[k];
-        if (sv && cs && sv > cs.v && cs.pid !== p.id) { g.rec.season[k] = { v: sv, n: p.n, y: String(g.season), pid: p.id, prev: cs.n }; DY.news('record', `${p.n} breaks Tennessee's season record`, `${sv} ${name.toLowerCase()} and counting, passing ${cs.n} (${cs.v}).`, { pid: p.id }); }
+        if (sv && cs && sv > cs.v && cs.pid !== p.id) { g.rec.season[k] = { v: sv, n: p.n, y: String(g.season), pid: p.id, prev: cs.n }; DY.news('record', `${p.n} breaks ${DY.UN()}'s season record`, `${sv} ${name.toLowerCase()} and counting, passing ${cs.n} (${cs.v}).`, { pid: p.id }); }
         else if (sv && cs && cs.pid === p.id && sv > cs.v) cs.v = sv;
         const cv = DY.careerTotal(p, k, true), cc = g.rec.career[k];
-        if (cv && cc && cv > cc.v && cc.pid !== p.id) { g.rec.career[k] = { v: cv, n: p.n, y: (p.firstY || g.season) + '–' + g.season, pid: p.id, prev: cc.n }; DY.news('record', `${p.n} is Tennessee's all-time leader in ${name.toLowerCase()}`, `${cv} career ${name.toLowerCase()}, passing ${cc.n} (${cc.v}).`, { pid: p.id }); GM.recBroke = (GM.recBroke || []).concat(`${p.n}: Tennessee's career ${name.toLowerCase()} record (${cv})`); }
+        if (cv && cc && cv > cc.v && cc.pid !== p.id) { g.rec.career[k] = { v: cv, n: p.n, y: (p.firstY || g.season) + '–' + g.season, pid: p.id, prev: cc.n }; DY.news('record', `${p.n} is ${DY.UN()}'s all-time leader in ${name.toLowerCase()}`, `${cv} career ${name.toLowerCase()}, passing ${cc.n} (${cc.v}).`, { pid: p.id }); if (!cc.blank) GM.recBroke = (GM.recBroke || []).concat(`${p.n}: ${DY.UN()}'s career ${name.toLowerCase()} record (${cv})`); }
         else if (cv && cc && cc.pid === p.id && cv > cc.v) cc.v = cv;
       }
-      for (const name in REC_MAP) { const k = REC_MAP[name], cur = g.rec.game[k]; if (l[k] && cur && l[k] > cur.v) { g.rec.game[k] = { v: l[k], n: p.n, y: String(g.season), note: 'vs. ' + DY.T(DY.oppOf(x)).name, pid: p.id, prev: cur.n }; DY.news('record', `${p.n} sets a Tennessee single-game record`, `${l[k]} ${name.toLowerCase()} against ${DY.T(DY.oppOf(x)).name}, passing ${cur.n} (${cur.v}).`, { pid: p.id }); } }
+      for (const name in REC_MAP) { const k = REC_MAP[name], cur = g.rec.game[k]; if (l[k] && cur && l[k] > cur.v) { g.rec.game[k] = { v: l[k], n: p.n, y: String(g.season), note: 'vs. ' + DY.T(DY.oppOf(x)).name, pid: p.id, prev: cur.n }; DY.news('record', `${p.n} sets a ${DY.UN()} single-game record`, `${l[k]} ${name.toLowerCase()} against ${DY.T(DY.oppOf(x)).name}, passing ${cur.n} (${cur.v}).`, { pid: p.id }); } }
     }
   };
   DY.updateRecordsSeason = () => {
@@ -739,7 +750,7 @@
         const k = REC_MAP[name];
         const v = p.s && p.s[k], cur = g.rec.season[k];
         if (v && cur && cur.pid === p.id) { if (v > cur.v) cur.v = v; }
-        else if (v && cur && v > cur.v) { g.rec.season[k] = { v, n: p.n, y: String(g.season), pid: p.id, prev: cur.n }; DY.news('record', `${p.n} breaks a Tennessee season record`, `${v} ${name.toLowerCase()}, passing ${cur.n} (${cur.v}).`, { pid: p.id }); }
+        else if (v && cur && v > cur.v) { g.rec.season[k] = { v, n: p.n, y: String(g.season), pid: p.id, prev: cur.n }; DY.news('record', `${p.n} breaks a ${DY.UN()} season record`, `${v} ${name.toLowerCase()}, passing ${cur.n} (${cur.v}).`, { pid: p.id }); }
         const cv = DY.careerTotal(p, k, true), cc = g.rec.career[k];
         if (cv && cc && cc.pid === p.id) { if (cv > cc.v) { cc.v = cv; cc.y = (p.firstY || g.season) + '–' + g.season; } }
         else if (cv && cc && cv > cc.v) { g.rec.career[k] = { v: cv, n: p.n, y: (p.firstY || g.season) + '–' + g.season, pid: p.id, prev: cc.n }; }
@@ -749,7 +760,7 @@
   DY.careerTotal = (p, k, incl) => { let v = 0; for (const y in p.car) v += p.car[y][k] || 0; if (incl && p.s) v += p.s[k] || 0; return v; };
 
   /* ---------- news ---------- */
-  DY.news = (type, h, b, extra) => { const g = G(); g.news.unshift(Object.assign({ type, h, b, y: g.season, w: g.week, ph: g.phase }, extra || {})); if (g.news.length > 160) g.news.length = 160; };
+  DY.news = (type, h, b, extra) => { const g = G(); if (type === 'record' && /— \(0\)|passing — /.test(b || '')) return; g.news.unshift(Object.assign({ type, h, b, y: g.season, w: g.week, ph: g.phase }, extra || {})); if (g.news.length > 160) g.news.length = 160; };
   DY.weekNews = w => {
     const g = G(), ut = DY.userT();
     // upsets of top-10 teams
@@ -761,6 +772,6 @@
     });
     const r = DY.apRank(ut.id);
     const prev = (g.polls.hist[g.season + '-' + (w - 1)] || []).indexOf(ut.id) + 1;
-    if (r !== (prev || null)) DY.news('poll', r ? `Tennessee ${prev ? (r < prev ? 'climbs' : 'slides') + ' to' : 'enters the poll at'} No. ${r}` : 'Tennessee drops out of the AP Top 25', `AP Top 5: ${g.polls.ap.slice(0, 5).map((x, i) => (i + 1) + '. ' + tname(x.t)).join(', ')}.`);
+    if (r !== (prev || null)) DY.news('poll', r ? `${DY.UN()} ${prev ? (r < prev ? 'climbs' : 'slides') + ' to' : 'enters the poll at'} No. ${r}` : `${DY.UN()} drops out of the AP Top 25`, `AP Top 5: ${g.polls.ap.slice(0, 5).map((x, i) => (i + 1) + '. ' + tname(x.t)).join(', ')}.`);
   };
 })(typeof window !== 'undefined' ? window : globalThis);

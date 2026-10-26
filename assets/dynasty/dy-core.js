@@ -134,6 +134,24 @@
     EDGE: [75.5, 1.4, 255, 14], DT: [75, 1.3, 300, 16], LB: [73.5, 1.4, 230, 10], CB: [71.5, 1.6, 186, 9], S: [72.5, 1.4, 202, 10], K: [72.5, 2, 190, 12], P: [74, 2, 205, 12], LS: [73.5, 1.5, 235, 10] };
   DY.htStr = h => `${Math.floor(h / 12)}'${h % 12}"`;
   const NUMS = { QB: [1, 19], RB: [0, 39], WR: [0, 19], TE: [80, 89], OT: [50, 79], IOL: [50, 79], EDGE: [5, 99], DT: [90, 99], LB: [0, 59], CB: [0, 39], S: [0, 39], K: [10, 49], P: [10, 49], LS: [40, 69] };
+  // jersey numbers: two players may share a number only if one plays offense and the other defense (they are never on the
+  // field together). Kickers, punters and snappers get a number of their own. Real players keep their real numbers.
+  DY.fixNums = team => {
+    if (!team || !team.roster) return;
+    const ps = team.roster.map(DY.P).filter(Boolean).sort((a, b) => (b.real ? 1 : 0) - (a.real ? 1 : 0) || b.yr - a.yr || a.id - b.id);
+    const used = { O: new Set(), D: new Set(), ST: new Set() };
+    const clash = (side, n) => side === 'ST' ? used.O.has(n) || used.D.has(n) || used.ST.has(n) : used[side].has(n) || used.ST.has(n);
+    ps.forEach(p => {
+      const side = DY.SIDE(p.pos);
+      if (p.num == null || (clash(side, p.num) && !p.real)) {
+        const r = NUMS[p.pos] || [0, 99], free = [];
+        for (let n = r[0]; n <= r[1]; n++) if (!clash(side, n)) free.push(n);
+        if (!free.length) for (let n = 0; n <= 99; n++) if (!clash(side, n)) free.push(n);
+        if (free.length) p.num = pick(free);
+      }
+      used[side].add(p.num);
+    });
+  };
   DY.makeName = () => {
     let n = pick(DY.FIRST) + ' ' + pick(DY.LAST);
     if (chance(0.045)) n += ' ' + pick(DY.SUFFIX);
@@ -523,6 +541,15 @@
     team.roster = ids; team.depth = DY.autoDepth(team);
     // starters at QB: make sure the starter is not a true freshman project unless the team is thin
     return ids;
+  };
+  // the user's team, when it isn't Tennessee: a full roster (CPU teams carry about 54-60 for speed)
+  DY.fillRoster = (team, n) => {
+    const mix = Object.entries(DY.ROSTER_MIX).filter(([pos]) => !['K', 'P', 'LS'].includes(pos));
+    while (team.roster.length < n) {
+      const pos = DY.wpick(mix, x => x[1])[0], yr = DY.wpick(CLASS_DIST, x => x[1])[0];
+      const p = DY.genPlayerFor(team, pos, yr, null); DY.G.P[p.id] = p; team.roster.push(p.id);
+    }
+    team.depth = DY.autoDepth(team);
   };
   // an FCS team for one game, built from a fixed seed (not saved)
   DY.TMP = {};

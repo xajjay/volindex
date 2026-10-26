@@ -543,3 +543,11 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
 .dy-fp b { font-size: 14px; }
 .dy-fp span { font-size: 12px; }
 .dy-tstars { color: #FF8200; letter-spacing: 1px; font-size: 14px; } .dy-tstars.big { font-size: 22px; }
+.dy-rets { margin-top: 10px; }
+.dy-rotrow select { max-width: 100%; border: 1px solid var(--line-strong); background: var(--surface); color: var(--fg); border-radius: 8px; padding: 6px 8px; font: inherit; font-size: 13px; }
+.dy-edrow { display: grid; grid-template-columns: 120px 1fr; gap: 10px; align-items: center; margin: 6px 0; font-size: 14px; }
+.dy-edrow .dy-in { width: 100%; }
+@media (max-width: 560px) { .dy-edrow { grid-template-columns: 1fr; gap: 4px; } }
+.dy-rotrow { min-width: 0; }
+.dy-rotrow select { width: 100%; min-width: 0; }
+@media (max-width: 560px) { .dy-rets .dy-rotrow { grid-template-columns: 1fr; gap: 4px; } .dy-rets .dy-rotrow b { display: none; } }
