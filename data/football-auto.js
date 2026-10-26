@@ -1,13 +1,12 @@
-/* Written by tools/update_data.py on 2026-10-25. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-10-26. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-10-25",
+ "updated": "2026-10-26",
  "team": {
   "record": "6-2",
   "sec": "3-2",
-  "pollWeek": "Week 8",
-  "coaches": 11,
-  "ap": 11,
+  "pollWeek": "Week 9",
+  "ap": 16,
   "apTop25": [
    [
     1,
@@ -15,101 +14,102 @@ window.SITE_AUTO.football = {
    ],
    [
     2,
-    "BYU"
-   ],
-   [
-    3,
     "Ohio State"
    ],
    [
-    4,
-    "Notre Dame"
-   ],
-   [
-    5,
+    3,
     "Georgia"
    ],
    [
-    6,
+    4,
     "Indiana"
    ],
    [
-    7,
-    "Ole Miss"
+    5,
+    "Notre Dame"
    ],
    [
-    8,
-    "Texas Tech"
-   ],
-   [
-    9,
-    "UCLA"
-   ],
-   [
-    10,
+    6,
     "Utah"
    ],
    [
-    11,
-    "Tennessee"
+    7,
+    "UCLA"
    ],
    [
-    12,
+    8,
+    "BYU"
+   ],
+   [
+    9,
     "Kentucky"
    ],
    [
-    13,
+    10,
     "Alabama"
    ],
    [
-    14,
-    "Houston"
-   ],
-   [
-    15,
-    "Iowa"
-   ],
-   [
-    16,
-    "USC"
-   ],
-   [
-    17,
-    "Wake Forest"
-   ],
-   [
-    18,
-    "LSU"
-   ],
-   [
-    19,
+    11,
     "Texas"
    ],
    [
-    20,
+    12,
+    "Ole Miss"
+   ],
+   [
+    13,
+    "Texas Tech"
+   ],
+   [
+    14,
+    "Wake Forest"
+   ],
+   [
+    15,
+    "LSU"
+   ],
+   [
+    16,
+    "Tennessee"
+   ],
+   [
+    17,
     "Florida"
    ],
    [
-    21,
-    "Boise State"
+    18,
+    "Houston"
    ],
    [
-    22,
-    "Missouri"
-   ],
-   [
-    23,
+    19,
     "SMU"
    ],
    [
-    24,
+    20,
+    "Boise State"
+   ],
+   [
+    20,
     "Northwestern"
    ],
    [
-    25,
+    22,
     "Arizona"
+   ],
+   [
+    23,
+    "Missouri"
+   ],
+   [
+    24,
+    "Oklahoma State"
+   ],
+   [
+    25,
+    "Wisconsin"
    ]
   ],
+  "coaches": 17,
   "ranks": {
    "ppg": [
     32.2,
@@ -1146,106 +1146,6 @@ window.SITE_AUTO.football = {
     "fr": 0,
     "ff": 0
    }
-  }
- },
- "natRanks": {
-  "stats": [
-   "Rushing yards",
-   "Rushing TD",
-   "Passing yards",
-   "Passing TD",
-   "Receiving yards",
-   "Receiving TD",
-   "Receptions",
-   "Tackles for loss",
-   "Sacks",
-   "Tackles",
-   "Passes defended",
-   "Interceptions"
-  ],
-  "players": {
-   "Tyree Weathersby": [
-    {
-     "stat": "Sacks",
-     "rank": 6
-    },
-    {
-     "stat": "Tackles for loss",
-     "rank": 27
-    }
-   ],
-   "Amare Campbell": [
-    {
-     "stat": "Tackles for loss",
-     "rank": 32
-    }
-   ],
-   "Xavier Gilliam": [
-    {
-     "stat": "Tackles for loss",
-     "rank": 7
-    },
-    {
-     "stat": "Sacks",
-     "rank": 12
-    }
-   ],
-   "Mariyon Dye": [
-    {
-     "stat": "Sacks",
-     "rank": 25
-    }
-   ],
-   "Ty Redmond": [
-    {
-     "stat": "Passes defended",
-     "rank": 3
-    }
-   ],
-   "Dejuan Lane": [
-    {
-     "stat": "Interceptions",
-     "rank": 12
-    }
-   ],
-   "Kayin Lee": [
-    {
-     "stat": "Interceptions",
-     "rank": 41
-    }
-   ],
-   "Faizon Brandon": [
-    {
-     "stat": "Passing TD",
-     "rank": 96
-    }
-   ],
-   "Mike Matthews": [
-    {
-     "stat": "Receiving yards",
-     "rank": 45
-    },
-    {
-     "stat": "Receptions",
-     "rank": 69
-    }
-   ],
-   "Braylon Staley": [
-    {
-     "stat": "Receptions",
-     "rank": 87
-    }
-   ],
-   "DeSean Bishop": [
-    {
-     "stat": "Rushing yards",
-     "rank": 2
-    },
-    {
-     "stat": "Rushing TD",
-     "rank": 6
-    }
-   ]
   }
  },
  "recruits": {
@@ -12931,16 +12831,16 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     7.8,
-     45,
-     40,
-     53
+     10.6,
+     31,
+     27,
+     38
     ],
     "ut": [
-     17.5,
-     13,
-     24,
-     16
+     17.9,
+     11,
+     17,
+     18
     ]
    },
    "fpi": {
@@ -13238,16 +13138,16 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     9.9,
-     33,
-     46,
-     30
+     9.7,
+     34,
+     44,
+     33
     ],
     "ut": [
-     17.5,
-     13,
-     24,
-     16
+     17.9,
+     11,
+     17,
+     18
     ]
    },
    "fpi": {
@@ -13537,16 +13437,16 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     22.6,
-     6,
-     10,
-     7
+     25.2,
+     3,
+     5,
+     5
     ],
     "ut": [
-     17.5,
-     13,
-     24,
-     16
+     17.9,
+     11,
+     17,
+     18
     ]
    },
    "fpi": {
@@ -13844,16 +13744,16 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     0.3,
-     72,
-     64,
-     86
+     -1.4,
+     77,
+     66,
+     89
     ],
     "ut": [
-     17.5,
-     13,
-     24,
-     16
+     17.9,
+     11,
+     17,
+     18
     ]
    },
    "fpi": {
@@ -14001,21 +13901,21 @@ window.SITE_AUTO.football = {
   }
  },
  "pear": {
-  "week": 8,
+  "week": 9,
   "ratings": [
    [
     "TSR",
-    "17.3",
+    "16.7",
     12
    ],
    [
     "SP+",
-    "17.5",
-    13
+    "17.9",
+    11
    ],
    [
     "FPI",
-    "18.1",
+    "16.8",
     12
    ],
    [
@@ -14025,153 +13925,146 @@ window.SITE_AUTO.football = {
    ],
    [
     "Massey",
-    "8.76",
-    11
+    "8.59",
+    14
    ],
    [
     "Dokter",
-    "68.84",
-    11
+    "67.23",
+    12
    ],
    [
     "Sagarin",
-    "88.19",
+    "86.83",
     11
    ],
    [
     "RQI",
-    "0.744",
-    8
+    "0.220",
+    17
    ],
    [
     "SOS",
-    "10.73",
-    29
+    "10.58",
+    26
    ]
   ],
   "offense": [
    [
     "Rating",
-    "38.30",
-    15
+    "38.40",
+    14
    ],
    [
     "Success rate",
     "0.04",
-    40
+    43
    ],
    [
     "EPA/play (PPA)",
-    "0.07",
-    58
+    "0.01",
+    80
    ],
    [
     "Rush PPA",
-    "0.18",
-    12
+    "0.11",
+    33
    ],
    [
     "Pass PPA",
-    "-0.06",
-    98
+    "-0.09",
+    104
    ],
    [
     "Points per opportunity",
-    "0.62",
-    46
+    "0.44",
+    61
    ],
    [
     "Drive quality",
-    "17.70",
-    19
+    "15.70",
+    24
    ]
   ],
   "defense": [
    [
     "Rating",
-    "21.00",
+    "21.70",
     14
    ],
    [
     "Success rate",
-    "-0.06",
-    22
+    "-0.05",
+    27
    ],
    [
     "EPA/play (PPA)",
-    "-0.27",
-    3
+    "-0.20",
+    8
    ],
    [
     "Rush PPA",
-    "-0.26",
-    9
+    "-0.15",
+    23
    ],
    [
     "Pass PPA",
-    "-0.25",
-    14
+    "-0.24",
+    19
    ],
    [
     "Points per opportunity",
-    "-1.63",
-    3
+    "-1.31",
+    8
    ],
    [
     "Drive quality",
-    "-20.90",
+    "-20.20",
     12
    ]
   ],
   "games": [
    [
-    "South Carolina",
-    29,
-    "Tennessee -3.0",
-    "31.5-28.5",
-    58.4
-   ],
-   [
     "Kentucky",
-    26,
-    "Tennessee -8.5",
-    "34.8-26.3",
-    72.2
+    20,
+    "Tennessee -6.4",
+    "33.9-27.5",
+    67.2
    ],
    [
     "Texas A&M",
-    24,
-    "Tennessee -2.0",
-    "29.7-27.7",
-    55.6
+    25,
+    "Tennessee -1.1",
+    "29.8-28.8",
+    53.1
    ],
    [
     "LSU",
     6,
-    "LSU -1.8",
-    "29.7-31.5",
-    45.0
+    "LSU -3.1",
+    "29.6-32.6",
+    41.4
    ],
    [
     "Vanderbilt",
-    62,
-    "Tennessee -13.3",
-    "35.2-21.9",
-    81.7
+    68,
+    "Tennessee -13.1",
+    "35.4-22.3",
+    81.3
    ]
   ],
   "played": [
    [
     "Furman",
-    49
+    57
    ],
    [
     "Georgia Tech",
-    70
+    79
    ],
    [
     "Kennesaw State",
-    114
+    123
    ],
    [
     "Texas",
@@ -14179,162 +14072,166 @@ window.SITE_AUTO.football = {
    ],
    [
     "Auburn",
-    28
+    34
    ],
    [
     "Arkansas",
-    60
+    61
    ],
    [
     "Alabama",
     7
+   ],
+   [
+    "South Carolina",
+    28
    ]
   ],
-  "record": "6-1",
+  "record": "6-2",
   "sec": {
    "Georgia": [
-    23.9,
+    24.3,
     4,
-    43.8,
+    44.5,
     5,
-    19.9,
-    7,
-    37
+    20.2,
+    5,
+    39
    ],
    "LSU": [
-    22.1,
+    22.8,
     6,
-    42.6,
+    43.5,
     6,
-    20.5,
+    20.7,
     10,
-    25
+    20
    ],
    "Alabama": [
-    21.8,
+    22.5,
     7,
-    44.9,
+    45.1,
     3,
-    23.1,
-    32,
-    5
+    22.6,
+    26,
+    4
    ],
    "Texas": [
-    21.6,
+    21.5,
     8,
-    41.4,
-    9,
-    19.8,
-    5,
-    9
-   ],
-   "Ole Miss": [
-    17.6,
-    11,
     42.3,
     8,
-    24.6,
-    49,
-    16
+    20.7,
+    11,
+    7
+   ],
+   "Ole Miss": [
+    17.8,
+    9,
+    43.0,
+    7,
+    25.2,
+    53,
+    3
    ],
    "Tennessee": [
-    17.3,
+    16.7,
     12,
-    38.3,
-    15,
-    21.0,
+    38.4,
     14,
-    29
+    21.7,
+    14,
+    26
    ],
    "Florida": [
-    14.2,
+    14.3,
     17,
-    40.1,
-    11,
-    25.9,
-    65,
+    40.0,
+    10,
+    25.7,
+    60,
+    13
+   ],
+   "Oklahoma": [
+    13.6,
+    18,
+    33.5,
+    33,
+    20.0,
+    4,
+    8
+   ],
+   "Kentucky": [
+    13.3,
+    20,
+    38.0,
+    16,
+    24.7,
+    50,
     6
    ],
    "Missouri": [
-    12.9,
-    22,
-    35.0,
-    26,
-    22.0,
-    22,
-    24
-   ],
-   "Oklahoma": [
-    12.5,
-    23,
-    32.4,
-    38,
-    19.9,
-    8,
-    2
+    13.1,
+    21,
+    35.3,
+    28,
+    22.2,
+    20,
+    30
    ],
    "Texas A&M": [
-    12.3,
-    24,
-    33.9,
-    30,
-    21.6,
-    17,
-    23
-   ],
-   "Kentucky": [
-    11.8,
+    12.6,
     26,
-    37.3,
-    19,
-    25.6,
-    61,
-    4
-   ],
-   "Auburn": [
-    11.6,
-    28,
-    34.1,
-    29,
-    22.5,
-    27,
-    10
+    34.9,
+    30,
+    22.3,
+    21,
+    9
    ],
    "South Carolina": [
-    11.3,
-    29,
-    36.0,
-    24,
-    24.7,
-    51,
-    21
+    12.0,
+    27,
+    36.7,
+    20,
+    24.6,
+    46,
+    16
+   ],
+   "Auburn": [
+    10.5,
+    34,
+    34.0,
+    31,
+    23.5,
+    32,
+    1
    ],
    "Mississippi State": [
-    9.4,
-    36,
-    36.8,
-    20,
-    27.4,
-    95,
-    8
+    9.1,
+    37,
+    35.6,
+    27,
+    26.5,
+    69,
+    2
    ],
    "Arkansas": [
-    1.8,
+    2.2,
+    61,
+    28.8,
     60,
-    28.5,
-    62,
-    26.7,
-    82,
-    11
+    26.6,
+    73,
+    14
    ],
    "Vanderbilt": [
-    1.0,
-    62,
+    0.6,
+    68,
     28.0,
-    65,
-    26.9,
-    85,
-    18
+    63,
+    27.3,
+    80,
+    15
    ]
   }
  },
@@ -14409,7 +14306,7 @@ window.SITE_AUTO.football = {
   "OK   AP and Coaches polls",
   "OK   team per-game numbers and national/SEC ranks",
   "OK   player season stats",
-  "OK   national (FBS) ranks for Tennessee players",
+  "SKIP national (FBS) ranks for Tennessee players: HTTP Error 429: Too Many Requests",
   "OK   recruiting classes",
   "OK   ESPN lines, TV and win chances",
   "OK   full team stat sheet with national and SEC ranks",
@@ -14417,7 +14314,107 @@ window.SITE_AUTO.football = {
   "OK   box scores for finished games (ESPN)",
   "OK   matchup previews for remaining games (CFBD)",
   "OK   season-by-season schedules and team leaders (cached after the first run)",
-  "OK   PEAR ratings (week 8)",
+  "OK   PEAR ratings (week 9)",
   "OK   FPI ratings and ranks for the SEC (CFBD)"
- ]
+ ],
+ "natRanks": {
+  "stats": [
+   "Rushing yards",
+   "Rushing TD",
+   "Passing yards",
+   "Passing TD",
+   "Receiving yards",
+   "Receiving TD",
+   "Receptions",
+   "Tackles for loss",
+   "Sacks",
+   "Tackles",
+   "Passes defended",
+   "Interceptions"
+  ],
+  "players": {
+   "Tyree Weathersby": [
+    {
+     "stat": "Sacks",
+     "rank": 6
+    },
+    {
+     "stat": "Tackles for loss",
+     "rank": 27
+    }
+   ],
+   "Amare Campbell": [
+    {
+     "stat": "Tackles for loss",
+     "rank": 32
+    }
+   ],
+   "Xavier Gilliam": [
+    {
+     "stat": "Tackles for loss",
+     "rank": 7
+    },
+    {
+     "stat": "Sacks",
+     "rank": 12
+    }
+   ],
+   "Mariyon Dye": [
+    {
+     "stat": "Sacks",
+     "rank": 25
+    }
+   ],
+   "Ty Redmond": [
+    {
+     "stat": "Passes defended",
+     "rank": 3
+    }
+   ],
+   "Dejuan Lane": [
+    {
+     "stat": "Interceptions",
+     "rank": 12
+    }
+   ],
+   "Kayin Lee": [
+    {
+     "stat": "Interceptions",
+     "rank": 41
+    }
+   ],
+   "Faizon Brandon": [
+    {
+     "stat": "Passing TD",
+     "rank": 96
+    }
+   ],
+   "Mike Matthews": [
+    {
+     "stat": "Receiving yards",
+     "rank": 45
+    },
+    {
+     "stat": "Receptions",
+     "rank": 69
+    }
+   ],
+   "Braylon Staley": [
+    {
+     "stat": "Receptions",
+     "rank": 87
+    }
+   ],
+   "DeSean Bishop": [
+    {
+     "stat": "Rushing yards",
+     "rank": 2
+    },
+    {
+     "stat": "Rushing TD",
+     "rank": 6
+    }
+   ]
+  }
+ }
 };
