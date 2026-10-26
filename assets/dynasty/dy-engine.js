@@ -51,19 +51,26 @@
   const maxs = (GM, p, k, v) => { if (!p) return; const s = line(GM, p); s[k] = Math.max(s[k] || 0, v); };
 
   /* ---------- who is on the field this snap (rotation, garbage time, injuries) ---------- */
+  // how much the backups play (percent of snaps when the game is close); stars play more, QB1 plays every snap
+  DY.ROT_DEFAULT = { RB: 30, WR: 12, TE: 18, DL: 24, LB: 6, DB: 4 };
+  DY.ROT_GROUPS = [['RB', 'Running back'], ['WR', 'Wide receiver'], ['TE', 'Tight end'], ['DL', 'Defensive line'], ['LB', 'Linebacker'], ['DB', 'Secondary']];
   function pers(GM, s) {
     const L = GM.L[s], lead = GM.score[s] - GM.score[other(s)];
     const garbage = (GM.q === 4 && Math.abs(lead) >= 24) || (GM.q >= 3 && Math.abs(lead) >= 35);
     const g = garbage ? 1 : 0;
+    const R = Object.assign({}, DY.ROT_DEFAULT, GM.T[s].rot || {});
     const at = (arr, i) => arr[Math.min(arr.length - 1, i)] || arr[0];
-    const rot = (arr, i, pr) => (arr.length > i + 2 && chance(pr)) ? arr[i + 2] : at(arr, i);
+    // the backup comes in R% of the time, less when the starter is much better (a star stays on the field)
+    const sw = (st, bk, grp) => { if (!bk || bk === st) return st; if (garbage) return chance(0.75) ? bk : st; const m = clamp(1 - ((st.ovr || 70) - (bk.ovr || 70)) / 16, 0.12, 1.25); return chance(R[grp] / 100 * m) ? bk : st; };
+    const QB = garbage && Math.abs(lead) >= 28 ? at(L.QB, 1) : L.QB[0];
     const P = {
-      QB: at(L.QB, g), RB: chance(garbage ? 0.8 : 0.32) ? at(L.RB, 1) : L.RB[0],
-      WR: [at(L.WR, garbage ? 3 : 0), at(L.WR, garbage ? 4 : 1), chance(garbage ? .7 : .15) ? at(L.WR, 3) : at(L.WR, 2)],
-      TE: chance(garbage ? .7 : .2) ? at(L.TE, 1) : L.TE[0],
+      QB, RB: sw(L.RB[0], L.RB[1], 'RB'),
+      WR: [garbage ? at(L.WR, 3) : sw(L.WR[0], L.WR[3], 'WR'), garbage ? at(L.WR, 4) : sw(L.WR[1], L.WR[4] || L.WR[3], 'WR'), sw(L.WR[2], L.WR[3], 'WR')],
+      TE: sw(L.TE[0], L.TE[1], 'TE'),
       OL: [at(L.OT, 0), at(L.IOL, 0), at(L.IOL, 1), at(L.IOL, 2), at(L.OT, 1)],
-      DL: [rot(L.EDGE, 0, garbage ? .8 : .22), rot(L.DT, 0, garbage ? .8 : .28), rot(L.DT, 1, garbage ? .8 : .28), rot(L.EDGE, 1, garbage ? .8 : .22)],
-      LB: [garbage ? at(L.LB, 2) : L.LB[0], at(L.LB, 1)], CB: [garbage ? at(L.CB, 2) : L.CB[0], at(L.CB, 1)], NB: L.NB, S: [garbage ? at(L.S, 2) : L.S[0], at(L.S, 1)],
+      DL: [sw(L.EDGE[0], L.EDGE[2], 'DL'), sw(L.DT[0], L.DT[2], 'DL'), sw(L.DT[1], L.DT[3] || L.DT[2], 'DL'), sw(L.EDGE[1], L.EDGE[3] || L.EDGE[2], 'DL')],
+      LB: [sw(L.LB[0], L.LB[2], 'LB'), sw(L.LB[1], L.LB[3] || L.LB[2], 'LB')],
+      CB: [sw(L.CB[0], L.CB[3] || L.CB[2], 'DB'), sw(L.CB[1], L.CB[3] || L.CB[2], 'DB')], NB: L.NB, S: [sw(L.S[0], L.S[2], 'DB'), sw(L.S[1], L.S[2], 'DB')],
       K: L.K[0], P: L.P[0], KR: L.KR, PR: L.PR,
       TE2: at(L.TE, 1), WR4: at(L.WR, 3), WR5: at(L.WR, 4), FB: L.RB[1] || L.TE[1] || L.RB[0],
     };
@@ -71,8 +78,11 @@
     if (garbage && L.IOL.length > 3) P.OL[2] = L.IOL[3];
     return P;
   }
-  const markSnap = (GM, P) => { const all = [P.QB, P.RB, ...P.WR, P.TE, ...P.OL]; all.forEach(p => { if (p) GM.snap[p.id] = 1; }); };
-  const markDef = (GM, P) => { [...P.DL, ...P.LB, ...P.CB, P.NB, ...P.S].forEach(p => { if (p) GM.snap[p.id] = 1; }); };
+  // snap counts: everyone on the field for the play (by formation), every snap
+  const snap1 = (GM, p) => { if (!p) return; GM.snap[p.id] = 1; add(GM, p, 'sn'); };
+  const markSnapF = (GM, P, F) => { [P.QB, ...P.OL].forEach(p => snap1(GM, p)); const wr = F ? F.wr : 3, te = F ? F.te : 1, rb = F ? F.rb : 1;
+    if (rb >= 1) snap1(GM, P.RB); if (rb >= 2) snap1(GM, P.FB); [P.WR[0], P.WR[1], P.WR[2], P.WR4, P.WR5].slice(0, wr).forEach(p => snap1(GM, p)); if (te >= 1) snap1(GM, P.TE); if (te >= 2) snap1(GM, P.TE2); };
+    const markDef = (GM, P) => { [...P.DL, ...P.LB, ...P.CB, P.NB, ...P.S].forEach(p => snap1(GM, p)); };
 
   /* ---------- effective rating for this snap: attribute + game form + momentum + crowd + clutch ---------- */
   function bigMoment(GM) { const d = Math.abs(GM.score.h - GM.score.a); return GM.q >= 5 || (GM.q === 4 && GM.clock <= 420 && d <= 8); }
@@ -543,14 +553,55 @@
     return { type: 'pen', text, anim: { kind: 'pen', on }, s, pen: true, shake, tag: 'FLAG', ballBefore: before, ballAfter: GM.ball };
   }
 
+  /* ---------- Index grades (a PFF-style grade from what each player did on each snap) ----------
+     Every player on the field gets the snap; credit and blame go to the players involved: the passer's decision and result,
+     the ball carrier's yards over expected and broken tackles, the target's catch or drop, the tackler, the defender in coverage,
+     the rusher who got home and the blocker who lost (in a live game the 22-man simulation adds blocks held and lost, whiffs and
+     missed tackles). A game grade is 0-100: about 60-65 is average, 80+ is very good, 90+ is elite. */
+  function gradePlay(GM, s, r, O, D) {
+    if (!r) return;
+    const G_ = (p, v) => { if (p && v) add(GM, p, 'gv', Math.round(v * 100) / 100); };
+    const need = GM.down >= 3 ? GM.togo : GM.down === 2 ? GM.togo * 0.6 : GM.togo * 0.45;
+    const y = r.yards || 0, succ = y >= need || r.td;
+    const OL = O.OL || [];
+    if (r.kind === 'run') {
+      const c = r.carrier;
+      G_(c, clamp((y - 3.5) / 5, -0.8, 1.6) + (r.broke && !r.sim ? 0.4 : 0) + (r.fum ? -2 : 0) + (succ ? 0.2 : -0.1));
+      if (!r.sim) OL.forEach(p => G_(p, clamp((y - 3) / 8, -0.4, 0.4) * 0.3));
+      if (r.tackler) G_(r.tackler, (y <= 0 ? 1.0 : y <= 2 ? 0.5 : y <= 5 ? 0.2 : 0.05) + (r.fum ? 1.2 : 0));
+      if (r.ast) G_(r.ast, 0.2);
+      if (y >= 12) [...(D.LB || []), ...(D.S || [])].forEach(p => G_(p, -0.2));
+    } else if (r.kind === 'pass') {
+      const air = r.air || 0;
+      G_(r.passer, clamp(0.25 + (y - 6) / 12 + air / 25, -0.4, 1.8) + (succ ? 0.25 : 0));
+      G_(r.target, clamp(0.3 + (y - air) / 10, 0, 1.2) + (r.fum ? -2 : 0));
+      if (r.defender) G_(r.defender, -clamp(0.2 + y / 20, 0.2, 1.2));
+      if (r.tackler) G_(r.tackler, (y <= 3 ? 0.4 : 0.1) + (r.fum ? 1.2 : 0));
+      if (!r.sim) OL.forEach(p => G_(p, 0.03));
+    } else if (r.kind === 'inc') {
+      if (r.drop) { G_(r.target, -1.4); G_(r.passer, 0.2); }
+      else if (!r.away && r.target) G_(r.passer, -0.3);
+      if (r.defender) G_(r.defender, r.drop ? 0 : 0.8);
+      if (!r.sim) OL.forEach(p => G_(p, r.pressured ? -0.12 : 0.02));
+    } else if (r.kind === 'int') { G_(r.passer, -2); G_(r.defender, 2); G_(r.target, -0.3); }
+    else if (r.kind === 'dpi') { G_(r.defender, -1.5); G_(r.target, 0.4); }
+    else if (r.kind === 'sack') { G_(r.passer, -0.5); G_(r.sackBy || r.tackler, 1.6); if (!r.sim) OL.forEach(p => G_(p, -0.25)); }
+    if (r.flagHold) G_(r.flagHold, -1.4);
+    if (r.gr) for (const id in r.gr) G_(DY.P(+id), r.gr[id]);
+  }
+  // a game or season grade from the summed play credit and the snaps played
+  DY.GRADE_K = { QB: 0.36, RB: 0.55, WR: 0.8, TE: 0.85, OT: 1.0, IOL: 1.0, EDGE: 0.85, DT: 0.95, LB: 0.9, CB: 0.85, S: 0.95, K: 1, P: 1 };
+  DY.gradeOf = (l, pos) => { if (!l || !(l.sn >= 6)) return null; const v = (l.gv || 0) * (DY.GRADE_K[pos] || 0.9) / Math.sqrt(l.sn); return Math.round(clamp(62 + 36 * Math.tanh(v * 1.1), 30, 99.5) * 10) / 10; };
+  DY.gradeCls = g => g == null ? '' : g >= 90 ? 'g-elite' : g >= 80 ? 'g-high' : g >= 70 ? 'g-good' : g >= 60 ? 'g-avg' : 'g-low';
+
   /* ---------- run and pass resolution ---------- */
   function resolve(GM, s, call, dc, isTry) {
     const d = other(s), O = pers(GM, s), D = pers(GM, d), def = DY.DEFS[dc.d] || DY.DEFS.c3;
-    markSnap(GM, O); markDef(GM, D);
     const read = dc.read && dc.read === call.k + (call.t || '') + (call.dir || '') ? 1 : 0;
     if (call.k === 'rpo') call.t = 'rpo';
     const fk = call.f && DY.FORMS[call.f] ? call.f : DY.aiForm(GM, s, call);
     const F = DY.FORMS[fk], book = DY.BOOK[call.t] || DY.BOOK.in;
+    markSnapF(GM, O, F); markDef(GM, D);
     const pl = (call.play && book.find(b => b.n === call.play)) || pick(book);
     // a live game on screen: the 22-man simulation plays the snap
     if (GM.live && DY.SIM && (call.k === 'run' || call.k === 'pass' || call.k === 'rpo')) {
@@ -562,6 +613,7 @@
       r.play = pl.n + (call.k === 'run' && call.dir ? ' ' + { L: 'Left', M: 'Middle', R: 'Right' }[call.dir] : ''); r.form = F.name; r.cov = def.name + ' · ' + ctx0.dp.name; r.call = call; r.dcall = dc; r.pm = pm0;
       r.anim = Object.assign(r.anim || {}, { f: fk });
       if (pm0 > 0 && chance(0.3)) r.events.push(`${pl.n} was the right call against ${def.name}.`);
+      gradePlay(GM, s, r, O, D);
       return r;
     }
     // the fast model: an RPO is a run or a quick throw depending on the box
@@ -575,6 +627,7 @@
     r.anim = Object.assign(r.anim || {}, { f: fk });
     if (pm > 0 && chance(0.35)) r.events.push(`${pl.n} was the right call against ${def.name}.`);
     if (read && chance(0.5)) r.events.push(`${GM.T[d].abbr} saw it coming — they have been sitting on that call.`);
+    gradePlay(GM, s, r, O, D);
     return r;
   }
   function tacklerFor(D, yards, kind) {

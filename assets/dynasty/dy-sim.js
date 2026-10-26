@@ -249,13 +249,15 @@
   };
 
   /* ---------- engagements ---------- */
+  // Index grades: credit and blame from what actually happened on the field this snap
+  const GR = (W, a, v) => { if (!a || !a.p || !v) return; W.gr = W.gr || {}; W.gr[a.p.id] = (W.gr[a.p.id] || 0) + v; };
   function engage(W, b, d, mode, push) {
     if (b.eng || d.eng) return null;
     // in space a quick second-level defender can slip a block (the blocker lunges and misses)
     if (mode === 'run' && d.x > 2.4 && !b.tried) {
       b.tried = d;
       const dq = (W.R(d.p, 'spd') + W.R(d.p, 'prc') + (W.R(d.p, 'bsh') || 60)) / 3, bq = (W.R(b.p, 'agi') + W.R(b.p, 'rbk')) / 2;
-      if (chance(clamp(K.whiff + (dq - bq) / 100, 0.08, 0.6))) { b.stun = 0.45; b.tried = d; d.slow = 0.15; return null; }
+      if (chance(clamp(K.whiff + (dq - bq) / 100, 0.08, 0.6))) { b.stun = 0.45; b.tried = d; d.slow = 0.15; GR(W, b, -0.45); GR(W, d, 0.3); return null; }
     }
     const o = unit(d.x - b.x, d.y - b.y);
     const pr = { b, d, mode, prog: 0, thr: 0.85 + rnd() * 0.6, push: push || { x: 1, y: 0 }, o, t0: W.t };
@@ -264,7 +266,7 @@
       const bs = W.R(b.p, 'rbk') * 0.7 + W.R(b.p, 'str') * 0.3 + W.boost.run, ds = W.R(d.p, 'bsh') * 0.6 + W.R(d.p, 'str') * 0.25 + W.R(d.p, 'agi') * 0.15 + W.boost.box;
       if (chance(clamp(K.pen0 + (ds - bs) / 80, 0.04, 0.35))) pr.prog = pr.thr - 0.08 - rnd() * 0.12;
     }
-    b.eng = pr; d.eng = pr; W.pairs.push(pr);
+    b.eng = pr; d.eng = pr; W.pairs.push(pr); (W.allPairs = W.allPairs || []).push(pr);
     return pr;
   }
   function shed(W, pr, why) {
@@ -272,6 +274,11 @@
     pr.b.stun = 0.35 + rnd() * 0.3;
     pr.d.freed = W.t;
     if (why) pr.d.sheddedBy = pr.b;
+    if (why) {
+      // a lost rep: in pass protection before the throw it is a pressure; in the run game it is a lost gap
+      const early = pr.mode === 'pass' ? W.phase !== 'air' && !W.throwT : !W.carrier || W.carrier.x < pr.d.x + 1;
+      GR(W, pr.b, early ? (pr.mode === 'pass' ? -0.55 : -0.4) : -0.08); GR(W, pr.d, early ? (pr.mode === 'pass' ? 0.5 : 0.4) : 0.08);
+    }
   }
   function runPairs(W) {
     for (const pr of W.pairs) {
@@ -423,7 +430,7 @@
       if (d.eng) { c.slow = 0.2; continue; }
       d.down = 0.75 + rnd() * 0.35; d.stun = 0.4; c.slow = 0.25;
       W.broke = W.broke || [];
-      W.broke.push({ d, how: power >= wiggle ? 'breaks the tackle of' : 'makes ' + last(d.p) + ' miss' });
+      W.broke.push({ d, how: power >= wiggle ? 'breaks the tackle of' : 'makes ' + last(d.p) + ' miss' }); GR(W, d, -0.8); GR(W, c, 0.5);
       W.ev.push({ t: W.t, text: power >= wiggle ? 'BROKEN TACKLE' : 'MISSED TACKLE', cls: 'good small' });
     }
   }
@@ -1099,7 +1106,9 @@
     (W.broke || []).slice(0, 2).forEach(b => ev.push(`${last(c && c.p)} ${b.how}${/breaks/.test(b.how) ? ' ' + last(b.d.p) : ''}.`));
     const yards = v => Math.round(v);
     const time = Math.max(3, Math.round((W.tEnd || W.t) + 1));
-    const base = { tkd: W.tackle ? { t: W.tackle.t, eng: W.tackle.eng, freed: W.tackle.freed, unb: W.tackle.unb, role: W.tackle.by.role, cx: c ? c.x : 0 } : null, cd: W.catchDiag, events: ev, time, anim, sim: true, endL: c ? c.y : 0, flagHold: W.flag && W.flag.kind === 'hold' ? W.flag.p : null };
+    // blocks that held to the end of the play
+    (W.allPairs || []).forEach(pr => { if (pr.done) return; if (pr.mode === 'pass') { GR(W, pr.b, 0.12); GR(W, pr.d, -0.04); } else { GR(W, pr.b, 0.15); GR(W, pr.d, -0.08); } });
+    const base = { gr: W.gr || null, tkd: W.tackle ? { t: W.tackle.t, eng: W.tackle.eng, freed: W.tackle.freed, unb: W.tackle.unb, role: W.tackle.by.role, cx: c ? c.x : 0 } : null, cd: W.catchDiag, events: ev, time, anim, sim: true, endL: c ? c.y : 0, flagHold: W.flag && W.flag.kind === 'hold' ? W.flag.p : null };
     if (W.int) {
       const d = W.int;
       const caught = W.intX;

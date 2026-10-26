@@ -531,3 +531,15 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
   .dy-field .dy-fp span { font-size: 9px; max-width: 38px; }
   .dy-field .dy-fp i { display: block; font-size: 7.5px; }
 }
+.dy-grade { display: inline-block; min-width: 42px; text-align: center; font-weight: 900; font-size: 12.5px; border-radius: 6px; padding: 2px 6px; font-variant-numeric: tabular-nums; }
+.dy-grade.g-elite { background: #1E7A44; color: #fff; } .dy-grade.g-high { background: #4CAF50; color: #fff; } .dy-grade.g-good { background: #C9E7B5; color: #1d3b12; }
+.dy-grade.g-avg { background: #F3E3A8; color: #4a3b00; } .dy-grade.g-low { background: #F6C3B5; color: #6b1d0b; }
+.dy-rot { margin: 6px 0 12px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+.dy-rot summary { font-weight: 800; cursor: pointer; }
+.dy-rotrow { display: grid; grid-template-columns: 130px 1fr 44px; gap: 10px; align-items: center; padding: 3px 0; font-size: 14px; }
+.dy-rotrow input { width: 100%; accent-color: #FF8200; }
+.dy-unitovr { display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 6px; background: #FF8200; color: #141414; font-weight: 900; }
+.dy-fp.star b, .dy-field.d .dy-fp.star b { background: #FF8200; color: #141414; border-color: #fff; box-shadow: 0 0 0 3px rgba(255,130,0,.55), 0 0 16px 4px rgba(255,130,0,.75); }
+.dy-fp b { font-size: 14px; }
+.dy-fp span { font-size: 12px; }
+.dy-tstars { color: #FF8200; letter-spacing: 1px; font-size: 14px; } .dy-tstars.big { font-size: 22px; }

@@ -107,7 +107,7 @@
     if (!GM) GM = DY.startGame(x, true);
     GM.live = true; if (GM.by == null) GM.by = 26.67;
     S = { GM, x, el, speed: g.settings.speed || 'slow', paused: false, timer: null, raf: null, cam: 60, camY: 26.67, onDone: opts.onDone, tab: 'pbp', pendTO: false, tempo: null, lastRes: null,
-      form: 'auto', otab: null, osub: { run: 'in', pass: 'quick', rpo: null, st: null }, dir: 'M', play: {}, dg: 'zone', dk: 'auto', dst: 'safe', clockShow: null };
+      form: 'auto', otab: null, osub: { run: 'auto', pass: 'auto', rpo: 'auto', st: null }, dir: 'A', play: {}, dg: 'zone', dk: 'auto', dst: 'safe', clockShow: null };
     el.innerHTML = shell();
     S.cv = el.querySelector('canvas'); S.ctx = S.cv.getContext('2d');
     bind();
@@ -309,10 +309,10 @@
   }
 
   /* ---------- the play call ---------- */
-  const RUNSUB = [['in', 'Inside'], ['out', 'Outside'], ['qb', 'QB run'], ['opt', 'Option']];
-  const PASSSUB = [['quick', 'Quick'], ['med', 'Medium'], ['deep', 'Deep'], ['screen', 'Screen'], ['pa', 'Play action']];
+  const RUNSUB = [['auto', 'Auto'], ['in', 'Inside'], ['out', 'Outside'], ['qb', 'QB run'], ['opt', 'Option']];
+  const PASSSUB = [['auto', 'Auto'], ['quick', 'Quick'], ['med', 'Medium'], ['deep', 'Deep'], ['screen', 'Screen'], ['pa', 'Play action']];
   const OPT = ['Zone Read Keep', 'Speed Option', 'Triple Option', 'Midline Option'];
-  const DESC = { in: 'Between the tackles', out: 'Stretch it to the edge', qb: 'Draws, QB power, keepers', opt: 'Read the end: give, keep or pitch', quick: 'Out fast: beats the blitz', med: 'Needs a clean pocket', deep: 'A shot downfield', screen: 'Let them rush, throw behind them', pa: 'Best when they load the box' };
+  const DESC = { auto: 'Your coordinator calls it: down, distance, the score, what the defense is showing and what has been working.', in: 'Between the tackles', out: 'Stretch it to the edge', qb: 'Draws, QB power, keepers', opt: 'Read the end: give, keep or pitch', quick: 'Out fast: beats the blitz', med: 'Needs a clean pocket', deep: 'A shot downfield', screen: 'Let them rush, throw behind them', pa: 'Best when they load the box' };
   function playList(kind) { return kind === 'opt' ? OPT : (DY.BOOK[kind] || []).map(b => b.n).filter(n => kind !== 'qb' || !OPT.includes(n)); }
   function renderPanel(need) {
     const GM = S.GM, el = S.el.querySelector('#dygCtrl'), sim = S.el.querySelector('#dygSim');
@@ -346,6 +346,25 @@
     const r = b.getBoundingClientRect(), vh = root.innerHeight || 800;
     if (r.bottom > vh - 8) root.scrollBy(0, r.bottom - vh + 16);
   }
+  // the staff's call: the same logic the CPU uses (situation, tendencies, what is working), kept to the run or pass you asked for
+  function staffCall(GM, tab) {
+    for (let i = 0; i < 12; i++) { const c = DY.aiOff(GM, GM.user); if ((tab === 'run' && c.k === 'run') || (tab === 'pass' && c.k === 'pass')) return { k: c.k, t: c.t, dir: c.dir || autoDir(GM, c.t), play: c.play || null }; }
+    return tab === 'run' ? { k: 'run', t: 'in', dir: autoDir(GM, 'in') } : { k: 'pass', t: GM.togo >= 8 ? 'med' : 'quick' };
+  }
+  // run direction: away from where the defense has been loading up, toward the wide side of the field on outside runs
+  function autoDir(GM, sub) {
+    const them = GM.user === 'h' ? 'a' : 'h', lean = GM.lastLean && GM.lastLean[them];
+    const wide = (GM.by || 26.67) < 26.67 ? (GM.poss === 'h' ? 'R' : 'L') : (GM.poss === 'h' ? 'L' : 'R');
+    if (sub === 'out' || sub === 'opt') return Math.random() < 0.65 ? wide : (wide === 'L' ? 'R' : 'L');
+    const opts = ['L', 'M', 'R'].filter(d => d !== lean);
+    return Math.random() < 0.45 ? 'M' : opts[Math.floor(Math.random() * opts.length)];
+  }
+  // RPO: against a loaded box the staff likes the quick-throw tags; against two-high, the inside run tags
+  function staffRpo(GM) {
+    const list = DY.BOOK.rpo.map(b => b.n), them = GM.user === 'h' ? 'a' : 'h', dt = GM.dtend[them] || {}, tot = Object.values(dt).reduce((a, b) => a + b, 0) || 1;
+    const box = ((dt.run || 0) + (dt.bear || 0) + (dt.blitz || 0)) / tot;
+    return box > 0.3 ? (Math.random() < 0.5 ? 'Slant RPO' : 'Bubble Read') : list[Math.floor(Math.random() * list.length)];
+  }
   function tipFor(GM, us, them) {
     const dt = GM.dtend[them], dTot = Object.values(dt).reduce((a, b) => a + b, 0);
     let tip = '';
@@ -364,22 +383,22 @@
     const forms = Object.keys(DY.FORMS);
     let body = '';
     if (tab === 'run' || tab === 'pass') {
-      const subs = tab === 'run' ? RUNSUB : PASSSUB, list = playList(sub);
-      const dirs = tab === 'run' ? (sub === 'out' || sub === 'opt' ? ['L', 'R'] : ['L', 'M', 'R']) : null;
-      const dir = dirs && !dirs.includes(S.dir) ? dirs[0] : S.dir;
+      const subs = tab === 'run' ? RUNSUB : PASSSUB, list = sub === 'auto' ? [] : playList(sub);
+      const dirs = tab === 'run' && sub !== 'auto' ? (sub === 'out' || sub === 'opt' ? ['A', 'L', 'R'] : ['A', 'L', 'M', 'R']) : null;
+      const dir = dirs && !dirs.includes(S.dir) ? 'A' : S.dir;
       body = `<div class="dyg-chips dyg-sub">${subs.map(([k2, l]) => `<button data-osub="${k2}" aria-pressed="${sub === k2}">${l}</button>`).join('')}</div>
         <div class="dyg-desc">${esc(DESC[sub] || '')}</div>
         <div class="dyg-row3">
-          ${dirs ? `<div class="dyg-chips dyg-dir"><span class="dyg-lab">Direction</span>${dirs.map(d => `<button data-dir="${d}" aria-pressed="${dir === d}">${{ L: '◀ Left', M: 'Middle', R: 'Right ▶' }[d]}</button>`).join('')}</div>` : ''}
-          <label class="dyg-sel"><span class="dyg-lab">Play</span><select data-pick="${sub}"><option value="">Auto (staff picks)</option>${list.map(n => `<option ${S.play[sub] === n ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label>
+          ${dirs ? `<div class="dyg-chips dyg-dir"><span class="dyg-lab">Direction</span>${dirs.map(d => `<button data-dir="${d}" aria-pressed="${dir === d}">${{ A: 'Auto', L: '◀ Left', M: 'Middle', R: 'Right ▶' }[d]}</button>`).join('')}</div>` : ''}
+          ${sub === 'auto' ? '' : `<label class="dyg-sel"><span class="dyg-lab">Play</span><select data-pick="${sub}"><option value="">Auto (staff picks)</option>${list.map(n => `<option ${S.play[sub] === n ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label>`}
           <label class="dyg-sel"><span class="dyg-lab">Formation</span><select data-form="1"><option value="auto">Auto</option>${forms.map(f => `<option value="${f}" ${S.form === f ? 'selected' : ''}>${esc(DY.FORMS[f].name)}</option>`).join('')}</select></label>
         </div>
-        <button class="dyg-snap" data-snap="${tab}">SNAP <small>${esc(S.play[sub] || (tab === 'run' ? subs.find(x => x[0] === sub)[1] + ' run' : subs.find(x => x[0] === sub)[1] + ' pass'))}${dirs ? ' · ' + { L: 'left', M: 'middle', R: 'right' }[dir] : ''}</small></button>`;
+        <button class="dyg-snap" data-snap="${tab}">SNAP <small>${esc(sub === 'auto' ? (tab === 'run' ? 'Run: staff call' : 'Pass: staff call') : S.play[sub] || (tab === 'run' ? subs.find(x => x[0] === sub)[1] + ' run' : subs.find(x => x[0] === sub)[1] + ' pass'))}${dirs ? ' · ' + { A: 'auto direction', L: 'left', M: 'middle', R: 'right' }[dir] : ''}</small></button>`;
     } else if (tab === 'rpo') {
-      const list = DY.BOOK.rpo.map(b => b.n), cur = S.osub.rpo || list[0];
-      body = `<div class="dyg-chips dyg-sub">${list.map(n => `<button data-orpo="${esc(n)}" aria-pressed="${cur === n}">${esc(n)}</button>`).join('')}</div>
+      const list = ['auto'].concat(DY.BOOK.rpo.map(b => b.n)), cur = S.osub.rpo || 'auto';
+      body = `<div class="dyg-chips dyg-sub">${list.map(n => `<button data-orpo="${esc(n)}" aria-pressed="${cur === n}">${n === 'auto' ? 'Auto' : esc(n)}</button>`).join('')}</div>
         <div class="dyg-desc">The quarterback reads one defender: if he plays the run, throw it; if he drops, hand it off.</div>
-        <button class="dyg-snap" data-snap="rpo">SNAP <small>${esc(cur)}</small></button>`;
+        <button class="dyg-snap" data-snap="rpo">SNAP <small>${esc(cur === 'auto' ? 'RPO: staff call' : cur)}</small></button>`;
     } else {
       body = `<div class="dyg-grid4"><button class="dyg-big" data-sp="punt">Punt<small>${P.P[0] ? esc(DY.lastName(P.P[0])) : ''}</small></button><button class="dyg-big" data-sp="fg" ${dist > 68 ? 'disabled' : ''}>Field goal<small>${dist} yds · ${fgp}%</small></button><button class="dyg-big" data-sp="spike" ${GM.running && GM.down < 4 ? '' : 'disabled'}>Spike<small>stop the clock</small></button><button class="dyg-big" data-sp="kneel">Kneel<small>run clock</small></button></div>`;
     }
@@ -477,11 +496,12 @@
       const call = { tempo: S.tempo, f: S.form === 'auto' ? null : S.form };
       if (d.snap) {
         const tab = d.snap;
-        if (tab === 'rpo') { const n = S.osub.rpo || DY.BOOK.rpo[0].n; Object.assign(call, { k: 'rpo', t: 'rpo', play: n, dir: S.dir }); return doStep({ call }); }
-        const sub = S.osub[tab] || (tab === 'run' ? 'in' : 'quick');
+        if (tab === 'rpo') { const n = S.osub.rpo && S.osub.rpo !== 'auto' ? S.osub.rpo : staffRpo(GM); Object.assign(call, { k: 'rpo', t: 'rpo', play: n, dir: S.dir === 'A' ? autoDir(GM, 'in') : S.dir }); return doStep({ call }); }
+        const sub = S.osub[tab] || 'auto';
+        if (sub === 'auto') { Object.assign(call, staffCall(GM, tab), { tempo: S.tempo || null, f: call.f }); return doStep({ call }); }
         if (tab === 'run') {
           const dirs = sub === 'out' || sub === 'opt' ? ['L', 'R'] : ['L', 'M', 'R'];
-          const dir = dirs.includes(S.dir) ? S.dir : dirs[0];
+          const dir = S.dir === 'A' || !dirs.includes(S.dir) ? autoDir(GM, sub) : S.dir;
           if (sub === 'opt') Object.assign(call, { k: 'run', t: 'qb', dir, play: S.play.opt || OPT[Math.floor(Math.random() * OPT.length)] });
           else Object.assign(call, { k: 'run', t: sub, dir, play: S.play[sub] || null });
         } else Object.assign(call, { k: 'pass', t: sub, play: S.play[sub] || null });
@@ -551,7 +571,12 @@
       ${tbl(s, 'Returns', [['KR', l => v(l, 'kr') + '-' + v(l, 'kry')], ['PR', l => v(l, 'pr') + '-' + v(l, 'pry')], ['TD', l => v(l, 'rttd')]], l => l.kr || l.pr, l => v(l, 'kry') + v(l, 'pry'))}</div>`;
     const q = ls ? `<div class="dy-scroll"><table class="dyt dyg-ls"><thead><tr><th></th>${ls.h.map((_, i) => `<th>${i < 4 ? i + 1 : 'OT'}</th>`).join('')}<th>T</th></tr></thead><tbody>${['a', 'h'].map(s => `<tr><td><b>${esc(T[s].abbr)}</b></td>${ls[s].map(x => `<td>${x || 0}</td>`).join('')}<td><b>${ls[s].reduce((a, b) => a + (b || 0), 0)}</b></td></tr>`).join('')}</tbody></table></div>` : '';
     const t = ts ? `<div class="dy-scroll"><table class="dyt"><thead><tr><th></th><th>${esc(T.a.abbr)}</th><th>${esc(T.h.abbr)}</th></tr></thead><tbody>${[['First downs', 'fd'], ['Total yards', 'yds'], ['Rushing', x => x.ra + '-' + x.ry], ['Passing', x => x.pc + '/' + x.pa + ', ' + x.py], ['3rd down', x => x.c3 + '/' + x.a3], ['4th down', x => x.c4 + '/' + x.a4], ['Turnovers', 'to'], ['Sacks allowed', 'sk'], ['Penalties', x => x.pen + '-' + x.peny], ['Possession', x => DY.clockStr(x.top)]].map(([l, k]) => `<tr><td>${l}</td><td>${typeof k === 'function' ? k(ts.a) : ts.a[k]}</td><td>${typeof k === 'function' ? k(ts.h) : ts.h[k]}</td></tr>`).join('')}</tbody></table></div>` : '';
-    return `<div class="dyg-box">${q}${t}<div class="dyg-boxsides">${side('a')}${side('h')}</div></div>`;
+    const grd = sd => { const rs = lines(sd).map(([id, l]) => ({ p: DY.P(+id), l })).filter(x => x.p && x.l.sn).map(x => Object.assign(x, { g: DY.gradeOf(x.l, x.p.pos) })).sort((a, b) => (b.g || 0) - (a.g || 0));
+      if (!rs.length) return '';
+      const cell = x => `<tr><td><a href="#" data-pid="${x.p.id}" class="dy-pl${T[sd].user ? '' : ' o'}">${esc(x.p.n)}</a> <small class="dim">${x.p.pos}</small></td><td>${x.l.sn}</td><td>${x.g == null ? '—' : `<span class="dy-grade ${DY.gradeCls(x.g)}">${x.g.toFixed(1)}</span>`}</td></tr>`;
+      return `<div class="dy-scroll"><table class="dyt"><thead><tr><th>Index grades</th><th>Snaps</th><th>Grade</th></tr></thead><tbody>${rs.slice(0, 26).map(cell).join('')}</tbody></table></div>`; };
+    const gsides = `<div class="dyg-boxsides"><div class="dyg-boxside"><h4 style="color:${T.a.c1}">${esc(T.a.name)}: snaps and grades</h4>${grd('a')}</div><div class="dyg-boxside"><h4 style="color:${T.h.c1}">${esc(T.h.name)}: snaps and grades</h4>${grd('h')}</div></div>`;
+    return `<div class="dyg-box">${q}${t}<div class="dyg-boxsides">${side('a')}${side('h')}</div>${gsides}</div>`;
   };
 
   /* ---------- canvas: camera, field, players ---------- */
@@ -676,13 +701,26 @@
     const names = trk.ids.map(id => { const p = id[3] ? DY.P(id[3]) : null; return p ? DY.lastName(p) : ''; });
     const fr = trk.fr, T = fr[fr.length - 1][0];
     // kicks: the ball in the air first, the coverage running down, the return team setting up
-    const pre0 = ret ? Math.max(1.6, trk.hang || 3) : 0;
-    let starts = null, kickFrom = null;
+    const isPunt = ret && r.type !== 'kick';
+    // a punt: the punt formation, the snap, the kick, then the ball in the air while the gunners run and the returner settles under it
+    const snapT = isPunt ? 1.25 : 0, flightT = isPunt ? Math.max(2.2, Math.min(3.4, (trk.hang || 4) * 0.75)) : 0;
+    const pre0 = ret ? (isPunt ? snapT + flightT : Math.max(1.6, trk.hang || 3)) : 0;
+    let starts = null, kickFrom = null, losP = null;
     if (ret) {
       const f0 = fr[0][1];
       const kickYd = r.type === 'kick' ? 100 - ((a.from) || 35) : Math.min(99, 100 - pre.ball);
-      kickFrom = toXY(r.type === 'kick' ? kickYd : kickYd + 13, 0);
-      starts = trk.ids.map((id, i) => id[0] === 'd' ? toXY(Math.min(99, kickYd + (r.type === 'kick' ? 0.5 : 0) + (i % 3) * 0.6), f0[i * 2 + 1] * 0.95) : id[1] === 'KR' ? toXY(f0[i * 2] - 1, 0) : toXY(Math.min(99, f0[i * 2] + 12), f0[i * 2 + 1] * 0.8));
+      kickFrom = toXY(r.type === 'kick' ? kickYd : kickYd + 14, 0);
+      if (isPunt) {
+        losP = toXY(kickYd, 0);
+        const P_SPOT = [[14, 0], [0.5, -22], [0.5, 22], [0, 0], [0.4, -1.3], [0.4, 1.3], [0.5, -2.6], [0.5, 2.6], [1.4, -4.2], [1.4, 4.2], [5, 0]];
+        const R_SPOT = [[-1.5, -20], [-1.5, 20], [-1, -5], [-1, -3], [-1, -1], [-1, 1], [-1, 3], [-1, 5], [-9, -6], [-9, 6]];
+        let ki = 0, bi = 0;
+        starts = trk.ids.map((id, i) => {
+          if (id[0] === 'd') { const sp = P_SPOT[Math.min(P_SPOT.length - 1, ki++)]; return toXY(Math.min(99.5, kickYd + sp[0]), sp[1]); }
+          if (id[1] === 'KR') return toXY(fr[0][2] - 2, 0);
+          const sp = R_SPOT[Math.min(R_SPOT.length - 1, bi++)]; return toXY(Math.max(0.5, kickYd + sp[0]), sp[1]);
+        });
+      } else starts = trk.ids.map((id, i) => id[0] === 'd' ? toXY(Math.min(99, kickYd + 0.5 + (i % 3) * 0.6), f0[i * 2 + 1] * 0.95) : id[1] === 'KR' ? toXY(f0[i * 2] - 1, 0) : toXY(Math.min(99, f0[i * 2] + 12), f0[i * 2 + 1] * 0.8));
     }
     const lines = ret ? null : [X(s, pre.ball), pre.ball + pre.togo >= 100 ? null : X(s, pre.ball + pre.togo)];
     const pace = (S.speed === 'fast' ? 1.9 : 1) * (reduce() ? 1.5 : 1);
@@ -702,11 +740,26 @@
       const sec = Math.max(0, (now - t0) / 1000 * pace);
       const ts = sec - pre0;     // time inside the tracked frames
       let bx, by, bz, holder = -1, pos;
-      if (ret && ts < 0) {
+      if (ret && ts < 0 && isPunt) {
+        const land = toXY(fr[0][2], fr[0][3]), krI = trk.ids.findIndex(id => id[1] === 'KR');
+        if (sec < snapT) {
+          // the snap: everyone set, the ball goes back to the punter
+          pos = starts.map(st => st.slice());
+          const u = Math.min(1, sec / 0.35); bx = losP[0] + (kickFrom[0] - losP[0]) * u; by = losP[1]; bz = 0.6;
+          holder = sec >= 0.35 ? 0 : -1;
+        } else {
+          const u = Math.max(0, Math.min(1, (sec - snapT) / flightT));
+          pos = starts.map((st, i) => { const e = toXY(fr[0][1][i * 2], fr[0][1][i * 2 + 1]); const uu = trk.ids[i][1] === 'KR' ? Math.min(1, u * 1.4) : u; return [st[0] + (e[0] - st[0]) * uu, st[1] + (e[1] - st[1]) * uu]; });
+          bx = kickFrom[0] + (land[0] - kickFrom[0]) * u; by = kickFrom[1] + (land[1] - kickFrom[1]) * u; bz = Math.sin(Math.PI * u) * 16;
+          holder = -1;
+        }
+        var krLabel = krI;
+      } else if (ret && ts < 0) {
         // kick pre-roll
         const u = Math.max(0, Math.min(1, sec / pre0)), land = toXY(fr[0][2], 0);
         pos = starts.map((st, i) => { const e = toXY(fr[0][1][i * 2], fr[0][1][i * 2 + 1]); return [st[0] + (e[0] - st[0]) * u, st[1] + (e[1] - st[1]) * u]; });
         bx = kickFrom[0] + (land[0] - kickFrom[0]) * u; by = kickFrom[1] + (land[1] - kickFrom[1]) * u; bz = Math.sin(Math.PI * u) * 14;
+        var krLabel = trk.ids.findIndex(id => id[1] === 'KR');
       } else {
         const k = Math.min(fr.length - 2, Math.floor(ts / 0.1)), A0 = fr[Math.max(0, k)], B0 = fr[Math.min(fr.length - 1, k + 1)];
         const u = Math.max(0, Math.min(1, (ts - A0[0]) / Math.max(0.001, B0[0] - A0[0])));
@@ -722,7 +775,8 @@
       const tkd = tk && ts >= tk.t;
       for (let i = 0; i < n; i++) {
         const isH = holder === i, dn = downs ? downs[i] === '1' || downs[i] === '3' : false;
-        dot(pos[i][0], pos[i][1], paints[i], trk.ids[i][2], isH || (tkd && (tk.i === i || tk.a === i)), dn, isH && names[i] ? names[i] : null);
+        const lab = (isH || (ts < 0 && typeof krLabel !== 'undefined' && krLabel === i)) && names[i] ? names[i] : null;
+        dot(pos[i][0], pos[i][1], paints[i], trk.ids[i][2], isH || (tkd && (tk.i === i || tk.a === i)) || lab != null, dn, lab);
       }
       if (trk.flag && ts >= trk.flag.t) { const fxy = toXY(trk.flag.x, trk.flag.y); flagAt(fxy[0], fxy[1]); }
       ballDot(bx, by, bz || 0);
@@ -757,7 +811,17 @@
     if (kind === 'none') { S.anim = null; drawStatic(); return setTimeout(done, 200); }
     const s = r.type === 'kick' ? (pre.kicker || (r.s === 'h' ? 'a' : 'h')) : pre.poss, d = dirOf(s);
     const los = r.type === 'kick' ? X(s, a.from || 35) : X(s, pre.ball), by = pre.by || 26.67;
-    let al = null; try { if (r.type !== 'kick') al = DY.SIM.align(GM, s, kind === 'fg' || kind === 'xp' ? 'goal' : 'ace12', null); } catch (e) { al = null; }
+    let al = null; try { if (r.type !== 'kick' && kind !== 'punt') al = DY.SIM.align(GM, s, kind === 'fg' || kind === 'xp' ? 'goal' : 'ace12', null); } catch (e) { al = null; }
+    if (kind === 'punt') {
+      // the punt formation (and the return team, with the returner deep)
+      const PS = [[14, 0], [0.5, -22], [0.5, 22], [0, 0], [0.4, -1.3], [0.4, 1.3], [0.5, -2.6], [0.5, 2.6], [1.4, -4.2], [1.4, 4.2], [5, 0]];
+      const RS = [[-1.5, -20], [-1.5, 20], [-1, -5], [-1, -3], [-1, -1], [-1, 1], [-1, 3], [-1, 5], [-9, -6], [-9, 6]];
+      const Lk = GM.L[s], Lr = GM.L[s === 'h' ? 'a' : 'h'], pr = Lr.PR || Lr.KR || (Lr.WR || [])[0];
+      const ag = PS.map((sp, i) => ({ side: 'o', f: -sp[0], l: sp[1], p: i === 0 ? (Lk.P || [])[0] : null }));
+      RS.forEach(sp => ag.push({ side: 'd', f: -sp[0], l: sp[1], p: null }));
+      ag.push({ side: 'd', f: Math.min(100 - pre.ball, (a.land || pre.ball + 40) - pre.ball), l: 0, p: pr, ret: true });
+      al = { ag, by: 26.67 };
+    }
     const po = teamPaint(GM, s), pd = teamPaint(GM, s === 'h' ? 'a' : 'h');
     const pace = S.speed === 'fast' ? 1.9 : 1;
     let T = 1.2, ball;
@@ -778,7 +842,7 @@
       S.cam += (camTo(bx) - S.cam) * 0.08;
       drawField();
       if (r.type !== 'kick') drawLines(X(s, pre.ball), null);
-      if (al) al.ag.forEach(p => dot(X(s, pre.ball + p.f + (p.side === 'o' ? 0.2 : -0.2) * u), al.by + p.l * d, p.side === 'o' ? po : pd, p.p ? p.p.num : ''));
+      if (al) al.ag.forEach(p => dot(X(s, pre.ball + p.f + (p.ret ? 0 : (p.side === 'o' ? 0.2 : -0.2) * u)), al.by + p.l * d, p.side === 'o' ? po : pd, p.p ? p.p.num : '', !!p.ret, false, p.ret && p.p ? DY.lastName(p.p) : null));
       if (r.type === 'pen' && sec > 0.3) flagAt(X(s, pre.ball) - d, by - 3);
       ballDot(bx, bY, bz);
       if (!evPopped.v && u >= 0.95) { evPopped.v = true; const tx = kind === 'fg' || kind === 'xp' ? (a.blocked ? 'BLOCKED' : a.ok ? 'GOOD' : 'NO GOOD') : kind === 'kick' ? (a.tb ? 'TOUCHBACK' : a.fc ? 'FAIR CATCH' : '') : kind === 'punt' ? (a.fc ? 'FAIR CATCH' : '') : r.type === 'pen' ? 'FLAG' : kind === 'kneel' ? 'KNEEL' : kind === 'spike' ? 'SPIKE' : ''; pop(tx, kind === 'fg' || kind === 'xp' ? (a.ok ? 'good' : 'bad') : 'meh'); }

@@ -428,7 +428,6 @@
     const g = G(), p = DY.P(id), ut = DY.userT(), P = g.off.portal;
     const committed = Object.values(P.mine).reduce((s, v) => s + v, 0) - (P.mine[id] || 0);
     if (DY.payroll(ut) + committed + amt > ut.budget * 1.05) return `That offer puts you over your NIL budget (${DY.money(ut.budget - DY.payroll(ut) - committed)} left).`;
-    if (DY.rosterRoom() <= 0 && !P.mine[id]) return `Your roster is full: ${DY.rosterMax()} players counting signees and transfer offers.`;
     if (!P.mine[id] && DY.transfersIn() >= DY.CAP.tin) return `That is ${DY.CAP.tin} transfer offers already (the limit).`;
     if (!P.mine[id] && DY.newcomers() >= DY.CAP.newcomers) return `That is ${DY.CAP.newcomers} newcomers already (signees plus transfers).`;
     P.mine[id] = Math.max(0, Math.round(amt / 5000) * 5000); return null;
@@ -490,6 +489,9 @@
   DY.transfersIn = () => { const g = G(), P = g.off && g.off.portal; return (P ? Object.keys(P.mine).length : 0) + DY.userT().roster.map(DY.P).filter(p => p.prevT != null && p.tin === g.season).length; };
   DY.newcomers = () => { const g = G(); const commits = g.recruit && !g.recruit.signed ? Math.min(DY.CAP.hs, DY.myCommits().length) : DY.userT().roster.map(DY.P).filter(p => p.firstY === g.season + 1).length; return commits + DY.transfersIn(); };
   DY.rosterRoom = () => { const g = G(), ut = DY.userT(), P = g.off && g.off.portal; const commits = g.recruit && !g.recruit.signed ? DY.myCommits().length : 0; return DY.rosterMax() + 4 - ut.roster.length - commits - (P ? Object.keys(P.mine).length : 0); };
+  // the portal hides a transfer's true overall: a star rating and a range from your scouts
+  DY.tStars = p => p.ovr >= 84 ? 5 : p.ovr >= 75 ? 4 : 3;
+  DY.tRange = p => { const h = (p.id * 2654435761 >>> 0) % 1000 / 1000, w = 5 + Math.round(h * 3), lo = Math.round(p.ovr - 1 - h * (w - 2)); return [Math.max(50, lo), Math.min(99, lo + w)]; };
   DY.portalPlayers = () => { const P = G().off.portal; return P ? P.pool.map(DY.P).filter(p => p && p.portal) : []; };
 
   /* signing day: commits sign, uncommitted players pick their leader, everyone fills out a class */
@@ -556,12 +558,12 @@
     if (final) g.teams.forEach(t => { if (t.user) return; const extra = t.roster.length - 60; if (extra > 0) { const out = t.roster.map(DY.P).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)).slice(0, extra); out.forEach(p => { p.t = null; p.gone = g.season; p.leave = 'cut'; }); t.roster = t.roster.filter(id => DY.P(id).t === t.id); } });
     if (!final) return;
     let need = DY.cutsNeeded() - o.cut.length;
-    if (need > 0) { const order = ut.roster.map(DY.P).filter(p => !o.cut.includes(p.id)).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)); order.slice(0, need).forEach(p => o.cut.push(p.id)); }
+    if (need > 0) { const order = ut.roster.map(DY.P).filter(p => !o.cut.includes(p.id) && p.tin !== g.season).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)); order.slice(0, need).forEach(p => o.cut.push(p.id)); }
     o.cut.forEach(id => { const p = DY.P(id); if (!p || p.t !== ut.id) return; p.t = null; p.t0 = ut.id; p.gone = g.season; p.leave = 'cut'; DY.addLog(p, 'Released at roster cut-down.'); });
     ut.roster = ut.roster.filter(id => DY.P(id).t === ut.id);
     DY.refreshDepth(ut);
   };
-  DY.toggleCut = id => { const o = G().off; o.cut = o.cut || []; const i = o.cut.indexOf(id); if (i >= 0) o.cut.splice(i, 1); else o.cut.push(id); };
+  DY.toggleCut = id => { const o = G().off; const pp = DY.P(id); if (pp && pp.tin === G().season) return 'Transfers who just arrived cannot be cut.'; o.cut = o.cut || []; const i = o.cut.indexOf(id); if (i >= 0) o.cut.splice(i, 1); else o.cut.push(id); };
 
   /* the NFL Draft: 7 rounds plus comp picks */
   DY.runDraft = () => {
