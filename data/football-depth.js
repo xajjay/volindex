@@ -9,7 +9,7 @@
    ============================================================ */
 window.DEPTH = window.DEPTH || {};
 window.DEPTH.football = {
-  "rev": 7,
+  "rev": 8,
   "current": {
     "label": "2026 depth chart",
     "updated": "2026-10-20",
@@ -67,11 +67,11 @@ window.DEPTH.football = {
     "chart": {
     "Backfield": [
       ["QB", ["George MacIntyre","Faizon Brandon","Ryan Staub","Derrick Baker"]],
-      ["RB", ["Daune Morris","David Gabriel Georges","Javin Gordon","Justin Baker","Asa Barnes"]]
+      ["RB", ["DeSean Bishop","Daune Morris","David Gabriel Georges","Javin Gordon","Justin Baker","Asa Barnes"]]
     ],
     "Receivers": [
       ["WR-X", ["Radarious Jackson","Travis Smith Jr.","Kesean Bowman","Nathan Roberts"]],
-      ["WR-Z", ["TK Keys","Dayon Cooper","Deon Hardin"]],
+      ["WR-Z", ["Mike Matthews","TK Keys","Dayon Cooper","Deon Hardin"]],
       ["WR-SL", ["Braylon Staley","Tyreek King","Ian Duarte"]],
       ["TE", ["Ethan Davis","DaSaahn Brame","Trent Thomas","Luca Wolf","Malik Howard"]]
     ],
@@ -89,15 +89,15 @@ window.DEPTH.football = {
       ["DE", ["Tyree Weathersby","Jordan Norman","Kedric Golston II"]]
     ],
     "Linebackers": [
-      ["MIKE", ["Amare Campbell","TJ White","JP Peace"]],
-      ["WILL", ["Jeremiah Telander","Jadon Perlotte","Kenneth Simon II","Brayden Rouse"]]
+      ["MIKE", ["Amare Campbell","TJ White","Brayden Rouse","JP Peace","Kenneth Simon II"]],
+      ["WILL", ["Arion Carter","Jeremiah Telander","Edwin Spillman","Jadon Perlotte"]]
     ],
     "Secondary": [
       ["CB", ["Ty Redmond","Tim Merritt","Jamyan Theodore","Brandon Leavell"]],
       ["CB", ["Kayin Lee","Tre Poteat III","Dylan Haley"]],
       ["NICKEL", ["Qua Moss","Tevis Metcalf","Isaiah Hardge","Carter Jamison"]],
       ["S", ["TJ Metcalf","Joel Wyatt","Marcus Jones"]],
-      ["S", ["Edrees Farooq","Sidney Walton","Jaden Butler"]]
+      ["S", ["Dejuan Lane","Edrees Farooq","Sidney Walton","Jaden Butler"]]
     ],
     "Special Teams": [
       ["PK", ["Cooper Ranvier","Ford Fehling","Grady Dangerfield"]],
@@ -108,6 +108,7 @@ window.DEPTH.football = {
       ["KR", ["Daune Morris","Qua Moss","David Gabriel Georges"]],
       ["PR", ["Qua Moss","Daune Morris"]]
     ]
-    }
+    },
+    "removed": ["Jesse Perry","Tyree Weathersby"]
   }
 };
