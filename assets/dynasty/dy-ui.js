@@ -286,7 +286,8 @@
     else if (g.phase === 'preseason') L.push(preseasonCard());
     else if (g.phase === 'season') L.push(`<div class="box"><div class="glabel">Week ${g.week}</div><h3>Bye week</h3><p class="dim">Rest up. Recruiting actions still count this week.</p></div>`);
     if (g.phase === 'post' || g.phase === 'ccg') L.push(bracketCard());
-    const last = DY.teamGames(ut.id).filter(x => x.res).slice(-1)[0];
+    const P0 = g.post || {}, mine = x => x && x.res && (x.h === ut.id || x.a === ut.id);
+    const last = [].concat(DY.teamGames(ut.id).filter(x => x.res), (P0.bowls || []).filter(mine), [].concat(...(P0.rounds || [])).filter(mine), (P0.cur || []).filter(x => mine(x) && !(P0.rounds || []).includes(P0.cur))).slice(-1)[0];
     if (last) L.push(lastGameCard(last));
     L.push(aroundCard(), newsCard(), fieldCard());
     R.push(pollMini(), standMini(), injuriesMini(), recruitMini(), leadersMini(), captainsMini());
@@ -326,7 +327,7 @@
   function lastGameCard(x) {
     const ut = DY.userT(), us = x.h === ut.id ? x.res.h : x.res.a, th = x.h === ut.id ? x.res.a : x.res.h, o = DY.oppOf(x);
     const top = x.box && x.box.top && x.box.top.find(t => t.s === (x.h === ut.id ? 'h' : 'a'));
-    return `<div class="box"><div class="glabel">Last game</div><h3 class="${us > th ? 'dy-w' : 'dy-l'}">${us > th ? 'W' : 'L'} ${us}-${th} ${x.h === ut.id ? 'vs' : 'at'} ${tlink(o)}${x.res.ot ? ' (OT)' : ''}</h3>
+    return `<div class="box"><div class="glabel">Last game${x.title ? ` · ${esc(x.title)}` : ''}</div><h3 class="${us > th ? 'dy-w' : 'dy-l'}">${us > th ? 'W' : 'L'} ${us}-${th} ${x.h === ut.id ? 'vs' : 'at'} ${tlink(o)}${x.res.ot ? ' (OT)' : ''}</h3>
       ${top ? `<div class="dy-top">${['qb', 'rb', 'wr', 'df'].filter(k => top[k]).map(k => `<span>${plink(DY.P(top[k][0]))} ${esc(top[k][1])}</span>`).join('')}</div>` : ''}
       ${x.box && x.box.ts ? `<button class="glink" data-box="${x.id}">Box score</button>` : ''}</div>`;
   }
@@ -446,13 +447,13 @@
       if (!root0.isConnected) { clearInterval(tmr); return; }
       if (k >= its.length) { clearInterval(tmr); root0.querySelector('.cf-ctrl').hidden = true; return; }
       const el = its[k++]; el.classList.add('on');
-      if (el.dataset.mine === '1') { el.classList.add('boom'); auto = false; clearInterval(tmr); root0.querySelector('#cfAuto').setAttribute('aria-pressed', 'false'); }
+      if (el.dataset.mine === '1') { el.classList.add('boom'); if (auto) { clearInterval(tmr); tmr = setTimeout(() => { if (auto) tmr = setInterval(reveal, 1500); }, 3500); } }
       if (el.scrollIntoView && k > 3) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       prog(); if (k >= its.length) root0.querySelector('.cf-ctrl').hidden = true;
     };
     root0.querySelector('#cfNext').onclick = reveal;
-    root0.querySelector('#cfAuto').onclick = e => { auto = !auto; e.currentTarget.setAttribute('aria-pressed', String(auto)); clearInterval(tmr); if (auto) tmr = setInterval(reveal, 1500); };
-    root0.querySelector('#cfAll').onclick = () => { clearInterval(tmr); while (k < its.length) its[k++].classList.add('on'); root0.querySelectorAll('.boom').forEach(x => x.classList.remove('boom')); prog(); root0.querySelector('.cf-ctrl').hidden = true; };
+    root0.querySelector('#cfAuto').onclick = e => { auto = !auto; e.currentTarget.setAttribute('aria-pressed', String(auto)); clearInterval(tmr); clearTimeout(tmr); if (auto) tmr = setInterval(reveal, 1500); };
+    root0.querySelector('#cfAll').onclick = () => { clearInterval(tmr); clearTimeout(tmr); while (k < its.length) its[k++].classList.add('on'); root0.querySelectorAll('.boom').forEach(x => x.classList.remove('boom')); prog(); root0.querySelector('.cf-ctrl').hidden = true; };
     tmr = setInterval(reveal, 1500); prog();
   }
   /* ---------- the Playoff tab ---------- */

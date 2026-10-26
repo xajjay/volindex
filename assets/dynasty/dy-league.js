@@ -594,14 +594,14 @@
       else if (r === 2) games = [site(prevW[0], prevW[1], false, 'CFP National Championship')];
     } else if (n === 12) {
       if (r === 0) games = [[4, 11], [7, 8], [5, 10], [6, 9]].map(([a, b]) => site(S[a], S[b], true, 'CFP First Round'));
-      else if (r === 1) { const bowls = DY.shuffle(DY.NY6).slice(0, 4); games = [[0, 1], [3, 0], [2, 3], [1, 2]].map(([seed, gi], i) => site(S[seed], prevW[gi], false, bowls[i] + ' (CFP Quarterfinal)')); }
+      else if (r === 1) { const bowls = DY.shuffle(DY.NY6.filter(x => !/Orange|Cotton/.test(x))).slice(0, 4); games = [[0, 1], [3, 0], [2, 3], [1, 2]].map(([seed, gi], i) => site(S[seed], prevW[gi], false, bowls[i] + ' (CFP Quarterfinal)')); }
       else if (r === 2) games = [[0, 1], [2, 3]].map(([a, b], i) => site(prevW[a], prevW[b], false, (i ? 'Cotton Bowl' : 'Orange Bowl') + ' (CFP Semifinal)'));
       else if (r === 3) games = [site(prevW[0], prevW[1], false, 'CFP National Championship')];
     } else {
       // first round 9-24 at the higher seed; second round at seeds 1-8 (1 vs 16/17, 8 vs 9/24, 4 vs 13/20, 5 vs 12/21, ...)
       if (r === 0) games = [[15, 16], [8, 23], [12, 19], [11, 20], [14, 17], [9, 22], [13, 18], [10, 21]].map(([a, b]) => site(S[a], S[b], true, 'CFP First Round'));
       else if (r === 1) games = [0, 7, 3, 4, 1, 6, 2, 5].map((seed, i) => site(S[seed], prevW[i], true, 'CFP Second Round'));
-      else if (r === 2) { const bowls = DY.shuffle(DY.NY6).slice(0, 4); games = [[0, 1], [2, 3], [4, 5], [6, 7]].map(([a, b], i) => site(prevW[a], prevW[b], false, bowls[i] + ' (CFP Quarterfinal)')); }
+      else if (r === 2) { const bowls = DY.shuffle(DY.NY6.filter(x => !/Orange|Cotton/.test(x))).slice(0, 4); games = [[0, 1], [2, 3], [4, 5], [6, 7]].map(([a, b], i) => site(prevW[a], prevW[b], false, bowls[i] + ' (CFP Quarterfinal)')); }
       else if (r === 3) games = [[0, 1], [2, 3]].map(([a, b], i) => site(prevW[a], prevW[b], false, (i ? 'Cotton Bowl' : 'Orange Bowl') + ' (CFP Semifinal)'));
       else if (r === 4) games = [site(prevW[0], prevW[1], false, 'CFP National Championship')];
     }
