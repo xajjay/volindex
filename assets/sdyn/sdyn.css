@@ -1,0 +1,18 @@
+/* The Vol Index — Hoops and Diamond Dynasty: additions to the Vol Dynasty stylesheet */
+.sdg .dyg-fieldwrap { background: #1d2733; }
+.sdg.hoops .dyg-fieldwrap { background: #b98a55; }
+.sdg-bases { width: 46px; height: 30px; margin-top: 2px; }
+.sdg-bases rect { fill: rgba(255,255,255,.18); stroke: rgba(255,255,255,.5); stroke-width: 1; }
+.sdg-bases rect.on { fill: #F2D600; stroke: #F2D600; }
+.sdg-out { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.22); margin-right: 2px; vertical-align: middle; }
+.sdg-out.on { background: #F2D600; }
+.sdg-he small { font-size: 12px; opacity: .85; font-weight: 700; }
+.sdg-en { display: inline-block; width: 60px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; vertical-align: middle; }
+.sdg-en i { display: block; height: 100%; }
+.sdg select, .dy-rotrow select { max-width: 100%; border: 1px solid var(--line-strong); background: var(--surface); color: var(--fg); border-radius: 8px; padding: 6px 8px; font: inherit; font-size: 13px; }
+.sdg .dyg-extra .dyg-lab { min-width: 74px; }
+.dy-game { margin-top: 4px; }
+.dyg-ls td, .dyg-ls th { text-align: center; padding: 4px 6px; }
+.dyg-ls td:first-child { text-align: left; }
+tr.st td:first-child { font-weight: 800; color: var(--orange-ink); }
+@media (max-width: 560px) { .sdg .dyg-extra .dyg-lab { min-width: 0; width: 100%; } .sdg .dyg-sc { font-size: 32px; } }

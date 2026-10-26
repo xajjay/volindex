@@ -54,10 +54,10 @@
   /* ---------- sports + games ---------- */
   const SPORTS = [
     { key: 'football', name: 'Football', icon: '🏈', file: 'data/games-data.js', games: ['dynasty', 'run', 'guesser', 'grid', 'career', 'rankings', 'duel', 'trivia'] },
-    { key: 'mbb', name: "Men's Basketball", icon: '🏀', beta: true, file: 'data/games-mbb.js', games: ['run', 'guesser', 'rankings', 'duel', 'trivia'] },
-    { key: 'wbb', name: "Women's Basketball", icon: '🏀', beta: true, file: 'data/games-wbb.js', games: ['run', 'guesser', 'rankings', 'duel', 'trivia'], lady: true },
-    { key: 'baseball', name: 'Baseball', icon: '⚾', beta: true, file: 'data/games-baseball.js', games: ['run', 'guesser', 'rankings', 'duel', 'trivia'] },
-    { key: 'softball', name: 'Softball', icon: '🥎', beta: true, file: 'data/games-softball.js', games: ['run', 'guesser', 'rankings', 'duel', 'trivia'] },
+    { key: 'mbb', name: "Men's Basketball", icon: '🏀', beta: true, file: 'data/games-mbb.js', games: ['dynasty', 'run', 'guesser', 'rankings', 'duel', 'trivia'] },
+    { key: 'wbb', name: "Women's Basketball", icon: '🏀', beta: true, file: 'data/games-wbb.js', games: ['dynasty', 'run', 'guesser', 'rankings', 'duel', 'trivia'], lady: true },
+    { key: 'baseball', name: 'Baseball', icon: '⚾', beta: true, file: 'data/games-baseball.js', games: ['dynasty', 'run', 'guesser', 'rankings', 'duel', 'trivia'] },
+    { key: 'softball', name: 'Softball', icon: '🥎', beta: true, file: 'data/games-softball.js', games: ['dynasty', 'run', 'guesser', 'rankings', 'duel', 'trivia'] },
     { key: 'volleyball', name: 'Volleyball', icon: '🏐', beta: true, file: 'data/games-volleyball.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
     { key: 'soccer', name: 'Soccer', icon: '⚽', beta: true, file: 'data/games-soccer.js', games: ['guesser', 'rankings', 'duel', 'trivia'] },
   ];
@@ -70,12 +70,14 @@
   const gIcon = (sport, g) => g === 'run' ? RUN_ICON[sport] : GAME_ICON[g];
   function gameName(sport, g) {
     const v = SP(sport).lady ? 'Lady Vol' : 'Vol';
-    return { dynasty: 'Vol Dynasty', run: RUN_NAME[sport], guesser: v + ' Guesser', grid: 'Power T Grid', career: 'VFL Career', rankings: 'Rocky Top Rankings', duel: 'Higher or Lower', trivia: v + ' Trivia' }[g];
+    return { dynasty: { football: 'Vol Dynasty', mbb: 'Vol Hoops Dynasty', wbb: 'Lady Vols Dynasty', baseball: 'Vol Diamond Dynasty', softball: 'Lady Vols Softball Dynasty' }[sport], run: RUN_NAME[sport], guesser: v + ' Guesser', grid: 'Power T Grid', career: 'VFL Career', rankings: 'Rocky Top Rankings', duel: 'Higher or Lower', trivia: v + ' Trivia' }[g];
   }
   function gameBlurb(sport, g) {
     const fb = sport === 'football';
     return {
-      dynasty: 'Take over Tennessee with the real 2026 roster. Call the plays in a live, animated sim, recruit the real 2027 class and beyond, manage NIL and the portal, and chase the playoff for as many seasons as you want.',
+      dynasty: fb ? 'Take over Tennessee with the real 2026 roster. Call the plays in a live, animated sim, recruit the real 2027 class and beyond, manage NIL and the portal, and chase the playoff for as many seasons as you want.'
+        : sport === 'mbb' || sport === 'wbb' ? `Take over ${SP(sport).lady ? 'the Lady Vols' : 'Tennessee'} with the real 2026-27 roster and schedule. Coach every possession on a live court, recruit, work the portal and NIL, and chase the SEC title and March Madness, season after season.`
+        : `Take over Tennessee ${sport} with the real 2027 roster and schedule. Manage every at-bat on a live diamond, recruit, work the portal and NIL, and chase ${sport === 'softball' ? 'Oklahoma City' : 'Omaha'}, season after season.`,
       run: fb ? 'Spin an era, draft five Vols on offense and five on defense at their best, then play 12 games against all-time great teams. Win the SEC and run the 12-team playoff.'
         : sport === 'mbb' || sport === 'wbb' ? `Spin an era and draft a starting five plus a sixth ${SP(sport).lady ? 'Lady Vol' : 'man'} at their best season. Play a 31-game schedule of real Tennessee opponents, the SEC Tournament and the 64-team NCAA Tournament.`
         : `Spin an era and draft a lineup and a pitching staff at their best season. Play a 56-game schedule of real Tennessee opponents, the SEC Tournament, regionals, super regionals and the ${sport === 'softball' ? "Women's " : ''}College World Series.`,
@@ -778,6 +780,19 @@
     const next = () => { if (i >= DYN_FILES.length) return window.VI_DYN.render(app); const f = 'assets/dynasty/' + DYN_FILES[i++] + '.js?v=2'; loadScript(f, () => false, next, () => loading(app, 'Could not load Vol Dynasty. Refresh to try again.')); };
     next();
   }
+  // Hoops and Diamond Dynasty (basketball, baseball, softball): one set of scripts for all four, plus the football
+  // stylesheet and team colors
+  const SDYN_FILES = ['sd-data', 'sd-core', 'sd-hoops', 'sd-diamond', 'sd-league', 'sd-off', 'sd-save', 'sd-game', 'sd-ui'];
+  function renderSdyn(app, sport) {
+    if (!document.querySelector('link[data-dyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/dynasty/dynasty.css?v=2'; l.dataset.dyn = 1; document.head.appendChild(l); }
+    if (!document.querySelector('link[data-sdyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/sdyn/sdyn.css?v=1'; l.dataset.sdyn = 1; document.head.appendChild(l); }
+    if (window.VI_SDYN && window.SDG) return window.VI_SDYN.render(app, sport);
+    loading(app, 'Loading the dynasty…');
+    const files = (window.DY && window.DY.TEAMS ? [] : ['assets/dynasty/dy-data.js']).concat(SDYN_FILES.map(f => 'assets/sdyn/' + f + '.js'));
+    let i = 0;
+    const next = () => { if (i >= files.length) return window.VI_SDYN.render(app, sport); loadScript(files[i++] + '?v=1', () => false, next, () => loading(app, 'Could not load the dynasty. Refresh to try again.')); };
+    next();
+  }
   let last = null;
   function rerender() { if (last) render(last.app, last.sport, last.game, true); }
   function loading(app, msg) { app.innerHTML = `<div class="wrap hub-hero"><div class="eyebrow">Games</div><h1>${esc(msg || 'Loading…')}</h1></div>`; }
@@ -789,6 +804,7 @@
     if (!s) return renderHome(app);
     if (game && !s.games.includes(game)) game = null;
     if (sport === 'football' && game === 'dynasty') return renderDynasty(app);
+    if (game === 'dynasty') return renderSdyn(app, sport);
     // football data is needed for every football game; beta sports load their own file
     const ready = sport === 'football' ? () => !!window.VI_GAMES_DATA : () => !!(window.VI_GAMES_SPORT && window.VI_GAMES_SPORT[sport]);
     if (!ready()) { loading(app); return loadScript(s.file, ready, () => render(app, sport, game), () => loading(app, 'Could not load the games data. Refresh to try again.')); }
