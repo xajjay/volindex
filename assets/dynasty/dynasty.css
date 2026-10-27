@@ -673,3 +673,4 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
 .dyg-simbar:empty { display: none; }
 .dyg-full .dyg-fullbar { flex-wrap: wrap; }
 @media (max-width: 560px) { .dy-fp span { display: none; } .dy-fp i { font-size: 9px; } }   /* phone: overall + position only on the mini field (tap a dot for the player) */
+.dy-race li.me, .dy-mini li.me { font-weight: 800; } .dy-race li.me small { font-weight: 400; }

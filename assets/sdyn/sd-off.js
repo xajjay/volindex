@@ -134,6 +134,7 @@
       else if (g.sport === 'baseball' && p.yr >= 3 && p.ovr >= 80 && chance(clamp((p.ovr - 78) * 0.13, 0, 0.92))) { p.leave = 'pro'; p.dg = dg; }
     }));
     g.off.leaving = ut.roster.filter(id => SD.P(id).leave).map(id => ({ id, why: SD.P(id).leave }));
+    SD.jobReview();
   };
   SD.persuadeChance = (p, raise) => clamp(0.5 - (p.dg - 84) * 0.06 + (p.tr.loyal - 70) / 100 + (raise || 0) / Math.max(50000, SD.nilValue(p, SD.userT())) * 0.3, 0.03, 0.85);
   SD.persuade = (id, raise) => {
@@ -143,6 +144,59 @@
     const ok = chance(SD.persuadeChance(p, raise)); o.pitched[id] = ok;
     if (ok) { p.leave = null; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); SD.news('nil', `${p.n} is coming back`, ''); }
     return ok ? `${p.n} is coming back!` : `${p.n} is turning pro.`;
+  };
+  /* ---------- the coaching carousel (non-Tennessee dynasties): the AD's goal, job security, offers ---------- */
+  const tnStart = () => (G().startTeam || 'Tennessee') === 'Tennessee';
+  SD.expectedPct = t => clamp(0.35 + (t.prestige - 45) / 85, 0.3, 0.86);
+  SD.coachGoal = () => {
+    const g = G(), ut = SD.userT(); if (tnStart()) return null;
+    const cg = g.coach.goal; if (cg && cg.season === g.season && cg.team === ut.id) return cg;
+    const reg = SD.userGames().filter(x => x.kind === 'reg'), n = reg.length || (SD.kind() === 'hoops' ? 31 : 56);
+    const oppR = reg.length ? reg.reduce((a, x) => a + SD.teamRating(T(SD.oppOf(x))), 0) / reg.length : 72;
+    const wins = Math.round(n * clamp(SD.expectedPct(ut) - (oppR - 72) / 60, 0.25, 0.9));
+    const pr = ut.prestige, hoops = SD.kind() === 'hoops', cws = G().sport === 'softball' ? 'the WCWS' : 'Omaha';
+    const text = pr >= 88 ? (hoops ? 'Reach the Final Four' : `Get to ${cws}`) : pr >= 80 ? (hoops ? 'Make the NCAA Tournament and win games' : 'Host a regional') : pr >= 70 ? 'Make the NCAA Tournament' : pr >= 60 ? 'Finish above .500 and contend in the conference' : 'Show progress';
+    g.coach.goal = { season: g.season, team: ut.id, wins, games: n, text };
+    return g.coach.goal;
+  };
+  SD.jobSecurity = () => {
+    const g = G(), ut = SD.userT(), goal = SD.coachGoal(); if (!goal) return null;
+    const reg = SD.userGames().filter(x => x.kind === 'reg'), done = reg.filter(x => x.res);
+    const w = done.filter(x => (x.h === ut.id) === (x.res.h > x.res.a)).length, played = done.length, left = Math.max(0, goal.games - played);
+    const rate = (w + goal.wins / goal.games * 6) / (played + 6), pace = w + left * rate;
+    const prior = (g.coach.perf || []).slice(-2), pr = prior.length ? prior.reduce((a, b) => a + b, 0) / prior.length : 0;
+    const years = g.season - (g.coach.since || g.startSeason || g.season) + 1;
+    const v = Math.round(clamp(60 + (pace - goal.wins) / goal.games * 120 + pr * 3 + (years <= 1 ? 15 : 0), 2, 98));
+    return { v, label: v >= 75 ? 'Secure' : v >= 55 ? 'Stable' : v >= 35 ? 'Warm seat' : 'Hot seat', pace: Math.round(pace), goal, years };
+  };
+  SD.jobReview = () => {
+    const g = G(), ut = SD.userT(), o = g.off; o.jobs = null; if (tnStart()) return;
+    if (!g.startSeason) g.startSeason = g.season;
+    const goal = SD.coachGoal(), h = g.hist[g.hist.length - 1] || {}, fin = h.finish || '';
+    const regW = SD.userGames().filter(x => x.kind === 'reg' && x.res && ((x.h === ut.id) === (x.res.h > x.res.a))).length;
+    const post = /National champions/.test(fin) ? 6 : /championship|finals|Final Four|World Series/i.test(fin) ? 4 : /Elite Eight|Sweet 16|Super Regional/.test(fin) ? 2.5 : /round|Regional/.test(fin) ? 1.5 : 0;
+    const score = (regW - goal.wins) / goal.games * 18 + post + (h.secT ? 1.5 : 0) + (h.secReg ? 1 : 0) - (goal.text.startsWith('Make the NCAA') && !post ? 1.5 : 0);
+    g.coach.perf = (g.coach.perf || []).concat([Math.round(score * 10) / 10]).slice(-4);
+    const last2 = g.coach.perf.slice(-2), years = g.season - (g.coach.since || g.startSeason) + 1;
+    const fired = years >= 2 && (score <= -4 || (last2.length === 2 && last2[0] <= -2 && last2[1] <= -2)), hot = !fired && score <= -2;
+    const pool = g.teams.filter(t => t.id !== ut.id); let offers = [];
+    if (fired) offers = SD.shuffle(pool.filter(t => t.prestige <= ut.prestige - 4 && t.prestige >= ut.prestige - 30)).slice(0, 3);
+    else if (score >= 1.5) { const up = Math.min(30, 6 + score * 3); offers = SD.shuffle(pool.filter(t => t.prestige > ut.prestige + 2 && t.prestige <= ut.prestige + up)).slice(0, score >= 4 ? 3 : score >= 2.5 ? 2 : 1); }
+    else if (score > -1 && chance(0.35)) offers = SD.shuffle(pool.filter(t => Math.abs(t.prestige - ut.prestige) <= 4)).slice(0, 1);
+    o.jobs = { score: Math.round(score * 10) / 10, exp: goal.wins, fired, hot, offers: offers.map(t => t.id), taken: null };
+    if (fired) SD.news('league', `${g.coach.name} is fired at ${ut.name}`, `${offers.length} school${offers.length === 1 ? '' : 's'} want to talk.`);
+    else if (offers.length) SD.news('league', `${g.coach.name} draws interest from ${offers.map(t => t.name).join(', ')}`, 'The coaching carousel is spinning.');
+  };
+  SD.takeJob = id => {
+    const g = G(), o = g.off, old = SD.userT(), t = T(id);
+    if (!o || !o.jobs || !o.jobs.offers.includes(id) || o.stage !== 'recap') return 'That offer is off the table.';
+    old.coach = 'Staff'; (g.coach.stints = g.coach.stints || []).push({ team: old.name, from: g.coach.since || g.startSeason, to: g.season });
+    g.user = t.id; t.coach = g.coach.name; g.coach.since = g.season + 1; g.coach.perf = []; t.rot = null; t.dl = null;
+    o.leaving = t.roster.filter(x => SD.P(x).leave).map(x => ({ id: x, why: SD.P(x).leave })); o.pitched = {};
+    if (g.recruit) { g.recruit.board = SD.myCommits().map(p => p.id); }
+    o.jobs.taken = id; o.jobs.offers = [];
+    SD.news('league', `${g.coach.name} takes the ${t.name} job`, `Leaving ${old.name}.`);
+    return null;
   };
   /* ---------- season preview (locked at the opener) and the end-of-season review ---------- */
   SD.gameOdds = (a, b, home) => { const hoops = SD.kind() === 'hoops'; return 1 / (1 + Math.exp(-0.18 * ((SD.teamRating(a) - SD.teamRating(b)) + (hoops ? 2.5 * home : 0)))); };

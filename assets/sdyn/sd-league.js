@@ -26,7 +26,7 @@
   SD.newDynasty = o => {
     const sp = SD.SPORTS[o.sport];
     SD.seed(o.seed || (Date.now() % 2147483647));
-    const g = SD.G = { v: SD.VERSION, sport: o.sport, season: sp.season, coach: { name: o.coach || 'Coach', w: 0, l: 0 }, settings: Object.assign({ coachMode: 'coach', speed: 'slow', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, sound: false, autoPen: true }, o.settings || {}),
+    const g = SD.G = { v: SD.VERSION, sport: o.sport, startTeam: o.team || 'Tennessee', season: sp.season, coach: { name: o.coach || 'Coach', w: 0, l: 0 }, settings: Object.assign({ coachMode: 'coach', speed: 'slow', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, sound: false, autoPen: true }, o.settings || {}),
       teams: SD.teamsFor(o.sport), P: {}, nextId: 1, guests: {}, sched: [], phase: 'preseason', polls: { ap: [], hist: {} }, news: [], hist: [], awards: {}, recruit: null, off: null, slot: o.slot || 1, created: Date.now(), seed: SD.rstate(), rec: { season: {}, career: {} } };
     g.user = (g.teams.find(t => t.name === (o.team || 'Tennessee')) || g.teams.find(t => t.name === 'Tennessee')).id;
     g.teams.forEach(t => { t.w = 0; t.l = 0; t.cw = 0; t.cl = 0; t.pf = 0; t.pa = 0; t.hist = []; t.roster = t.name === 'Tennessee' ? SD.importTennessee(t) : SD.genRoster(t); t.budget = SD.budgetFor(t); t.coach = t.id === g.user ? g.coach.name : SD.nameOf().split(' ')[1] + ' ' + pick(SD.LAST); });
@@ -593,7 +593,7 @@
   /* ---------- the end of the season: awards and history ---------- */
   SD.awardScore = (p, t) => {
     const s = p.s; if (!s || !s.gp) return 0;
-    if (SD.kind() === 'hoops') { const g = s.gp; return (s.pts + s.orb * 0.7 + s.drb * 0.5 + s.ast * 1.1 + s.stl * 1.5 + s.blk * 1.3 - s.to) / g * 3 + (t.w - t.l) * 0.4 + p.ovr * 0.15; }
+    if (SD.kind() === 'hoops') { const g = s.gp; const wp = (t.w + 1) / (t.w + t.l + 2); return ((s.pts + s.orb * 0.7 + s.drb * 0.5 + s.ast * 1.1 + s.stl * 1.5 + s.blk * 1.3 - s.to) / g * 2.4 + p.ovr * 0.3) * (0.62 + 0.7 * wp); }   // winning matters: POYs come from good teams
     if (SD.isPit(p)) { const ip = s.ipo / 3; if (ip < 10) return 0; const era = s.er * (G().sport === 'softball' ? 7 : 9) / ip; return ip * 0.35 + s.k * 0.15 - era * 6 + (s.w || 0) * 2 + (s.sv || 0); }
     if (s.ab < 40) return 0; const avg = s.h / s.ab, obp = (s.h + s.bb + s.hbp) / Math.max(1, s.ab + s.bb + s.hbp), slg = (s.h + s.d2 + s.d3 * 2 + s.hr * 3) / s.ab;
     return (obp + slg) * 60 + s.hr * 1.2 + s.rbi * 0.25 + s.sb * 0.2 + p.at.fld * 0.05;
@@ -606,7 +606,8 @@
     const A = g.awards[g.season] = {};
     const give = (p, k) => { p.aw = p.aw || []; p.aw.push({ y: g.season, a: k }); };
     A.poy = all[0] && all[0].p.id; if (all[0]) give(all[0].p, 'POY');
-    A.aa1 = all.slice(0, SD.kind() === 'hoops' ? 5 : 12).map(x => x.p.id); A.aa1.forEach(id => give(SD.P(id), 'AA1'));
+    const cap2 = (list, n) => { const per = {}; return list.filter(x => (per[x.t.id] = (per[x.t.id] || 0) + 1) <= 2).slice(0, n); };   // no more than two from one team
+    A.aa1 = cap2(all, SD.kind() === 'hoops' ? 5 : 12).map(x => x.p.id); A.aa1.forEach(id => give(SD.P(id), 'AA1'));
     const sec = all.filter(x => x.t.conf === 'SEC'); A.sec1 = sec.slice(0, SD.kind() === 'hoops' ? 5 : 12).map(x => x.p.id); A.sec1.forEach(id => give(SD.P(id), 'SEC1'));
     A.secPoy = sec[0] && sec[0].p.id; if (sec[0]) give(sec[0].p, 'SECPOY');
     const fr = sec.filter(x => x.p.yr === 1); A.secFr = fr[0] && fr[0].p.id; if (fr[0]) give(fr[0].p, 'SECFR');
