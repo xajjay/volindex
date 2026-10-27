@@ -249,7 +249,7 @@
     const out = {};
     for (const pos in DY.STARTERS) {
       const have = t.roster.map(DY.P).filter(p => p.pos === pos && p.el > 1).length;
-      const target = Math.round(DY.STARTERS[pos] * (t.user ? 3.6 : 2.4)) + (pos === 'QB' ? 1 : 0);
+      const target = ['K', 'P', 'LS'].includes(pos) ? (t.user ? 2 : 1) : Math.round(DY.STARTERS[pos] * (t.user ? 3.6 : 2.4)) + (pos === 'QB' ? 1 : 0);
       out[pos] = clamp(target - have, 0, 8);
     }
     return out;
@@ -393,6 +393,20 @@
     return { by, n: all.length, out: ut.roster.length - stay.length, inc: inc.length };
   };
   DY.persuadeChance = (p, raise) => { const dg = p.dg || DY.draftGrade(p); return clamp(0.55 - (dg - 82) * 0.06 + (p.tr.loyal - 60) / 140 + (raise || 0) / Math.max(100000, p.nilV || DY.nilValue(p, DY.userT())) * 0.3, 0.02, 0.85); };
+  // one tap through the rest of the offseason: the staff makes the remaining calls like Auto (stops only for a fired coach)
+  DY.offAdvance = () => {
+    const g = G(), keep = { nil: g.settings.nil, portal: g.settings.portal };
+    g.settings.nil = 'auto'; g.settings.portal = 'auto';
+    try {
+      let n = 0;
+      while (g.phase === 'offseason' && n++ < 20) {
+        const o = g.off;
+        if (o.stage === 'recap' && o.jobs && o.jobs.fired && o.jobs.taken == null) return 'fired';
+        DY.offNext();
+      }
+    } finally { g.settings.nil = keep.nil; g.settings.portal = keep.portal; }
+    return null;
+  };
   DY.offNext = () => {
     const g = G(), o = g.off, i = DY.OFF_ORDER.indexOf(o.stage);
     leaveStage(o.stage);

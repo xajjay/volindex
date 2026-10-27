@@ -66,24 +66,28 @@
     APP.innerHTML = `<div class="wrap games dy"><div class="gcrumb"><a href="#" data-back="1">${esc(sp.title)}</a> › New dynasty</div>
       <div class="dy-hero"><h1>New dynasty</h1><p>${s.team === 'Tennessee' ? `${esc(sp.name)} at Tennessee, ${sp.label(sp.season)}: the real roster and schedule${played ? `, with the ${played} real game${played > 1 ? 's' : ''} already played` : ''}.` : `${esc(sp.name)} at ${esc(s.team)}, ${sp.label(sp.season)}: a generated roster and schedule. Tennessee keeps its real roster as an opponent.`}</p></div>
       <div class="box gsetup dy-setup">
-        <div class="gfield"><div class="glabel">Start</div>${played ? seg('start', [['today', 'Today: take over mid-season']]) + `<p class="dim small">The season is under way: you take over with the real results so far.</p>` : `<p class="dim small" style="margin:0">The ${sp.label(sp.season)} season hasn't started, so you begin in the preseason (camp, then the opener on ${new Date(Date.UTC(sp.season, +sp.start.slice(0, 2) - 1, +sp.start.slice(3))).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}). Preseason rankings are the real ones where they are out.</p>`}</div>
-        <div class="gfield"><div class="glabel">Difficulty</div>${seg('diff', [['freshman', 'Freshman (easier)'], ['varsity', 'Varsity (default)'], ['heisman', 'Heisman (hard)']])}<p class="dim small">Heisman gives CPU teams a boost in your games and makes recruiting tougher.</p></div>
         <div class="gfield"><div class="glabel">Team</div><select id="sdTeam" class="dy-in">${(() => { const ts = SD.teamsFor(SPORT), confs = [...new Set(ts.map(t => t.conf))].sort((a, b) => (a === 'SEC' ? -1 : b === 'SEC' ? 1 : (SD.CONF_NAME[a] || a).localeCompare(SD.CONF_NAME[b] || b))); return confs.map(c => `<optgroup label="${esc(SD.CONF_NAME[c] || c)}">${ts.filter(t => t.conf === c).sort((a, b) => a.name.localeCompare(b.name)).map(t => `<option ${t.name === s.team ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</optgroup>`).join(''); })()}</select><p class="dim small">${s.team === 'Tennessee' ? 'Tennessee comes with its real players, stats and schedule.' : 'Every other school gets generated players and a generated schedule, with no real-life stats or history.'}</p></div>
+        <div class="gfield"><div class="glabel">Start</div>${played ? seg('start', [['today', 'Today: take over mid-season']]) + `<p class="dim small">The season is under way: you take over with the real results so far.</p>` : `<p class="dim small" style="margin:0">The ${sp.label(sp.season)} season hasn't started, so you begin in the preseason (camp, then the opener on ${new Date(Date.UTC(sp.season, +sp.start.slice(0, 2) - 1, +sp.start.slice(3))).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}). Preseason rankings are the real ones where they are out.</p>`}</div>
         <div class="gfield"><div class="glabel">Coach name</div><input id="sdCoach" class="dy-in" maxlength="28" placeholder="Your name" value="${esc(s.coach)}"></div>
+        <div class="gfield"><div class="glabel">Difficulty</div>${seg('diff', [['freshman', 'Freshman (easier)'], ['varsity', 'Varsity (default)'], ['heisman', 'Heisman (hard)']])}<p class="dim small">Heisman gives CPU teams a boost in your games and makes recruiting tougher.</p></div>
+        <div class="grow"><button class="btn primary big" id="sdStart">Start the dynasty</button><button class="btn" data-back="1">Back</button></div>
+        <details class="dy-more" id="sdMore"${s.more ? ' open' : ''}><summary>More options <span class="dim small">in-game control, recruiting, portal, NIL, speed</span></summary>
         <div class="gfield"><div class="glabel">In games</div>${seg('mode', [['coach', hoops0() ? 'I coach (strategy, timeouts, rotation)' : 'I manage (lineup, bullpen, steals, bunts)'], ['watch', 'Just watch']])}</div>
         <div class="gfield"><div class="glabel">Recruiting</div>${seg('recruiting', [['manual', 'I recruit'], ['auto', 'Auto'], ['off', 'Off']])}</div>
         <div class="gfield"><div class="glabel">Transfer portal</div>${seg('portal', [['manual', 'I manage it'], ['auto', 'Auto']])}</div>
         <div class="gfield"><div class="glabel">NIL raises</div>${seg('nil', [['manual', 'I decide'], ['auto', 'Auto']])}</div>
         <div class="gfield"><div class="glabel">Game speed</div>${seg('speed', [['slow', 'Slow'], ['fast', 'Fast']])}</div>
-        <div class="grow"><button class="btn primary big" id="sdStart">Start the dynasty</button><button class="btn" data-back="1">Back</button></div>
+          <div class="grow"><button class="btn primary" data-start2="1">Start the dynasty</button></div>
+        </details>
       </div></div>`;
     APP.querySelector('#sdTeam').onchange = ev => { s.team = ev.target.value; s.coach = APP.querySelector('#sdCoach').value; setup(); };
+    APP.querySelector('#sdMore').addEventListener('toggle', ev => { s.more = ev.target.open; });
     APP.firstElementChild.onclick = e => {
       const b = e.target.closest('button,a'); if (!b) return;
       if (b.dataset.back) { e.preventDefault(); return landing(); }
       const segEl = b.closest('.gseg');
       if (segEl && b.dataset.v != null) { s[segEl.dataset.key] = b.dataset.v; s.coach = APP.querySelector('#sdCoach').value; s.team = APP.querySelector('#sdTeam').value; return setup(); }
-      if (b.id === 'sdStart') {
+      if (b.id === 'sdStart' || b.dataset.start2) {
         s.coach = APP.querySelector('#sdCoach').value.trim() || 'Coach';
         busy('Building the season…', () => {
           SD.newDynasty({ sport: SPORT, coach: s.coach, slot: s.slot, team: s.team, settings: { difficulty: s.diff, coachMode: s.mode, recruiting: s.recruiting, portal: s.portal, nil: s.nil, speed: s.speed } });
@@ -169,14 +173,19 @@
     if (d.campf) { SD.campState().focus = d.campf; return keep(); }
     if (d.campp) { const C = SD.campState(), id = +d.campp, i = C.picks.indexOf(id); if (i >= 0) C.picks.splice(i, 1); else if (C.picks.length < 3) C.picks.push(id); else V.msg = 'Three players max: tap one to take him out.'; return keep(); }
     if (d.act === 'camp') { SD.runCamp(false); autosave(); return keep(); }
+    if (d.act === 'main' || d.act === 'sim') V.recap = null;
     if (d.act === 'main') { const a = primaryAction(); if (a) a.main(); return; }
     if (d.act === 'sim') { return busy('Simming…', () => { const x = SD.simNext(); if (x) { const me = x.h === g.user ? 'h' : 'a'; V.msg = `Final: ${T(x.a).name} ${x.res.a}, ${T(x.h).name} ${x.res.h}.`; } }); }
     if (d.act === 'simmenu') { const m = el.parentNode.querySelector('.dy-menu-in'); m.hidden = !m.hidden; return; }
-    if (d.ahead) return busy('Simming…', () => {
+    if (d.act === 'recapx') { V.recap = null; return hub(); }
+    if (d.act === 'offall') return busy('Running the offseason…', () => { SD.offAdvance(); V.msg = `Welcome to the ${SD.SP().label(G().season)} preseason.`; V.tab = 'home'; });
+    if (d.ahead) { const before = snap(); return busy('Simming…', () => {
+      if (g.phase === 'preseason') SD.startSeason();
       if (d.ahead === 'end') SD.simToEnd('end');
       else if (d.ahead === 'reg') { let n = 0; while (g.phase !== 'ct' && g.phase !== 'offseason' && n++ < 80) { if (!SD.simNext()) break; } }
       else { const until = SD.addDays(g.date, 7); let n = 0; while (g.date < until && g.phase !== 'offseason' && n++ < 20) { const nx = SD.nextUserGame(); if (!nx || nx.d >= until) { SD.simTo(until, false); break; } SD.simNext(); } }
-    });
+      V.recap = makeRecap(before);
+    }); }
     if (d.act === 'save') { el.disabled = true; return SD.saveSlot(g.slot || 1).then(err => { V.msg = err || `Saved to slot ${g.slot || 1}.`; hub(); }); }
     if (d.act === 'export') return SD.exportBlob().then(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${g.sport}-dynasty-${g.season}.gz`; a.click(); });
     if (d.more) { V.more[d.more] = !V.more[d.more]; return keep(); }
@@ -220,11 +229,37 @@
   UI.modal = html => modal(html);
 
   /* ---------- home ---------- */
+  // sim-ahead recap: what changed while you were away
+  function snap() {
+    const g = G(), ut = SD.userT();
+    return { w: ut.w, l: ut.l, rk: SD.apRank(ut.id), label: SD.phaseLabel(), news: g.news[0] || null, played: SD.userGames().filter(x => x.res).length,
+      inj: ut.roster.filter(id => { const p = SD.P(id); return p && p.inj && p.inj.g > 0; }), commits: g.recruit ? SD.myCommits().map(p => p.id) : [], season: g.season };
+  }
+  function makeRecap(b) {
+    const g = G(), a = snap(); if (a.season !== b.season) return null;
+    const games = SD.userGames().filter(x => x.res).slice(b.played);
+    const i = b.news ? g.news.indexOf(b.news) : g.news.length, fresh = i < 0 ? g.news : g.news.slice(0, i);
+    const headlines = fresh.filter(n => n.type !== 'commit' && /upset|No\. 1|champion|seed|award|fired|Selection/i.test(n.h)).slice(0, 5);
+    return { b, a, from: b.label, to: a.label, games, dw: a.w - b.w, dl: a.l - b.l, injN: a.inj.filter(id => !b.inj.includes(id)), comN: a.commits.filter(id => !b.commits.includes(id)), comL: b.commits.filter(id => !a.commits.includes(id)), headlines };
+  }
+  function recapCard() {
+    const r = V.recap; if (!r) return '';
+    const ut = SD.userT(), a = r.a, rk = n => n ? 'No. ' + n : 'unranked';
+    const games = r.games.slice(-12).map(x => { const us = x.h === ut.id ? x.res.h : x.res.a, th = x.h === ut.id ? x.res.a : x.res.h; return `<li><b class="${us > th ? 'dy-w' : 'dy-l'}">${us > th ? 'W' : 'L'} ${us}-${th}</b> ${x.h === ut.id && !x.neutral ? 'vs' : x.neutral ? 'vs' : 'at'} ${esc(T(SD.oppOf(x)).name)}</li>`; }).join('');
+    const pool = G().recruit ? G().recruit.pool : {};
+    return `<div class="box dy-recapcard"><div class="dy-rch"><div><div class="glabel">While you were away · ${esc(r.from)} → ${esc(r.to)}</div>
+        <h3>${a.w}-${a.l} <small class="dim">(${r.dw}-${r.dl} in the stretch)</small> · ${rk(a.rk)}${r.b.rk !== a.rk ? ` <small class="${(a.rk || 99) < (r.b.rk || 99) ? 'dy-w' : 'dy-l'}">${(a.rk || 99) < (r.b.rk || 99) ? '▲' : '▼'} from ${rk(r.b.rk)}</small>` : ''}</h3></div>
+        <button class="glink" data-act="recapx">Dismiss</button></div>
+      <div class="dy-rcg">${games ? `<div><div class="glabel">Your games${r.games.length > 12 ? ' (last 12)' : ''}</div><ul class="dy-mini">${games}</ul></div>` : ''}
+        ${r.injN.length ? `<div><div class="glabel">New injuries</div><ul class="dy-mini">${r.injN.map(id => { const p = SD.P(id); return `<li>${plink(p)} <small>${p.pos} · ${p.inj.g} game${p.inj.g > 1 ? 's' : ''}</small></li>`; }).join('')}</ul></div>` : ''}
+        ${r.comN.length || r.comL.length ? `<div><div class="glabel">Recruiting</div><ul class="dy-mini">${r.comN.map(id => pool[id] ? `<li>Commit: <b>${esc(pool[id].n)}</b> <small>${pool[id].rec.stars}★ ${pool[id].pos}</small></li>` : '').join('')}${r.comL.map(id => pool[id] ? `<li class="dy-l">Lost: ${esc(pool[id].n)}</li>` : '').join('')}</ul></div>` : ''}
+        ${r.headlines.length ? `<div><div class="glabel">Around the country</div><ul class="dy-mini">${r.headlines.map(n => `<li>${esc(n.h)}</li>`).join('')}</ul></div>` : ''}</div></div>`;
+  }
   function home(b) {
     const g = G(), ut = SD.userT();
     if (g.phase === 'offseason') return offseason(b);
     if (g.post && g.post.seen === false) return selectionShow(b);
-    const L = [], R = [];
+    const L = [recapCard()], R = [];
     const nx = SD.nextUserGame();
     if (g.phase === 'preseason') L.push(campCard(), depthPreview());
     if (nx) L.push(nextGameCard(nx));
@@ -424,7 +459,7 @@
       : [best(s => s.ab >= 20 ? s.h / s.ab : 0, s => avg3(s.h, s.ab) + ' AVG'), best(s => s.hr, s => s.hr + ' HR'), best(s => s.ipo >= 30 ? 100 - s.er * 9 / (s.ipo / 3) : 0, s => (s.er * (G().sport === 'softball' ? 7 : 9) / (s.ipo / 3)).toFixed(2) + ' ERA')];
     return `<div class="box"><div class="glabel">Team leaders <button class="glink" data-tab="stats">Stats</button></div><ul class="dy-mini">${rows.join('') || '<li class="dim">After the first game.</li>'}</ul></div>`;
   }
-  function recruitMini() { const g = G(), R = g.recruit; if (!R) return ''; const c = SD.myCommits(); return `<div class="box"><div class="glabel">Class of ${R.year} <button class="glink" data-tab="recruit">Recruiting</button></div><p>${R.classRank ? `No. ${R.classRank} class · ` : ''}${c.length} commit${c.length === 1 ? '' : 's'}</p><ul class="dy-mini">${c.slice(0, 5).map(p => `<li><span class="dy-stars">${stars(p.rec.stars)}</span> ${esc(p.n)} <small>${p.pos}</small></li>`).join('')}</ul></div>`; }
+  function recruitMini() { const g = G(), R = g.recruit; if (!R) return ''; const c = SD.myCommits(); return `<div class="box"><div class="glabel">Class of ${R.year} <button class="glink" data-tab="recruit">Recruiting</button></div><p>${R.classRank ? `${R.signed ? 'Final' : 'Current'} rank <b>No. ${R.classRank}</b> · ` : ''}${c.length} commit${c.length === 1 ? '' : 's'}</p><ul class="dy-mini">${c.slice(0, 5).map(p => `<li><span class="dy-stars">${stars(p.rec.stars)}</span> ${esc(p.n)} <small>${p.pos}</small></li>`).join('')}</ul></div>`; }
 
   /* ---------- schedule ---------- */
   function schedule(b) {
@@ -486,7 +521,10 @@
         ${p.visit ? `<small>Visit ${SD.dateStr(p.visit)}</small>` : homeGames.length ? `<select data-rvisit="${p.id}"><option value="">Official visit…</option>${homeGames.slice(0, 8).map(x => `<option value="${x.d}">${SD.dateStr(x.d)} vs ${esc(T(x.a).abbr)}</option>`).join('')}</select>` : ''}
         <button class="dy-ra" data-rrm="${p.id}">Remove</button>`}</td></tr>`; };
     const pool = Object.values(R.pool).filter(p => !R.board.includes(p.id) && p.commit !== g.user && (F.pos === 'ALL' || p.pos === F.pos) && (!F.stars || p.rec.stars === F.stars) && (!F.q || p.n.toLowerCase().includes(F.q.toLowerCase()))).sort((a, b) => a.rec.natl - b.rec.natl).slice(0, V.more.rpool ? 120 : 30);
-    b.innerHTML = `<div class="box"><div class="glabel">Class of ${R.year}</div><div class="dy-stats4"><div><b>${R.classRank ? 'No. ' + R.classRank : '—'}</b><small>Class rank</small></div><div><b>${commits.length}/${SD.CLASS[g.sport]}</b><small>Commits</small></div><div><b>${SD.HOURS() - SD.hoursUsed()}</b><small>Hours left this week</small></div><div><b>${board.length}/20</b><small>Board</small></div></div>
+    b.innerHTML = `<div class="box"><div class="glabel">Class of ${R.year}</div><div class="dy-stats4"><div><b>${R.classRank ? 'No. ' + R.classRank : '—'}</b><small>${R.signed ? 'Final class rank' : 'Current class rank'}</small></div><div><b>${commits.length}/${SD.CLASS[g.sport]}</b><small>Commits</small></div><div><b>${SD.HOURS() - SD.hoursUsed()}</b><small>Hours left this week</small></div><div><b>${board.length}/20</b><small>Board</small></div></div>
+      ${(() => { const nd = SD.needs(ut), back = ut.roster.map(SD.P).filter(p => p.el > 1).length, open = Math.max(0, SD.LIMIT[g.sport] - back), left = Math.max(0, Math.min(SD.CLASS[g.sport] + 2, open) - commits.length);
+        const list = Object.entries(nd).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+        return `<div class="dy-needs"><div class="glabel">Recruiting needs</div><p class="small"><b>${open}</b> open roster spots next season · <b>${left}</b> spots left in this class. The class rank moves as every school keeps signing.</p>${list.length ? `<div class="dy-needchips">${list.map(([pos, v]) => `<span class="dy-need ${v >= 3 ? 'hi' : v >= 2 ? 'md' : ''}">${pos} <b>${v}</b></span>`).join('')}</div>` : '<p class="small dim">Every position is stocked for next season.</p>'}</div>`; })()}
       ${g.settings.recruiting === 'auto' ? '<p><span class="chip">Auto</span> Your staff runs the board.</p>' : '<p class="small dim">Each week (Mondays) your calls, visits and NIL promises add interest. Four- and five-stars want an official visit to a home game before they commit. Other programs are recruiting the same kids.</p>'}
       ${commits.length ? `<ul class="dy-mini">${commits.map(p => `<li><span class="dy-stars">${stars(p.rec.stars)}</span> ${esc(p.n)} <small>${p.pos} · No. ${p.rec.natl}${p.real ? ' · real commitment' : ''}</small></li>`).join('')}</ul>` : ''}</div>
       <div class="box"><div class="glabel">Your board</div><div class="dy-scroll"><table class="dyt"><tbody>${board.map(card).join('') || '<tr><td class="dim">Add prospects from the list below.</td></tr>'}</tbody></table></div></div>
@@ -571,7 +609,7 @@
     let html = '';
     if (st === 'recap') {
       const h = g.hist[g.hist.length - 1] || {};
-      html = `<div class="dy-recap-hero"><div><span class="glabel">${SD.SP().label(h.y)} in review</span><h2>${h.w}-${h.l} · ${esc(h.finish || '')}</h2><p>${h.cw}-${h.cl} ${esc(SD.UC())}${h.ap ? ` · No. ${h.ap} in the final poll` : ''}${h.champ ? ` · National champion: ${esc(h.champ)}` : ''}</p></div></div>
+      html = recapCard() + `<div class="dy-recap-hero"><div><span class="glabel">${SD.SP().label(h.y)} in review</span><h2>${h.w}-${h.l} · ${esc(h.finish || '')}</h2><p>${h.cw}-${h.cl} ${esc(SD.UC())}${h.ap ? ` · No. ${h.ap} in the final poll` : ''}${h.champ ? ` · National champion: ${esc(h.champ)}` : ''}</p></div></div>
         <div class="box"><div class="glabel">Leaving</div><div class="dy-scroll"><table class="dyt"><tbody>${o.leaving.map(x => { const p = SD.P(x.id); return `<tr><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)} · ${p.ovr}</small></td><td>${x.why === 'grad' ? 'Out of eligibility' : `Turning pro (${esc(SD.SP().draft)})`}</td><td>${x.why === 'pro' && o.pitched[x.id] == null ? `<select data-pamt="${x.id}">${[0, 50000, 100000, 250000, 500000].map(v => `<option value="${v}">${v ? '+' + SD.money(v) : 'No raise'}</option>`).join('')}</select><button class="dy-ra" data-persuade="${x.id}">Ask him back</button> <small>${Math.round(SD.persuadeChance(p, 0) * 100)}%</small>` : ''}</td></tr>`; }).join('') || '<tr><td class="dim">Nobody.</td></tr>'}</tbody></table></div></div>`.replace('Ask him back', SD.SP().he === 'she' ? 'Ask her back' : 'Ask him back');
     } else if (st === 'nil') {
       const asks = {}; o.nilAsk.forEach(a => { asks[a.id] = a; });
@@ -584,7 +622,7 @@
         <div class="box"><div class="gchips dy-chips">${['ALL'].concat(SD.POS[SD.kind()]).map(x => `<button data-ppos="${x}" aria-pressed="${V.ppos === x}">${x === 'ALL' ? 'All' : x}</button>`).join('')}</div><div class="dy-scroll"><table class="dyt"><thead><tr><th>Player</th><th>From</th><th>Transfer rating</th><th>Offer</th></tr></thead><tbody>${avail.map(p => `<tr class="${P.mine[p.id] != null ? 'me' : ''}"><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${tlink(p.portal.from, false)}</td><td><span class="dy-tstars">${'★'.repeat(SD.tStars(p))}</span> <small>${SD.tRange(p).join('-')}</small></td><td>${P.mine[p.id] != null ? `<b>${SD.money(P.mine[p.id])}</b> ` : ''}<select data-pofferamt="${p.id}">${[10000, 25000, 50000, 100000, 250000, 500000, 1000000].map(v => `<option value="${v}">${SD.money(v)}</option>`).join('')}</select><button class="dy-ra" data-poffer="${p.id}">Offer</button></td></tr>`).join('')}</tbody></table></div></div>`;
     } else if (st === 'signing') {
       const c = SD.myCommits();
-      html = `<div class="box"><div class="glabel">Signing day · class of ${g.recruit.year}</div><p>No. ${g.recruit.classRank || '—'} class</p><ul class="dy-mini">${c.map(p => `<li><span class="dy-stars">${stars(p.rec.stars)}</span> ${esc(p.n)} <small>${p.pos} · ${p.ovr} · ${p.potG}</small></li>`).join('') || '<li class="dim">No signees.</li>'}</ul></div>`;
+      html = `<div class="box"><div class="glabel">Signing day · class of ${g.recruit.year} · final ranking</div><p><b>No. ${g.recruit.finalRank || g.recruit.classRank || '—'} class</b></p><ul class="dy-mini">${c.map(p => `<li><span class="dy-stars">${stars(p.rec.stars)}</span> ${esc(p.n)} <small>${p.pos} · ${p.ovr} · ${p.potG}</small></li>`).join('') || '<li class="dim">No signees.</li>'}</ul></div>`;
     } else if (st === 'draft') {
       const mine = (o.draft || []).filter(x => x.t === g.user);
       html = `<div class="box"><div class="glabel">${esc(SD.SP().draft)}</div><ul class="dy-mini">${mine.map(x => `<li>No. ${x.pk}: ${plink(SD.P(x.id))} <small>${SD.P(x.id).pos}</small></li>`).join('') || `<li class="dim">No ${esc(SD.UN())} players taken.</li>`}</ul></div>`;
@@ -604,7 +642,8 @@
         ${arr.length < nmax ? `<button class="btn" data-ncadd="1">Add a ${hoops() ? 'game' : 'series'}</button>` : ''}</div>`;
       html = ncHtml + `<div class="box"><div class="glabel">Next season</div><p>Roster set: ${ut.roster.length} players, team rating ${SD.teamRating(ut)}. Continue to build the ${SD.SP().label(g.season + 1)} schedule.</p></div>`;
     }
-    b.innerHTML = `${steps}${html}<div class="grow"><button class="btn primary big" data-act="main">${esc(primaryAction().label)}</button></div>`;
+    const lastStage = SD.OFF_ORDER.indexOf(st) >= SD.OFF_ORDER.length - 1;
+    b.innerHTML = `${steps}${html}<div class="grow"><button class="btn primary big" data-act="main">${esc(primaryAction().label)}</button>${lastStage ? '' : `<button class="btn" data-act="offall">Advance to the ${esc(SD.SP().label(g.season + 1))} preseason ›</button>`}</div>${lastStage ? '' : '<p class="small dim">Advance skips the remaining steps: your staff handles NIL raises, the portal and cuts the way Auto would.</p>'}`;
   }
 
   /* ---------- editing a generated player (not the ratings) ---------- */

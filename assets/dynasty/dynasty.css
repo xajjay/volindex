@@ -625,3 +625,21 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
 .dy-jobbar i { display: block; height: 100%; border-radius: 6px; transition: width .4s; }
 .dy-job p { margin: 8px 0 0; }
 .dy-job p b { display: inline !important; font-size: inherit !important; margin: 0 !important; }
+/* sim-ahead recap */
+.dy-recapcard { border-left: 4px solid var(--orange); }
+.dy-rch { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+.dy-rch h3 { margin: 4px 0 8px; }
+.dy-rcg { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 10px 16px; }
+.dy-rcg .dy-mini li { margin: 2px 0; }
+/* quick setup: the rest of the options fold away */
+.dy-more { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; }
+.dy-more > summary { cursor: pointer; font-weight: 700; padding: 6px 0; list-style-position: inside; }
+.dy-more > summary .dim { font-weight: 400; margin-left: 6px; }
+.dy-more[open] > summary { margin-bottom: 8px; }
+/* recruiting needs */
+.dy-needs { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+.dy-needchips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.dy-need { border: 1px solid var(--line-strong); border-radius: 999px; padding: 4px 10px; font-size: 13px; font-weight: 700; }
+.dy-need b { color: var(--orange-ink); margin-left: 2px; }
+.dy-need.hi { background: var(--orange-soft); border-color: var(--orange); }
+.dy-need.md { border-color: var(--orange); }

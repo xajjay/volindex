@@ -144,6 +144,20 @@
     if (ok) { p.leave = null; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); SD.news('nil', `${p.n} is coming back`, ''); }
     return ok ? `${p.n} is coming back!` : `${p.n} is turning pro.`;
   };
+  // positions short for next season: target counts per position vs. players with eligibility left
+  SD.needs = t => {
+    const hoops = SD.kind() === 'hoops', soft = G().sport === 'softball';
+    const target = hoops ? { PG: 3, SG: 3, SF: 3, PF: 3, C: 3 } : soft ? { SP: 4, RP: 3, C: 2, '1B': 2, '2B': 2, SS: 2, '3B': 2, LF: 2, CF: 2, RF: 2 } : { SP: 7, RP: 8, C: 3, '1B': 2, '2B': 2, SS: 3, '3B': 2, LF: 2, CF: 3, RF: 2 };
+    const out = {}; for (const pos in target) out[pos] = Math.max(0, target[pos] - t.roster.map(SD.P).filter(p => p.pos === pos && p.el > 1).length);
+    return out;
+  };
+  // one tap through the rest of the offseason (the staff makes the remaining calls like Auto)
+  SD.offAdvance = () => {
+    const g = G(), keep = { nil: g.settings.nil, portal: g.settings.portal };
+    g.settings.nil = 'auto'; g.settings.portal = 'auto';
+    try { let n = 0; while (g.phase === 'offseason' && n++ < 20) SD.offNext(); }
+    finally { g.settings.nil = keep.nil; g.settings.portal = keep.portal; }
+  };
   SD.offNext = () => {
     const g = G(), o = g.off, st = o.stage;
     if (st === 'recap') { removeLeavers(); nilReview(); }
