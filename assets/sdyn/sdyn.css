@@ -103,3 +103,4 @@ tr.st td:first-child { font-weight: 800; color: var(--orange-ink); }
 .ss-ctrl .btn[aria-pressed="true"] { background: rgba(255,255,255,.12); }
 .ss-prog { color: #9aa4b0; font-size: 13px; margin-left: auto; }
 .ss.done .ss-ctrl { display: none; }
+.ss.live .ss-ln.me small, .ss.live .ss-ln.me .ss-sd { color: #fff; }

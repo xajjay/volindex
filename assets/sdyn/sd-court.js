@@ -1,8 +1,8 @@
-/* The Vol Index — Hoops Dynasty: the live court, in the style of a tracking view (think NBA Pulse). Each possession from
-   the engine becomes a short piece of choreography: the ten players run from wherever the last possession left them, the
-   ball is brought up (or pushed in transition), the play develops (screens, drives, kick-outs, post entries, cuts, ball
-   reversals), the shot goes up and the rebound is fought for. Players move along smooth curves; the ball carries a trail;
-   shots leave a mark on the floor. All positions are in feet on a 94 x 50 court. */
+/* The Vol Index — Hoops Dynasty: the live court, in the style of a tracking view (think NBA Pulse or a 2K sim cast).
+   Each possession from the engine is played out by a small motion simulation: ten players steering with real speeds and
+   acceleration, a defense that reacts every tick, and offensive actions (the break, drag screens, ball screens, screens
+   away, cuts, drives, kick-outs, post-ups) that lead into the shot, the contest and the rebound. Positions are in feet
+   on a 94 x 50 court. View only: it never touches the game's seeded random numbers. */
 (function (root) {
   'use strict';
   const SD = root.SD;
@@ -24,149 +24,454 @@
   const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
   const toward = (a, b, ft) => { const d = dist(a, b) || 1; return [a[0] + (b[0] - a[0]) / d * ft, a[1] + (b[1] - a[1]) / d * ft]; };
 
-  /* ---------- choreography: keyframes {t, pos: {id: [x, y]}, hold: id | null, ball: [x, y], arc} ---------- */
+  /* ---------- the motion engine ----------
+     Every player is an agent with a position and a velocity. Each tick he steers toward a target (a spot, a moving point,
+     a path of waypoints) with a top speed and an acceleration limit, so he speeds up, slows down and curves like a person
+     instead of sliding between keyframes. Defenders are never scripted: each tick they work out where to stand from where
+     their man, the ball and the rim are (man), from the ball (zone) or full court (press). The offense runs real actions:
+     the ball up the floor, lanes filled on the break, a drag screen on the secondary break, ball reversal, screens away,
+     basket cuts, ball screens, drives that pull help, kick-outs, post-ups, clear-outs; then the shot, the contest, the
+     crash and the outlet. Possessions chain: positions and velocities carry over, so a rebound turns straight into the
+     other team running the other way. The whole possession is simulated up front at 30 ticks a second. */
+  const DT = 1 / 30;
+  SDC._vel = {}; SDC._after = 'live';
+  const lerp2 = (a, b, u) => [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u];
+  const unit = (a, b) => { const d = dist(a, b) || 1; return [(b[0] - a[0]) / d, (b[1] - a[1]) / d]; };
+
   SDC.choreo = (GM, r, from) => {
-    const s = r.s, d = other(s), F = frameOf(GM, s, r.per), P = F.P;
-    const O = byPos(GM.on[s]), D = byPos(GM.on[d]);
+    const s = r.s, d = other(s), F = frameOf(GM, s, r.per), P = F.P, rim = F.rim, sg = F.sg;
+    const O = byPos(GM.on[s]), D = byPos(GM.on[d]), all = O.concat(D);
+    const isO = {}; O.forEach(x => { isO[x] = 1; });
     const id = p => p && p.id;
-    const shooter = id(r.shooter), passer = id(r.ast) || id(r.passer);
-    const zone = GM.coach[d].def === 'zone', press = GM.coach[d].def === 'press';
-    const five = r.play === 'spot' || GM.coach[s].focus === 'three';
-    const SPOT = five ? [[24, 25], [21, 6], [21, 44], [3, 47], [6, 17]] : [[24, 25], [21, 6], [21, 44], [13, 34], [5.5, 17]];
-    const ZONE = [[18, 18], [18, 32], [7, 7], [7, 43], [4.5, 25]];
-    const kf = []; let t = 0;
-    const cur = {};                                   // where everyone is now
-    const start = id0 => from && from[id0] ? from[id0].slice() : [47 + rnd(-2, 2), 51];
-    O.concat(D).forEach(x => { cur[x] = start(x); });
-    let ballAt = from && from._ball ? from._ball.slice() : cur[O[0]].slice();
-    // defense: stay between your man and the basket (man), hold the zone shifted toward the ball, or pressure
-    const defend = (holdId, tight) => {
-      const bpos = holdId ? cur[holdId] : ballAt;
-      D.forEach((dd, i) => {
-        if (zone) { const z = P(ZONE[i][0], ZONE[i][1]); cur[dd] = [z[0], z[1] + (bpos[1] - 25) * 0.25]; return; }
-        const man = cur[O[i]] || P(20, 25), gap = man === bpos ? 3 : (tight ? 2.5 : 4.5);
-        let p = toward(man, F.rim, Math.min(gap, dist(man, F.rim) * 0.6));
-        if (O[i] !== holdId && dist(man, bpos) > 12) p = toward(p, bpos, 2.5);   // sag toward the ball
-        cur[dd] = p;
-      });
-    };
-    const push = (dt, hold, extra) => { t += dt; const pos = {}; for (const k in cur) pos[k] = cur[k].slice(); const b = hold ? cur[hold].slice() : ballAt.slice(); if (hold) ballAt = b; kf.push(Object.assign({ t, pos, hold: hold || null, ball: b, arc: 0 }, extra || {})); };
-    const handler = O[0];
-    const spotOf = i => P(SPOT[i][0] + rnd(-1.2, 1.2), SPOT[i][1] + rnd(-1.5, 1.5));
-    // 0: where the possession starts (the ball with whoever is nearest it: the rebounder, the inbounder, the thief)
-    let first = O.slice().sort((a, b) => dist(cur[a], ballAt) - dist(cur[b], ballAt))[0];
-    push(0, first);
-    const flow = r.kind === 'ft' && !r.shooter ? 'half' : (r.flow || 'half');
-    // 1: bring it up
-    if (flow === 'trans') {
-      const lanes = [[20, 25], [9, 7], [9, 43], [30, 18], [40, 32]];
-      O.forEach((x, i) => { cur[x] = P(lanes[i][0] + rnd(-2, 2), lanes[i][1] + rnd(-2, 2)); });
-      D.forEach((dd, i) => { cur[dd] = P(lanes[i][0] + 10 + i * 3, lanes[i][1] * 0.6 + 10); });
-      if (first !== handler) { push(0.6, first); }
-      push(1.5, handler);
-    } else {
-      O.forEach((x, i) => { cur[x] = P(SPOT[i][0] + 18 + rnd(-3, 3), SPOT[i][1] * 0.8 + 5); });
-      if (press) D.forEach((dd, i) => { cur[dd] = toward(cur[O[i]], F.rim, 2); }); else defend(null);
-      if (first !== handler) push(0.7, first);
-      push(flow === 'early' ? 1.3 : 1.6, handler);
-      O.forEach((x, i) => { cur[x] = spotOf(i); }); defend(handler);
-      push(flow === 'early' ? 1.0 : 1.5, handler);
+    const isBig = x => { const p = SD.P(x); return p && (p.pos === 'C' || p.pos === 'PF'); };
+    const shooter = id(r.shooter), passer0 = id(r.ast) || id(r.passer);
+    const cd = GM.coach[d] || {}, zone = cd.def === 'zone', press = cd.def === 'press';
+    const five = r.play === 'spot' || (GM.coach[s] || {}).focus === 'three' || !O.some(isBig);
+    const dxOf = p => (p[0] - F.bx) * sg;                                   // feet from the rim we attack, along the floor
+    const frames = []; let t = 0;
+    // ---- agents
+    const A = {};
+    all.forEach(x => {
+      const p = from && from[x] ? from[x].slice() : [47 + rnd(-5, 5), 51.5];
+      A[x] = { p, v: (SDC._vel[x] || [0, 0]).slice(), go: null, path: null, spd: 13, acc: 30, slow: 0, ph: rnd(0, 6.3) };
+    });
+    // ---- the ball
+    const B = { hold: null, p: (from && from._ball ? from._ball : [47, 25]).slice(), z: 0, fl: null, dr: true };
+    const after = SDC._after || 'live';
+    let H = from && from._hold != null && isO[from._hold] ? +from._hold : null;
+    const nearestO = pt => O.slice().sort((a, b) => dist(A[a].p, pt) - dist(A[b].p, pt))[0];
+    // ---- offensive spacing (slots) and the defense
+    const SP = five ? [[25, 25], [21, 7], [21, 43], [1.6, 2.6], [1.6, 47.4]] : [[25, 25], [21, 7], [21, 43], [1.6, 47.4], [4.5, 17]];
+    const slot = {}; O.forEach((x, i) => { slot[x] = i; });
+    const slotPt = x => { const sp = SP[slot[x]], a = A[x]; return P(sp[0] + Math.sin(t * 0.9 + a.ph) * 0.9, sp[1] + Math.cos(t * 0.7 + a.ph) * 1.1); };
+    const ZONE = [[19, 17], [19, 33], [6, 9], [6, 41], [3.5, 25]];
+    let defMode = 'live';            // live (man / zone / press by the coach), box (box out), ft, whistle
+    let pressOn = press && (after === 'inb' || after === 'dead');
+    const manOf = x => O[D.indexOf(x)];
+    const defOf = x => D[O.indexOf(x)];
+    const ballPt = () => B.p;
+    function defTarget(x) {
+      const a = A[x], man = manOf(x), mp = man != null ? A[man].p : P(20, 25), bp = ballPt();
+      if (defMode === 'box') return toward(mp, rim, Math.min(2.6, dist(mp, rim) * 0.5));
+      const onBall = B.hold === man;
+      if (zone && !pressOn && dxOf(bp) < 42) {
+        const z = P(ZONE[D.indexOf(x)][0], ZONE[D.indexOf(x)][1]);
+        let p = lerp2(z, bp, 0.22);
+        if (onBall || (dist(mp, z) < 7 && dist(mp, bp) < 4)) p = toward(mp, rim, 3);       // step up to the ball in your area
+        return p;
+      }
+      if (pressOn) {
+        if (onBall) return toward(mp, rim, 2.4);
+        return lerp2(toward(mp, rim, 3), bp, 0.15);
+      }
+      const dm = dxOf(mp);
+      if (dm > 36) {
+        // no full-court pressure: get back first, meet them around the top of the key, stay on the line to the rim
+        const want = 36 + (dm - 36) * 0.25; return lerp2(mp, rim, (dm - want) / dm);
+      }
+      const db = dist(mp, bp), gap = onBall ? 3.3 : db < 18 ? 3.8 : 4.6;
+      let p = toward(mp, rim, Math.min(gap, dist(mp, rim) * 0.5));
+      if (!onBall) {
+        if (db < 18) p = toward(p, bp, 1.2);                                                   // one pass away: in the passing lane
+        else { const w = clamp((db - 18) / 22, 0, 1) * 0.24; p = lerp2(p, lerp2(bp, rim, 0.6), w); }   // help side: sink a step or two
+      }
+      return p;
     }
-    const passTo = (to, dt) => { if (!to) return; push(dt || 0.7, to, { arc: 2.5 }); defend(to); };
-    const atShot = () => {
-      if (!shooter) return null;
-      const sp = cur[shooter];
-      if (r.type === 'rim') return P(rnd(2.5, 4.5), 25 + rnd(-3, 3));
-      if (r.type === 'mid') { const ang = Math.atan2(sp[1] - 25, Math.abs(sp[0] - F.bx) || 1); return P(Math.max(4, 14 * Math.cos(ang)), 25 + 14 * Math.sin(ang)); }
-      const y = sp[1]; if (Math.abs(y - 25) > 17) return P(3, y < 25 ? 2.5 : 47.5);   // a corner three
-      const ang = Math.atan2(y - 25, Math.max(4, Math.abs(sp[0] - F.bx))); return P(23.4 * Math.cos(ang), 25 + 23.4 * Math.sin(ang));
+    function target(x) {
+      const a = A[x];
+      if (a.path && a.path.length) {
+        let q = a.path[0]; if (typeof q === 'function') q = q();
+        if (dist(a.p, q) < (a.path.length > 1 ? 2.2 : 0.4) && a.path.length > 1) { a.path.shift(); q = a.path[0]; if (typeof q === 'function') q = q(); }
+        return q;
+      }
+      if (a.go) return typeof a.go === 'function' ? a.go() : a.go;
+      if (isO[x]) return slotPt(x);
+      return defTarget(x);
+    }
+    const handPt = x => { const a = A[x], sp = Math.hypot(a.v[0], a.v[1]); const u = sp > 1.5 ? [a.v[0] / sp, a.v[1] / sp] : unit(a.p, rim); return [a.p[0] + u[0] * 0.8 - u[1] * 0.7, a.p[1] + u[1] * 0.8 + u[0] * 0.7]; };
+    function tick(mark) {
+      // steer
+      for (const x of all) {
+        const a = A[x], T = target(x), dv = [T[0] - a.p[0], T[1] - a.p[1]], dd = Math.hypot(dv[0], dv[1]);
+        let vmax = a.spd;
+        if (!isO[x]) vmax = Math.max(vmax, dd > 9 ? 19 : 14);                            // defenders react at game speed
+        if (a.slow > t) vmax = Math.min(vmax, a.slowTo);                                  // caught on a screen
+        if (defMode === 'whistle') vmax = Math.min(vmax, 3);
+        const sp = Math.min(vmax, dd * 2.3), want = dd < 0.05 ? [0, 0] : [dv[0] / dd * sp, dv[1] / dd * sp];
+        let ax = want[0] - a.v[0], ay = want[1] - a.v[1]; const am = Math.hypot(ax, ay), lim = a.acc * DT;
+        if (am > lim) { ax *= lim / am; ay *= lim / am; }
+        a.v[0] += ax; a.v[1] += ay;
+      }
+      // move, then keep bodies apart
+      for (const x of all) { const a = A[x]; a.p[0] = clamp(a.p[0] + a.v[0] * DT, -3, 97); a.p[1] = clamp(a.p[1] + a.v[1] * DT, -2.5, 52.5); }
+      for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) {
+        const a = A[all[i]], b = A[all[j]], dx = b.p[0] - a.p[0], dy = b.p[1] - a.p[1], dd = Math.hypot(dx, dy) || 0.01, need = 2.3;
+        if (dd < need) { const push = (need - dd) * 0.5, ux = dx / dd, uy = dy / dd; a.p[0] -= ux * push; a.p[1] -= uy * push; b.p[0] += ux * push; b.p[1] += uy * push; }
+      }
+      // the ball
+      if (B.fl) {
+        const f = B.fl, u = clamp((t + DT - f.t0) / f.dur, 0, 1), dest = f.to != null ? handPt(f.to) : f.at;
+        B.p = lerp2(f.from, dest, u); B.z = f.z0 + (f.z1 - f.z0) * u + f.arc * 4 * u * (1 - u);
+        if (u >= 1) { B.fl = null; B.hold = f.to != null ? f.to : null; if (f.done) f.done(); }
+      } else if (B.hold != null) {
+        B.p = handPt(B.hold); const sp = Math.hypot(A[B.hold].v[0], A[B.hold].v[1]);
+        B.z = B.dr && sp > 1 ? Math.abs(Math.sin(t * (8 + sp * 0.35))) * 1.5 : 1.8;
+      } else { B.z = Math.max(0, B.z - 0.4); }
+      t += DT;
+      const pos = {}; for (const x of all) pos[x] = [Math.round(A[x].p[0] * 100) / 100, Math.round(A[x].p[1] * 100) / 100];
+      const fr = { t, pos, ball: B.p.slice(), z: B.z, hold: B.hold }; if (mark) fr.mark = mark;
+      frames.push(fr);
+    }
+    const run = (sec, until) => { const end = t + sec; while (t < end - 1e-6) { tick(); if (until && until()) break; } };
+    const go = (x, pt, spd) => { if (x == null) return; A[x].path = null; A[x].go = pt; A[x].st = false; if (spd) A[x].spd = spd; };
+    const pathTo = (x, pts, spd) => { if (x == null) return; A[x].path = pts.slice(); A[x].go = pts[pts.length - 1]; if (spd) A[x].spd = spd; };
+    const free = (x, spd) => { if (x == null) return; A[x].path = null; A[x].go = null; A[x].st = false; A[x].spd = spd || 13; };
+    const freeAll = spd => all.forEach(x => free(x, spd));
+    const stay = x => { go(x, A[x].p.slice(), 4); A[x].st = true; };
+    const slowDown = (x, to, sec) => { if (x == null) return; A[x].slow = t + sec; A[x].slowTo = to; };
+    function pass(to, opt) {
+      if (to == null || B.hold === to) return;
+      const o = opt || {}, fromP = B.hold != null ? handPt(B.hold) : B.p.slice(), dd = dist(fromP, A[to].p);
+      B.fl = { from: fromP, z0: B.z || 1.8, z1: 1.8, to, t0: t, dur: clamp(dd / (o.v || 42), 0.22, 1.05), arc: o.arc != null ? o.arc : Math.min(2.4, dd / 14) };
+      const prev = B.hold; B.hold = null; run(B.fl.dur + 0.1, () => !B.fl); H = to; B.dr = true;
+      if (prev != null && A[prev].st && isO[prev]) free(prev, 13);          // pass and move: never stand and watch
+    }
+    const toSpot = (x, spot, spd, max) => { go(x, spot, spd); run(max || 2, () => dist(A[x].p, spot) < 1.2); };
+    const atShot = (x, type) => {
+      const sp = A[x].p, y = sp[1];
+      if (type === 'rim') return P(rnd(2, 4), 25 + clamp((y - 25) * 0.25, -3.5, 3.5) + rnd(-1, 1));
+      if (type === 'mid') { const ang = Math.atan2(y - 25, Math.max(3, dxOf(sp))); const rr = rnd(11, 16); return P(Math.max(3, rr * Math.cos(ang)), 25 + rr * Math.sin(ang)); }
+      if (Math.abs(y - 25) > 17 && dxOf(sp) < 10) return P(1.6, y < 25 ? 2.6 : 47.4);   // a corner three
+      const ang = Math.atan2(y - 25, Math.max(4, dxOf(sp))); return P(23.6 * Math.cos(ang), 25 + 23.6 * Math.sin(ang));
     };
-    // 2: the action
-    if (r.kind === 'to' && !r.thief) {
-      // a violation or an offensive foul: the whistle stops it
-      push(1.4, handler); return finish();
+    // ---------------- 0: the start of the possession ----------------
+    let flow = r.kind === 'ft' && !r.type ? 'half' : (r.flow || 'half');
+    if (r.kind === 'to' || r.kind === 'foul') flow = after === 'live' && r.thief && GM.trans ? 'early' : 'half';
+    freeAll(12);
+    const handler = O[0];
+    if (after === 'inb' || after === 'dead') {
+      // the ball is out of bounds: an inbounder takes it out, the guard comes to get it
+      const base = after === 'inb';
+      const inb = base ? (O.find(isBig) || O[4]) : O[2];
+      const spot = base ? P(89.6, 25 + clamp(B.p[1] - 25, -5, 5)) : [clamp(B.p[0], 6, 88), B.p[1] < 25 ? -1.4 : 51.4];
+      B.hold = null; B.fl = null;
+      if (base) { go(inb, B.p.slice(), 15); run(1.6, () => dist(A[inb].p, B.p) < 1.6); }
+      else { B.p = spot.slice(); go(inb, spot, 16); run(1.6, () => dist(A[inb].p, spot) < 1.2); }
+      B.hold = inb; B.dr = false; go(inb, spot, 9); H = inb;
+      const recv = inb === handler ? O[1] : handler;
+      const meet = base ? P(80, 25 + (spot[1] > 25 ? -9 : 9)) : [clamp(spot[0] + sg * 8, 4, 90), spot[1] < 25 ? 9 : 41];
+      go(recv, meet, 15);
+      O.forEach(x => { if (x !== inb && x !== recv) go(x, P(clamp(dxOf(A[x].p), 45, 70), clamp(A[x].p[1], 6, 44)), 11); });
+      run(1.0, () => dist(A[inb].p, spot) < 1 && dist(A[recv].p, meet) < 2);
+      pass(recv); B.dr = true; free(inb, 15);
+      O.forEach(x => { if (x !== recv && x !== inb) free(x, 13); });
+    } else {
+      if (H == null) { H = nearestO(B.p); B.hold = H; }
+      else B.hold = H;
+    }
+    // ---------------- 1: up the floor ----------------
+    const topSlot = () => { const o = O.find(x => slot[x] === 0); if (o != null && o !== H) { slot[o] = slot[H]; slot[H] = 0; } };
+    const ballSide = () => (A[H].p[1] < 25 ? -1 : 1);
+    if (H !== handler && isBig(H)) {
+      // the outlet: the big who rebounded finds the guard leaking out
+      const lead = [A[H].p[0] - sg * 2, clamp(A[H].p[1] + (A[H].p[1] < 25 ? -8 : 8), 5, 45)];
+      go(handler, () => [clamp(A[H].p[0] + sg * 5, -1, 95), A[handler].p[1] * 0.5 + lead[1] * 0.5], 17);
+      run(0.5); pass(handler);
+    }
+    if (flow === 'trans') {
+      // the break: the ball in the middle, wings sprinting wide, the rim runner, the trailer
+      const lanes = [[25, 25], [5, 4.5], [5, 45.5], [26, 18], [4, 22]];
+      const mid = H;
+      O.forEach((x, i) => { if (x !== mid) { const li = x === handler ? 0 : i; go(x, P(lanes[li][0] + rnd(-2, 2), lanes[li][1] + rnd(-1.5, 1.5)), li === 3 ? 16 : 20); } });
+      go(mid, () => P(Math.max(14, dxOf(A[mid].p) - 6), 25 + (A[mid].p[1] - 25) * 0.8), 19);
+      run(4.5, () => dxOf(A[mid].p) < 22);
+    } else if (flow === 'early') {
+      // secondary break: push it, fill the lanes, a trailer for a drag screen
+      O.forEach((x, i) => { if (x !== H) go(x, slotPt.bind(null, x), i === 4 || i === 3 ? 14 : 17); });
+      go(H, () => P(Math.max(26, dxOf(A[H].p) - 8), 25 + (A[H].p[1] - 25) * 0.7), 16);
+      run(5, () => dxOf(A[H].p) < 30);
+    } else {
+      // walk it up: everyone into the set, the handler sizes up the defense at the top
+      O.forEach(x => { if (x !== H) free(x, 12.5); });
+      topSlot(); const tgt = P(28, 25 + ballSide() * rnd(2, 7));
+      go(H, tgt, 13.5); run(5, () => dist(A[H].p, tgt) < 3);
+      pressOn = false;
+      stay(H); run(0.3);
+    }
+    pressOn = false; topSlot();
+    // ---------------- 2: the half court ----------------
+    const offBall = () => O.filter(x => x !== H);
+    function reversal() {
+      const cands = offBall().filter(x => slot[x] <= 2 || (five && slot[x] <= 4)).sort((a, b) => dist(A[a].p, A[H].p) - dist(A[b].p, A[H].p));
+      const to = cands[0]; if (to == null) return; const prev = H; stay(H); pass(to); free(prev, 13); stay(to); run(rnd(0.35, 0.6)); free(to, 12);
+    }
+    function screenAway() {
+      const offs = offBall(); if (offs.length < 2) return;
+      const a = offs[Math.floor(Math.random() * offs.length)], rest = offs.filter(x => x !== a);
+      const b = rest.sort((p, q) => dist(A[p].p, A[a].p) - dist(A[q].p, A[a].p))[0];
+      const db = defOf(b);
+      go(a, () => toward(A[db].p, A[a].p, 2.3), 13); stay(H); run(1.1, () => dist(A[a].p, A[db].p) < 2.8);
+      run(0.25);
+      const sa = slot[a]; slot[a] = slot[b]; slot[b] = sa;            // they swap spots: b comes off the screen into a's spot
+      const rub = [A[a].p[0] + (A[a].p[0] - A[db].p[0]) * 0.8, A[a].p[1] + (A[a].p[1] - A[db].p[1]) * 0.8];
+      pathTo(b, [rub, slotPt.bind(null, b)], 17); slowDown(db, 6, 0.7);
+      run(0.5); free(a, 12); A[b].path = [slotPt.bind(null, b)]; run(0.9);
+      free(b, 13);
+    }
+    function cutThrough() {
+      const c = offBall().filter(x => slot[x] === 1 || slot[x] === 2)[0]; if (c == null) return;
+      const side = A[c].p[1] < 25 ? -1 : 1;
+      pathTo(c, [P(15, 25 + side * 9), P(4, 25 + side * 2), P(6, 25 - side * 8), slotPt.bind(null, c)], 16);
+      stay(H); run(2.0); free(c, 13); free(H, 12);
+    }
+    function shuffle() {     // the handler probes: a hard dribble to the wing and back, everyone shifts with him
+      const s0 = A[H].p.slice(), side = s0[1] < 25 ? 1 : -1, wing = P(clamp(dxOf(s0) - 4, 18, 28), clamp(s0[1] + side * 11, 6, 44));
+      go(H, wing, 12); run(1.2, () => dist(A[H].p, wing) < 1.5); stay(H); run(0.3); free(H, 12);
     }
     if (flow === 'half' || flow === 'call') {
-      // ball reversal and off-ball movement first (always in motion, and before most sets)
-      const swings = r.motion ? 2 : (r.play === 'iso' ? 0 : Math.random() < 0.55 ? 1 : 0);
-      let h = handler;
-      for (let k = 0; k < swings; k++) {
-        const a = 1 + Math.floor(Math.random() * 2), b2 = 3 + Math.floor(Math.random() * 2);   // a wing and a big swap spots: a screen away
-        const tmp = cur[O[a]]; cur[O[a]] = cur[O[b2]]; cur[O[b2]] = tmp;
-        const to = O[[1, 2, 0][k % 3]] === h ? O[2] : O[[1, 2, 0][k % 3]];
-        passTo(to, 0.9); h = to;
-      }
-      if (r.play === 'pnr') {
-        const big = O[3] && SD.P(O[3]).pos !== 'PG' ? (shooter && shooter !== handler && shooter !== h ? shooter : O[4] || O[3]) : O[4];
-        if (h !== handler) passTo(handler, 0.8);
-        cur[big] = toward(cur[handler], F.rim, 2.5); defend(handler); push(1.0, handler);                    // the screen
-        cur[handler] = P(13, cur[handler][1] < 25 ? 30 : 20); cur[big] = P(7, 25 + rnd(-4, 4));               // the drive and the roll
-        const bm = D[O.indexOf(big)]; defend(handler); if (bm) cur[bm] = toward(cur[handler], F.rim, 2);       // the hedge
-        push(1.1, handler);
-      } else if (r.play === 'drive' || r.play === 'trans') {
-        if (shooter && shooter !== h) passTo(shooter, 0.8);
-      } else if (r.play === 'post') {
-        const big = shooter || O[4];
-        cur[big] = P(6, cur[big][1] < 25 ? 18 : 32); defend(h, true); push(1.0, h);
-        passTo(big, 0.8); cur[big] = toward(cur[big], F.rim, 2); defend(big, true); push(1.2, big);           // backing down
-      } else if (r.play === 'spot') {
-        if (h !== handler && passer !== h) passTo(handler, 0.7);
-        const drv = passer || handler; cur[drv] = P(11, 25 + rnd(-5, 5)); defend(drv);
-        const di = O.indexOf(drv); D.forEach((dd, i) => { if (i !== di && Math.random() < 0.4) cur[dd] = toward(cur[dd], cur[drv], 4); });   // the help collapses
-        push(1.1, drv);
-      } else if (r.play === 'iso') {
-        const iso = shooter || handler; if (iso !== h) passTo(iso, 0.8);
-        O.forEach((x, i) => { if (x !== iso) cur[x] = P(i % 2 ? 4 : 22, i < 3 ? 4 : 46); });                // clear out
-        cur[iso] = P(22, cur[iso][1] < 25 ? 12 : 38); defend(iso, true); push(1.4, iso);
-        push(1.0, iso);                                                                                       // the jab, the hesitation
-      } else if (r.play === 'cut') {
-        const cutter = shooter || O[2]; if (passer && passer !== h) passTo(passer, 0.8);
-        cur[cutter] = P(16, cur[cutter][1] < 25 ? 6 : 44); defend(passer || h); push(0.8, passer || h);
-      }
-    } else if (flow === 'early') {
-      if (r.play === 'spot' && passer && passer !== handler) { cur[passer] = P(13, 25 + rnd(-4, 4)); defend(passer); push(0.8, passer); }
+      let n = r.time >= 23 ? 3 : r.time >= 16 ? 2 : r.time >= 9 ? 1 : 0;
+      if (r.motion) n += 1;
+      if (r.play === 'iso' || r.kind === 'to' || r.kind === 'foul') n = Math.min(n, 1);
+      const acts = [reversal, screenAway, reversal, cutThrough, shuffle];
+      for (let k = 0; k < n; k++) acts[Math.floor(Math.random() * acts.length)]();
     }
-    // 3: the shot (or the steal)
+    // ---------------- 3: how it ends ----------------
+    const done = () => {
+      SDC._vel = {}; for (const x of all) SDC._vel[x] = A[x].v.slice();
+      return { kf: frames, T: t, F, ball: B.p.slice(), hold: B.hold };
+    };
+    // the whistle: a violation, a non-shooting foul
+    if ((r.kind === 'to' && !r.thief) || r.kind === 'foul') {
+      if (/throws it away|out of bounds/.test(r.text || '')) {
+        const out = [clamp(A[H].p[0] + rnd(-8, 8), 4, 90), A[H].p[1] < 25 ? -2 : 52];
+        B.fl = { from: handPt(H), z0: 1.8, z1: 0.5, at: out, t0: t, dur: 0.5, arc: 1.5 }; B.hold = null; run(0.55);
+      } else if (r.kind === 'foul') { const fd = id(r.fouled); if (fd != null && fd !== H && A[fd]) { go(H, () => toward(A[H].p, rim, 2), 15); run(0.6); } }
+      else { go(H, toward(A[H].p, rim, 6), 14); run(0.6); }
+      defMode = 'whistle'; all.forEach(x => stay(x)); run(1.0);
+      SDC._after = 'dead'; return done();
+    }
+    // the steal
     if (r.kind === 'to') {
-      const thief = id(r.thief), victim = id(r.who) || handler;
-      cur[thief] = toward(cur[victim], F.rim, 1); push(0.6, victim);
-      const away = [F.bx - F.sg * 40, 25 + rnd(-6, 6)];
-      cur[thief] = away; D.forEach(dd => { if (dd !== thief) cur[dd] = toward(cur[dd], away, 14); }); O.forEach(x => { cur[x] = toward(cur[x], away, 9); });
-      push(1.4, thief); return finish();
+      const thief = id(r.thief), victim = A[id(r.who)] ? id(r.who) : H;
+      if (victim !== H) pass(victim);
+      if (thief != null && A[thief]) {
+        // he jumps the lane or pokes it loose, and he is gone the other way
+        go(thief, () => handPt(victim), 21); run(0.6, () => dist(A[thief].p, B.p) < 1.6);
+        B.fl = { from: B.p.slice(), z0: B.z, z1: 1.2, to: thief, t0: t, dur: 0.25, arc: 0.6 }; B.hold = null; run(0.3);
+        B.dr = true;
+        const far = P(70, 25 + rnd(-6, 6));
+        go(thief, far, 21);
+        D.forEach((x, i) => { if (x !== thief) go(x, P(58 + i * 3, i % 2 ? 10 : 40), 19); });
+        O.forEach(x => { go(x, () => toward(A[thief].p, F.bx < 47 ? [94, 25] : [0, 25], 3 + rnd(0, 2)), 19); });
+        run(1.2);
+      }
+      SDC._after = 'live'; return done();
     }
-    if (!shooter) { push(1.2, handler); return finish(); }
-    const shotAt = atShot(), fromP = (passer && passer !== shooter) ? passer : null;
-    if (fromP && fromP !== kf[kf.length - 1].hold) push(0.6, fromP);
-    cur[shooter] = shotAt; defend(fromP || shooter);
-    const sd = D[O.indexOf(shooter)]; if (sd) cur[sd] = toward(shotAt, F.rim, 1.6);                         // the contest
-    if (r.type === 'rim' && r.blk) { const bl = id(r.blk); cur[bl] = toward(shotAt, F.rim, 1.2); }
-    push(fromP ? 0.8 : 1.1, shooter, fromP ? { arc: 2.5 } : null);
-    const mark = { at: shotAt.slice(), made: r.pts > 0 && r.kind === 'shot', three: r.type === '3', s };
-    // the ball in the air
-    if (r.blk) { ballAt = toward(shotAt, F.rim, -3).map((v, i) => v + rnd(-2, 2)); push(0.4, null, { arc: 3, mark }); }
-    else { ballAt = F.rim.slice(); push(r.type === '3' ? 1.0 : r.type === 'mid' ? 0.85 : 0.6, null, { arc: r.type === '3' ? 12 : r.type === 'mid' ? 8 : 4, mark }); }
-    const made = r.pts > 0 && r.kind === 'shot';
+    if (shooter == null || !A[shooter]) { run(1.2); SDC._after = 'live'; return done(); }
+    const type = r.type || 'mid';
+    if (r.kind === 'ft' && !r.type) { freeThrows(2, clamp(r.pts, 0, 2)); return done(); }
+    const helpD = () => D.filter(x => manOf(x) !== shooter).sort((a, b) => dist(A[a].p, rim) - dist(A[b].p, rim))[0];
+    // get the ball to the man who makes the play
+    const passer = passer0 != null && A[passer0] && passer0 !== shooter ? passer0 : null;
+    function feed(x) { if (x != null && x !== H) { stay(H); pass(x); } }
+    function drive(x, end, spd) {
+      // an attack: the help steps in, the shooter's man sinks
+      const hd = helpD(); go(x, end, spd || 17);
+      run(0.35); if (hd != null) { go(hd, () => toward(A[x].p, rim, 2.2), 17); }
+      run(1.3, () => dist(A[x].p, end) < 1.6);
+    }
+    const play = r.play || 'iso';
+    if (flow === 'trans') {
+      // the finish on the break
+      if (shooter !== H) {
+        if (type === '3') { const spot = atShot(shooter, '3'); go(shooter, spot, 19); go(H, P(13, 25 + rnd(-3, 3)), 18); run(1.2, () => dist(A[shooter].p, spot) < 1.5); }
+        else { go(shooter, P(3, 25 + (A[shooter].p[1] < 25 ? -2 : 2)), 21); go(H, P(15, 25), 18); run(0.9, () => dxOf(A[shooter].p) < 12); }
+        pass(shooter, { v: 46 });
+      }
+    } else if (flow === 'early' && (play === 'pnr' || play === 'drive' || play === 'spot')) {
+      // the drag screen: the trailer runs into a ball screen on the move
+      const tr = O.filter(x => x !== H && isBig(x))[0] || O[4];
+      if (tr !== H && tr != null) {
+        const dh = defOf(H); go(tr, () => toward(A[dh].p, P(40, 25), 2.3), 18); run(1.1, () => dist(A[tr].p, A[dh].p) < 3);
+        slowDown(dh, 7, 0.8); go(H, P(14, 25 + (A[H].p[1] < 25 ? 5 : -5)), 17);
+        pathTo(tr, [P(5, 25)], 16); run(0.9);
+      }
+      if (passer != null && passer !== H) feed(passer);
+    } else if (play === 'pnr') {
+      // the ball screen: the big sets it on the handler's man, the handler turns the corner, the big rolls (or pops)
+      const ballH = isBig(H) ? (O.find(x => !isBig(x)) || H) : H; feed(ballH);
+      const scr = shooter !== H && isBig(shooter) ? shooter : (O.filter(x => x !== H && isBig(x))[0] || O.find(x => x !== H));
+      const dh = defOf(H), side = A[H].p[1] < 25 ? 1 : -1;      // turn the corner toward the middle
+      go(scr, () => { const dp = A[dh].p; return [dp[0], dp[1] + side * 2.4]; }, 14);
+      stay(H); run(1.4, () => dist(A[scr].p, A[dh].p) < 3.2); run(0.35);
+      const corner = [A[scr].p[0] - sg * 1.2, A[scr].p[1] + side * 2.4], attack = P(13, 25 + side * rnd(0, 5));
+      pathTo(H, [corner, attack], 16); slowDown(dh, 6, 0.9);
+      const ds = defOf(scr);
+      if (!zone && Math.random() < 0.4) { go(ds, () => toward(A[H].p, rim, 2.5), 17); }   // the hedge
+      else go(ds, () => P(10, 25 + (A[H].p[1] - 25) * 0.3), 15);                          // the drop
+      run(0.5);
+      const pop = shooter === scr && type !== 'rim';
+      pathTo(scr, [pop ? P(type === '3' ? 23 : 15, A[scr].p[1] < 25 ? 18 : 32) : P(4, 25 - side * 2)], 15);
+      run(0.9); free(ds, 15);
+      if (shooter === scr) pass(scr, { arc: type === 'rim' ? 3 : 1.5 });
+    } else if (play === 'post') {
+      // the post-up: seal on the block, the entry from the wing, back him down
+      const pp = shooter !== H && isBig(shooter) ? shooter : passer && isBig(passer) ? passer : (shooter === H ? null : shooter);
+      if (pp != null) {
+        const side = A[pp].p[1] < 25 ? -1 : 1, blk = P(6, 25 + side * 6.5);
+        const wingMan = O.filter(x => x !== pp).sort((a, b) => dist(A[a].p, P(20, 25 + side * 17)) - dist(A[b].p, P(20, 25 + side * 17)))[0];
+        go(wingMan, P(20, 25 + side * 17), 13); feed(wingMan); stay(wingMan);
+        go(pp, blk, 12); run(1.4, () => dist(A[pp].p, blk) < 1.3);
+        pass(pp, { arc: 1.5 }); B.dr = true;
+        const dp = defOf(pp); go(dp, () => toward(A[pp].p, rim, 2.0), 10);
+        go(pp, () => toward(A[pp].p, rim, 1.5), 3.5); run(1.3); free(dp, 14);
+        if (shooter !== pp) { go(pp, A[pp].p.slice(), 2); pass(shooter, { arc: 1.2 }); }
+      }
+    } else if (play === 'iso') {
+      // clear out: everyone to the weak side, the jab, the hesitation, the move
+      feed(shooter);
+      const side = A[shooter].p[1] < 25 ? -1 : 1;
+      O.forEach(x => { if (x !== shooter) go(x, P(x === O[4] && !five ? 5 : slot[x] % 2 ? 2 : 22, 25 - side * (slot[x] === 0 ? 10 : 20) + rnd(-2, 2)), 12); });
+      const top = P(22, 25 + side * 9); go(shooter, top, 9); run(1.2, () => dist(A[shooter].p, top) < 1.5);
+      const p0 = A[shooter].p.slice();
+      go(shooter, () => P(dxOf(p0) + Math.sin(t * 5) * 1.3, p0[1] + Math.cos(t * 3.4) * 1.6), 9); run(1.2);
+    } else if (play === 'cut') {
+      // the backdoor: a jab out, then hard to the rim behind the denial
+      const fd = passer != null ? passer : H; feed(fd);
+      if (shooter !== fd) {
+        const sp = A[shooter].p.slice(), side = sp[1] < 25 ? -1 : 1, outP = toward(sp, P(30, 25 + side * 20), 3);
+        pathTo(shooter, [outP, P(9, 25 + side * 4), P(3, 25 + side * 1.5)], 19); run(1.0, () => dxOf(A[shooter].p) < 12);
+        pass(shooter, { v: 40, arc: 2.6 });
+      }
+    } else {
+      // drive and kick, a spot-up three: someone gets into the paint, the help comes, the ball goes out
+      const drv = passer != null ? passer : (shooter === H ? H : H); feed(drv);
+      const side = A[drv].p[1] < 25 ? -1 : 1;
+      if (shooter !== drv) {
+        const spot = type === '3' ? atShot(shooter, '3') : atShot(shooter, type);
+        go(shooter, spot, 14);
+        drive(drv, P(10, 25 + side * rnd(1, 5)), 17);
+        pass(shooter, { v: 44 });
+      }
+    }
+    // the shot itself
+    if (shooter !== H) feed(shooter);
+    const spot = atShot(shooter, type);
+    if (type === 'rim' || dist(A[shooter].p, spot) > 2.5) {
+      if (type === 'rim') { const hd = helpD(); if (hd != null) go(hd, () => toward(rim, A[shooter].p, 3.2), 18); }
+      go(shooter, spot, type === 'rim' ? 18 : 13); run(type === 'rim' ? 1.1 : 1.3, () => dist(A[shooter].p, spot) < (type === 'rim' ? 2 : 1.6));
+    }
+    // the contest: his man closes out, the rim protector comes if it is at the rim
+    const sd = defOf(shooter); if (sd != null) go(sd, () => toward(A[shooter].p, rim, 2.2), 20);
+    if (r.blk && A[id(r.blk)]) { const bl = id(r.blk); go(bl, () => toward(A[shooter].p, rim, 1.6), 22); }
+    stay(shooter); B.dr = false; run(type === 'rim' ? 0.12 : 0.3);
+    const made = r.kind === 'shot' && r.pts > 0;
+    const sv = type === '3' ? 3 : 2;
+    const mark = { at: A[shooter].p.slice(), made, three: type === '3', s }; let loose = null;
+    // crash: bigs to the glass, guards get back, the defense boxes out
+    const crash = () => {
+      defMode = 'box';
+      D.forEach(x => free(x, 15));
+      O.forEach((x, i) => { if (x === shooter) return; if (isBig(x) || i === 2) go(x, () => toward(rim, A[x].p, 4.5), 15); else go(x, P(36 + i * 3, 25 + (i % 2 ? -10 : 10)), 14); });
+    };
+    if (r.blk && A[id(r.blk)]) {
+      const at = toward(A[shooter].p, rim, 2.5);
+      B.fl = { from: handPt(shooter), z0: 2.5, z1: 5, at, t0: t, dur: 0.18, arc: 0.5 }; B.hold = null; run(0.2);
+      frames[frames.length - 1].mark = mark;
+      loose = [at[0] + sg * rnd(6, 13), clamp(at[1] + rnd(-12, 12), 3, 47)];
+      B.fl = { from: B.p.slice(), z0: 5, z1: 1, at: loose, t0: t, dur: 0.55, arc: 2 }; crash(); run(0.6);
+    } else {
+      const air = type === '3' ? 1.05 : type === 'mid' ? 0.9 : 0.55;
+      B.fl = { from: handPt(shooter), z0: 3, z1: 4, at: rim.slice(), t0: t, dur: air, arc: type === '3' ? 11 : type === 'mid' ? 8 : 2.5 }; B.hold = null;
+      run(0.2); free(shooter, 12);
+      if (!made && r.kind !== 'ft') crash();
+      run(air - 0.1, () => !B.fl);
+      frames[frames.length - 1].mark = mark;
+    }
+    // free throws (and the and-one)
+    function freeThrows(n, makes) {
+      defMode = 'whistle'; all.forEach(x => stay(x)); run(0.4); defMode = 'ft';
+      const lane = [[2.5, 17.6], [2.5, 32.4], [5.8, 17.6], [5.8, 32.4], [9, 17.6], [9, 32.4]];
+      const others = O.filter(x => x !== shooter), order = [D[4], D[3], others[0], others[1], D[2], D[1]].filter(x => x != null);
+      go(shooter, P(14.2, 25), 9);
+      order.forEach((x, i) => go(x, P(lane[i][0], lane[i][1]), 9));
+      all.forEach(x => { if (x !== shooter && !order.includes(x)) go(x, P(25, x === others[others.length - 1] ? 12 : 38), 9); });
+      B.fl = null; B.hold = shooter; B.dr = false;
+      run(1.4, () => dist(A[shooter].p, P(14.2, 25)) < 0.8); run(0.2);
+      const res = []; for (let i = 0; i < n; i++) res.push(i >= n - makes);
+      if (Math.random() < 0.5) res.reverse();
+      let last = true;
+      res.forEach((m, i) => {
+        B.dr = false; B.hold = shooter; run(0.3);
+        B.fl = { from: handPt(shooter), z0: 3, z1: 4, at: rim.slice(), t0: t, dur: 0.75, arc: 4.5 }; B.hold = null; run(0.8, () => !B.fl);
+        B.fl = { from: B.p.slice(), z0: 4, z1: 0.3, at: m ? P(0.8, 25) : P(rnd(3, 7), 25 + rnd(-6, 6)), t0: t, dur: 0.35, arc: 0 }; run(0.4);
+        last = m; if (i < n - 1) { B.hold = shooter; B.p = handPt(shooter); }
+      });
+      if (!last) {
+        defMode = 'live'; const rb = D.slice(0).sort((a, b) => dist(A[a].p, B.p) - dist(A[b].p, B.p))[0];
+        go(rb, B.p.slice(), 14); run(0.5, () => dist(A[rb].p, B.p) < 1.5); B.hold = rb; B.dr = true; freeAll(13);
+        D.forEach((x, i) => { if (i < 2) go(x, P(60, i ? 12 : 38), 16); }); run(0.5);
+        SDC._after = 'live';
+      } else { freeAll(10); all.forEach(x => { if (!isO[x]) free(x, 12); }); run(0.5); SDC._after = 'inb'; }
+    };
     if (r.kind === 'ft') {
-      // to the line: the shooter at the stripe, the rest on the lane
-      const lane = [[7, 19], [7, 31], [10, 19], [10, 31], [13, 19], [13, 31]];
-      cur[shooter] = P(15, 25); let li = 0;
-      D.concat(O.filter(x => x !== shooter)).forEach((x, i) => { cur[x] = i < 6 ? P(lane[li][0], lane[li++][1]) : P(26, 25 + (i - 6) * 8); });
-      ballAt = cur[shooter].slice(); push(1.4, shooter);
-      ballAt = F.rim.slice(); push(0.8, null, { arc: 5 }); push(0.5, shooter, { arc: 3 }); ballAt = F.rim.slice(); push(0.8, null, { arc: 5 });
-      ballAt = P(1.5, 25); push(0.5, null); return finish();
+      // fouled on the shot (the shot does not go in) or in the bonus
+      const n = r.type ? (type === '3' ? 3 : 2) : 2;
+      B.fl = { from: B.p.slice(), z0: B.z, z1: 0.5, at: P(rnd(2, 6), 25 + rnd(-5, 5)), t0: t, dur: 0.35, arc: 0 }; run(0.4);
+      freeThrows(n, clamp(r.pts, 0, n)); return done();
     }
     if (made) {
-      ballAt = P(1, 25 + rnd(-1, 1)); O.forEach(x => { cur[x] = toward(cur[x], [F.bx - F.sg * 60, 25], 5); }); push(0.6, null);
-      return finish();
+      // through the net: the scorers turn and run back, the other team grabs it to inbound
+      B.fl = { from: B.p.slice(), z0: 3.5, z1: 0, at: P(0.6, 25 + rnd(-1, 1)), t0: t, dur: 0.35, arc: 0 }; run(0.35);
+      if (r.and1) { freeThrows(1, r.pts - sv > 0 ? 1 : 0); return done(); }
+      defMode = 'live';
+      O.forEach((x, i) => go(x, P(52 + i * 4, clamp(A[x].p[1] * 0.6 + 10, 8, 42)), 11 + (i % 3)));
+      const inb = D.find(isBig) || D[4]; D.forEach(x => { if (x !== inb) go(x, P(clamp(dxOf(A[x].p) + 12, 8, 60), A[x].p[1]), 9); });
+      go(inb, B.p.slice(), 13);
+      run(0.7); SDC._after = 'inb'; return done();
     }
-    // the rebound: everyone crashes, the rebounder comes up with it
-    const rb = id(r.orb) || id(r.drb), spot = P(rnd(4, 9), 25 + rnd(-8, 8));
-    O.concat(D).forEach(x => { if (x !== shooter && dist(cur[x], F.rim) < 26) cur[x] = toward(cur[x], F.rim, 3); });
-    if (rb) cur[rb] = spot;
-    ballAt = spot; push(0.7, null, { arc: 3 });
-    if (rb) push(0.3, rb);
-    return finish();
-    function finish() { return { kf, T: t, F, ball: ballAt }; }
+    // the rebound
+    const rbId = A[id(r.orb)] ? id(r.orb) : A[id(r.drb)] ? id(r.drb) : null;
+    const far = type === '3' ? rnd(7, 15) : type === 'mid' ? rnd(5, 11) : rnd(3, 8);
+    const ang = rnd(-1.2, 1.2), bounce = loose || P(far * Math.cos(ang), 25 + far * Math.sin(ang) * 1.2);
+    if (rbId != null) go(rbId, bounce, 20);
+    if (!r.blk) { B.fl = { from: B.p.slice(), z0: 4, z1: 2.5, to: rbId, at: bounce, t0: t, dur: 0.55, arc: 2.5 }; run(0.6, () => !B.fl); }
+    else if (rbId != null) { run(0.5, () => !B.fl); B.fl = { from: B.p.slice(), z0: B.z, z1: 2.2, to: rbId, t0: t, dur: 0.35, arc: 1 }; run(0.4, () => !B.fl); }
+    if (rbId == null) { const nb = nearestO(B.p); B.hold = nb; }
+    defMode = 'live'; B.dr = true;
+    if (r.drb) {
+      // the outlet: guards leak out, the other team sprints back
+      const nd = rbId;
+      D.forEach((x, i) => { if (x !== nd && i < 3) go(x, P(58 + i * 4, i === 1 ? 7 : i === 2 ? 43 : 22), 17); else if (x !== nd) go(x, P(40, A[x].p[1]), 12); });
+      go(nd, () => toward(A[nd].p, P(60, 25), 3), 8);
+      O.forEach((x, i) => go(x, P(64 + i * 2, 14 + i * 5), 16));
+      run(0.55);
+    } else {
+      // offensive board: kick it back out and reset
+      freeAll(12); run(0.45);
+    }
+    SDC._after = 'live';
+    return done();
   };
 
   /* ---------- drawing ---------- */
@@ -211,7 +516,7 @@
       c.beginPath(); c.arc(X(p[0]), Y(p[1]), r, 0, Math.PI * 2); c.fillStyle = fill; c.fill();
       c.lineWidth = hold ? 2.5 : 1.2; c.strokeStyle = hold ? '#ffffff' : 'rgba(0,0,0,.55)'; c.stroke();
       c.fillStyle = ink(fill); c.font = `700 ${Math.max(8, r * 0.95)}px "IBM Plex Mono", ui-monospace, monospace`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(String(pl.num ?? ''), X(p[0]), Y(p[1]) + 0.5);
-      if (hold && r >= 7) { c.font = `600 ${Math.max(9, r * 0.85)}px "IBM Plex Sans", system-ui, sans-serif`; c.fillStyle = 'rgba(236,240,245,.92)'; c.fillText(SD.H.last(pl), X(p[0]), Y(p[1]) + r + Math.max(8, r * 0.9)); }
+      if (r >= 7) { c.font = `${hold ? 700 : 500} ${Math.max(8, r * (hold ? 0.85 : 0.72))}px "IBM Plex Sans", system-ui, sans-serif`; c.fillStyle = hold ? 'rgba(255,255,255,.96)' : 'rgba(214,226,240,.55)'; c.fillText(SD.H.last(pl), X(p[0]), Y(p[1]) + r + Math.max(7, r * 0.8)); }
     };
     for (const id in st.pos) if (st.side[id] !== st.s) dot(+id, st.pos[id], st.side[id], false);
     for (const id in st.pos) if (st.side[id] === st.s) dot(+id, st.pos[id], st.side[id], +id === st.hold);
@@ -223,18 +528,11 @@
   };
 
   /* ---------- playing a possession on the canvas ---------- */
-  // Catmull-Rom through the keyframes: smooth paths with no stops at each keyframe
-  const cr = (p0, p1, p2, p3, u) => { const u2 = u * u, u3 = u2 * u; return [0, 1].map(i => 0.5 * ((2 * p1[i]) + (-p0[i] + p2[i]) * u + (2 * p0[i] - 5 * p1[i] + 4 * p2[i] - p3[i]) * u2 + (-p0[i] + 3 * p1[i] - 3 * p2[i] + p3[i]) * u3)); };
+  // the possession was simulated at 30 ticks a second: blend the two ticks either side of the moment we are drawing
   SDC.state = (C, tm, side) => {
-    const kf = C.kf; let i = 0; while (i < kf.length - 2 && kf[i + 1].t <= tm) i++;
-    const A = kf[i], B = kf[Math.min(i + 1, kf.length - 1)], span = Math.max(0.01, B.t - A.t), u = clamp((tm - A.t) / span, 0, 1);
-    const A0 = kf[Math.max(0, i - 1)], B1 = kf[Math.min(kf.length - 1, i + 2)];
-    const pos = {};
-    for (const id in A.pos) { const p1 = A.pos[id], p2 = B.pos[id] || p1; pos[id] = cr((A0.pos[id] || p1), p1, p2, (B1.pos[id] || p2), u); }
-    // the ball: with the holder (a little dribble), or in the air between two places
-    let ball, z = 0, hold = null;
-    if (A.hold && A.hold === B.hold) { hold = A.hold; const p = pos[hold]; ball = [p[0] + 0.9, p[1] + 0.5]; z = Math.abs(Math.sin(tm * 9)) * 1.2; }
-    else { const a = A.hold ? pos[A.hold] : A.ball, b = B.hold ? pos[B.hold] : B.ball; ball = [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u]; z = (B.arc || 0) * 4 * u * (1 - u); hold = u > 0.97 ? B.hold : null; }
-    return { pos, ball, z, hold, i, side };
+    const kf = C.kf, n = kf.length; if (!n) return { pos: {}, ball: [47, 25], z: 0, hold: null, side };
+    const f = clamp(tm / DT - 1, 0, n - 1), i = Math.floor(f), u = f - i, A = kf[i], B = kf[Math.min(n - 1, i + 1)];
+    const pos = {}; for (const id in A.pos) { const p = A.pos[id], q = B.pos[id] || p; pos[id] = [p[0] + (q[0] - p[0]) * u, p[1] + (q[1] - p[1]) * u]; }
+    return { pos, ball: [A.ball[0] + (B.ball[0] - A.ball[0]) * u, A.ball[1] + (B.ball[1] - A.ball[1]) * u], z: A.z + (B.z - A.z) * u, hold: u < 0.5 ? A.hold : B.hold, i, side };
   };
 })(typeof window !== 'undefined' ? window : globalThis);

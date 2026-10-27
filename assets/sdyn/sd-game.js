@@ -132,7 +132,7 @@
       updateBoard(); caption(r); panel(); controls();
       if (GM.over) return end();
       if (!S.hoops && S.stepMode && !S.simTo && r.kind !== 'sub') { S.waiting = true; controls(); return; }
-      const pause = S.hoops ? (r.endPer ? 1800 : r.kind === 'to' ? 1200 : 350) : (r.endHalf ? 1600 : 450);
+      const pause = S.hoops ? (r.endPer ? 1800 : r.kind === 'ft' || r.kind === 'foul' || (r.kind === 'to' && !r.thief) ? 500 : 40) : (r.endHalf ? 1600 : 450);   // hoops: the next possession picks up where this one left off
       S.timer = setTimeout(next, S.speed === 'fast' ? pause * 0.35 : pause);
     });
   }
@@ -384,7 +384,7 @@
       if (r.kind === 'to' && !r.who && !r.thief) { drawIdle(); return done(); }       // a timeout
       const side = {}; GM.on.h.forEach(id => { side[id] = 'h'; }); GM.on.a.forEach(id => { side[id] = 'a'; });
       let C; try { C = SDC.choreo(GM, r, S.pos); } catch (e) { console.error(e); drawIdle(); return done(); }
-      const scale = fast ? 0.32 : 0.95, total = Math.max(300, C.T * 1000 * scale), t0 = performance.now();
+      const scale = fast ? 0.28 : 0.52, total = Math.max(300, C.T * 1000 * scale), t0 = performance.now();
       let marked = false; S.trail = [];
       S.anim = true;
       const frame = now => {
@@ -397,7 +397,7 @@
         S.lastSt = st;
         if (tm >= C.T) {
           S.anim = null;
-          const end = C.kf[C.kf.length - 1]; S.pos = Object.assign({}, end.pos, { _ball: C.ball });
+          const end = C.kf[C.kf.length - 1]; S.pos = Object.assign({}, end.pos, { _ball: C.ball, _hold: C.hold });
           if (r.pts >= 3 && r.kind === 'shot') banner(r.and1 ? 'AND ONE!' : 'THREE!', S.col[r.s]);
           else if (r.and1) banner('AND ONE!', S.col[r.s]);
           else if (r.blk && r.big) banner('REJECTED', S.col[other(r.s)]);
