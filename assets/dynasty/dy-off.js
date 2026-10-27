@@ -165,7 +165,7 @@
         const won = x && x.res && ((x.h === ut.id) === (x.res.h > x.res.a));
         const opp = x ? DY.T(DY.oppOf(x)) : null, big = opp && (opp.ap || 99) <= 25;
         const v = (won ? 55 : 18) + (big ? 20 : 0) + (g.coach.arch === 'recruiter' ? 12 : 0);
-        pts += v; logs.push(`${p.n} (${p.rec.stars}★ ${p.pos}) took his official visit: ${won ? 'Neyland delivered' : 'a tough loss to watch'}.`);
+        pts += v; logs.push(`${p.n} (${p.rec.stars}★ ${p.pos}) took his official visit: ${won ? (DY.isTN && DY.isTN() ? 'Neyland delivered' : 'the home crowd delivered') : 'a tough loss to watch'}.`);
         p.visited = true;
       }
       p.acts = {};
@@ -173,7 +173,7 @@
       const atPos = DY.myCommits().filter(x => x.pos === p.pos && x !== p).length, room = Math.max(2, Math.round((DY.STARTERS[p.pos] || 1) * 1.5));
       const crowd = atPos >= room ? (p.pref.top.includes('pt') ? 0.65 : 0.88) : 1;
       pts = 140 * (1 - Math.exp(-pts / 140));
-      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + DY.fitScore(ut, p)) * (p.offer ? 1 : 0.55) * crowd;
+      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + DY.fitScore(ut, p)) * (p.offer ? 1 : 0.55) * crowd * DY.pull(ut, p);
     });
     // everyone else
     Object.values(R.pool).forEach(p => {
@@ -206,6 +206,14 @@
     R.hours = DY.HOURS();
     DY.rankClasses();
   };
+  // program pull: how much a school's pitch counts with a recruit. Blue-chips discount low-prestige programs,
+  // so a rebuild takes years of winning (prestige) instead of one good recruiting season. Tennessee-level programs ~1.0.
+  DY.pull = (t, p) => {
+    const pr = t.prestige || 60; let m = clamp(0.55 + (pr - 45) / 70, 0.6, 1.12);
+    if (p.rec.stars >= 5) m *= clamp((pr - 55) / 30, 0.15, 1.1);
+    else if (p.rec.stars === 4) m *= clamp((pr - 45) / 35, 0.3, 1.08);
+    return m;
+  };
   DY.rankClasses = () => {
     const g = G(), R = g.recruit, by = {};
     Object.values(R.pool).forEach(p => { if (p.commit != null) (by[p.commit] = by[p.commit] || []).push(p.id); });
@@ -221,9 +229,16 @@
     if (R.locked) return;
     const needs = DY.teamNeeds(ut);
     const cand = Object.values(R.pool).filter(p => !p.commit || p.commit === ut.id).filter(p => !p.real || p.commit === ut.id);
-    cand.forEach(p => { p._s = p.rec.c * 100 + (needs[p.pos] || 0) * 3 + DY.fitScore(ut, p) * 12 + (p.interest[ut.id] || 0) / 20; });
+    // aim where the program can actually land players: value discounted by pull (blue-chips mostly ignore low-prestige schools)
+    cand.forEach(p => {
+      const pl = DY.pull(ut, p), rival = Math.max(0, ...Object.entries(p.interest).filter(([t]) => +t !== ut.id).map(([, v]) => v));
+      // smaller programs look for players the big schools aren't already winning
+      p._s = p.rec.c * 100 * (0.55 + pl * 0.45) - (pl < 0.4 ? 25 : 0) + (needs[p.pos] || 0) * 6 + DY.fitScore(ut, p) * 12 + (p.interest[ut.id] || 0) / 20 - rival * (1 - Math.min(1, pl)) * 0.25;
+      if (['K', 'P', 'LS'].includes(p.pos) && !(needs[p.pos] > 0)) p._s -= 1000;
+    });
     const room = Math.max(0, DY.CAP.hs - DY.myCommits().length);
-    const want = cand.filter(p => p.commit !== ut.id).sort((a, b) => b._s - a._s).slice(0, Math.min(DY.BOARD_MAX - Math.min(18, DY.myCommits().length), room + 6));
+    let spec = DY.myCommits().filter(p => ['K', 'P', 'LS'].includes(p.pos)).length;
+    const want = cand.filter(p => p.commit !== ut.id).sort((a, b) => b._s - a._s).filter(p => !['K', 'P', 'LS'].includes(p.pos) || spec++ < 1).slice(0, Math.min(DY.BOARD_MAX - Math.min(18, DY.myCommits().length), room + 6));
     R.board = DY.myCommits().map(p => p.id).concat(want.map(p => p.id)).slice(0, DY.BOARD_MAX);
     let hrs = DY.HOURS(), coach = 4;
     want.forEach(p => { if (p.interest[ut.id] == null) p.interest[ut.id] = 0; if (!p.offer) DY.offer(p.id); p.acts = {}; if (coach > 0 && hrs >= 7 && p.rec.stars >= 4) { p.acts.coach = 1; hrs -= 7; coach--; } else if (hrs >= 3) { p.acts.call = 1; hrs -= 3; } else if (hrs >= 1) { p.acts.dm = 1; hrs -= 1; } });
@@ -281,11 +296,38 @@
      make the playoff, and better jobs call. Fall well short (or two bad years in a row) and you are fired: you pick from the
      jobs still open, usually a step down. */
   DY.expectedWins = t => clamp(3.5 + (t.prestige - 45) / 6.5, 3, 11);
+  // the AD's goal for this season (non-Tennessee dynasties): wins from the program's prestige, adjusted for the schedule
+  DY.coachGoal = () => {
+    const g = G(), ut = DY.userT();
+    if ((g.startTeam || 'Tennessee') === 'Tennessee') return null;
+    const cg = g.coach.goal;
+    if (cg && cg.season === g.season && cg.team === ut.id) return cg;
+    const opp = DY.userGames().filter(x => x.wk >= 0).map(x => DY.T(DY.oppOf(x))).filter(Boolean);
+    const oppP = opp.length ? opp.reduce((s, t) => s + (t.prestige || 50), 0) / opp.length : 65;
+    const wins = Math.round(clamp(DY.expectedWins(ut) - (oppP - 66) / 10, 3, 11));
+    const pr = ut.prestige;
+    const text = pr >= 90 ? 'Win the conference and make a deep playoff run' : pr >= 82 ? 'Make the playoff' : pr >= 74 ? 'Contend for the conference and win a bowl' : pr >= 64 ? 'Get to a bowl game' : 'Show progress: become bowl eligible';
+    g.coach.goal = { season: g.season, team: ut.id, wins, text, oppP: Math.round(oppP) };
+    return g.coach.goal;
+  };
+  // job security 0-100 during the season: pace against the AD's goal plus recent history (first year gets grace)
+  DY.jobSecurity = () => {
+    const g = G(), ut = DY.userT(), goal = DY.coachGoal(); if (!goal) return null;
+    const played = ut.w + ut.l, left = Math.max(0, 12 - played);
+    const rate = (ut.w + goal.wins / 12 * 3) / (played + 3);   // early on, lean on what the AD expected
+    const pace = ut.w + left * rate;
+    const hist = (g.coach.perf || []).slice(-2), prior = hist.length ? hist.reduce((a, b) => a + b, 0) / hist.length : 0;
+    const years = g.season - (g.coach.since || g.startSeason) + 1;
+    const v = Math.round(clamp(60 + (pace - goal.wins) * 9 + prior * 3 + (years <= 1 ? 15 : 0), 2, 98));
+    const label = v >= 75 ? 'Secure' : v >= 55 ? 'Stable' : v >= 35 ? 'Warm seat' : 'Hot seat';
+    return { v, label, pace: Math.round(pace * 10) / 10, goal, years };
+  };
   DY.jobReview = () => {
     const g = G(), ut = DY.userT(), o = g.off;
     o.jobs = null;
     if ((g.startTeam || 'Tennessee') === 'Tennessee') return;
-    const h = g.hist[g.hist.length - 1] || {}, exp = DY.expectedWins(ut);
+    const gl = g.coach.goal && g.coach.goal.season === g.season && g.coach.goal.team === ut.id ? g.coach.goal : null;
+    const h = g.hist[g.hist.length - 1] || {}, exp = gl ? gl.wins : DY.expectedWins(ut);
     let score = (ut.w - exp) * 0.9 + (h.sec ? 2 : 0) + (h.cfpSeed ? 2.5 : 0) + (h.finish === 'National champions' ? 5 : 0) + (/Semifinal|Championship/.test(h.finish || '') ? 1.5 : 0);
     g.coach.perf = (g.coach.perf || []).concat([Math.round(score * 10) / 10]).slice(-4);
     const last2 = g.coach.perf.slice(-2), years = g.season - (g.coach.since || g.startSeason) + 1;
@@ -637,7 +679,7 @@
   };
 
   /* progression: a usual path, with players who meet, beat or miss their potential (Burger Town-style) */
-  const GROW = { 1: 0.42, 2: 0.40, 3: 0.38, 4: 0.3, 5: 0.2, 6: 0.1 };
+  const GROW = { 1: 0.31, 2: 0.30, 3: 0.28, 4: 0.23, 5: 0.15, 6: 0.08 };   // share of the room to his ceiling closed per year (was ~0.4: 90+ players doubled in 3 years)
   DY.develop = (p, t) => {
     const g = G(), arch = g.coach.arch, side = DY.SIDE(p.pos);
     const before = p.ovr, ceil0 = p.ceil;
@@ -667,7 +709,7 @@
     else if (p.yr >= 3 && r < boomP + bustP + 0.04) { p.ceil = Math.min(99, p.ceil + ri(2, 4)); gr += 1.2; notes.push('late bloomer'); why.push('late bloomer'); }
     gr += gauss() * 1.1;
     // big jumps are rare: soften anything past +7
-    if (gr > 7) gr = 7 + (gr - 7) * 0.45;
+    if (gr > 6) gr = 6 + (gr - 6) * 0.4;
     gr = clamp(gr, -3, 11);
     p.why = why;
     if (p.pos === 'K' || p.pos === 'P' || p.pos === 'LS') gr = clamp(gr * 0.45, -2, 4);

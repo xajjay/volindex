@@ -33,7 +33,7 @@
     const seed = opts.seed || (Date.now() % 2147483647);
     DY.seed(seed);
     const g = DY.G = {
-      v: DY.VERSION, seed, season: 2026, startSeason: 2026, startTeam: opts.team || 'Tennessee', phase: 'preseason', week: 0, P: {}, nextId: 1, teams: [], user: (DY.TEAMS.find(t => t.name === opts.team) || { id: DY.UT_ID }).id,
+      v: DY.VERSION, fx: { potG: 1 }, seed, season: 2026, startSeason: 2026, startTeam: opts.team || 'Tennessee', phase: 'preseason', week: 0, P: {}, nextId: 1, teams: [], user: (DY.TEAMS.find(t => t.name === opts.team) || { id: DY.UT_ID }).id,
       coach: { name: opts.coach || 'Coach', arch: opts.arch || 'motivator', w: 0, l: 0, hist: [] },
       settings: Object.assign({ cfp: 'real', recruiting: 'manual', portal: 'manual', nil: 'manual', coachMode: 'offense', speed: 'slow', injuries: true, shake: true, difficulty: 'varsity', autosave: true, offStyle: 'power', watchSeason: false }, opts.settings || {}),
       sched: [], polls: { ap: [], cfp: null, hist: {} }, news: [], hist: [], awards: {}, rec: null, legacy: {}, post: null, off: null, recruit: null, created: Date.now(),
@@ -444,7 +444,8 @@
     const g = G();
     if (g.phase !== 'preseason') return;
     g.phase = 'season'; g.week = Math.min(...g.sched.map(x => x.wk));
-    if (g.week < 1 && !DY.userGames(g.week).length) g.week = 1;
+    // no user game in Week 0: play everyone else's Week 0 games now, then open on Week 1
+    if (g.week < 1 && !DY.userGames(g.week).length) { g.sched.filter(x => x.wk < 1 && !x.res).forEach(x => DY.simGame(x)); g.week = 1; }
   };
   DY.weekLabel = () => {
     const g = G();
@@ -565,7 +566,7 @@
     // bowls for the rest of the bowl-eligible teams
     const elig = all.filter(t => t.w >= 6 && !field.includes(t));
     const bowls = [], used = new Set();
-    DY.shuffle(DY.BOWLS).forEach(name => {
+    DY.BOWLS.forEach(name => {   // in prestige order; `elig` is already in committee order
       const a = elig.find(t => !used.has(t.id)); if (!a) return; used.add(a.id);
       const b = elig.find(t => !used.has(t.id) && t.conf !== a.conf) || elig.find(t => !used.has(t.id)); if (!b) return; used.add(b.id);
       bowls.push({ id: g.season + '-bowl-' + bowls.length, wk: 15, h: a.id, a: b.id, neutral: true, post: 'bowl', title: name, res: null });

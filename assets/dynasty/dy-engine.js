@@ -596,7 +596,7 @@
   }
   // a game or season grade from the summed play credit and the snaps played
   DY.GRADE_K = { QB: 0.36, RB: 0.55, WR: 0.8, TE: 0.85, OT: 1.0, IOL: 1.0, EDGE: 0.85, DT: 0.95, LB: 0.9, CB: 0.85, S: 0.95, K: 1, P: 1 };
-  DY.gradeOf = (l, pos) => { if (!l || !(l.sn >= 6)) return null; const v = (l.gv || 0) * (DY.GRADE_K[pos] || 0.9) / Math.sqrt(l.sn); return Math.round(clamp(62 + 36 * Math.tanh(v * 1.1), 30, 99.5) * 10) / 10; };
+  DY.playGrade = (l, pos) => { if (!l || !(l.sn >= 6)) return null; const v = (l.gv || 0) * (DY.GRADE_K[pos] || 0.9) / Math.sqrt(l.sn); return Math.round(clamp(62 + 36 * Math.tanh(v * 1.1), 30, 99.5) * 10) / 10; };
   DY.gradeCls = g => g == null ? '' : g >= 90 ? 'g-elite' : g >= 80 ? 'g-high' : g >= 70 ? 'g-good' : g >= 60 ? 'g-avg' : 'g-low';
 
   /* ---------- run and pass resolution ---------- */

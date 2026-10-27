@@ -366,9 +366,10 @@ Sacramento State|SAC|42|#043927|#C4B581|CA`;
     pass: { label: 'Coverage', sub: 'Cover 2 / Tampa', keys: ['c2', 't2', 'c4'] },
     prev: { label: 'Prevent', sub: 'Keep it in front', keys: ['prev', 'dman'] },
   };
-  DY.BOWLS = ['Citrus Bowl', 'ReliaQuest Bowl', 'Gator Bowl', 'Music City Bowl', 'Texas Bowl', 'Liberty Bowl', 'Las Vegas Bowl', 'Holiday Bowl', 'Alamo Bowl',
-    "Duke's Mayo Bowl", 'Pinstripe Bowl', 'Sun Bowl', 'Pop-Tarts Bowl', 'Armed Forces Bowl', 'Birmingham Bowl', 'Independence Bowl', 'Guaranteed Rate Bowl',
-    'Military Bowl', 'Fenway Bowl', 'Gasparilla Bowl', 'First Responder Bowl', 'Boca Raton Bowl', 'New Mexico Bowl', 'LA Bowl', 'Hawai\'i Bowl', 'Camellia Bowl',
+  // non-playoff bowls, most prestigious first: the best teams left after Selection Day get the biggest games
+  DY.BOWLS = ['Citrus Bowl', 'ReliaQuest Bowl', 'Alamo Bowl', 'Gator Bowl', 'Holiday Bowl', 'Pop-Tarts Bowl', 'Texas Bowl', 'Music City Bowl', 'Sun Bowl',
+    'Liberty Bowl', 'Las Vegas Bowl', "Duke's Mayo Bowl", 'Pinstripe Bowl', 'Fenway Bowl', 'Military Bowl', 'Gasparilla Bowl', 'Birmingham Bowl', 'Independence Bowl',
+    'Guaranteed Rate Bowl', 'Armed Forces Bowl', 'First Responder Bowl', 'LA Bowl', 'Hawai\'i Bowl', 'Boca Raton Bowl', 'New Mexico Bowl', 'Camellia Bowl',
     'Cure Bowl', 'Frisco Bowl', 'Myrtle Beach Bowl', 'Arizona Bowl', 'Bahamas Bowl', 'Famous Idaho Potato Bowl', 'New Orleans Bowl', 'Salute to Veterans Bowl'];
   DY.NY6 = ['Rose Bowl', 'Sugar Bowl', 'Orange Bowl', 'Cotton Bowl', 'Fiesta Bowl', 'Peach Bowl'];
   // team identity (offensive style) by school; others are drawn at random

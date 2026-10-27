@@ -68,11 +68,21 @@
       return gunzip(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes));
     }).then(txt => txt ? DY.fromText(txt) : null);
   };
+  // one-time repairs for saves made before a fix (g.fx remembers which have run)
+  DY.migrate = g => {
+    g.fx = g.fx || {};
+    if (!g.fx.potG) {   // potential grades were all A+ (a name clash in the engine); re-scout everyone
+      Object.values(g.P || {}).forEach(p => { if (p && p.ceil) p.potG = DY.scoutGrade(p.ceil); });
+      if (g.recruit && g.recruit.pool) Object.values(g.recruit.pool).forEach(p => { if (p && p.ceil) p.potG = DY.scoutGrade(p.ceil); });
+      g.fx.potG = 1;
+    }
+  };
   DY.fromText = txt => {
     const g = JSON.parse(txt);
     if (!g || g.v !== DY.VERSION || !g.teams) throw new Error('Not a dynasty save from this version.');
     DY.G = g; DY.seed(g.rs || g.seed);
     if (DY.seedPast) DY.seedPast(g);
+    DY.migrate(g);
     return g;
   };
   DY.deleteSlot = n => { idbDel('slot' + n); try { root.localStorage.removeItem('vi-dynasty-s' + n); } catch (e) { /* */ } const m = DY.readMeta(); delete m[n]; writeMeta(m); };

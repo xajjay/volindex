@@ -290,7 +290,7 @@
     const last = [].concat(DY.teamGames(ut.id).filter(x => x.res), (P0.bowls || []).filter(mine), [].concat(...(P0.rounds || [])).filter(mine), (P0.cur || []).filter(x => mine(x) && !(P0.rounds || []).includes(P0.cur))).slice(-1)[0];
     if (last) L.push(lastGameCard(last));
     L.push(aroundCard(), newsCard(), fieldCard());
-    R.push(pollMini(), standMini(), injuriesMini(), recruitMini(), leadersMini(), captainsMini());
+    R.push(jobMini(), pollMini(), standMini(), injuriesMini(), recruitMini(), leadersMini(), captainsMini());
     b.innerHTML = `<div class="dy-grid"><div class="dy-col">${L.join('')}</div><div class="dy-col">${R.join('')}</div></div>`;
   }
   function matchBars(a, b) {
@@ -358,6 +358,15 @@
     const o = DY.teamOvr(ut);
     return `<div class="box"><div class="glabel">Starters <span class="gseg dy-seg-sm"><button data-dview="off" aria-pressed="${off}">Offense ${o.off}</button><button data-dview="def" aria-pressed="${!off}">Defense ${o.def}</button></span></div>
       <div class="dy-field ${off ? 'o' : 'd'}"><div class="dy-los"></div>${off ? offHtml : defHtml}</div><button class="glink" data-goto="depth">Edit the depth chart</button></div>`;
+  }
+  // job security (non-Tennessee dynasties): the AD's goal and how the season is tracking
+  function jobMini() {
+    const js = DY.jobSecurity && DY.jobSecurity(); if (!js) return '';
+    const col = js.v >= 75 ? 'var(--win)' : js.v >= 55 ? '#8bc34a' : js.v >= 35 ? '#f0a020' : 'var(--loss)';
+    return `<div class="box dy-job"><div class="glabel">Job security</div>
+      <div class="dy-jobh"><b style="color:${col}">${esc(js.label)}</b><span class="dim small">${js.years <= 1 ? 'Year one: the AD is patient' : 'Year ' + js.years}</span></div>
+      <div class="dy-jobbar" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${js.v}" aria-label="Job security"><i style="width:${js.v}%;background:${col}"></i></div>
+      <p class="small">AD's goal: <b>${js.goal.wins} wins</b> · ${esc(js.goal.text)}.${G().phase === 'season' || G().phase === 'post' || G().phase === 'ccg' ? ` On pace for <b>${js.pace}</b>.` : ''}</p></div>`;
   }
   function pollMini() {
     const g = G();
@@ -578,7 +587,7 @@
       ${p.log && p.log.length ? `<div class="glabel">Timeline</div><ul class="dy-mini">${p.log.slice(0, 10).map(l => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
     </div>`);
   }
-  function statCols(pos) { const c = statCols0(pos); return c.concat([['Snaps', s => s.sn || '—'], ['Grade', s => gchip(DY.gradeOf(s, pos))]]); }
+  function statCols(pos) { const c = statCols0(pos); return c.concat([['Snaps', s => s.sn || '—'], ['Grade', s => gchip(DY.playGrade(s, pos))]]); }
   function statCols0(pos) {
     const v = (s, k) => s[k] || 0;
     if (pos === 'QB') return [['Cmp/Att', s => v(s, 'pc') + '/' + v(s, 'pa')], ['Yds', s => v(s, 'py')], ['TD', s => v(s, 'ptd')], ['INT', s => v(s, 'pi')], ['Rush', s => v(s, 'ry')], ['RTD', s => v(s, 'rtd')]];
@@ -737,7 +746,7 @@
   // Index grades: snaps and a PFF-style grade for every Tennessee player
   const gchip = gr => gr == null ? '<span class="dim">—</span>' : `<span class="dy-grade ${DY.gradeCls(gr)}">${gr.toFixed(1)}</span>`;
   function gradeTable(ps) {
-    const rows = ps.map(p => ({ p, s: sStats(p) })).filter(x => x.s && x.s.sn >= 10).map(x => Object.assign(x, { gr: DY.gradeOf(x.s, x.p.pos) })).filter(x => x.gr != null);
+    const rows = ps.map(p => ({ p, s: sStats(p) })).filter(x => x.s && x.s.sn >= 10).map(x => Object.assign(x, { gr: DY.playGrade(x.s, x.p.pos) })).filter(x => x.gr != null);
     if (!rows.length) return '';
     const side = V.gside || 'O', list = rows.filter(x => (side === 'O' ? DY.SIDE(x.p.pos) === 'O' : DY.SIDE(x.p.pos) === 'D')).sort((a, b) => b.gr - a.gr);
     return `<div class="box"><div class="glabel">Index grades and snaps <span class="gseg dy-seg-sm"><button data-gside="O" aria-pressed="${side === 'O'}">Offense</button><button data-gside="D" aria-pressed="${side === 'D'}">Defense</button></span></div>

@@ -618,3 +618,10 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
 .tb-alive { flex: none; font-family: var(--f-display); font-weight: 900; letter-spacing: .06em; background: #F2D600; color: #141414; padding: 4px 10px; border-radius: 8px; animation: tbpulse 2.4s ease-in-out infinite; }
 @keyframes tbpulse { 50% { box-shadow: 0 0 0 8px rgba(242,214,0,0); } 0%, 100% { box-shadow: 0 0 0 0 rgba(242,214,0,.6); } }
 .tb-champ { margin-top: 10px; font-family: var(--f-display); font-weight: 900; font-size: 22px; text-align: center; padding: 10px; border-radius: 10px; background: var(--orange-soft); color: var(--orange-ink); }
+/* job security */
+.dy-jobh { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 2px 0 6px; }
+.dy-jobh b { font-family: var(--f-display); font-size: 20px; }
+.dy-jobbar { height: 10px; border-radius: 6px; background: var(--line); overflow: hidden; }
+.dy-jobbar i { display: block; height: 100%; border-radius: 6px; transition: width .4s; }
+.dy-job p { margin: 8px 0 0; }
+.dy-job p b { display: inline !important; font-size: inherit !important; margin: 0 !important; }
