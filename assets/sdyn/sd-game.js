@@ -47,7 +47,7 @@
         <div class="dyg-board" id="sdgBoard"></div>
         <div class="dyg-fieldwrap sdg-fieldwrap"><canvas id="sdgCv"></canvas><div class="dyg-banner" id="sdgBan"></div></div>
         <div class="dyg-cap" id="sdgCap"><div class="dyg-head">${esc(GM.title || (GM.neutral ? 'Neutral site' : H.name))}</div><div class="dyg-text">${esc(A.name)} at ${esc(H.name)}. ${S.hoops ? 'Tip-off is coming up.' : 'First pitch is coming up.'}</div></div>
-        <div class="dyg-fullbar"><button data-g="pause">Pause</button><button data-g="speed">Speed</button><button data-g="full">Exit full screen</button></div>
+        <div class="dyg-fullbar"><button data-g="pause">Pause</button><button data-g="speed">Speed</button>${S.hoops ? '<button data-g="timeout">Timeout</button><button data-g="simper">Sim period</button>' : '<button data-g="nextpa">Next batter</button><button data-g="siminn">Sim inning</button>'}<button data-g="full">Exit full screen</button></div>
       </div>
       <div class="box dyg-ctrl" id="sdgCtrl"></div>
       <div class="dyg-tabs" role="tablist"><button data-gtab="pbp" aria-selected="true">Play-by-play</button><button data-gtab="box" aria-selected="false">Box score</button>${S.hoops ? '<button data-gtab="floor" aria-selected="false">On the floor</button>' : ''}</div>
@@ -323,7 +323,7 @@
       const side = {}; GM.on.h.forEach(id => { side[id] = 'h'; }); GM.on.a.forEach(id => { side[id] = 'a'; });
       if (!S.pos) { S.pos = {}; GM.on.h.forEach((id, i) => { S.pos[id] = [47 + 4 + i * 1.5, 13 + i * 6]; }); GM.on.a.forEach((id, i) => { S.pos[id] = [47 - 4 - i * 1.5, 13 + i * 6]; }); S.pos._ball = [47, 25]; }
       const pos = {}; Object.keys(side).forEach(id => { pos[id] = S.pos[id] || [47, 51]; });
-      SDC.draw(c, gg, { pos, side, s: GM.poss, ball: S.pos._ball || [47, 25], z: 0, hold: null, marks: S.marks, trail: [] }, GM, S.col, ink); } else { drawField(ctx()); drawFielders(ctx(), null); drawRunners(ctx(), S.GM.bases.map((id, i) => id ? { id, at: basePt(i + 1) } : null).filter(Boolean)); } }
+      SDC.draw(c, gg, { pos, side, s: GM.poss, ball: S.pos._ball || [47, 25], z: 0, hold: null, marks: S.marks, trail: [] }, GM, S.col, ink); } else { drawField(ctx()); drawFielders(ctx(), null); drawRunners(ctx(), S.GM.bases.map((id, i) => id ? { id, at: pathPt(i + 1, i + 2, i === 2 ? 0.06 : 0.11) } : null).filter(Boolean)); } }
 
   // the court: 94 x 50 feet
   function drawCourt(c) {

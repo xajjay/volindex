@@ -657,3 +657,19 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
 .dy-grade { flex: none; width: 64px; height: 64px; border-radius: 14px; display: grid; place-items: center; font-family: var(--f-display); font-size: 30px; font-weight: 900; color: #fff; background: var(--muted); }
 .dy-grade.gA { background: var(--win); } .dy-grade.gB { background: #5a9e3a; } .dy-grade.gC { background: #d89a1d; } .dy-grade.gD, .dy-grade.gF { background: var(--loss); }
 .dy-pvodds .dy-sched-mini li { display: flex; gap: 6px; align-items: baseline; }
+/* phone: bigger tap targets, slimmer wide tables, and a visible hint that a table scrolls */
+.dy-scroll { background: linear-gradient(to right, var(--surface) 30%, transparent) left / 24px 100% no-repeat local, linear-gradient(to left, var(--surface) 30%, transparent) right / 24px 100% no-repeat local, radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.18), transparent) left / 10px 100% no-repeat scroll, radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.18), transparent) right / 10px 100% no-repeat scroll; }
+@media (max-width: 560px) {
+  [data-dmove] { min-width: 36px; min-height: 36px; }
+  .dy-sortb { padding: 8px 4px; }
+  .tb-tm { padding-top: 7px; padding-bottom: 7px; min-height: 34px; }
+  .glink[data-gid], .glink[data-more] { display: inline-block; padding: 8px 4px; }
+  .dy-nextt th:nth-child(n+3):nth-child(-n+6), .dy-nextt td:nth-child(n+3):nth-child(-n+6) { display: none; }
+  .dy-nextt td:nth-child(8) { min-width: 120px; }
+}
+.cf-skip { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+/* keep the sim options in reach while calling plays */
+.dyg-simbar { position: sticky; bottom: 0; z-index: 6; background: var(--surface); box-shadow: 0 -6px 14px rgba(0,0,0,.08); border-radius: 10px 10px 0 0; }
+.dyg-simbar:empty { display: none; }
+.dyg-full .dyg-fullbar { flex-wrap: wrap; }
+@media (max-width: 560px) { .dy-fp span { display: none; } .dy-fp i { font-size: 9px; } }   /* phone: overall + position only on the mini field (tap a dot for the player) */

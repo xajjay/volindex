@@ -107,7 +107,9 @@
     let fab = document.getElementById('fbFab');
     if (!fab) { fab = document.createElement('button'); fab.id = 'fbFab'; fab.className = 'fb-fab'; fab.type = 'button'; fab.innerHTML = '<span aria-hidden="true">🐞</span> Feedback'; fab.title = 'Report a bug or share an idea'; fab.addEventListener('click', () => open()); document.body.appendChild(fab); }
     const live = !!document.querySelector('#dygCtrl, .dyg-fs, .sdg, .cf-show');
-    fab.hidden = !onGames() || live;
+    // dynasties are long, dense pages: the floating button would sit on top of content there (their Settings tab has a report box)
+    const dyn = /dynasty/.test(location.pathname + location.hash) && !!document.querySelector('.dyh, .dy-setup, .dy-slots');
+    fab.hidden = !onGames() || live || dyn;
     // a notice on the games pages: these are new, here's how to tell me what's broken
     const app = document.getElementById('app') || document.querySelector('main');
     if (app && onGames() && !store.get('vi-fb-note') && !app.querySelector('.fb-note')) {
