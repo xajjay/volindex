@@ -25,3 +25,25 @@ email magic links, no passwords to store.
 4. **Project settings → API**: copy the Project URL and the `anon` public key into `assets/auth-config.js`.
 5. Deploy. The My games page now shows "Email me a sign-in link"; after signing in, progress merges and syncs
    after every finished daily.
+
+6. **Dynasty cloud saves** (football, hoops, baseball, softball). In the **SQL editor**, run once:
+
+   ```sql
+   create table public.dynasty_saves (
+     user_id uuid not null references auth.users on delete cascade,
+     game text not null,             -- football, mbb, wbb, baseball, softball
+     slot int not null,              -- 1 to 3
+     data text not null,             -- the gzip-compressed save, base64
+     meta jsonb not null default '{}'::jsonb,
+     updated_at timestamptz not null default now(),
+     primary key (user_id, game, slot)
+   );
+   alter table public.dynasty_saves enable row level security;
+   create policy "own saves read"   on public.dynasty_saves for select using (auth.uid() = user_id);
+   create policy "own saves insert" on public.dynasty_saves for insert with check (auth.uid() = user_id);
+   create policy "own saves update" on public.dynasty_saves for update using (auth.uid() = user_id);
+   create policy "own saves delete" on public.dynasty_saves for delete using (auth.uid() = user_id);
+   ```
+
+   Signed-in players' saves then back up automatically (a few seconds after each save, and when they leave the
+   page), and each dynasty's start page lists the saves in their account with a Load button.

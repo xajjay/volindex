@@ -17,13 +17,16 @@
   SD.saveSlot = n => {
     const g = SD.G; if (!g) return Promise.resolve('Nothing to save.');
     g.rs = SD.rstate(); g.savedAt = Date.now(); g.slot = n;
-    return gzip(SD.pack(g)).then(bytes => put(g.sport + '-slot' + n, bytes).then(() => null).catch(() => {
+    let cloudBytes = null;
+    return gzip(SD.pack(g)).then(bytes => { cloudBytes = bytes; return bytes; }).then(bytes => put(g.sport + '-slot' + n, bytes).then(() => null).catch(() => {
       try { let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); root.localStorage.setItem('vi-sdyn-' + g.sport + n, root.btoa(s)); return null; } catch (e) { return 'Your browser storage is full. Export your save to keep it.'; }
     })).then(err => {
       if (err) return err;
       const ut = SD.userT(), m = SD.readMeta(g.sport);
       m[n] = { team: ut.name, coach: g.coach.name, label: SD.phaseLabel(), rec: `${ut.w}-${ut.l}`, titles: g.hist.filter(h => h.finish === 'National champions').length, at: g.savedAt };
-      writeMeta(g.sport, m); return null;
+      writeMeta(g.sport, m);
+      if (root.VI_CLOUD) root.VI_CLOUD.save(g.sport, n, cloudBytes, m[n]);       // a backup in the player's account when signed in
+      return null;
     });
   };
   SD.loadSlot = (sport, n) => get(sport + '-slot' + n).catch(() => null).then(bytes => {
@@ -31,6 +34,7 @@
     return gunzip(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)).then(txt => SD.fromText(txt));
   });
   SD.fromText = txt => { const g = JSON.parse(txt); if (!g || g.v !== SD.VERSION || !g.teams) throw new Error('Not a save from this version.'); SD.G = g; SD.seed(g.rs || g.seed); return g; };
+  SD.fromBytes = bytes => gunzip(bytes).then(SD.fromText);
   SD.deleteSlot = (sport, n) => { del(sport + '-slot' + n); try { root.localStorage.removeItem('vi-sdyn-' + sport + n); } catch (e) { /* ignore */ } const m = SD.readMeta(sport); delete m[n]; writeMeta(sport, m); };
   SD.exportBlob = () => { const g = SD.G; g.rs = SD.rstate(); return gzip(SD.pack(g)).then(b => new root.Blob([b], { type: 'application/gzip' })); };
   SD.importFile = f => f.arrayBuffer().then(b => gunzip(new Uint8Array(b))).then(SD.fromText);

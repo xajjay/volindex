@@ -674,3 +674,11 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
 .dyg-full .dyg-fullbar { flex-wrap: wrap; }
 @media (max-width: 560px) { .dy-fp span { display: none; } .dy-fp i { font-size: 9px; } }   /* phone: overall + position only on the mini field (tap a dot for the player) */
 .dy-race li.me, .dy-mini li.me { font-weight: 800; } .dy-race li.me small { font-weight: 400; }
+/* cloud saves (signed-in players) */
+.dy-cloudbox { margin: 14px 0; }
+.dy-cloudbox h3 { margin: 0 0 8px; font-size: 1rem; }
+.dy-cloudbox p { margin: 0; }
+.dy-cloud { display: grid; gap: 8px; }
+.dy-cloudrow { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid var(--line, rgba(127,127,127,.2)); }
+.dy-cloudrow:first-child { border-top: 0; }
+.dy-cloudrow .btn { min-height: 44px; }

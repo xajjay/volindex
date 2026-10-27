@@ -43,12 +43,15 @@
       <div class="dy-hero"><span class="gtag">Preview</span><h1>${esc(sp.title)}</h1><p>${esc(blurb(sp))}</p></div>
       <div class="dy-slots">${[1, 2, 3].map(n => { const s = m[n]; return `<div class="box dy-slot ${s ? '' : 'empty'}"><div class="glabel">Slot ${n}</div>${s ? `<h3>Coach ${esc(s.coach)}</h3><p class="dim">${s.team && s.team !== 'Tennessee' ? esc(s.team) + ' · ' : ''}${esc(s.label)} · ${esc(s.rec)}${s.titles ? ` · ${s.titles} title${s.titles > 1 ? 's' : ''}` : ''}</p><div class="grow"><button class="btn primary" data-load="${n}">Continue</button><button class="btn" data-del="${n}">Delete</button></div>` : `<p class="dim">Empty</p><div class="grow"><button class="btn primary" data-new="${n}">New dynasty</button></div>`}</div>`; }).join('')}</div>
       <div class="grow"><label class="btn"><input type="file" accept=".gz,application/gzip" id="sdImport" hidden>Import a save file</label></div>
-      <div class="gnote small">Saves live in this browser. This is an early preview: expect balance changes.</div></div>`;
+      <div class="box dy-cloudbox" id="sdCloud" hidden></div>
+      <div class="gnote small">Saves live in this browser (and in your account when you're signed in). This is an early preview: expect balance changes.</div></div>`;
+    const cl = APP.querySelector('#sdCloud');
+    if (root.VI_CLOUD && root.VI_AUTH_CONFIG) { cl.hidden = false; root.VI_CLOUD.panel(cl, SPORT, m, (n, bytes) => SD.fromBytes(bytes).then(g => { if (g.sport !== SPORT) throw new Error('that save is for another sport'); g.slot = n; return SD.saveSlot(n); }).then(() => { V.tab = 'home'; hub(); }).catch(err => { V.msg = 'That save could not be read: ' + err.message; landing(); })); }
     APP.firstElementChild.onclick = e => {
       const b = e.target.closest('button'); if (!b) return;
       if (b.dataset.new) { V.setup = { slot: +b.dataset.new }; setup(); }
       if (b.dataset.load) { b.disabled = true; b.textContent = 'Loading…'; SD.loadSlot(SPORT, +b.dataset.load).then(g => { if (!g) return landing(); g.slot = +b.dataset.load; V.tab = 'home'; hub(); }).catch(err => { V.msg = 'That save could not be read: ' + err.message; landing(); }); }
-      if (b.dataset.del) { if (b.dataset.sure) { SD.deleteSlot(SPORT, +b.dataset.del); landing(); } else { b.dataset.sure = 1; b.textContent = 'Tap again to delete'; } }
+      if (b.dataset.del) { if (b.dataset.sure) { SD.deleteSlot(SPORT, +b.dataset.del); if (root.VI_CLOUD) root.VI_CLOUD.remove(SPORT, +b.dataset.del); landing(); } else { b.dataset.sure = 1; b.textContent = 'Tap again to delete'; } }
     };
     const imp = APP.querySelector('#sdImport');
     imp.onchange = () => { const f = imp.files[0]; if (!f) return; SD.importFile(f).then(g => { if (g.sport !== SPORT) { V.msg = 'That save is for another sport.'; return landing(); } g.slot = g.slot || 1; SD.saveSlot(g.slot); hub(); }).catch(err => { V.msg = 'Could not import: ' + err.message; landing(); }); };

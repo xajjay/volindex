@@ -51,15 +51,17 @@
   DY.saveSlot = (n, live) => {
     const g = DY.G; if (!g) return Promise.resolve('Nothing to save.');
     g.rs = DY.rstate(); g.live = live ? DY.packLive(live) : null; g.savedAt = Date.now(); g.slot = n;
-    const txt = DY.pack(g);
-    return gzip(txt).then(bytes => idbPut('slot' + n, bytes).then(() => null).catch(() => {
+    const txt = DY.pack(g); let cloudBytes = null;
+    return gzip(txt).then(bytes => { cloudBytes = bytes; return bytes; }).then(bytes => idbPut('slot' + n, bytes).then(() => null).catch(() => {
       // fallback: localStorage (base64)
       try { let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); root.localStorage.setItem('vi-dynasty-s' + n, root.btoa(s)); return null; } catch (e) { return 'Your browser storage is full. Export your save to keep it.'; }
     })).then(err => {
       if (err) return err;
       const ut = DY.userT(), m = DY.readMeta();
       m[n] = { team: ut.name, coach: g.coach.name, season: g.season, label: DY.weekLabel(), rec: ut.w + '-' + ut.l, natl: g.hist.filter(h => h.finish === 'National champions').length, at: Date.now(), kb: Math.round(txt.length / 1024) };
-      writeMeta(m); return null;
+      writeMeta(m);
+      if (root.VI_CLOUD) root.VI_CLOUD.save('football', n, cloudBytes, m[n]);      // a backup in the player's account when signed in
+      return null;
     });
   };
   DY.loadSlot = n => {
@@ -85,6 +87,7 @@
     DY.migrate(g);
     return g;
   };
+  DY.fromBytes = bytes => gunzip(bytes).then(DY.fromText);
   DY.deleteSlot = n => { idbDel('slot' + n); try { root.localStorage.removeItem('vi-dynasty-s' + n); } catch (e) { /* */ } const m = DY.readMeta(); delete m[n]; writeMeta(m); };
   DY.exportBlob = live => { const g = DY.G; g.rs = DY.rstate(); g.live = live ? DY.packLive(live) : null; return gzip(DY.pack(g)).then(b => new root.Blob([b], { type: 'application/gzip' })); };
   DY.importFile = file => file.arrayBuffer().then(b => gunzip(new Uint8Array(b))).then(DY.fromText);

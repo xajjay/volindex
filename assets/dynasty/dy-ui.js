@@ -44,13 +44,16 @@
       <div class="dy-hero"><span class="gtag">Preview</span><h1>Vol Dynasty</h1><p>Take over Tennessee with the real 2026 roster and depth chart. Call every play, sign the real 2027 class and recruit the ones after it, work the portal and your NIL budget, and chase the playoff year after year.</p></div>
       <div class="dy-slots">${[1, 2, 3].map(n => { const s = m[n]; return `<div class="box dy-slot ${s ? '' : 'empty'}"><div class="glabel">Slot ${n}</div>${s ? `<h3>Coach ${esc(s.coach)}</h3><p class="dim">${s.team && s.team !== 'Tennessee' ? esc(s.team) + ' · ' : ''}${esc(s.label)} · ${esc(s.rec)}${s.natl ? ` · ${s.natl} national title${s.natl > 1 ? 's' : ''}` : ''}</p><p class="dim small">Saved ${new Date(s.at).toLocaleString()}</p><div class="grow"><button class="btn primary" data-load="${n}">Continue</button><button class="btn" data-del="${n}">Delete</button></div>` : `<p class="dim">Empty</p><div class="grow"><button class="btn primary" data-new="${n}">New dynasty</button></div>`}</div>`; }).join('')}</div>
       <div class="grow"><label class="btn"><input type="file" accept=".gz,.vdyn,application/gzip" id="dyImport" hidden>Import a save file</label></div>
-      <div class="gnote small">Saves live in this browser. Export one from Settings to move it to another device. This is an early preview: expect balance changes, and saves from a later version may not load.</div>
+      <div class="box dy-cloudbox" id="dyCloud" hidden></div>
+      <div class="gnote small">Saves live in this browser (and in your account when you're signed in). You can also export one from Settings. This is an early preview: expect balance changes, and saves from a later version may not load.</div>
     </div>`;
+    const cl = APP.querySelector('#dyCloud');
+    if (root.VI_CLOUD && root.VI_AUTH_CONFIG) { cl.hidden = false; root.VI_CLOUD.panel(cl, 'football', m, (n, bytes) => DY.fromBytes(bytes).then(g => { g.slot = n; return DY.saveSlot(n); }).then(() => { V.tab = 'home'; hub(); }).catch(err => { alert('That save could not be read: ' + err.message); landing(); })); }
     APP.firstElementChild.onclick = e => {
       const b = e.target.closest('button'); if (!b) return;
       if (b.dataset.new) { V.setup = { slot: +b.dataset.new }; setup(); }
       if (b.dataset.load) { const n = +b.dataset.load; b.disabled = true; b.textContent = 'Loading…'; DY.loadSlot(n).then(g => { if (!g) { alert('That save could not be read.'); return landing(); } g.slot = n; V.tab = 'home'; hub(); }).catch(err => { alert(err.message); landing(); }); }
-      if (b.dataset.del) { if (b.dataset.sure) { DY.deleteSlot(+b.dataset.del); landing(); } else { b.dataset.sure = 1; b.textContent = 'Tap again to delete'; } }
+      if (b.dataset.del) { if (b.dataset.sure) { DY.deleteSlot(+b.dataset.del); if (root.VI_CLOUD) root.VI_CLOUD.remove('football', +b.dataset.del); landing(); } else { b.dataset.sure = 1; b.textContent = 'Tap again to delete'; } }
     };
     const imp = APP.querySelector('#dyImport');
     imp.onchange = () => { const f = imp.files[0]; if (!f) return; DY.importFile(f).then(g => { g.slot = g.slot || 1; DY.saveSlot(g.slot); hub(); }).catch(err => alert('Could not import: ' + err.message)); };
