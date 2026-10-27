@@ -144,6 +144,47 @@
     if (ok) { p.leave = null; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); SD.news('nil', `${p.n} is coming back`, ''); }
     return ok ? `${p.n} is coming back!` : `${p.n} is turning pro.`;
   };
+  /* ---------- season preview (locked at the opener) and the end-of-season review ---------- */
+  SD.gameOdds = (a, b, home) => { const hoops = SD.kind() === 'hoops'; return 1 / (1 + Math.exp(-0.18 * ((SD.teamRating(a) - SD.teamRating(b)) + (hoops ? 2.5 * home : 0)))); };
+  SD.EXP_TIERS = () => SD.kind() === 'hoops' ? ['Rebuilding year', 'Bubble team', 'NCAA Tournament team', 'Sweet 16 contender', 'Final Four contender', 'National title contender']
+    : ['Rebuilding year', 'Bubble team', 'Regional team', 'Regional host', 'Omaha contender', 'National title contender'].map(x => G().sport === 'softball' ? x.replace('Omaha', 'WCWS') : x);
+  const TIER_AT = [0.8, 1.5, 2.1, 3.2, 4.2, 5];
+  SD.preview = () => {
+    const g = G(), ut = SD.userT(); g.previews = g.previews || {};
+    const have = g.previews[g.season]; if (have && have.team === ut.id) return have;
+    if (g.phase !== 'preseason') return have || null;
+    const games = SD.userGames().filter(x => !x.res && x.kind === 'reg');
+    const odds = games.map(x => { const o = T(SD.oppOf(x)); return { id: x.id, d: x.d, opp: o.id, p: SD.gameOdds(ut, o, x.neutral ? 0 : x.h === ut.id ? 1 : -1) }; });
+    const exp = odds.reduce((a, o) => a + o.p, 0), line = Math.floor(exp) + 0.5, n = odds.length;
+    const avgOpp = t => { const os = g.sched.filter(x => x.kind === 'reg' && (x.h === t.id || x.a === t.id)).map(x => T(x.h === t.id ? x.a : x.h)).filter(o => o && o.roster); return os.length ? os.reduce((a, o) => a + SD.teamRating(o), 0) / os.length : 0; };
+    const sos = g.teams.map(t => ({ id: t.id, v: avgOpp(t) })).sort((a, b) => b.v - a.v), sosRank = sos.findIndex(x => x.id === ut.id) + 1;
+    const ap = SD.apRank(ut.id), pct = n ? exp / n : 0;
+    const tier = ap && ap <= 4 ? 5 : ap && ap <= 10 ? 4 : ap && ap <= 20 || pct >= 0.72 ? 3 : ap || pct >= 0.6 ? 2 : pct >= 0.5 ? 1 : 0;
+    const top25 = odds.filter(o => (SD.apRank(o.opp) || 99) <= 25).length;
+    const big = odds.slice().sort((a, b) => ((26 - (SD.apRank(b.opp) || 26)) + (1 - Math.abs(b.p - 0.5) * 2) * 8) - ((26 - (SD.apRank(a.opp) || 26)) + (1 - Math.abs(a.p - 0.5) * 2) * 8))[0] || null;
+    const ros = ut.roster.map(SD.P).filter(Boolean), stars = ros.slice().sort((a, b) => b.ovr - a.ovr).slice(0, 3);
+    const core = new Set(SD.kind() === 'hoops' ? SD.lineup(ut).slice(0, 8).map(p => p.id) : (() => { const L = SD.diamondLineup(ut); return Object.values(L.field).filter(Boolean).map(p => p.id).concat(L.rotation.map(p => p.id)); })());
+    const breakouts = ros.filter(p => !stars.includes(p) && p.yr <= 3 && p.ceil - p.ovr >= 4 && core.has(p.id)).sort((a, b) => ((b.ceil - b.ovr) + (b.lastDelta || 0) * 1.5) - ((a.ceil - a.ovr) + (a.lastDelta || 0) * 1.5)).slice(0, 3);
+    return (g.previews[g.season] = { season: g.season, team: ut.id, exp: Math.round(exp * 10) / 10, line, games: n, tier, label: SD.EXP_TIERS()[tier], ap, ovr: SD.teamRating(ut), sosRank, sosOf: sos.length, top25,
+      odds, big: big && { id: big.id, d: big.d, opp: big.opp, p: big.p }, stars: stars.map(p => p.id), breakouts: breakouts.map(p => p.id) });
+  };
+  SD.review = () => {
+    const g = G(), ut = SD.userT(), pv = (g.previews || {})[g.season], h = g.hist[g.hist.length - 1]; if (!h) return null;
+    const fin = h.finish || '';
+    const done = /National champions/.test(fin) ? 5 : /championship|finals/i.test(fin) ? 4.6 : /Final Four|World Series/.test(fin) ? 4.2 : /Elite Eight/.test(fin) ? 3.7 : /Sweet 16|Super Regional/.test(fin) ? 3.2 : /second round/.test(fin) ? 2.6 : /first round|Regional/.test(fin) ? 2.1 : clamp((h.w / Math.max(1, h.w + h.l) - 0.4) * 5, 0, 1.5);
+    const prod = p => { const keep = p.s; p.s = p.s || p.lastS; const v = SD.awardScore(p, ut); p.s = keep; return v; };
+    const ids = ut.roster.concat((g.off && g.off.leaving || []).map(x => x.id)).filter((x, i, a) => a.indexOf(x) === i).map(SD.P).filter(Boolean);
+    const scored = ids.map(p => ({ p, v: prod(p) })).filter(x => x.v > 0).sort((a, b) => b.v - a.v);
+    const stars = scored.slice(0, 3).map(x => x.p);
+    const byOvr = ids.slice().sort((a, b) => b.ovr - a.ovr);
+    const breakouts = scored.map((x, i) => ({ p: x.p, jump: byOvr.indexOf(x.p) - i })).filter(x => !stars.includes(x.p) && !(pv && pv.stars.includes(x.p.id)) && x.p.ovr < 85 && x.jump >= 3).sort((a, b) => b.jump - a.jump).slice(0, 3).map(x => x.p);
+    let score, vsLine = null;
+    const regW = SD.userGames().filter(x => x.kind === 'reg' && x.res && ((x.h === ut.id) === (x.res.h > x.res.a))).length;
+    if (pv) { vsLine = regW - pv.line; score = vsLine * (SD.kind() === 'hoops' ? 0.25 : 0.12) + (done - TIER_AT[pv.tier]) * 1.2; } else score = done - 2;
+    const grade = score >= 3 ? 'A+' : score >= 2 ? 'A' : score >= 1 ? 'B+' : score >= 0 ? 'B' : score >= -1 ? 'C+' : score >= -2 ? 'C' : score >= -3 ? 'D' : 'F';
+    const verdict = score >= 2 ? 'Blew past expectations' : score >= 0.6 ? 'Beat expectations' : score >= -0.6 ? 'Right about where we expected' : score >= -2 ? 'Fell short of expectations' : 'A disappointing year';
+    return { pv, w: h.w, l: h.l, regW, fin, grade, verdict, vsLine, stars: stars.map(p => p.id), breakouts: breakouts.map(p => p.id) };
+  };
   // positions short for next season: target counts per position vs. players with eligibility left
   SD.needs = t => {
     const hoops = SD.kind() === 'hoops', soft = G().sport === 'softball';

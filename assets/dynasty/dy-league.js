@@ -443,6 +443,7 @@
   DY.startSeason = () => {
     const g = G();
     if (g.phase !== 'preseason') return;
+    if (DY.preview) DY.preview();   // lock in the preseason outlook before kickoff
     g.phase = 'season'; g.week = Math.min(...g.sched.map(x => x.wk));
     // no user game in Week 0: play everyone else's Week 0 games now, then open on Week 1
     if (g.week < 1 && !DY.userGames(g.week).length) { g.sched.filter(x => x.wk < 1 && !x.res).forEach(x => DY.simGame(x)); g.week = 1; }

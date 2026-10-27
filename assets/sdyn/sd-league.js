@@ -381,7 +381,7 @@
   SD.confs = () => [...new Set(G().teams.map(t => t.conf))];
 
   /* ---------- the season's phases ---------- */
-  SD.startSeason = () => { const g = G(); if (g.phase !== 'preseason') return; if (SD.runCamp && !(g.camp && g.camp.y === g.season && g.camp.done)) SD.runCamp(true); g.phase = 'season'; g.date = SD.addDays(SD.dateOf(SD.SP().start), -1); };
+  SD.startSeason = () => { const g = G(); if (g.phase !== 'preseason') return; if (SD.preview) SD.preview(); if (SD.runCamp && !(g.camp && g.camp.y === g.season && g.camp.done)) SD.runCamp(true); g.phase = 'season'; g.date = SD.addDays(SD.dateOf(SD.SP().start), -1); };
   SD.regularOver = () => !G().sched.some(x => x.kind === 'reg' && !x.res);
   // conference tournaments: single elimination, top seeds get byes into a 16- (or 8-) team bracket
   SD.setupCT = () => {

@@ -296,6 +296,50 @@
      make the playoff, and better jobs call. Fall well short (or two bad years in a row) and you are fired: you pick from the
      jobs still open, usually a step down. */
   DY.expectedWins = t => clamp(3.5 + (t.prestige - 45) / 6.5, 3, 11);
+  /* ---------- season preview (built once, before kickoff) and the end-of-season review against it ---------- */
+  // per-game win chance from the overall gap (fit on simulated games: 0.44 per point, small home edge)
+  DY.gameOdds = (a, b, home) => 1 / (1 + Math.exp(-0.44 * ((DY.teamOvr(a).ovr - DY.teamOvr(b).ovr) + 0.5 * home)));
+  DY.EXP_TIERS = ['Rebuilding year', 'Fighting for a bowl', 'Bowl team', 'Conference contender', 'Playoff contender', 'National title contender'];
+  DY.preview = () => {
+    const g = G(), ut = DY.userT(); g.previews = g.previews || {};
+    const have = g.previews[g.season]; if (have && have.team === ut.id) return have;
+    if (g.phase !== 'preseason') return have || null;
+    const games = DY.userGames().filter(x => !x.res && x.wk >= 0);
+    const odds = games.map(x => { const o = DY.T(DY.oppOf(x)); return { id: x.id, opp: o.id, wk: x.wk, p: DY.gameOdds(ut, o, x.neutral ? 0 : x.h === ut.id ? 1 : -1), tag: x.tag || null }; });
+    const exp = odds.reduce((s, o) => s + o.p, 0), line = Math.floor(exp) + 0.5;
+    // strength of schedule: average opponent overall, ranked among FBS teams
+    const avgOpp = t => { const os = g.sched.filter(x => x.h === t.id || x.a === t.id).map(x => DY.T(x.h === t.id ? x.a : x.h)).filter(o => o && o.roster); return os.length ? os.reduce((s, o) => s + DY.teamOvr(o).ovr, 0) / os.length : 0; };
+    const sos = g.teams.filter(t => t.fbs !== false).map(t => ({ id: t.id, v: avgOpp(t) })).sort((a, b) => b.v - a.v);
+    const sosRank = sos.findIndex(x => x.id === ut.id) + 1;
+    const ap = DY.apRank(ut.id);
+    const tier = ap && ap <= 4 || exp >= 11 ? 5 : ap && ap <= 12 || exp >= 9.8 ? 4 : exp >= 8.5 ? 3 : exp >= 6.5 ? 2 : exp >= 5 ? 1 : 0;
+    const top25 = odds.filter(o => (DY.apRank(o.opp) || 99) <= 25).length;
+    const big = odds.slice().sort((a, b) => ((26 - (DY.apRank(b.opp) || 26)) + (b.tag ? 6 : 0) + (1 - Math.abs(b.p - 0.5) * 2) * 8) - ((26 - (DY.apRank(a.opp) || 26)) + (a.tag ? 6 : 0) + (1 - Math.abs(a.p - 0.5) * 2) * 8))[0] || null;
+    const ros = ut.roster.map(DY.P).filter(Boolean);
+    const stars = ros.slice().sort((a, b) => b.ovr - a.ovr).slice(0, 3);
+    const L = DY.lineup(ut), starters = new Set(); Object.values(L).forEach(v => [].concat(v).forEach(p => { if (p && p.id) starters.add(p.id); }));
+    const breakouts = ros.filter(p => !stars.includes(p) && !['K', 'P', 'LS'].includes(p.pos) && p.yr <= 3 && p.ceil - p.ovr >= 4 && (starters.has(p.id) || p.ovr >= 74))
+      .sort((a, b) => ((b.ceil - b.ovr) + (b.lastDelta || 0) * 1.5 + (starters.has(b.id) ? 3 : 0)) - ((a.ceil - a.ovr) + (a.lastDelta || 0) * 1.5 + (starters.has(a.id) ? 3 : 0))).slice(0, 3);
+    return (g.previews[g.season] = { season: g.season, team: ut.id, exp: Math.round(exp * 10) / 10, line, tier, label: DY.EXP_TIERS[tier], ap, ovr: DY.teamOvr(ut).ovr, sosRank, sosOf: sos.length, top25,
+      odds, big: big && { id: big.id, opp: big.opp, wk: big.wk, p: big.p }, stars: stars.map(p => p.id), breakouts: breakouts.map(p => p.id) });
+  };
+  // how the season went against the preview: wins vs. the line, finish vs. the expectation, who carried the team
+  DY.review = () => {
+    const g = G(), ut = DY.userT(), pv = (g.previews || {})[g.season], h = g.hist[g.hist.length - 1];
+    if (!h) return null;
+    const fin = h.finish || '';
+    const tierDone = /National champions/.test(fin) ? 5 : /Championship|Semifinal/.test(fin) ? 4.6 : /CFP|Quarterfinal/.test(fin) ? 4 : h.sec ? 3.5 : /Won .*Bowl/.test(fin) ? 2.6 : /Bowl/.test(fin) ? 2 : ut.w >= 6 ? 1.6 : ut.w >= 4 ? 1 : 0;
+    const ids = ut.roster.concat((g.off && g.off.leaving || []).map(x => x.id)).filter((x, i, a) => a.indexOf(x) === i).map(DY.P).filter(Boolean);
+    const z = p => { const ex = { QB: 95, RB: 75, WR: 70, TE: 70, OT: 110, IOL: 110, EDGE: 60, DT: 66, LB: 75, CB: 50, S: 50, K: 50, P: 30 }[p.pos] || 60; return ((p.lastScore || 0) - ex * (p.ovr / 82)) / (ex * 0.45); };
+    const stars = ids.filter(p => (p.lastGp || 0) >= 6).sort((a, b) => (b.lastScore || 0) - (a.lastScore || 0)).slice(0, 3);
+    const breakouts = ids.filter(p => !stars.includes(p) && !(pv && pv.stars.includes(p.id)) && p.ovr < 88 && !['K', 'P', 'LS'].includes(p.pos) && (p.lastGp || 0) >= 6 && z(p) > 0.8).sort((a, b) => z(b) - z(a)).slice(0, 3);
+    let score = 0, vsLine = null, vsTier = null;
+    const regW = g.sched.filter(x => (x.h === ut.id || x.a === ut.id) && x.res && ((x.h === ut.id) === (x.res.h > x.res.a))).length;
+    if (pv) { vsLine = regW - pv.line; vsTier = tierDone - pv.tier; score = vsLine * 0.6 + vsTier * 1.2; } else score = (ut.w - 7) * 0.5 + tierDone - 2;
+    const grade = score >= 3 ? 'A+' : score >= 2 ? 'A' : score >= 1 ? 'B+' : score >= 0 ? 'B' : score >= -1 ? 'C+' : score >= -2 ? 'C' : score >= -3 ? 'D' : 'F';
+    const verdict = score >= 2 ? 'Blew past expectations' : score >= 0.6 ? 'Beat expectations' : score >= -0.6 ? 'Right about where we expected' : score >= -2 ? 'Fell short of expectations' : 'A disappointing year';
+    return { pv, w: ut.w, l: ut.l, regW, fin, grade, verdict, vsLine, stars: stars.map(p => p.id), breakouts: breakouts.map(p => p.id) };
+  };
   // the AD's goal for this season (non-Tennessee dynasties): wins from the program's prestige, adjusted for the schedule
   DY.coachGoal = () => {
     const g = G(), ut = DY.userT();

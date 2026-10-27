@@ -643,3 +643,17 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
 .dy-need b { color: var(--orange-ink); margin-left: 2px; }
 .dy-need.hi { background: var(--orange-soft); border-color: var(--orange); }
 .dy-need.md { border-color: var(--orange); }
+/* season preview / review */
+.dy-preview, .dy-review { border-top: 4px solid var(--orange); }
+.dy-pvtop { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+.dy-pvtop h3 { margin: 4px 0 2px; font-family: var(--f-display); font-size: 24px; }
+.dy-ou { text-align: center; border: 1px solid var(--line-strong); border-radius: 10px; padding: 6px 10px; flex: none; display: grid; }
+.dy-ou b { font-family: var(--f-display); font-size: 20px; color: var(--orange-ink); }
+.dy-ou small { font-size: 11px; color: var(--muted); }
+.dy-pvcols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 8px 16px; margin-top: 6px; }
+.dy-pvodds summary { cursor: pointer; font-weight: 700; margin-top: 8px; }
+.dy-odds { margin-left: auto; font-variant-numeric: tabular-nums; font-size: 13px; padding: 0 6px; border-radius: 6px; }
+.dy-odds.hi { color: var(--win); } .dy-odds.lo { color: var(--loss); }
+.dy-grade { flex: none; width: 64px; height: 64px; border-radius: 14px; display: grid; place-items: center; font-family: var(--f-display); font-size: 30px; font-weight: 900; color: #fff; background: var(--muted); }
+.dy-grade.gA { background: var(--win); } .dy-grade.gB { background: #5a9e3a; } .dy-grade.gC { background: #d89a1d; } .dy-grade.gD, .dy-grade.gF { background: var(--loss); }
+.dy-pvodds .dy-sched-mini li { display: flex; gap: 6px; align-items: baseline; }

@@ -322,7 +322,7 @@
     if (g.live && !(root.DYG && root.DYG.live())) L.push(`<div class="box dy-resume"><b>Game in progress</b> <span class="dim">${esc(T(g.live.T.a).name)} ${g.live.score.a}, ${esc(T(g.live.T.h).name)} ${g.live.score.h} · Q${Math.min(4, g.live.q)}</span> <button class="btn primary" data-act="resume">Resume</button></div>`);
     const a = primaryAction();
     if (a && a.x) L.push(nextGameCard(a.x, a));
-    else if (g.phase === 'preseason') L.push(preseasonCard());
+    else if (g.phase === 'preseason') L.push(previewCard(), preseasonCard());
     else if (g.phase === 'season') L.push(`<div class="box"><div class="glabel">Week ${g.week}</div><h3>Bye week</h3><p class="dim">Rest up. Recruiting actions still count this week.</p></div>`);
     if (g.phase === 'post' || g.phase === 'ccg') L.push(bracketCard());
     const P0 = g.post || {}, mine = x => x && x.res && (x.h === ut.id || x.a === ut.id);
@@ -350,6 +350,30 @@
       ${matchBars(ut, o)}
       <p class="small">Players to watch: ${plink(qb, qb.n)} (QB, ${qb.ovr})${star && star !== qb ? `, ${plink(star)} (${star.pos}, ${star.ovr})` : ''}</p>
       <div class="grow"><button class="btn primary big" data-act="main">${a && a.simOnly ? 'Sim the game' : 'Play the game'}</button><button class="btn" data-act="sim">${a && a.simOnly ? 'Play it instead' : 'Sim it'}</button></div></div>`;
+  }
+  // the season preview: expectation, Vegas-style win total, schedule strength, players to watch, the game to circle
+  function previewCard() {
+    const pv = DY.preview && DY.preview(); if (!pv) return '';
+    const ut = DY.userT(), pl = id => plink(DY.P(id)), big = pv.big;
+    const sub = p => `<small>${p.pos} · ${p.ovr} OVR${p.potG ? ' · ' + p.potG + ' potential' : ''}</small>`;
+    const wk = o => `<li><span>Wk ${o.wk}</span> ${tlink(o.opp)}<b class="dy-odds ${o.p >= 0.65 ? 'hi' : o.p >= 0.4 ? 'md' : 'lo'}">${o.p < 0.01 ? '<1' : o.p > 0.99 ? '>99' : Math.round(o.p * 100)}%</b></li>`;
+    return `<div class="box dy-preview"><div class="glabel">${G().season} season preview</div>
+      <div class="dy-pvtop"><div><h3>${esc(pv.label)}</h3><p class="dim small">${pv.ap ? 'No. ' + pv.ap + ' in the preseason AP poll' : 'Unranked in the preseason AP poll'} · team overall ${pv.ovr}</p></div>
+        <div class="dy-ou"><small>Win total</small><b>O/U ${pv.line}</b><small>projection ${pv.exp}</small></div></div>
+      <p>Strength of schedule: <b>No. ${pv.sosRank}</b> of ${pv.sosOf}${pv.top25 ? ` · ${pv.top25} game${pv.top25 > 1 ? 's' : ''} against preseason top-25 teams` : ''}.${big ? ` ${big.p < 0.3 ? 'The biggest test' : 'The game to circle'}: <b>Week ${big.wk} vs ${esc(DY.T(big.opp).name)}</b> (${big.p < 0.01 ? 'under 1' : Math.round(big.p * 100)}% to win).` : ''}</p>
+      <div class="dy-pvcols"><div><div class="glabel">Stars</div><ul class="dy-mini">${pv.stars.map(id => `<li>${pl(id)} ${sub(DY.P(id))}</li>`).join('')}</ul></div>
+        <div><div class="glabel">Breakout candidates</div><ul class="dy-mini">${pv.breakouts.map(id => `<li>${pl(id)} ${sub(DY.P(id))}</li>`).join('') || '<li class="dim">No obvious candidate.</li>'}</ul></div></div>
+      <details class="dy-pvodds"><summary>Game-by-game odds</summary><ol class="dy-sched-mini">${pv.odds.map(wk).join('')}</ol></details></div>`;
+  }
+  // end-of-season review against that preview
+  function reviewCard() {
+    const r = DY.review && DY.review(); if (!r) return '';
+    const pv = r.pv, pl = id => plink(DY.P(id));
+    return `<div class="box dy-review"><div class="dy-pvtop"><div><div class="glabel">Season grade</div><h3>${esc(r.verdict)}</h3>
+        <p class="dim small">${pv ? `Expected: ${esc(pv.label.toLowerCase())}, O/U ${pv.line} wins. Result: ${r.regW} regular-season wins${r.vsLine != null ? ` (${r.vsLine > 0 ? 'over' : 'under'})` : ''}, ${r.w}-${r.l} overall, ${esc(r.fin || 'season over')}.` : `${r.w}-${r.l}, ${esc(r.fin)}.`}</p></div>
+        <div class="dy-grade g${r.grade[0]}">${r.grade}</div></div>
+      <div class="dy-pvcols"><div><div class="glabel">Stars</div><ul class="dy-mini">${r.stars.map(id => `<li>${pl(id)} <small>${DY.P(id).pos}</small></li>`).join('')}</ul></div>
+        <div><div class="glabel">Breakouts</div><ul class="dy-mini">${r.breakouts.map(id => `<li>${pl(id)} <small>${DY.P(id).pos} · played above his ${DY.P(id).ovr} rating</small></li>`).join('') || '<li class="dim">Nobody outplayed his rating by much.</li>'}</ul></div></div></div>`;
   }
   function preseasonCard() {
     const g = G(), ut = DY.userT(), o = DY.teamOvr(ut), games = DY.userGames();
@@ -912,7 +936,7 @@
     const g = G(), o = g.off, ut = DY.userT(), st = o.stage;
     const steps = `<ol class="dy-steps">${DY.OFF_ORDER.map(k => `<li class="${k === st ? 'on' : DY.OFF_ORDER.indexOf(k) < DY.OFF_ORDER.indexOf(st) ? 'done' : ''}">${esc(DY.OFF_LABEL[k])}</li>`).join('')}</ol>`;
     let html = recapCard();
-    if (st === 'recap') html += jobsCard() + recapHtml();
+    if (st === 'recap') html += jobsCard() + reviewCard() + recapHtml();
     else if (st === 'nil') {
       const ps = ut.roster.map(DY.P).sort((a, b) => (b.nil || 0) - (a.nil || 0));
       const asks = {}; o.nilAsk.forEach(a => { asks[a.id] = a; });

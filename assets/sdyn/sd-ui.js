@@ -229,6 +229,26 @@
   UI.modal = html => modal(html);
 
   /* ---------- home ---------- */
+  function previewCard() {
+    const pv = SD.preview && SD.preview(); if (!pv) return '';
+    const pl = id => plink(SD.P(id)), sub = p => `<small>${p.pos} · ${p.ovr} OVR${p.yr ? ' · ' + (SD.YR[p.yr] || '') : ''}</small>`, big = pv.big;
+    const pctS = p => p < 0.01 ? '<1' : p > 0.99 ? '>99' : Math.round(p * 100);
+    return `<div class="box dy-preview"><div class="glabel">${esc(SD.SP().label(G().season))} season preview</div>
+      <div class="dy-pvtop"><div><h3>${esc(pv.label)}</h3><p class="dim small">${pv.ap ? 'No. ' + pv.ap + ' in the preseason poll' : 'Unranked in the preseason poll'} · team rating ${pv.ovr}</p></div>
+        <div class="dy-ou"><small>Regular-season wins</small><b>O/U ${pv.line}</b><small>of ${pv.games} · projection ${pv.exp}</small></div></div>
+      <p>Strength of schedule: <b>No. ${pv.sosRank}</b> of ${pv.sosOf}${pv.top25 ? ` · ${pv.top25} game${pv.top25 > 1 ? 's' : ''} against preseason top-25 teams` : ''}.${big ? ` ${big.p < 0.3 ? 'The biggest test' : 'The game to circle'}: <b>${esc(SD.dateStr(big.d))} vs ${esc(T(big.opp).name)}</b> (${pctS(big.p)}% to win).` : ''}</p>
+      <div class="dy-pvcols"><div><div class="glabel">Stars</div><ul class="dy-mini">${pv.stars.map(id => `<li>${pl(id)} ${sub(SD.P(id))}</li>`).join('')}</ul></div>
+        <div><div class="glabel">Breakout candidates</div><ul class="dy-mini">${pv.breakouts.map(id => `<li>${pl(id)} ${sub(SD.P(id))}</li>`).join('') || '<li class="dim">No obvious candidate.</li>'}</ul></div></div></div>`;
+  }
+  function reviewCard() {
+    const r = SD.review && SD.review(); if (!r) return '';
+    const pv = r.pv, pl = id => plink(SD.P(id));
+    return `<div class="box dy-review"><div class="dy-pvtop"><div><div class="glabel">Season grade</div><h3>${esc(r.verdict)}</h3>
+        <p class="dim small">${pv ? `Expected: ${esc(pv.label.toLowerCase())}, O/U ${pv.line} regular-season wins. Result: ${r.regW} regular-season wins (${r.vsLine > 0 ? 'over' : 'under'}), ${r.w}-${r.l} overall, ${esc(r.fin)}.` : `${r.w}-${r.l}, ${esc(r.fin)}.`}</p></div>
+        <div class="dy-grade g${r.grade[0]}">${r.grade}</div></div>
+      <div class="dy-pvcols"><div><div class="glabel">Stars</div><ul class="dy-mini">${r.stars.map(id => `<li>${pl(id)} <small>${SD.P(id).pos}</small></li>`).join('')}</ul></div>
+        <div><div class="glabel">Breakouts</div><ul class="dy-mini">${r.breakouts.map(id => `<li>${pl(id)} <small>${SD.P(id).pos} · outplayed his ${SD.P(id).ovr} rating</small></li>`).join('') || '<li class="dim">Nobody outplayed his rating by much.</li>'}</ul></div></div></div>`;
+  }
   // sim-ahead recap: what changed while you were away
   function snap() {
     const g = G(), ut = SD.userT();
@@ -261,7 +281,7 @@
     if (g.post && g.post.seen === false) return selectionShow(b);
     const L = [recapCard()], R = [];
     const nx = SD.nextUserGame();
-    if (g.phase === 'preseason') L.push(campCard(), depthPreview());
+    if (g.phase === 'preseason') L.push(previewCard(), campCard(), depthPreview());
     if (nx) L.push(nextGameCard(nx));
     if (g.phase === 'ct' || g.phase === 'ncaa') L.push(postCard());
     const last = SD.userGames().filter(x => x.res).slice(-1)[0];
@@ -609,7 +629,7 @@
     let html = '';
     if (st === 'recap') {
       const h = g.hist[g.hist.length - 1] || {};
-      html = recapCard() + `<div class="dy-recap-hero"><div><span class="glabel">${SD.SP().label(h.y)} in review</span><h2>${h.w}-${h.l} · ${esc(h.finish || '')}</h2><p>${h.cw}-${h.cl} ${esc(SD.UC())}${h.ap ? ` · No. ${h.ap} in the final poll` : ''}${h.champ ? ` · National champion: ${esc(h.champ)}` : ''}</p></div></div>
+      html = recapCard() + reviewCard() + `<div class="dy-recap-hero"><div><span class="glabel">${SD.SP().label(h.y)} in review</span><h2>${h.w}-${h.l} · ${esc(h.finish || '')}</h2><p>${h.cw}-${h.cl} ${esc(SD.UC())}${h.ap ? ` · No. ${h.ap} in the final poll` : ''}${h.champ ? ` · National champion: ${esc(h.champ)}` : ''}</p></div></div>
         <div class="box"><div class="glabel">Leaving</div><div class="dy-scroll"><table class="dyt"><tbody>${o.leaving.map(x => { const p = SD.P(x.id); return `<tr><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)} · ${p.ovr}</small></td><td>${x.why === 'grad' ? 'Out of eligibility' : `Turning pro (${esc(SD.SP().draft)})`}</td><td>${x.why === 'pro' && o.pitched[x.id] == null ? `<select data-pamt="${x.id}">${[0, 50000, 100000, 250000, 500000].map(v => `<option value="${v}">${v ? '+' + SD.money(v) : 'No raise'}</option>`).join('')}</select><button class="dy-ra" data-persuade="${x.id}">Ask him back</button> <small>${Math.round(SD.persuadeChance(p, 0) * 100)}%</small>` : ''}</td></tr>`; }).join('') || '<tr><td class="dim">Nobody.</td></tr>'}</tbody></table></div></div>`.replace('Ask him back', SD.SP().he === 'she' ? 'Ask her back' : 'Ask him back');
     } else if (st === 'nil') {
       const asks = {}; o.nilAsk.forEach(a => { asks[a.id] = a; });
