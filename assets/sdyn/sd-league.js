@@ -88,7 +88,8 @@
   SD.userT = () => T(G().user);
   // difficulty: CPU teams get this added to their ratings in your games; recruiting gets a little harder or easier
   SD.DIFF = { freshman: -3, varsity: 0, heisman: 3 };
-  SD.diff = () => SD.DIFF[(G().settings || {}).difficulty || 'varsity'] || 0;
+  // baseball plays a touch harder on Varsity (Tennessee was winning 55+ a year)
+  SD.diff = () => { const lv = (G().settings || {}).difficulty || 'varsity'; return (SD.DIFF[lv] || 0) + (G().sport === 'baseball' && lv !== 'freshman' ? 1.5 : 0); };
   SD.recruitMult = () => ({ freshman: 0.95, varsity: 0.74, heisman: 0.62 })[(G().settings || {}).difficulty || 'varsity'];
   SD.tnT = () => G().teams.find(t => t.name === 'Tennessee');           // the real Tennessee (user or not)
   SD.UN = () => SD.userT().name;                                          // the user's school

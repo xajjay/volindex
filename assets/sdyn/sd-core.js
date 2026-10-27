@@ -86,7 +86,7 @@
   /* ---------- potential ---------- */
   SD.GRADES = [['A+', 97], ['A', 92], ['A-', 88], ['B+', 84], ['B', 80], ['B-', 76], ['C+', 72], ['C', 68], ['C-', 64], ['D', 0]];
   SD.gradeOfCeil = c => (SD.GRADES.find(g => c >= g[1]) || SD.GRADES[SD.GRADES.length - 1])[0];
-  SD.setCeil = (p, grade) => { const yrsLeft = Math.max(0, (p.el || 1) - 1); p.ceil = Math.round(clamp(p.ovr + yrsLeft * (2.2 + (grade - 85) * 0.18) + gauss() * 2.5, p.ovr, 99)); p.potG = SD.gradeOfCeil(p.ceil); };
+  SD.setCeil = (p, grade) => { const yrsLeft = Math.max(0, (p.el || 1) - 1); p.ceil = Math.round(clamp(p.ovr + yrsLeft * Math.max(1.2, 4.2 + (grade - 85) * 0.15) + gauss() * 2.5, p.ovr, 99)); p.potG = SD.gradeOfCeil(p.ceil); };
   SD.starsOf = c => c >= 0.9834 ? 5 : c >= 0.89 ? 4 : c >= 0.797 ? 3 : 2;
 
   /* ---------- players ---------- */
@@ -246,6 +246,8 @@
   SD.diamondLineup = t => {
     const ps = t.roster.map(SD.P).filter(p => p && !(p.inj && p.inj.g > 0));
     const hit = ps.filter(p => !SD.isPit(p)), pit = ps.filter(p => SD.isPit(p));
+    // emergency: no healthy arms at all (should never happen after the roster rules) - use injured ones, then a walk-on
+    if (!pit.length) { t.roster.map(SD.P).filter(p => p && SD.isPit(p)).forEach(p => pit.push(p)); if (!pit.length) { const f = SD.makePlayer('RP', 52, { t: t.id, yr: 1, el: 1, rec: { walkon: true, stars: 0 } }); t.roster.push(f.id); pit.push(f); } }
     // short on position players: the worst pitchers hit
     if (hit.length < 9) pit.slice().sort((a, b) => a.ovr - b.ovr).slice(0, 9 - hit.length).forEach(p => hit.push(p));
     const D = t.dl || {};

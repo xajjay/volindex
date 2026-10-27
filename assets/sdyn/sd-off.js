@@ -10,27 +10,31 @@
   const T = id => SD.T(id);
 
   /* ---------- recruiting ---------- */
-  SD.CLASS = { mbb: 4, wbb: 4, baseball: 13, softball: 6 };
+  SD.CLASS = { mbb: 4, wbb: 4, baseball: 13, softball: 8 };
   SD.HOURS = () => 40;
   SD.ACTIONS = { dm: { name: 'Social media', hrs: 1, pts: 4 }, call: { name: 'Phone call', hrs: 3, pts: 12 }, coach: { name: 'Head coach visit', hrs: 7, pts: 30 } };
   const posPool = () => SD.kind() === 'hoops' ? ['PG', 'SG', 'SF', 'PF', 'C'] : G().sport === 'softball' ? ['C', '1B', '2B', 'SS', '3B', 'LF', 'CF', 'RF', 'SP', 'SP', 'RP'] : ['C', '1B', '2B', 'SS', '3B', 'LF', 'CF', 'RF', 'SP', 'SP', 'SP', 'RP', 'RP', 'RP'];
+  SD.PROS_BASE = 66;   // freshman rating at a .80 composite (tuned so league talent holds steady season to season)
   function prospect(year, rank, n) {
     // national rank -> composite: No. 1 about .9999, No. 25 about .985 (five-stars), No. 150 about .93
-    const c = clamp(1 - Math.pow(rank / n, 0.75) * 0.3 - rr(0, 0.004), 0.7, 0.9999), g = c * 100;
+    // past the top n prospects the composite keeps sliding gently (2-stars and walk-on level), never below .66
+    const c = rank <= n ? clamp(1 - Math.pow(rank / n, 0.75) * 0.3 - rr(0, 0.004), 0.7, 0.9999) : clamp(0.7 - (rank - n) / n * 0.03 - rr(0, 0.004), 0.66, 0.7), g = c * 100;
     const pos = pick(posPool());
-    const ovr = Math.round(clamp(55 + (g - 80) * 1.0 + Math.max(0, g - 95) * 1.2 + gauss() * 2.5, 50, 84));
+    const ovr = Math.round(clamp(SD.PROS_BASE + (g - 80) * 0.7 + Math.max(0, g - 95) * 1.2 + gauss() * 2.5, 50, 84));
     const p = SD.makePlayer(pos, ovr, { t: null, yr: 1, el: 4, grade: g, rec: { c, stars: SD.starsOf(c), g, natl: rank, cls: year } });
     p.pros = true; p.interest = {}; p.commit = null; p.offer = false; p.acts = {}; p.visit = null; p.visited = false; p.nilOffer = 0; p.scout = 0;
     p.pref = SD.shuffle(['pt', 'nil', 'champ', 'prox', 'brand', 'dev']).slice(0, 3);
     // a few programs start interested
-    const g0 = G(); for (let i = 0; i < 10; i++) { const t = SD.wpick(g0.teams, t => Math.pow(t.prestige / 60, 4 + p.rec.stars)); p.interest[t.id] = rr(0, 30) * (t.prestige / 80); }
+    const g0 = G(); for (let i = 0; i < 10; i++) { const t = SD.wpick(g0.teams, t => Math.pow(t.prestige / 60, 2.5 + p.rec.stars * 0.6)); p.interest[t.id] = rr(0, 30) * (t.prestige / 80); }
     return p;
   }
   SD.initRecruiting = first => {
     const g = G(), year = SD.kind() === 'hoops' ? g.season + 1 : g.season + 1;
-    const n = SD.kind() === 'hoops' ? 380 : 700;
+    // enough prospects for every program to fill its class; the top of the board keeps the same shape (n0), the rest is a deeper tail
+    const n0 = SD.kind() === 'hoops' ? 380 : 700, per = { mbb: 4.6, wbb: 4.6, baseball: 10.5, softball: 7.8 }[g.sport] || 5;
+    const n = Math.max(n0, Math.round(g.teams.length * per));
     const pool = {};
-    for (let i = 1; i <= n; i++) { const p = prospect(year, i, n); pool[p.id] = p; }
+    for (let i = 1; i <= n; i++) { const p = prospect(year, i, n0); pool[p.id] = p; }
     g.recruit = { year, pool, board: [], log: [], signed: false, classRank: null };
     // the real commitments for next year's class
     const R = root.RECRUITING && root.RECRUITING[g.sport];
@@ -56,7 +60,7 @@
   SD.setVisit = (id, d) => { const g = G(), p = g.recruit.pool[id]; const x = SD.userGames().find(y => y.d === d && y.h === g.user && !y.res); if (!x) return 'Official visits are for home games.'; if (Object.values(g.recruit.pool).filter(q => q.visit === d).length >= 4) return 'Four visitors a game is the limit.'; p.visit = d; return null; };
   SD.recruitWeek = () => {
     const g = G(), R = g.recruit; if (!R || R.signed) return;
-    const ut = SD.userT(), mode = g.settings.recruiting, full = SD.myCommits().length >= SD.CLASS[g.sport];
+    const ut = SD.userT(), mode = g.settings.recruiting, full = SD.myCommits().length >= SD.CLASS[g.sport] + 2;
     if (mode === 'auto') autoRecruit();
     const logs = [];
     if (mode !== 'off') R.board.forEach(id => {
@@ -71,7 +75,7 @@
     });
     Object.values(R.pool).forEach(p => {
       if (p.commit != null && p.firm) return;
-      for (const tid in p.interest) { const t = g.teams[tid]; if (!t || t.user || +tid === g.user) continue; const heat = p.rec.stars >= 4 ? 1 + Math.max(0, t.prestige - 75) / 35 : 1; p.interest[tid] += (3 + t.prestige / 10) * (0.5 + fitScore(t, p)) * rr(0.3, 1.4) * heat; }
+      for (const tid in p.interest) { const t = g.teams[tid]; if (!t || t.user || +tid === g.user) continue; const heat = p.rec.stars >= 4 ? 1 + Math.max(0, t.prestige - 75) / 50 : 1; p.interest[tid] += (3 + t.prestige / 10) * (0.5 + fitScore(t, p)) * rr(0.3, 1.4) * heat; }
       const order = Object.entries(p.interest).sort((a, b) => b[1] - a[1]); if (!order.length) return;
       const [lead, lv] = order[0], second = order[1] ? order[1][1] : 0, isMe = +lead === g.user;
       const need = (130 + p.rec.stars * 15) * (1 - Math.min(20, weekNo()) / 34);
@@ -94,7 +98,9 @@
   }
   function autoRecruit() {
     const g = G(), R = g.recruit, ut = SD.userT();
-    const room = SD.CLASS[g.sport] - SD.myCommits().length; if (room <= 0) return;
+    // open spots next season: the limit minus players coming back (seniors leave), capped by the class size
+    const back = ut.roster.map(SD.P).filter(p => p.el > 1).length;
+    const room = Math.min(SD.CLASS[g.sport] + 2, Math.max(1, SD.LIMIT[g.sport] - back + 1)) - SD.myCommits().length; if (room <= 0) return;
     // chase who you can get: quality, fit, and how close you are to the leader
     const winnable = p => { const mine = p.interest[ut.id] || 0, top = Math.max(0, ...Object.entries(p.interest).filter(([t]) => +t !== ut.id).map(([, v]) => v)); return Math.min(1, (mine + 12) / (top + 12)); };
     const score = p => p.rec.c * 60 + winnable(p) * 45 + fitScore(ut, p) * 10;
@@ -151,7 +157,7 @@
     g.teams.forEach(SD.uniqueNums);
     o.stage = SD.OFF_ORDER[SD.OFF_ORDER.indexOf(st) + 1];
     if (o.stage === 'draft') runDraft();
-    if (o.stage === 'progress') { const ut = SD.userT(), before = {}; ut.roster.forEach(id => { before[id] = SD.P(id).ovr; }); g.teams.forEach(t => t.roster.forEach(id => develop(SD.P(id)))); o.prog = ut.roster.map(id => { const p = SD.P(id); return { id, before: before[id], after: p.ovr, why: p.devWhy || [] }; }).sort((a, b) => (b.after - b.before) - (a.after - a.before)); }
+    if (o.stage === 'progress') { const ut = SD.userT(), before = {}; ut.roster.forEach(id => { before[id] = SD.P(id).ovr; }); g.teams.forEach(t => t.roster.forEach(id => { const p = SD.P(id); if (p.firstY !== g.season + 1) develop(p); })); o.prog = ut.roster.map(id => { const p = SD.P(id); return { id, before: before[id], after: p.ovr, why: p.devWhy || [] }; }).sort((a, b) => (b.after - b.before) - (a.after - a.before)); }
   };
   function removeLeavers() {
     const g = G();
@@ -239,13 +245,23 @@
     });
   }
   function signingDay() {
-    const g = G(), R = g.recruit;
-    Object.values(R.pool).forEach(p => {
-      if (p.commit == null) { if (chance(0.5)) { const t = pick(g.teams.filter(x => x.id !== g.user)); p.commit = t.id; } else return; }
-      const t = T(p.commit); if (!t) return;
-      if (t.id === g.user && SD.myCommits().indexOf(p) >= SD.CLASS[g.sport] + 2) return;
+    const g = G(), R = g.recruit, lim = SD.LIMIT[g.sport], ut = SD.userT();
+    // open spots: what a program can add before the roster limit (CPU teams keep one spot for the portal)
+    const room = {}; g.teams.forEach(t => { room[t.id] = t.id === g.user ? SD.CLASS[g.sport] + 2 : Math.max(0, lim - t.roster.length - (SD.kind() === 'hoops' ? 0 : 1)); });
+    const sign = (p, t) => {
       delete p.pros; delete p.interest; delete p.acts; p.t = t.id; p.yr = 1; p.el = 4; p.car = {}; p.firstY = g.season + 1; p.nil = SD.nilValue(p, t) * 0.6 | 0;
-      t.roster.push(p.id); g.P[p.id] = p;
+      t.roster.push(p.id); g.P[p.id] = p; room[t.id]--;
+    };
+    const list = Object.values(R.pool).sort((a, b) => b.rec.c - a.rec.c);
+    // commitments first
+    list.forEach(p => { if (p.commit == null) return; const t = T(p.commit); if (t && room[t.id] > 0) sign(p, t); else p.commit = null; });
+    // everyone else signs with the most interested program that still has room (you only get players you offered)
+    list.forEach(p => {
+      if (p.t != null) return;
+      const order = Object.entries(p.interest || {}).sort((a, b) => b[1] - a[1]).map(x => +x[0]);
+      let tid = order.find(id => room[id] > 0 && (id !== g.user || (p.offer && g.settings.recruiting !== 'off')));
+      if (tid == null) { const open = g.teams.filter(t => t.id !== g.user && room[t.id] > 0); if (!open.length) return; tid = SD.wpick(open, t => room[t.id] * Math.pow(t.prestige / 70, p.rec.stars >= 4 ? 3 : 1)).id; }
+      sign(p, T(tid));
     });
     R.signed = true; R.finalRank = R.classRank;
   }
@@ -260,8 +276,10 @@
   function develop(p) {
     const work = (p.tr.work - 70) / 40, room = Math.max(0, p.ceil - p.ovr);
     const mins = p.lastS ? (SD.kind() === 'hoops' ? (p.lastS.min || 0) / Math.max(1, p.lastS.gp) / 30 : (p.lastS.pa || p.lastS.bf || 0) / 150) : 0;
-    let gain = clamp(room * (0.28 + work * 0.12 + Math.min(0.15, mins * 0.1)) + gauss() * 1.2, -2, 9);
+    let gain = clamp(room * (0.36 + work * 0.12 + Math.min(0.15, mins * 0.1)) + gauss() * 1.2, -2, 9);
     if (p.yr >= 4) gain = Math.min(gain, 3);
+    // the last few points are the hardest: slow growth near the top (diamond more, it piled up 90s)
+    if (p.ovr >= 85 && gain > 0) gain *= SD.kind() === 'hoops' ? 0.8 : 0.5;
     const before = p.ovr;
     for (const k in p.at) p.at[k] = Math.round(clamp(p.at[k] + gain * rr(0.6, 1.3), 50, 99));
     SD.setOvr(p); p.yr++; p.lastDelta = p.ovr - before;
@@ -277,7 +295,16 @@
     o.cut.forEach(id => { const p = SD.P(id); p.t = null; p.gone = g.season; p.leave = 'cut'; });
     ut.roster = ut.roster.filter(id => !o.cut.includes(id));
     // CPU teams trim and fill to their limits
-    g.teams.forEach(t => { if (t.id === g.user) return; const lim = SD.LIMIT[g.sport]; if (t.roster.length > lim) t.roster = t.roster.map(SD.P).sort((a, b) => b.ovr - a.ovr).slice(0, lim).map(p => p.id); while (t.roster.length < lim - (SD.kind() === 'hoops' ? 2 : 6)) { const pits = t.roster.map(SD.P).filter(SD.isPit).length, pos = SD.kind() === 'diamond' && pits < (g.sport === 'softball' ? 5 : 12) ? (pits < 4 ? 'SP' : 'RP') : SD.kind() === 'diamond' && t.roster.length - pits < 13 ? pick(['C', '1B', '2B', 'SS', '3B', 'LF', 'CF', 'RF']) : pick(posPool()); const p = SD.makePlayer(pos, Math.round(clamp(38 + t.prestige * 0.47 - 6 + gauss() * 4, 50, 85)), { t: t.id, yr: 1, el: 4 }); t.roster.push(p.id); } });
+    g.teams.forEach(t => { if (t.id === g.user) return; const lim = SD.LIMIT[g.sport]; if (t.roster.length > lim) t.roster = t.roster.map(SD.P).sort((a, b) => b.ovr - a.ovr).slice(0, lim).map(p => p.id); while (t.roster.length < lim - (SD.kind() === 'hoops' ? 1 : 2)) { const pits = t.roster.map(SD.P).filter(SD.isPit).length, pos = SD.kind() === 'diamond' && pits < (g.sport === 'softball' ? 5 : 12) ? (pits < 4 ? 'SP' : 'RP') : SD.kind() === 'diamond' && t.roster.length - pits < 13 ? pick(['C', '1B', '2B', 'SS', '3B', 'LF', 'CF', 'RF']) : pick(posPool()); const p = SD.makePlayer(pos, Math.round(clamp(38 + t.prestige * 0.47 - 6 + gauss() * 4, 50, 85)), { t: t.id, yr: 1, el: 4 }); t.roster.push(p.id); } });
+    // every staff needs arms: below the minimum, the weakest position players make way for walk-on pitchers
+    if (SD.kind() === 'diamond') g.teams.forEach(t => {
+      const minP = g.sport === 'softball' ? 5 : 12; let pits = t.roster.map(SD.P).filter(SD.isPit).length, added = 0;
+      while (pits < minP) {
+        if (t.roster.length >= SD.LIMIT[g.sport]) { const drop = t.roster.map(SD.P).filter(p => !SD.isPit(p) && p.tin !== g.season).sort((a, b) => a.ovr - b.ovr)[0]; if (!drop) break; t.roster = t.roster.filter(id => id !== drop.id); drop.t = null; drop.gone = g.season; drop.leave = 'cut'; }
+        const p = SD.makePlayer(pits < 4 ? 'SP' : 'RP', Math.round(clamp(38 + t.prestige * 0.47 - 6 + gauss() * 4, 50, 80)), { t: t.id, yr: 1, el: 4, rec: { walkon: true, stars: 0 } }); t.roster.push(p.id); pits++; added++;
+      }
+      if (added && t.id === g.user) SD.news('roster', `${added} walk-on pitcher${added > 1 ? 's' : ''} added`, 'The staff was short of arms, so the weakest position players made way.');
+    });
     // walk-ons fill Tennessee's roster
     while (ut.roster.length < SD.LIMIT[g.sport] - (SD.kind() === 'hoops' ? 2 : 4)) { const p = SD.makePlayer(pick(posPool()), ri(52, 60), { t: ut.id, yr: 1, el: 4, rec: { walkon: true, stars: 0 } }); ut.roster.push(p.id); }
   }

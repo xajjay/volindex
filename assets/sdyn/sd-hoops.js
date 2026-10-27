@@ -32,6 +32,8 @@
   H.line = line;
   const onP = (GM, s) => GM.on[s].map(SD.P);
   // a rating for this moment: the attribute, fatigue, and a little game-to-game form
+  // soften big rating gaps (elite vs. weak): the better side still wins the matchup, just not by 50 every night
+  const sq = d => d > 12 ? 12 + (d - 12) * 0.55 : d < -12 ? -12 + (d + 12) * 0.55 : d;
   const R = (GM, p, k) => { const e = GM.en[p.id] == null ? 1 : GM.en[p.id]; const form = GM.form && GM.form[p.id] || 0; return ((p.at[k] || 60) + (GM.diff && p.t !== GM.uid ? GM.diff : 0)) * (0.86 + 0.14 * e) + form; };
 
   /* ---------- the rotation ---------- */
@@ -113,7 +115,7 @@
     const trans = GM.trans === s; GM.trans = null;
     // turnovers
     const press = cd.def === 'press';
-    const toP = clamp(0.15 + (avg(D.map(p => R(GM, p, 'stl'))) - avg(O.map(p => (R(GM, p, 'hnd') + R(GM, p, 'pas')) / 2))) / 380 + (press ? 0.035 : 0) - (avg(O.map(p => p.at.iq)) - 70) / 700 + (trans ? -0.03 : 0), 0.08, 0.26);
+    const toP = clamp(0.15 + sq(avg(D.map(p => R(GM, p, 'stl'))) - avg(O.map(p => (R(GM, p, 'hnd') + R(GM, p, 'pas')) / 2))) / 380 + (press ? 0.035 : 0) - (avg(O.map(p => p.at.iq)) - 70) / 700 + (trans ? -0.03 : 0), 0.08, 0.26);
     if (chance(toP)) {
       const who = SD.wpick(O, p => (p.pos === 'PG' ? 2.2 : p.pos === 'SG' ? 1.5 : 1) * (100 - p.at.hnd + 20));
       add(GM, who, 'to');
@@ -175,9 +177,9 @@
     const home = GM.neutral ? 0 : (s === 'h' ? 0.012 : -0.008);
     const mom = (GM.run.s === s ? Math.min(4, GM.run.n / 3) * 0.004 : 0);
     let pm;
-    if (type === 'rim') pm = (w ? 0.56 : 0.6) + (R(GM, shooter, 'ins') - R(GM, help || dfn, 'idf')) / 170 + (R(GM, shooter, 'ath') - R(GM, dfn, 'ath')) / 320 + (play === 'trans' ? 0.1 : play === 'cut' ? 0.05 : 0) - (zone ? 0.03 : 0);
-    else if (type === 'mid') pm = (w ? 0.39 : 0.41) + (R(GM, shooter, 'mid') - R(GM, dfn, 'pdf')) / 210;
-    else pm = (w ? 0.32 : 0.345) + (R(GM, shooter, 'thr') - R(GM, dfn, 'pdf')) / 200 + (play === 'spot' ? 0.018 : play === 'iso' ? -0.02 : 0) + (zone ? 0.012 : 0) + (passer ? (passer.at.pas - 70) / 1400 : 0);
+    if (type === 'rim') pm = (w ? 0.56 : 0.6) + sq(R(GM, shooter, 'ins') - R(GM, help || dfn, 'idf')) / 170 + sq(R(GM, shooter, 'ath') - R(GM, dfn, 'ath')) / 320 + (play === 'trans' ? 0.1 : play === 'cut' ? 0.05 : 0) - (zone ? 0.03 : 0);
+    else if (type === 'mid') pm = (w ? 0.39 : 0.41) + sq(R(GM, shooter, 'mid') - R(GM, dfn, 'pdf')) / 210;
+    else pm = (w ? 0.32 : 0.345) + sq(R(GM, shooter, 'thr') - R(GM, dfn, 'pdf')) / 200 + (play === 'spot' ? 0.018 : play === 'iso' ? -0.02 : 0) + (zone ? 0.012 : 0) + (passer ? (passer.at.pas - 70) / 1400 : 0);
     pm = clamp(pm + clutchB + home + mom + (shooter.tr.cons < 60 ? gauss() * 0.04 : 0), 0.12, 0.86);
     const val = type === '3' ? 3 : 2;
     // blocks and shooting fouls
