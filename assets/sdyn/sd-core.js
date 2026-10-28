@@ -97,7 +97,7 @@
     const g = G(), kind = SD.kind(), id = g.nextId = (g.nextId || 1) + 1;
     const town = o.home ? null : pick(SD.TOWNS);
     const at = fillAttrs(pos, ovr, kind);
-    const p = { id, n: o.n || SD.nameOf(), pos, t: o.t == null ? null : o.t, yr: o.yr || 1, el: o.el == null ? 5 - (o.yr || 1) : o.el, num: o.num != null ? o.num : ri(0, 55),
+    const p = { id, n: o.n || SD.nameOf(), pos, pos2: o.pos2 || null, t: o.t == null ? null : o.t, yr: o.yr || 1, el: o.el == null ? 5 - (o.yr || 1) : o.el, num: o.num != null ? o.num : ri(0, 55),
       ht: o.ht || htFor(pos, kind), home: o.home || (town[0] + ', ' + town[1]), st: o.st || (town ? town[1] : 'TN'), at, tr: SD.makeTraits(), ovr: 0, rec: o.rec || null, nil: 0, s: null, car: {}, aw: [], log: [], inj: null, bt: o.bt || (kind === 'diamond' ? (chance(0.3) ? 'L' : 'R') + '/' + (chance(0.25) ? 'L' : 'R') : null) };
     if (o.at) Object.assign(p.at, o.at);
     SD.setOvr(p);
@@ -128,13 +128,22 @@
   const CLS = { 'Fr.': 1, 'So.': 2, 'Jr.': 3, 'Sr.': 4, '5th': 5, '6th': 6, 'Gr.': 5 };
   const lastSeason = sport => { const C = root.SITE_AUTO && root.SITE_AUTO[sport] && root.SITE_AUTO[sport].career; if (!C) return null; const y = Object.keys(C).sort().pop(); return { y, d: C[y] }; };
   const num = v => +String(v == null ? 0 : v).replace(/[^\d.-]/g, '') || 0;
+  const GRAN = new Set(['PG', 'SG', 'SF', 'PF', 'C']);
+  // explicit granular position(s) on the roster sheet override the height guess below, e.g. "pos": "PG"
+  // or "pos": "PG/SG" for a player who can start at either (the second tag is kept as a secondary position).
+  function granPos(rp) {
+    const parts = String(rp.pos || '').toUpperCase().split('/').map(s => s.trim()).filter(s => GRAN.has(s));
+    return parts.length ? parts : null;
+  }
   function hoopsPos(rp, ht) {
+    const gp = granPos(rp); if (gp) return gp[0];
     const p = (rp.pos || 'G').toUpperCase(), w = SD.SP().he === 'she', h = ht || 76;
     if (p.startsWith('C')) return 'C';
     if (p.startsWith('F') || p === 'F/C') return h >= (w ? 75 : 81) ? 'C' : h >= (w ? 72 : 79) ? 'PF' : 'SF';
     if (p === 'G/F') return 'SF';
     return h <= (w ? 68 : 74) ? 'PG' : 'SG';
   }
+  function hoopsPos2(rp) { const gp = granPos(rp); return gp && gp[1] ? gp[1] : null; }
   // men's and women's hoops: 247 / ESPN ratings plus production last season (at Tennessee or elsewhere)
   function importHoops(team) {
     const sport = G().sport, S = root.SITE && root.SITE[sport], R = root.BB_RATINGS && root.BB_RATINGS[sport] ? root.BB_RATINGS[sport].players : {};
@@ -144,7 +153,7 @@
     if (L) (L.chart['Starting five'] || []).forEach(([, list]) => starters.add(list[0]));
     const ids = [];
     (S ? S.roster : []).forEach(rp => {
-      const ht = htIn(rp.ht), pos = hoopsPos(rp, ht), yr = CLS[rp.cls] || 2;
+      const ht = htIn(rp.ht), pos = hoopsPos(rp, ht), pos2 = hoopsPos2(rp), yr = CLS[rp.cls] || 2;
       const r = R[rp.name] || {}, rating = r.tr ? r.tr.rating : r.hs ? (r.hs.own || r.hs.grade || 85) : (yr === 1 ? 84 : 82);
       const st = stats[rp.name], ppgNote = /([\d.]+)\s*(career\s*)?ppg/.exec(rp.note || '');
       const ppg = st ? num(st.pointsPerGame) : ppgNote ? +ppgNote[1] : 0, mpg = st ? num(st.minutesPerGame) : ppg ? 26 : 0;
@@ -152,7 +161,7 @@
       if (starters.has(rp.name)) ovr = Math.max(ovr, 75);
       ovr = Math.round(clamp(ovr, 58, 92));
       const comp = r.hs && r.hs.comp ? r.hs.comp : r.hs && r.hs.grade ? clamp(0.8 + (r.hs.grade - 85) * 0.015, 0.8, 0.999) : 0.86;
-      const p = SD.makePlayer(pos, ovr, { n: rp.name, t: team.id, yr, el: Math.max(1, (yr >= 5 ? 6 : 5) - yr), num: rp.num, ht: ht || undefined, home: rp.home, rec: { c: comp, stars: r.hs ? r.hs.stars || SD.starsOf(comp) : SD.starsOf(comp), g: comp * 100, natl: r.hs ? r.hs.natl : null, tr: r.tr || null } });
+      const p = SD.makePlayer(pos, ovr, { n: rp.name, t: team.id, yr, el: Math.max(1, (yr >= 5 ? 6 : 5) - yr), num: rp.num, ht: ht || undefined, home: rp.home, pos2, rec: { c: comp, stars: r.hs ? r.hs.stars || SD.starsOf(comp) : SD.starsOf(comp), g: comp * 100, natl: r.hs ? r.hs.natl : null, tr: r.tr || null } });
       p.real = true; p.prev = rp.prev || null; p.note = rp.note || null;
       // shooting split from real numbers when we have them
       if (st) {
@@ -232,12 +241,22 @@
     const ps = t.roster.map(SD.P).filter(p => p && !(p.inj && p.inj.g > 0));
     if (SD.kind() === 'hoops') {
       if (t.rot && t.rot.length) { const keep = t.rot.map(SD.P).filter(p => p && ps.includes(p)); const rest = ps.filter(p => !keep.includes(p)).sort((a, b) => b.ovr - a.ovr); return keep.concat(rest); }
-      // best five by position, then the bench by overall
+      // best five by position (falling back to a player's secondary position before giving up on the slot
+      // entirely), then the bench by overall
+      const SLOTS = ['PG', 'SG', 'SF', 'PF', 'C'], fits = (p, pos) => p.pos === pos || p.pos2 === pos;
       const five = [], used = new Set();
-      ['PG', 'SG', 'SF', 'PF', 'C'].forEach(pos => { const c = ps.filter(p => !used.has(p) && p.pos === pos).sort((a, b) => b.ovr - a.ovr)[0] || ps.filter(p => !used.has(p)).sort((a, b) => b.ovr - a.ovr)[0]; if (c) { five.push(c); used.add(c); } });
-      // a much better bench player starts over a weak starter
+      SLOTS.forEach(pos => {
+        const c = ps.filter(p => !used.has(p) && p.pos === pos).sort((a, b) => b.ovr - a.ovr)[0]
+          || ps.filter(p => !used.has(p) && fits(p, pos)).sort((a, b) => b.ovr - a.ovr)[0]
+          || ps.filter(p => !used.has(p)).sort((a, b) => b.ovr - a.ovr)[0];
+        if (c) { five.push(c); used.add(c); }
+      });
+      // a much better bench player starts over a weak starter at a slot he actually fits (primary or secondary)
       const bench = ps.filter(p => !used.has(p)).sort((a, b) => b.ovr - a.ovr);
-      for (let i = 0; i < five.length; i++) { const b0 = bench[0]; if (b0 && b0.ovr >= five[i].ovr + 6) { bench.shift(); bench.push(five[i]); five[i] = b0; bench.sort((a, b) => b.ovr - a.ovr); } }
+      for (let i = 0; i < five.length; i++) {
+        const slotPos = SLOTS[i] || five[i].pos, b0 = bench.find(b => fits(b, slotPos));
+        if (b0 && b0.ovr >= five[i].ovr + 6) { bench.splice(bench.indexOf(b0), 1); bench.push(five[i]); five[i] = b0; bench.sort((a, b) => b.ovr - a.ovr); }
+      }
       return five.concat(bench);
     }
     return null;

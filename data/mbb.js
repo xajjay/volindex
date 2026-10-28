@@ -1,4 +1,8 @@
-/* Men's Basketball data for The Vol Index. Gathered 2026-10-12. Edit the lineup in mbb-lineup.js */
+/* Men's Basketball data for The Vol Index. Gathered 2026-10-12. Edit the lineup in mbb-lineup.js.
+   "pos" below is usually just G/F/C (the dynasty guesses PG vs SG, SF vs PF, etc. from height). To set a
+   player's exact position yourself, or give them a secondary position, use granular tags instead, e.g.
+   "pos": "PG" or "pos": "PG/SG" (second tag = secondary; the dynasty's lineup-builder will now only ever
+   start or swap that player into his primary or secondary slot, never any open slot regardless of position). */
 window.SITE = window.SITE || {};
 window.SITE.mbb = {
  "key": "mbb",
@@ -63,7 +67,7 @@ window.SITE.mbb = {
   {
    "num": 0,
    "name": "Braedan Lue",
-   "pos": "F",
+   "pos": "PF",
    "ht": "6'8\"",
    "wt": "243",
    "cls": "Jr.",
@@ -75,7 +79,7 @@ window.SITE.mbb = {
   {
    "num": 1,
    "name": "Manny Green",
-   "pos": "G",
+   "pos": "SF",
    "ht": "6'6\"",
    "wt": "212",
    "cls": "Fr.",
@@ -87,7 +91,7 @@ window.SITE.mbb = {
   {
    "num": 2,
    "name": "Juke Harris",
-   "pos": "G",
+   "pos": "SG/SF",
    "ht": "6'7\"",
    "wt": "205",
    "cls": "Jr.",
@@ -99,7 +103,7 @@ window.SITE.mbb = {
   {
    "num": 3,
    "name": "Terrence Hill Jr.",
-   "pos": "G",
+   "pos": "PG",
    "ht": "6'2\"",
    "wt": "186",
    "cls": "Jr.",
@@ -111,7 +115,7 @@ window.SITE.mbb = {
   {
    "num": 4,
    "name": "Dai Dai Ames",
-   "pos": "G",
+   "pos": "PG/SG",
    "ht": "6'2\"",
    "wt": "199",
    "cls": "Sr.",
@@ -123,7 +127,7 @@ window.SITE.mbb = {
   {
    "num": 6,
    "name": "DeWayne Brown II",
-   "pos": "F",
+   "pos": "PF",
    "ht": "6'8\"",
    "wt": "248",
    "cls": "So.",
@@ -135,7 +139,7 @@ window.SITE.mbb = {
   {
    "num": 7,
    "name": "Tyler Lundblade",
-   "pos": "G",
+   "pos": "SG",
    "ht": "6'6\"",
    "wt": "216",
    "cls": "6th",
@@ -147,7 +151,7 @@ window.SITE.mbb = {
   {
    "num": 8,
    "name": "Marquis Clark",
-   "pos": "G",
+   "pos": "PG",
    "ht": "6'2\"",
    "wt": "211",
    "cls": "Fr.",
@@ -159,7 +163,7 @@ window.SITE.mbb = {
   {
    "num": 9,
    "name": "Jalen Washington",
-   "pos": "F",
+   "pos": "C",
    "ht": "6'10\"",
    "wt": "244",
    "cls": "5th",
@@ -172,7 +176,7 @@ window.SITE.mbb = {
   {
    "num": 10,
    "name": "Jalen Haralson",
-   "pos": "G",
+   "pos": "PF/SF",
    "ht": "6'7\"",
    "wt": "222",
    "cls": "So.",
@@ -196,7 +200,7 @@ window.SITE.mbb = {
   {
    "num": 12,
    "name": "Christian Fermin",
-   "pos": "F",
+   "pos": "C",
    "ht": "6'10\"",
    "wt": "234",
    "cls": "5th",
@@ -208,7 +212,7 @@ window.SITE.mbb = {
   {
    "num": 13,
    "name": "Ralph Scott",
-   "pos": "F",
+   "pos": "SF",
    "ht": "6'8\"",
    "wt": "211",
    "cls": "Fr.",
@@ -232,7 +236,7 @@ window.SITE.mbb = {
   {
    "num": 24,
    "name": "Troy Henderson",
-   "pos": "G",
+   "pos": "PG",
    "ht": "6'1\"",
    "wt": "188",
    "cls": "So.",
@@ -256,7 +260,7 @@ window.SITE.mbb = {
   {
    "num": 33,
    "name": "Chris Washington Jr.",
-   "pos": "F",
+   "pos": "PF",
    "ht": "6'9\"",
    "wt": "214",
    "cls": "Fr.",
