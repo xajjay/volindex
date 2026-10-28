@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-10-26. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-10-28. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-10-26",
+ "updated": "2026-10-28",
  "team": {
   "record": "6-2",
   "sec": "3-2",
@@ -240,140 +240,6 @@ window.SITE_AUTO.football = {
   }
  ],
  "playerStats": {
-  "DJ Burks": {
-   "def": {
-    "solo": 2,
-    "ast": 0,
-    "tot": 2,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Ethan Davis": {
-   "rec": [
-    3,
-    43,
-    14.3,
-    25,
-    2
-   ]
-  },
-  "Isaiah Hardge": {
-   "def": {
-    "solo": 1,
-    "ast": 1,
-    "tot": 2,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "TJ Metcalf": {
-   "def": {
-    "solo": 24,
-    "ast": 21,
-    "tot": 45,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 1,
-    "pbu": 0,
-    "qbh": 1,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Kayin Lee": {
-   "def": {
-    "solo": 11,
-    "ast": 4,
-    "tot": 15,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 2,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Ryan Staub": {
-   "pass": [
-    3,
-    3,
-    27,
-    0,
-    0,
-    null,
-    null
-   ]
-  },
-  "Nathan Robinson": {
-   "def": {
-    "solo": 3,
-    "ast": 8,
-    "tot": 11,
-    "tfl": 1.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 1,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "DeSean Bishop": {
-   "rush": [
-    171,
-    957,
-    5.6,
-    59,
-    11
-   ],
-   "rec": [
-    9,
-    64,
-    7.1,
-    15,
-    0
-   ]
-  },
-  "Jeremiah Telander": {
-   "def": {
-    "solo": 12,
-    "ast": 22,
-    "tot": 34,
-    "tfl": 5.0,
-    "sacks": 3.0,
-    "int": 1,
-    "pbu": 3,
-    "qbh": 3,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Daevin Hobbs": {
-   "def": {
-    "solo": 5,
-    "ast": 6,
-    "tot": 11,
-    "tfl": 2.5,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 4,
-    "fr": 0,
-    "ff": 0
-   }
-  },
   "Tyree Weathersby": {
    "def": {
     "solo": 10,
@@ -388,252 +254,21 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "Dejuan Lane": {
-   "def": {
-    "solo": 24,
-    "ast": 12,
-    "tot": 36,
-    "tfl": 5.0,
-    "sacks": 2.0,
-    "int": 3,
-    "pbu": 4,
-    "qbh": 1,
-    "fr": 1,
-    "ff": 0
-   }
-  },
-  "Mike Matthews": {
-   "rush": [
-    4,
-    12,
-    3.0,
-    10,
-    1
-   ],
-   "rec": [
-    34,
-    528,
-    15.5,
-    57,
-    3
-   ]
-  },
-  "Edwin Spillman": {
-   "def": {
-    "solo": 13,
-    "ast": 12,
-    "tot": 25,
-    "tfl": 2.0,
-    "sacks": 2.0,
-    "int": 0,
-    "pbu": 2,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Hunter Barnes": {
-   "rush": [
-    11,
-    75,
-    6.8,
-    38,
-    1
-   ]
-  },
-  "Josh Turbyville": {
-   "def": {
-    "solo": 1,
-    "ast": 0,
-    "tot": 1,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   },
+  "Cooper Ranvier": {
    "kick": [
-    0,
-    0,
-    1,
-    1,
-    0
-   ]
-  },
-  "Arion Carter": {
-   "def": {
-    "solo": 25,
-    "ast": 21,
-    "tot": 46,
-    "tfl": 5.0,
-    "sacks": 2.0,
-    "int": 0,
-    "pbu": 1,
-    "qbh": 3,
-    "fr": 2,
-    "ff": 0
-   }
-  },
-  "Carson Gentle": {
-   "def": {
-    "solo": 5,
-    "ast": 4,
-    "tot": 9,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 1,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Amare Campbell": {
-   "def": {
-    "solo": 31,
-    "ast": 21,
-    "tot": 52,
-    "tfl": 8.0,
-    "sacks": 3.0,
-    "int": 0,
-    "pbu": 3,
-    "qbh": 1,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Jackson Ross": {
-   "punt": [
-    32,
-    1426,
-    44.6,
-    57,
-    null,
-    14,
-    null
-   ]
-  },
-  "Trent Thomas": {
-   "rec": [
-    6,
-    45,
-    7.5,
-    17,
-    1
-   ]
-  },
-  "Jordan Norman": {
-   "def": {
-    "solo": 5,
-    "ast": 9,
-    "tot": 14,
-    "tfl": 4.0,
-    "sacks": 2.5,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 2,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Braylon Staley": {
-   "rec": [
-    32,
-    259,
-    8.1,
-    35,
-    2
-   ]
-  },
-  "Justin Baker": {
-   "rush": [
-    4,
-    91,
-    22.8,
-    73,
-    1
-   ]
-  },
-  "Dasaahn Brame": {
-   "rush": [
-    2,
-    2,
-    1.0,
-    1,
-    2
-   ],
-   "rec": [
-    14,
-    181,
-    12.9,
-    68,
-    0
-   ],
-   "def": {
-    "solo": 1,
-    "ast": 0,
-    "tot": 1,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Isaiah Campbell": {
-   "def": {
-    "solo": 0,
-    "ast": 2,
-    "tot": 2,
-    "tfl": 0.5,
-    "sacks": 0.5,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "George MacIntyre": {
-   "pass": [
-    69,
-    103,
-    728,
-    2,
-    3,
-    null,
-    null
-   ],
-   "rush": [
-    13,
-    -1,
-    -0.1,
+    11,
     12,
-    0
-   ],
+    30,
+    30,
+    49
+   ]
+  },
+  "Joel Wyatt": {
    "def": {
     "solo": 0,
     "ast": 1,
     "tot": 1,
     "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 3
-   }
-  },
-  "Jadon Perlotte": {
-   "def": {
-    "solo": 2,
-    "ast": 1,
-    "tot": 3,
-    "tfl": 1.0,
     "sacks": 0.0,
     "int": 0,
     "pbu": 0,
@@ -672,56 +307,14 @@ window.SITE_AUTO.football = {
     25
    ]
   },
-  "Tre Poteat": {
+  "Isaiah Campbell": {
    "def": {
-    "solo": 2,
-    "ast": 3,
-    "tot": 5,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 1,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Ty Redmond": {
-   "def": {
-    "solo": 20,
-    "ast": 15,
-    "tot": 35,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 9,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Ethan Utley": {
-   "def": {
-    "solo": 1,
-    "ast": 1,
-    "tot": 2,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 1,
-    "qbh": 2,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Tevis Metcalf": {
-   "def": {
-    "solo": 5,
+    "solo": 0,
     "ast": 2,
-    "tot": 7,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 1,
+    "tot": 2,
+    "tfl": 0.5,
+    "sacks": 0.5,
+    "int": 0,
     "pbu": 0,
     "qbh": 0,
     "fr": 0,
@@ -742,7 +335,21 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "Jordan Burns": {
+  "DJ Burks": {
+   "def": {
+    "solo": 2,
+    "ast": 0,
+    "tot": 2,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Carter Gooden": {
    "def": {
     "solo": 0,
     "ast": 1,
@@ -756,7 +363,35 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "Hezekiah Harris": {
+  "Dejuan Lane": {
+   "def": {
+    "solo": 24,
+    "ast": 12,
+    "tot": 36,
+    "tfl": 5.0,
+    "sacks": 2.0,
+    "int": 3,
+    "pbu": 4,
+    "qbh": 1,
+    "fr": 1,
+    "ff": 0
+   }
+  },
+  "Nathan Robinson": {
+   "def": {
+    "solo": 3,
+    "ast": 8,
+    "tot": 11,
+    "tfl": 1.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 1,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Josh Turbyville": {
    "def": {
     "solo": 1,
     "ast": 0,
@@ -768,27 +403,59 @@ window.SITE_AUTO.football = {
     "qbh": 0,
     "fr": 0,
     "ff": 0
-   }
-  },
-  "Faizon Brandon": {
-   "pass": [
-    61,
-    101,
-    697,
-    7,
+   },
+   "kick": [
+    0,
+    0,
     1,
-    null,
-    null
-   ],
-   "rush": [
-    53,
-    130,
-    2.5,
-    22,
-    3
+    1,
+    0
    ]
   },
-  "Kedric Golston II": {
+  "Ryan Staub": {
+   "pass": [
+    3,
+    3,
+    27,
+    0,
+    0,
+    null,
+    null
+   ]
+  },
+  "Edwin Spillman": {
+   "def": {
+    "solo": 13,
+    "ast": 12,
+    "tot": 25,
+    "tfl": 2.0,
+    "sacks": 2.0,
+    "int": 0,
+    "pbu": 2,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Trent Thomas": {
+   "rec": [
+    6,
+    45,
+    7.5,
+    17,
+    1
+   ]
+  },
+  "Hunter Barnes": {
+   "rush": [
+    11,
+    75,
+    6.8,
+    38,
+    1
+   ]
+  },
+  "Sidney Walton": {
    "def": {
     "solo": 1,
     "ast": 1,
@@ -797,122 +464,25 @@ window.SITE_AUTO.football = {
     "sacks": 0.0,
     "int": 0,
     "pbu": 0,
-    "qbh": 1,
+    "qbh": 0,
     "fr": 0,
     "ff": 0
    }
   },
-  "Nathan Roberts": {
-   "rec": [
-    2,
-    16,
-    8.0,
-    11,
-    0
-   ]
-  },
-  "Tyreek King": {
+  "Luca Wolf": {
    "rec": [
     1,
-    5,
-    5.0,
-    5,
-    0
-   ]
-  },
-  "Dereon Albert": {
-   "def": {
-    "solo": 0,
-    "ast": 2,
-    "tot": 2,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Joakim Dodson": {
-   "kr": [
-    1,
-    20,
-    20.0,
-    0,
-    20
-   ]
-  },
-  "Timothy Merritt": {
-   "def": {
-    "solo": 3,
-    "ast": 1,
-    "tot": 4,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Dylan Lewis": {
-   "def": {
-    "solo": 2,
-    "ast": 4,
-    "tot": 6,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Mariyon Dye": {
-   "def": {
-    "solo": 8,
-    "ast": 3,
-    "tot": 11,
-    "tfl": 6.0,
-    "sacks": 5.0,
-    "int": 0,
-    "pbu": 1,
-    "qbh": 1,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Travis Smith Jr.": {
-   "rec": [
-    3,
-    27,
+    9,
     9.0,
-    15,
+    9,
     0
    ],
-   "def": {
-    "solo": 0,
-    "ast": 1,
-    "tot": 1,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Cooper Ranvier": {
-   "kick": [
-    11,
-    12,
-    30,
-    30,
-    49
+   "kr": [
+    1,
+    7,
+    7.0,
+    0,
+    7
    ]
   },
   "Radarious Jackson": {
@@ -936,7 +506,25 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "Sidney Walton": {
+  "Nathan Roberts": {
+   "rec": [
+    2,
+    16,
+    8.0,
+    11,
+    0
+   ]
+  },
+  "Tyreek King": {
+   "rec": [
+    1,
+    5,
+    5.0,
+    5,
+    0
+   ]
+  },
+  "Isaiah Hardge": {
    "def": {
     "solo": 1,
     "ast": 1,
@@ -950,11 +538,25 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "Joel Wyatt": {
+  "Kedric Golston II": {
+   "def": {
+    "solo": 1,
+    "ast": 1,
+    "tot": 2,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 1,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Dereon Albert": {
    "def": {
     "solo": 0,
-    "ast": 1,
-    "tot": 1,
+    "ast": 2,
+    "tot": 2,
     "tfl": 0.0,
     "sacks": 0.0,
     "int": 0,
@@ -964,33 +566,24 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "TK Keys": {
-   "rec": [
-    6,
-    54,
-    9.0,
-    22,
-    1
-   ]
+  "TJ Metcalf": {
+   "def": {
+    "solo": 24,
+    "ast": 21,
+    "tot": 45,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 1,
+    "pbu": 0,
+    "qbh": 1,
+    "fr": 0,
+    "ff": 0
+   }
   },
-  "TJ White": {
+  "Brayden Rouse": {
    "def": {
     "solo": 2,
-    "ast": 3,
-    "tot": 5,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Ryan Scott": {
-   "def": {
-    "solo": 3,
-    "ast": 1,
+    "ast": 2,
     "tot": 4,
     "tfl": 0.0,
     "sacks": 0.0,
@@ -1022,7 +615,23 @@ window.SITE_AUTO.football = {
     57
    ]
   },
-  "Carter Gooden": {
+  "George MacIntyre": {
+   "pass": [
+    69,
+    103,
+    728,
+    2,
+    3,
+    null,
+    null
+   ],
+   "rush": [
+    13,
+    -1,
+    -0.1,
+    12,
+    0
+   ],
    "def": {
     "solo": 0,
     "ast": 1,
@@ -1033,8 +642,17 @@ window.SITE_AUTO.football = {
     "pbu": 0,
     "qbh": 0,
     "fr": 0,
-    "ff": 0
+    "ff": 3
    }
+  },
+  "Braylon Staley": {
+   "rec": [
+    32,
+    259,
+    8.1,
+    35,
+    2
+   ]
   },
   "JJ Finch": {
    "def": {
@@ -1050,11 +668,263 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "Brayden Rouse": {
+  "Jackson Ross": {
+   "punt": [
+    32,
+    1426,
+    44.6,
+    57,
+    null,
+    14,
+    null
+   ]
+  },
+  "Carson Gentle": {
+   "def": {
+    "solo": 5,
+    "ast": 4,
+    "tot": 9,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 1,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Mariyon Dye": {
+   "def": {
+    "solo": 8,
+    "ast": 3,
+    "tot": 11,
+    "tfl": 6.0,
+    "sacks": 5.0,
+    "int": 0,
+    "pbu": 1,
+    "qbh": 1,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Hezekiah Harris": {
+   "def": {
+    "solo": 1,
+    "ast": 0,
+    "tot": 1,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Justin Baker": {
+   "rush": [
+    4,
+    91,
+    22.8,
+    73,
+    1
+   ]
+  },
+  "Daevin Hobbs": {
+   "def": {
+    "solo": 5,
+    "ast": 6,
+    "tot": 11,
+    "tfl": 2.5,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 4,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Jordan Burns": {
+   "def": {
+    "solo": 0,
+    "ast": 1,
+    "tot": 1,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Timothy Merritt": {
+   "def": {
+    "solo": 3,
+    "ast": 1,
+    "tot": 4,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Jeremiah Telander": {
+   "def": {
+    "solo": 12,
+    "ast": 22,
+    "tot": 34,
+    "tfl": 5.0,
+    "sacks": 3.0,
+    "int": 1,
+    "pbu": 3,
+    "qbh": 3,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Dasaahn Brame": {
+   "rush": [
+    2,
+    2,
+    1.0,
+    1,
+    2
+   ],
+   "rec": [
+    14,
+    181,
+    12.9,
+    68,
+    0
+   ],
+   "def": {
+    "solo": 1,
+    "ast": 0,
+    "tot": 1,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Mike Matthews": {
+   "rush": [
+    4,
+    12,
+    3.0,
+    10,
+    1
+   ],
+   "rec": [
+    34,
+    528,
+    15.5,
+    57,
+    3
+   ]
+  },
+  "Arion Carter": {
+   "def": {
+    "solo": 25,
+    "ast": 21,
+    "tot": 46,
+    "tfl": 5.0,
+    "sacks": 2.0,
+    "int": 0,
+    "pbu": 1,
+    "qbh": 3,
+    "fr": 2,
+    "ff": 0
+   }
+  },
+  "TK Keys": {
+   "rec": [
+    6,
+    54,
+    9.0,
+    22,
+    1
+   ]
+  },
+  "DeSean Bishop": {
+   "rush": [
+    171,
+    957,
+    5.6,
+    59,
+    11
+   ],
+   "rec": [
+    9,
+    64,
+    7.1,
+    15,
+    0
+   ]
+  },
+  "Ryan Scott": {
+   "def": {
+    "solo": 3,
+    "ast": 1,
+    "tot": 4,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Jadon Perlotte": {
    "def": {
     "solo": 2,
-    "ast": 2,
-    "tot": 4,
+    "ast": 1,
+    "tot": 3,
+    "tfl": 1.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Jordan Norman": {
+   "def": {
+    "solo": 5,
+    "ast": 9,
+    "tot": 14,
+    "tfl": 4.0,
+    "sacks": 2.5,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 2,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Ethan Davis": {
+   "rec": [
+    3,
+    43,
+    14.3,
+    25,
+    2
+   ]
+  },
+  "Dylan Lewis": {
+   "def": {
+    "solo": 2,
+    "ast": 4,
+    "tot": 6,
     "tfl": 0.0,
     "sacks": 0.0,
     "int": 0,
@@ -1092,21 +962,19 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "Luca Wolf": {
-   "rec": [
-    1,
-    9,
-    9.0,
-    9,
-    0
-   ],
-   "kr": [
-    1,
-    7,
-    7.0,
-    0,
-    7
-   ]
+  "Ethan Utley": {
+   "def": {
+    "solo": 1,
+    "ast": 1,
+    "tot": 2,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 1,
+    "qbh": 2,
+    "fr": 0,
+    "ff": 0
+   }
   },
   "Deon Hardin": {
    "rec": [
@@ -1133,6 +1001,52 @@ window.SITE_AUTO.football = {
     0
    ]
   },
+  "Amare Campbell": {
+   "def": {
+    "solo": 31,
+    "ast": 21,
+    "tot": 52,
+    "tfl": 8.0,
+    "sacks": 3.0,
+    "int": 0,
+    "pbu": 3,
+    "qbh": 1,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Faizon Brandon": {
+   "pass": [
+    61,
+    101,
+    697,
+    7,
+    1,
+    null,
+    null
+   ],
+   "rush": [
+    53,
+    130,
+    2.5,
+    22,
+    3
+   ]
+  },
+  "Kayin Lee": {
+   "def": {
+    "solo": 11,
+    "ast": 4,
+    "tot": 15,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 2,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
   "Breeze Carter": {
    "def": {
     "solo": 0,
@@ -1143,6 +1057,92 @@ window.SITE_AUTO.football = {
     "int": 0,
     "pbu": 0,
     "qbh": 1,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Ty Redmond": {
+   "def": {
+    "solo": 20,
+    "ast": 15,
+    "tot": 35,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 9,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Tevis Metcalf": {
+   "def": {
+    "solo": 5,
+    "ast": 2,
+    "tot": 7,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 1,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Joakim Dodson": {
+   "kr": [
+    1,
+    20,
+    20.0,
+    0,
+    20
+   ]
+  },
+  "Tre Poteat": {
+   "def": {
+    "solo": 2,
+    "ast": 3,
+    "tot": 5,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 1,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "TJ White": {
+   "def": {
+    "solo": 2,
+    "ast": 3,
+    "tot": 5,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Travis Smith Jr.": {
+   "rec": [
+    3,
+    27,
+    9.0,
+    15,
+    0
+   ],
+   "def": {
+    "solo": 0,
+    "ast": 1,
+    "tot": 1,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 0,
     "fr": 0,
     "ff": 0
    }
@@ -1164,6 +1164,12 @@ window.SITE_AUTO.football = {
    "Interceptions"
   ],
   "players": {
+   "Amare Campbell": [
+    {
+     "stat": "Tackles for loss",
+     "rank": 32
+    }
+   ],
    "Tyree Weathersby": [
     {
      "stat": "Sacks",
@@ -1172,12 +1178,6 @@ window.SITE_AUTO.football = {
     {
      "stat": "Tackles for loss",
      "rank": 27
-    }
-   ],
-   "Amare Campbell": [
-    {
-     "stat": "Tackles for loss",
-     "rank": 32
     }
    ],
    "Xavier Gilliam": [
@@ -1485,8 +1485,8 @@ window.SITE_AUTO.football = {
    "kick": "2026-10-24T19:30Z"
   },
   "Kentucky": {
-   "tv": null,
-   "kick": "2026-11-07T05:00Z",
+   "tv": "ESPN",
+   "kick": "2026-11-07T23:15Z",
    "win": 66.9
   },
   "Texas A&M": {
@@ -13892,14 +13892,14 @@ window.SITE_AUTO.football = {
      "line": "62 tackles, 4 TFL"
     },
     {
-     "name": "C.J. Heard",
-     "pos": "S",
+     "name": "Nicholas Rinaldi",
+     "pos": "LB",
      "what": "defensive",
      "line": "3 sacks"
     },
     {
-     "name": "Miles Capers",
-     "pos": "EDGE",
+     "name": "Cayden Daniels",
+     "pos": "CB",
      "what": "interceptions",
      "line": "1 INT"
     }
