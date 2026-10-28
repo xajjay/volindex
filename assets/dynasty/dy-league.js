@@ -26,7 +26,7 @@
   // Varsity is the default; Heisman is the hard setting (CPU teams play above their ratings in your games)
   DY.DIFF = { freshman: -3, varsity: 0, heisman: 3 };
   // playoff size: the real format is 12 teams in 2026 and 24 teams from 2027 (no conference title games)
-  DY.cfpSize = () => { const g = G(), c = g.settings.cfp; return c === 'real' || c == null ? (g.season >= 2027 ? 24 : 12) : +c; };     // CFP rankings come out the Tuesday after these weeks (early November on)
+  DY.cfpSize = () => { const g = G(), c = g.settings.cfp; if ((c === 'real' || c == null) && g.hx && DY.histCfp && DY.histCfp(g.season)) return DY.histCfp(g.season); return c === 'real' || c == null ? (g.season >= 2027 ? 24 : 12) : +c; };     // CFP rankings come out the Tuesday after these weeks (early November on)
 
   /* ---------- new dynasty ---------- */
   DY.newDynasty = opts => {
@@ -47,12 +47,14 @@
       t.budget = DY.teamBudget(t);
       g.teams.push(t);
       if (t.id === g.user) t.user = true;
+      if (opts.year) return;      // a historical start: that season's real rosters (below)
       if (t.id === DY.UT_ID) { DY.importTennessee(t); t.depthEdited = t.user; } else { DY.genRoster(t); if (t.user) DY.fillRoster(t, 84); }
     });
+    if (opts.year) DY.histBuild(g, opts.year); else if (DY.resetEra) DY.resetEra();
     g.teams.forEach(DY.fixNums);
     const ut = DY.userT();
     ut.style = g.settings.offStyle || 'power'; DY.pickCaptains(ut);
-    DY.seedPast(g);
+    if (!g.hx) DY.seedPast(g);
     // NIL: contracts sized to the budget
     DY.initNil(ut); if (!DY.isTN()) DY.initNil(DY.tnT());
     g.teams.forEach(t => DY.pickCaptains(t)); g.camp = { y: g.season, list: [] };
@@ -108,6 +110,7 @@
     2027: [['Georgia Tech', 'H', '2027-08-28'], ['Tennessee State', 'H', '2027-09-04'], ['Western Michigan', 'H', '2027-09-18']],
   };
   DY.buildSchedule = season => {
+    const hs = DY.histSchedule && DY.histSchedule(season); if (hs) return hs;     // a historical season: the real slate
     const g = G(), UT = DY.UT_ID;
     const games = [];
     const add = (wk, h, a, conf, neutral, tag) => { games.push({ id: season + '-' + games.length, wk, h, a, conf: !!conf, neutral: !!neutral, tag: tag || null, res: null }); };
@@ -504,7 +507,7 @@
   DY.sos = avgOppElo;
   DY.preseasonPoll = () => {
     const g = G();
-    const ranked = g.teams.slice().sort((a, b) => DY.apKey(b) - DY.apKey(a));
+    const ranked = g.teams.filter(t => !t.dorm).sort((a, b) => DY.apKey(b) - DY.apKey(a));
     setPoll(ranked, 0);
   };
   function setPoll(ranked, wk) {
@@ -517,10 +520,10 @@
   DY.cfpRank = tid => { const c = G().polls.cfp; if (!c) return null; const i = c.findIndex(x => x.t === tid); return i >= 0 ? i + 1 : null; };
   DY.updatePolls = wk => {
     const g = G();
-    setPoll(g.teams.slice().sort((a, b) => DY.apKey(b) - DY.apKey(a)), wk);
+    setPoll(g.teams.filter(t => !t.dorm).sort((a, b) => DY.apKey(b) - DY.apKey(a)), wk);
     if (DY.CFP_WEEKS.includes(wk) || wk === 14) {
       const prev = {}; (g.polls.cfp || []).forEach((x, i) => prev[x.t] = i + 1);
-      g.polls.cfp = g.teams.slice().sort((a, b) => DY.cfpKey(b, wk === 14) - DY.cfpKey(a, wk === 14)).slice(0, 25).map(t => ({ t: t.id, prev: prev[t.id] || null, rec: t.w + '-' + t.l }));
+      g.polls.cfp = g.teams.filter(t => !t.dorm).sort((a, b) => DY.cfpKey(b, wk === 14) - DY.cfpKey(a, wk === 14)).slice(0, 25).map(t => ({ t: t.id, prev: prev[t.id] || null, rec: t.w + '-' + t.l }));
       g.polls.cfpWeek = wk;
       if (wk === DY.CFP_WEEKS[0]) DY.news('poll', `First College Football Playoff rankings are out`, `${g.polls.cfp.slice(0, 4).map((x, i) => (i + 1) + '. ' + tname(x.t)).join(', ')}. ${DY.UN()} is ${DY.cfpRank(g.user) ? 'No. ' + DY.cfpRank(g.user) : 'outside the top 25'}.`);
     }
@@ -531,6 +534,7 @@
     const g = G(), games = [];
     for (const conf in DY.CONF_GAMES) {
       const st = DY.standings(conf);
+      if (DY.NOCCG && DY.NOCCG.includes(conf)) { if (st[0]) { st[0].champ = g.season; st[0].confChamp = (st[0].confChamp || 0) + 1; } continue; }   // no title game that year: the regular-season leader
       if (st.length < 4) continue;
       const [a, b] = st;
       games.push({ id: g.season + '-ccg-' + conf, wk: 14, h: a.id, a: b.id, conf: false, neutral: true, post: 'ccg', ccg: conf, title: `${DY.CONF_NAME[conf]} Championship`, res: null });
@@ -552,7 +556,7 @@
   DY.selection = () => {
     const g = G(), size = DY.cfpSize();
     const cfp = g.polls.cfp.map(x => DY.T(x.t));
-    const all = g.teams.slice().sort((a, b) => DY.cfpKey(b, true) - DY.cfpKey(a, true));
+    const all = g.teams.filter(t => !t.dorm).sort((a, b) => DY.cfpKey(b, true) - DY.cfpKey(a, true));
     const champs = all.filter(t => t.champ === g.season);
     const p4c = champs.filter(t => DY.P4.includes(t.conf));
     const g6c = champs.filter(t => !DY.P4.includes(t.conf)).slice(0, 1);
@@ -567,7 +571,11 @@
     // bowls for the rest of the bowl-eligible teams
     const elig = all.filter(t => t.w >= 6 && !field.includes(t));
     const bowls = [], used = new Set();
-    DY.BOWLS.forEach(name => {   // in prestige order; `elig` is already in committee order
+    // two- and four-team playoffs: the New Year's Six bowls that are not semifinals take the next-best teams
+    const semis = size === 4 ? [['Rose Bowl', 'Sugar Bowl'], ['Orange Bowl', 'Cotton Bowl'], ['Fiesta Bowl', 'Peach Bowl']][(((g.season - 2014) % 3) + 3) % 3] : [];
+    g.post.semis = semis;
+    const names = (size <= 4 ? DY.NY6.filter(n => !semis.includes(n)) : []).concat(DY.BOWLS).map(n => DY.eraBowl ? DY.eraBowl(n, g.season) : n).filter(Boolean);
+    names.forEach(name => {   // in prestige order; `elig` is already in committee order
       const a = elig.find(t => !used.has(t.id)); if (!a) return; used.add(a.id);
       const b = elig.find(t => !used.has(t.id) && t.conf !== a.conf) || elig.find(t => !used.has(t.id)); if (!b) return; used.add(b.id);
       bowls.push({ id: g.season + '-bowl-' + bowls.length, wk: 15, h: a.id, a: b.id, neutral: true, post: 'bowl', title: name, res: null });
@@ -586,9 +594,9 @@
     const site = (a, b, campus, name) => { const sa = S.indexOf(a), sb = S.indexOf(b); const h = sa <= sb ? a : b, aw = h === a ? b : a; return { id: g.season + '-cfp-' + r + '-' + games.length, wk: 15 + r, h, a: aw, neutral: !campus, post: 'cfp', round: r, title: name, res: null }; };
     const prevW = r ? P.rounds[r - 1].map(winnerOf) : [];
     if (n === 2) {
-      if (r === 0) games = [site(S[0], S[1], false, 'CFP National Championship')];
+      if (r === 0) games = [site(S[0], S[1], false, g.season < 2014 ? 'BCS National Championship' : 'CFP National Championship')];
     } else if (n === 4) {
-      if (r === 0) { const b = DY.shuffle(DY.NY6).slice(0, 2); games = [[0, 3], [1, 2]].map(([a, c], i) => site(S[a], S[c], false, b[i] + ' (CFP Semifinal)')); }
+      if (r === 0) { const b = P.semis && P.semis.length ? P.semis : DY.shuffle(DY.NY6).slice(0, 2); games = [[0, 3], [1, 2]].map(([a, c], i) => site(S[a], S[c], false, b[i] + ' (CFP Semifinal)')); }
       else if (r === 1) games = [site(prevW[0], prevW[1], false, 'CFP National Championship')];
     } else if (n === 8) {
       if (r === 0) games = [[0, 7], [3, 4], [1, 6], [2, 5]].map(([a, c]) => site(S[a], S[c], true, 'CFP Quarterfinal'));

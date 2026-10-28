@@ -70,6 +70,7 @@
         out.push(p);
       });
     }
+    if (DY.histClass) DY.histClass(year, out, prospect);     // a historical dynasty: the real class, re-ranked by careers
     // national, position and state ranks
     out.sort((a, b) => b.rec.c - a.rec.c);
     const posN = {}, stN = {};
@@ -114,7 +115,7 @@
     const list = DY.genClass(year, withReal);
     const pool = {}; list.forEach(p => { pool[p.id] = p; });
     // year one: the real class is locked in (with NIL promises sized to each player's market value)
-    const locked = !!withReal && year === (g.startSeason || 2026) + 1 && g.user === DY.UT_ID;
+    const locked = !!withReal && !g.hx && year === (g.startSeason || 2026) + 1 && g.user === DY.UT_ID;
     g.recruit = { year, pool, board: [], hours: DY.HOURS(), log: [], classRank: null, signed: false, locked };
     const ut = DY.userT();
     list.filter(p => p.commit === g.user).forEach(p => { g.recruit.board.push(p.id); p.nilOffer = DY.recruitNil(p); p.nilLocked = true; });
@@ -878,6 +879,7 @@
     g.teams.forEach(DY.fixNums);
     DY.cleanNonconf(g.season + 1);
     g.season++;
+    if (g.hx && DY.applyEra) DY.applyEra(g);      // historical: that year's conferences (the modern ones from 2026)
     g.teams.forEach(t => {
       t.w = t.l = t.cw = t.cl = t.pf = t.pa = 0; t.res = []; t.ap = null;
       // CPU programs drift with results

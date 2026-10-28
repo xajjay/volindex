@@ -68,7 +68,7 @@
     return idbGet('slot' + n).catch(() => null).then(bytes => {
       if (!bytes) { const b = root.localStorage.getItem('vi-dynasty-s' + n); if (!b) return null; const bin = root.atob(b); bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); }
       return gunzip(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes));
-    }).then(txt => txt ? DY.fromText(txt) : null);
+    }).then(txt => txt ? DY.fromText(txt) : null).then(g => DY.histReady ? DY.histReady(g) : g);
   };
   // one-time repairs for saves made before a fix (g.fx remembers which have run)
   DY.migrate = g => {
@@ -87,8 +87,8 @@
     DY.migrate(g);
     return g;
   };
-  DY.fromBytes = bytes => gunzip(bytes).then(DY.fromText);
+  DY.fromBytes = bytes => gunzip(bytes).then(DY.fromText).then(g => DY.histReady ? DY.histReady(g) : g);
   DY.deleteSlot = n => { idbDel('slot' + n); try { root.localStorage.removeItem('vi-dynasty-s' + n); } catch (e) { /* */ } const m = DY.readMeta(); delete m[n]; writeMeta(m); };
   DY.exportBlob = live => { const g = DY.G; g.rs = DY.rstate(); g.live = live ? DY.packLive(live) : null; return gzip(DY.pack(g)).then(b => new root.Blob([b], { type: 'application/gzip' })); };
-  DY.importFile = file => file.arrayBuffer().then(b => gunzip(new Uint8Array(b))).then(DY.fromText);
+  DY.importFile = file => file.arrayBuffer().then(b => gunzip(new Uint8Array(b))).then(DY.fromText).then(g => DY.histReady ? DY.histReady(g) : g);
 })(typeof window !== 'undefined' ? window : globalThis);
