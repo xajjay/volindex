@@ -193,6 +193,7 @@
     }); }
     if (d.act === 'save') { el.disabled = true; return SD.saveSlot(g.slot || 1).then(err => { V.msg = err || `Saved to slot ${g.slot || 1}.`; hub(); }); }
     if (d.act === 'export') return SD.exportBlob().then(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${g.sport}-dynasty-${g.season}.gz`; a.click(); });
+    if (d.act === 'quit') { SD.G = null; return landing(); }
     if (d.more) { V.more[d.more] = !V.more[d.more]; return keep(); }
     if (d.rpos) { V.rpos = d.rpos; return keep(); }
     if (d.statk) { V.statk = d.statk; return keep(); }
@@ -676,7 +677,7 @@
       <div class="gfield"><div class="glabel">Recruiting</div>${seg('recruiting', [['manual', 'I recruit'], ['auto', 'Auto'], ['off', 'Off']])}</div>
       <div class="gfield"><div class="glabel">Transfer portal</div>${seg('portal', [['manual', 'I manage it'], ['auto', 'Auto']])}</div>
       <div class="gfield"><div class="glabel">NIL raises</div>${seg('nil', [['manual', 'I decide'], ['auto', 'Auto']])}</div>
-      <div class="grow"><button class="btn" data-act="export">Export save file</button></div></div>`;
+      <div class="grow"><button class="btn" data-act="export">Export save file</button><button class="btn" data-act="quit">Quit to menu</button></div></div>`;
   }
 
   /* ---------- the offseason ---------- */
