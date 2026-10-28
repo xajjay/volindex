@@ -8,7 +8,7 @@
   'use strict';
   const DY = root.DY;
   const { clamp } = DY;
-  DY.HIST_FIRST = 2006; DY.HIST_LAST = 2025;
+  DY.HIST_FIRST = 1990; DY.HIST_LAST = 2025;
   const G = () => DY.G;
   const BASE = { name: Object.assign({}, DY.CONF_NAME), games: Object.assign({}, DY.CONF_GAMES), p4: DY.P4.slice(), conf: DY.TEAMS.map(t => t.conf) };
 
@@ -24,7 +24,11 @@
 
   /* ---------- the era: conferences, title games, the playoff ---------- */
   const NO_CCG = y => {
-    const out = ['IND', 'BE', 'WAC'];
+    const out = ['IND', 'BE', 'SWC', 'B8', 'BW'];
+    if (y < 1992) out.push('SEC');
+    if (y < 1996 || y > 1998) out.push('WAC');
+    if (y < 1997) out.push('MAC');
+    if (y < 2005) out.push('ACC', 'CUSA');
     if (y < 2011) out.push('B1G', 'P12');
     if (y >= 2011 && y < 2017) out.push('B12');
     if (y < 2013) out.push('MWC');
@@ -34,8 +38,8 @@
     return out;
   };
   const NAMES = y => ({ SEC: 'SEC', B1G: 'Big Ten', B12: 'Big 12', ACC: 'ACC', P12: y <= 2010 ? 'Pac-10' : 'Pac-12', MWC: 'Mountain West', AAC: 'American',
-    BE: 'Big East', SBC: 'Sun Belt', MAC: 'MAC', CUSA: 'Conference USA', WAC: 'WAC', IND: 'Independent', FCS: 'FCS' });
-  const POWER = y => y <= 2012 ? ['SEC', 'B1G', 'B12', 'ACC', 'P12', 'BE'] : y <= 2023 ? ['SEC', 'B1G', 'B12', 'ACC', 'P12'] : ['SEC', 'B1G', 'B12', 'ACC'];
+    BE: 'Big East', SWC: 'Southwest', B8: 'Big Eight', BW: 'Big West', SBC: 'Sun Belt', MAC: 'MAC', CUSA: 'Conference USA', WAC: 'WAC', IND: 'Independent', FCS: 'FCS' });
+  const POWER = y => y <= 1995 ? ['SEC', 'B1G', 'P12', 'ACC', 'SWC', 'B8', 'BE'] : y <= 2012 ? ['SEC', 'B1G', 'B12', 'ACC', 'P12', 'BE'] : y <= 2023 ? ['SEC', 'B1G', 'B12', 'ACC', 'P12'] : ['SEC', 'B1G', 'B12', 'ACC'];
   DY.histCfp = y => y < 2014 ? 2 : y < 2024 ? 4 : y < 2026 ? 12 : null;
   DY.isHistSeason = (g, y) => !!(g && g.hx && y <= DY.HIST_LAST && root.DY_HSCHED && root.DY_HSCHED[y]);
   DY.applyEra = g => {
@@ -73,6 +77,7 @@
   DY.histSchedule = season => {
     const g = G(); if (!DY.isHistSeason(g, season)) return null;
     const S = root.DY_HSCHED[season], games = [], busy = {};
+    if (!S.g.length) return genSchedule(season);
     const id = n => n.startsWith('F:') ? fcsId(n) : (DY.byName(n) || {}).id;
     const rows = S.g.map(r => ({ d: season + '-' + r[0], h: id(r[1]), a: id(r[2]), n: !!r[3], c: !!r[4] })).filter(r => r.h != null && r.a != null && r.h !== r.a)
       .sort((x, y) => x.d < y.d ? -1 : 1);
@@ -92,10 +97,80 @@
       const tag = (tn(r.h) === 'Tennessee' || tn(r.a) === 'Tennessee') && (tn(r.h) === 'Alabama' || tn(r.a) === 'Alabama') ? 'Third Saturday in October' : null;
       games.push({ id: season + '-' + games.length, wk: w, h: r.h, a: r.a, conf: r.c, neutral: r.n, tag, res: null, real: true });
     });
+    fillFcs(season, games, busy);
     games.sort((x, y) => x.wk - y.wk);
     g.sched = games;
     return games;
   };
+  // the record before 2007 only has games between I-A teams: fill everyone to eleven with I-AA opponents
+  function fillFcs(season, games, busy) {
+    const g = G(), cnt = {};
+    games.forEach(x => { cnt[x.h] = (cnt[x.h] || 0) + 1; cnt[x.a] = (cnt[x.a] || 0) + 1; });
+    const want = season >= 2006 ? 12 : 11;
+    g.teams.filter(t => !t.dorm).forEach(t => {
+      for (let w = 1; w <= DY.LAST_WK && (cnt[t.id] || 0) < want; w++) {
+        if (busy[t.id + '|' + w]) continue;
+        if ((cnt[t.id] || 0) >= want - 1 && season >= 2006) break;   // the modern record is complete: at most one added
+        const f = DY.FCS[(hash(t.name + season) + w) % DY.FCS.length];
+        games.push({ id: season + '-' + games.length, wk: w, h: t.id, a: f.id, conf: false, neutral: false, tag: null, res: null });
+        busy[t.id + '|' + w] = 1; cnt[t.id] = (cnt[t.id] || 0) + 1;
+      }
+    });
+  }
+  // seasons before 2001: a generated slate in that year's conferences (rivalries kept), eleven games
+  function genSchedule(season) {
+    const g = G(), games = [], busy = {}, rnd = DY.r, cnt = {};
+    DY.LAST_WK = 13; g.hx.wk = g.hx.wk || {}; g.hx.wk[season] = { off: 0, last: 13 };
+    const live = g.teams.filter(t => !t.dorm), byConf = {};
+    live.forEach(t => { (byConf[t.conf] = byConf[t.conf] || []).push(t.id); });
+    const edges = [], key = (a, b) => a < b ? a + '-' + b : b + '-' + a, have = new Set();
+    const addE = (a, b, c) => { const k = key(a, b); if (have.has(k)) return; have.add(k); edges.push([a, b, c]); };
+    const RIV = [['Tennessee', 'Alabama'], ['Tennessee', 'Vanderbilt'], ['Tennessee', 'Kentucky'], ['Tennessee', 'Florida'], ['Tennessee', 'Georgia'], ['Alabama', 'Auburn'], ['Florida', 'Georgia'],
+      ['Ohio State', 'Michigan'], ['USC', 'UCLA'], ['Texas', 'Oklahoma'], ['Texas', 'Texas A&M'], ['Oklahoma', 'Nebraska'], ['Florida', 'Florida State'], ['Clemson', 'South Carolina'], ['Army', 'Navy'], ['Notre Dame', 'USC'], ['Miami', 'Florida State']];
+    RIV.forEach(([a, b]) => { const A = DY.byName(a), B = DY.byName(b); if (A && B && !A.dorm && !B.dorm) addE(A.id, B.id, A.conf === B.conf); });
+    for (const c in byConf) {
+      if (c === 'IND' || c === 'NONE') continue;
+      const ids = byConf[c], n = Math.min(c === 'BW' || c === 'BE' ? 6 : 8, ids.length - 1), deg = {};
+      ids.forEach(i => { deg[i] = 0; }); edges.forEach(([a, b]) => { if (deg[a] != null && deg[b] != null) { deg[a]++; deg[b]++; } });
+      for (let it = 0; it < 4000; it++) {
+        const need = ids.filter(i => deg[i] < n); if (need.length < 2) break;
+        const a = need[Math.floor(rnd() * need.length)], cands = need.filter(b => b !== a && !have.has(key(a, b)));
+        if (!cands.length) { deg[a] = n; continue; }
+        const b = cands[Math.floor(rnd() * cands.length)]; addE(a, b, true); deg[a]++; deg[b]++;
+      }
+    }
+    edges.forEach(([a, b]) => { cnt[a] = (cnt[a] || 0) + 1; cnt[b] = (cnt[b] || 0) + 1; });
+    // non-conference: fill to eleven against other I-A teams, then I-AA
+    const ids = live.map(t => t.id);
+    for (let pass = 0; pass < 3; pass++) for (const a of DY.shuffle(ids)) {
+      if ((cnt[a] || 0) >= 11) continue;
+      const cands = ids.filter(b => b !== a && (cnt[b] || 0) < 11 && DY.T(b).conf !== DY.T(a).conf && !have.has(key(a, b)));
+      if (!cands.length) continue;
+      const b = cands[Math.floor(rnd() * cands.length)]; addE(a, b, false); cnt[a] = (cnt[a] || 0) + 1; cnt[b] = (cnt[b] || 0) + 1;
+    }
+    // weeks: non-conference first, the conference season after; Tennessee-Alabama on the third Saturday in October, Vanderbilt last
+    const third = DY.thirdSatOct(season), tn = n => (DY.byName(n) || {}).id;
+    const order = edges.slice().sort((x, y) => (x[2] ? 1 : 0) - (y[2] ? 1 : 0));
+    const place = (a, b, conf, pref) => {
+      const tries = pref != null ? [pref] : [];
+      for (let w = conf ? 4 : 1; w <= 13; w++) tries.push(w);
+      for (let w = 1; w <= 13; w++) tries.push(w);
+      for (const w of tries) if (!busy[a + '|' + w] && !busy[b + '|' + w]) {
+        busy[a + '|' + w] = busy[b + '|' + w] = 1;
+        const hm = (season + a * 7 + b * 3) % 2 === 0, A = DY.T(a), B = DY.T(b);
+        const tag = (A.name === 'Tennessee' || B.name === 'Tennessee') && (A.name === 'Alabama' || B.name === 'Alabama') ? 'Third Saturday in October' : null;
+        games.push({ id: season + '-' + games.length, wk: w, h: hm ? a : b, a: hm ? b : a, conf: !!conf, neutral: false, tag, res: null }); return true;
+      }
+      return false;
+    };
+    const special = e => { const n = [DY.T(e[0]).name, DY.T(e[1]).name].sort().join('|'); return n === 'Alabama|Tennessee' ? third : n === 'Tennessee|Vanderbilt' ? 13 : n === 'Auburn|Alabama' || n === 'Alabama|Auburn' ? 13 : n === 'Michigan|Ohio State' ? 13 : null; };
+    order.filter(e => special(e) != null).forEach(e => place(e[0], e[1], e[2], special(e)));
+    order.filter(e => special(e) == null).forEach(e => place(e[0], e[1], e[2]));
+    fillFcs(season, games, busy);
+    games.sort((x, y) => x.wk - y.wk);
+    g.sched = games;
+    return games;
+  }
 
   /* ---------- a historical dynasty ---------- */
   const MIX_MIN = { QB: 3, RB: 3, WR: 6, TE: 3, OT: 4, IOL: 5, EDGE: 4, DT: 4, LB: 5, CB: 5, S: 4, K: 1, P: 1 };
@@ -145,8 +220,14 @@
       if (D.pr[t.name] != null) t.prestige = D.pr[t.name];
       t.budget = DY.teamBudget(t);
       const rows = D.ros[t.name];
-      if (rows && rows.length >= 30) realRoster(t, rows, t.user);
-      else { DY.genRoster(t); if (t.user) DY.fillRoster(t, 84); }
+      if (rows && rows.length >= 45) realRoster(t, rows, t.user);
+      else if (rows && rows.length) {      // a few real players (the ones the record has): the rest of the roster is generated
+        realRoster(t, rows, true);
+        const mix = DY.ROSTER_MIX;
+        for (const pos in mix) { let have = t.roster.filter(i => DY.G.P[i].pos === pos).length; while (have < mix[pos]) { const p = DY.genPlayerFor(t, pos, DY.ri(1, 4), { bump: -6 }); DY.G.P[p.id] = p; t.roster.push(p.id); have++; } }
+        if (t.user) DY.fillRoster(t, 84);
+        t.depth = DY.autoDepth(t);
+      } else { DY.genRoster(t); if (t.user) DY.fillRoster(t, 84); }
     });
   };
 
@@ -176,18 +257,20 @@
   DY.eraBowl = (n, y) => {
     const g = G(); if (!g || !g.hx || y >= 2026) return n;
     const M = {
-      'Pop-Tarts Bowl': y < 2012 ? 'Champs Sports Bowl' : y < 2017 ? 'Russell Athletic Bowl' : y < 2020 ? 'Camping World Bowl' : y < 2023 ? 'Cheez-It Bowl' : n,
-      "Duke's Mayo Bowl": y < 2011 ? 'Meineke Car Care Bowl' : y < 2020 ? 'Belk Bowl' : n,
-      'ReliaQuest Bowl': y < 2022 ? 'Outback Bowl' : n,
+      'Pop-Tarts Bowl': y < 1990 ? null : y < 2001 ? 'Carquest Bowl' : y < 2004 ? 'Tangerine Bowl' : y < 2012 ? 'Champs Sports Bowl' : y < 2017 ? 'Russell Athletic Bowl' : y < 2020 ? 'Camping World Bowl' : y < 2023 ? 'Cheez-It Bowl' : n,
+      "Duke's Mayo Bowl": y < 2002 ? null : y < 2011 ? 'Meineke Car Care Bowl' : y < 2020 ? 'Belk Bowl' : n,
+      'ReliaQuest Bowl': y < 1995 ? 'Hall of Fame Bowl' : y < 2022 ? 'Outback Bowl' : n,
       'Peach Bowl': y < 2014 ? 'Chick-fil-A Bowl' : n,
-      'Citrus Bowl': y < 2015 ? 'Capital One Bowl' : n,
-      'Guaranteed Rate Bowl': y < 2014 ? 'Insight Bowl' : y < 2018 ? 'Cactus Bowl' : y < 2020 ? 'Cheez-It Bowl' : n,
-      'First Responder Bowl': y < 2018 ? 'Heart of Dallas Bowl' : n,
+      'Citrus Bowl': y < 2003 ? 'Florida Citrus Bowl' : y < 2015 ? 'Capital One Bowl' : n,
+      'Guaranteed Rate Bowl': y < 1997 ? 'Copper Bowl' : y < 2014 ? 'Insight Bowl' : y < 2018 ? 'Cactus Bowl' : y < 2020 ? 'Cheez-It Bowl' : n,
+      'First Responder Bowl': y < 2010 ? null : y < 2018 ? 'Heart of Dallas Bowl' : n,
       'Fenway Bowl': y < 2021 ? null : n, 'LA Bowl': y < 2021 ? null : n, 'Myrtle Beach Bowl': y < 2020 ? null : n, 'Frisco Bowl': y < 2017 ? null : n,
-      'Gasparilla Bowl': y < 2008 ? 'St. Petersburg Bowl' : y < 2017 ? 'St. Petersburg Bowl' : n, 'Cure Bowl': y < 2015 ? null : n, 'Arizona Bowl': y < 2015 ? null : n,
+      'Gasparilla Bowl': y < 2008 ? null : y < 2017 ? 'St. Petersburg Bowl' : n, 'Cure Bowl': y < 2015 ? null : n, 'Arizona Bowl': y < 2015 ? null : n,
       'Bahamas Bowl': y < 2014 ? null : n, 'Boca Raton Bowl': y < 2014 ? null : n, 'Camellia Bowl': y < 2014 ? null : n, 'Salute to Veterans Bowl': y < 2025 ? null : n,
-      'Pinstripe Bowl': y < 2010 ? null : n, 'Military Bowl': y < 2008 ? null : n, 'Birmingham Bowl': y < 2015 ? 'BBVA Compass Bowl' : n,
-      'Famous Idaho Potato Bowl': y < 2011 ? 'Humanitarian Bowl' : n, 'Texas Bowl': y < 2006 ? null : n, 'Music City Bowl': n,
+      'Pinstripe Bowl': y < 2010 ? null : n, 'Military Bowl': y < 2008 ? null : n, 'Birmingham Bowl': y < 2006 ? null : y < 2015 ? 'BBVA Compass Bowl' : n,
+      'Famous Idaho Potato Bowl': y < 1997 ? null : y < 2011 ? 'Humanitarian Bowl' : n, 'Texas Bowl': y < 2006 ? null : n, 'Music City Bowl': y < 1998 ? null : n,
+      'Las Vegas Bowl': y < 1992 ? null : n, 'Alamo Bowl': y < 1993 ? null : n, 'Armed Forces Bowl': y < 2003 ? null : y < 2006 ? 'Fort Worth Bowl' : n, "Hawai'i Bowl": y < 2002 ? null : n,
+      'New Mexico Bowl': y < 2006 ? null : n, 'New Orleans Bowl': y < 2001 ? null : n, 'Independence Bowl': n, 'Holiday Bowl': n, 'Sun Bowl': n, 'Liberty Bowl': n, 'Gator Bowl': n,
     };
     return M[n] === undefined ? n : M[n];
   };

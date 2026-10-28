@@ -594,7 +594,7 @@
     const site = (a, b, campus, name) => { const sa = S.indexOf(a), sb = S.indexOf(b); const h = sa <= sb ? a : b, aw = h === a ? b : a; return { id: g.season + '-cfp-' + r + '-' + games.length, wk: 15 + r, h, a: aw, neutral: !campus, post: 'cfp', round: r, title: name, res: null }; };
     const prevW = r ? P.rounds[r - 1].map(winnerOf) : [];
     if (n === 2) {
-      if (r === 0) games = [site(S[0], S[1], false, g.season < 2014 ? 'BCS National Championship' : 'CFP National Championship')];
+      if (r === 0) games = [site(S[0], S[1], false, g.season < 1998 ? 'National Championship Game' : g.season < 2014 ? 'BCS National Championship' : 'CFP National Championship')];
     } else if (n === 4) {
       if (r === 0) { const b = P.semis && P.semis.length ? P.semis : DY.shuffle(DY.NY6).slice(0, 2); games = [[0, 3], [1, 2]].map(([a, c], i) => site(S[a], S[c], false, b[i] + ' (CFP Semifinal)')); }
       else if (r === 1) games = [site(prevW[0], prevW[1], false, 'CFP National Championship')];

@@ -245,8 +245,136 @@ def build_year(y):
 for y in range(2006, 2026):
     build_year(y)
 
+# ---------- 1990-2005: conferences of the time, real players where the record has them ----------
+FBS_FROM = {'UCF': 1996, 'Marshall': 1997, 'UConn': 2002, 'Troy': 2001, 'South Florida': 2001, 'Middle Tennessee': 1999, 'FAU': 2004, 'FIU': 2005,
+            'UAB': 1996, 'Buffalo': 1999, 'ULM': 1994, 'North Texas': 1995, 'Boise State': 1996, 'Nevada': 1992, 'Arkansas State': 1992,
+            'Western Kentucky': 2009, 'Georgia State': 2013, 'Texas State': 2012, 'UTSA': 2012, 'South Alabama': 2012, 'Charlotte': 2015,
+            'Coastal Carolina': 2017, 'Liberty': 2018, 'App State': 2014, 'Georgia Southern': 2014, 'Old Dominion': 2014, 'James Madison': 2022,
+            'Sam Houston': 2023, 'Jacksonville State': 2023, 'Kennesaw State': 2024, 'Delaware': 2025, 'Missouri State': 2025, 'UMass': 2012}
+SEC10 = ['Alabama', 'Auburn', 'Florida', 'Georgia', 'Kentucky', 'LSU', 'Ole Miss', 'Mississippi State', 'Tennessee', 'Vanderbilt']
+ACC8 = ['Clemson', 'Duke', 'Georgia Tech', 'Maryland', 'North Carolina', 'NC State', 'Virginia', 'Wake Forest']
+B10 = ['Illinois', 'Indiana', 'Iowa', 'Michigan', 'Michigan State', 'Minnesota', 'Northwestern', 'Ohio State', 'Purdue', 'Wisconsin']
+P10 = ['Arizona', 'Arizona State', 'Cal', 'Oregon', 'Oregon State', 'Stanford', 'UCLA', 'USC', 'Washington', 'Washington State']
+B8 = ['Colorado', 'Iowa State', 'Kansas', 'Kansas State', 'Missouri', 'Nebraska', 'Oklahoma', 'Oklahoma State']
+SWC = ['Baylor', 'Houston', 'Rice', 'SMU', 'TCU', 'Texas', 'Texas A&M', 'Texas Tech']
+BEAST = ['Boston College', 'Miami', 'Pitt', 'Rutgers', 'Syracuse', 'Temple', 'Virginia Tech', 'West Virginia']
+MAC9 = ['Ball State', 'Bowling Green', 'Central Michigan', 'Eastern Michigan', 'Kent State', 'Miami (OH)', 'Ohio', 'Toledo', 'Western Michigan']
+def old_conf(y):
+    c = {}
+    for t in SEC10: c[t] = 'SEC'
+    if y >= 1992: c['Arkansas'] = c['South Carolina'] = 'SEC'
+    for t in ACC8: c[t] = 'ACC'
+    c['Florida State'] = 'ACC' if y >= 1992 else 'IND'
+    for t in B10: c[t] = 'B1G'
+    c['Penn State'] = 'B1G' if y >= 1993 else 'IND'
+    for t in P10: c[t] = 'P12'
+    if y <= 1995:
+        for t in B8: c[t] = 'B8'
+        for t in SWC: c[t] = 'SWC'
+        if y <= 1991: c['Arkansas'] = 'SWC'
+    else:
+        for t in B8 + ['Baylor', 'Texas', 'Texas A&M', 'Texas Tech']: c[t] = 'B12'
+    for t in BEAST: c[t] = 'BE' if y >= 1991 else 'IND'
+    if y <= 1995:
+        for t in ['Air Force', 'BYU', 'Colorado State', "Hawai'i", 'New Mexico', 'San Diego State', 'Utah', 'UTEP', 'Wyoming']: c[t] = 'WAC'
+        c['Fresno State'] = 'WAC' if y >= 1992 else 'BW'
+        for t in ['San José State', 'UNLV', 'Utah State', 'New Mexico State']: c[t] = 'BW'
+        if y >= 1992: c['Nevada'] = 'BW'
+        for t in ['Arkansas State', 'Louisiana Tech', 'Louisiana']: c[t] = 'BW' if y >= 1993 else 'IND'
+        for t in ['Memphis', 'Southern Miss', 'Tulane', 'Louisville', 'Cincinnati', 'East Carolina', 'Army', 'Navy', 'Notre Dame', 'Northern Illinois', 'ULM', 'North Texas']: c[t] = 'IND'
+        if y >= 1993: c['Northern Illinois'] = 'BW'
+    else:
+        if y <= 1998:
+            for t in ['Air Force', 'BYU', 'Colorado State', "Hawai'i", 'New Mexico', 'San Diego State', 'Utah', 'UTEP', 'Wyoming', 'Fresno State',
+                      'Rice', 'SMU', 'TCU', 'Tulsa', 'UNLV', 'San José State']: c[t] = 'WAC'
+        else:
+            for t in ['Air Force', 'BYU', 'Colorado State', 'New Mexico', 'San Diego State', 'UNLV', 'Utah', 'Wyoming']: c[t] = 'MWC'
+            for t in ['Fresno State', "Hawai'i", 'Rice', 'San José State', 'SMU', 'TCU', 'Tulsa', 'UTEP']: c[t] = 'WAC'
+            if y >= 2000: c['Nevada'] = 'WAC'
+        for t in ['Utah State', 'New Mexico State', 'Boise State', 'North Texas', 'Arkansas State']: c[t] = 'BW'
+        if y <= 1999: c['Nevada'] = 'BW'
+        for t in ['Cincinnati', 'Houston', 'Louisville', 'Memphis', 'Southern Miss', 'Tulane']: c[t] = 'CUSA'
+        c['East Carolina'] = 'CUSA' if y >= 1997 else 'IND'
+        c['UAB'] = 'CUSA' if y >= 1999 else 'IND'
+        c['Army'] = 'CUSA' if y >= 1998 else 'IND'
+        for t in ['Navy', 'Notre Dame', 'Louisiana Tech', 'Louisiana', 'ULM', 'UCF', 'Middle Tennessee']: c[t] = 'IND'
+        c['Northern Illinois'] = 'MAC' if y >= 1997 else 'BW'
+    for t in MAC9: c[t] = 'MAC'
+    if y >= 1992: c['Akron'] = 'MAC'
+    else: c['Akron'] = 'IND'
+    if y >= 1997: c['Marshall'] = 'MAC'
+    if y >= 1999: c['Buffalo'] = 'MAC'
+    c['Tulsa'] = c.get('Tulsa', 'IND')
+    return {t: v for t, v in c.items() if t in DYT and FBS_FROM.get(t, 0) <= y}
+# talent by team and season from the draft: who was on campus (arrived <= season < drafted)
+def draft_talent(y):
+    tal = collections.defaultdict(float)
+    for d in DRAFT:
+        enroll = d['y'] - max(3, min(5, d['age'] - 18))
+        if enroll <= y < d['y']:
+            t = dyname(d['col'])
+            if t in DYT: tal[t] += max(1, 30 - d['pick'] / 9) + d['val'] * 0.15
+    return tal
+UTSTATS = collections.defaultdict(list)
+cur = None
+for line in open(os.path.join(ROOT, 'tools/games_ut_football.txt')):
+    line = line.rstrip('\n')
+    m = re.match(r'^#(\d{4})\|', line)
+    if m: cur = int(m.group(1)); continue
+    if line.startswith('#') or not line.strip() or cur is None: continue
+    nm, pos = line.split('|')[:2]; UTSTATS[cur].append((nm, pos.split('/')[0]))
+SPOS = {'QB': 'QB', 'RB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE', 'DE': 'EDGE', 'DT': 'DT', 'NT': 'DT', 'LB': 'LB', 'DB': 'CB', 'CB': 'CB', 'S': 'S',
+        'K': 'K', 'P': 'P', 'OL': 'IOL', 'OT': 'OT', 'OG': 'IOL', 'C': 'IOL'}
+def build_old(y):
+    if y in SCHED and y >= 2001: conf = dict(CONFS[y])
+    else: conf = old_conf(y)
+    for t in list(conf):
+        if FBS_FROM.get(t, 0) > y: del conf[t]
+    tal = draft_talent(y)
+    srs = SRS.get(y, {})
+    # strength: results when there are any (2001-2005), blended with talent on campus
+    names = list(conf)
+    def z(d):
+        v = [d.get(t, 0) for t in names]; m, sd = statistics.mean(v), statistics.pstdev(v) or 1
+        return {t: (d.get(t, 0) - m) / sd for t in names}
+    zt, zs = z(tal), (z(srs) if srs else None)
+    st = {t: (zt[t] * 0.5 + zs[t] * 0.5) if zs else zt[t] for t in names}
+    pr = prestige_map(st)
+    # real players: everyone drafted later who was on campus that season, and Tennessee's stat leaders
+    ros = collections.defaultdict(list)
+    for d in DRAFT:
+        enroll = d['y'] - max(3, min(5, d['age'] - 18))
+        if not (enroll <= y < d['y']): continue
+        t = dyname(d['col'])
+        if t not in conf: continue
+        pos = POSMAP_D.get(d['pos'].upper())
+        if not pos: continue
+        yr = max(1, min(5, y - enroll + 1)); left = d['y'] - y     # seasons until the draft
+        ovr = 70 + max(0, 20 - d['pick'] / 13) - (left - 1) * 4.5 + min(4, d['val'] / 25)
+        ros[t].append([d['n'], pos, yr, max(55, min(94, round(ovr))), 0, 0, 0, None, None, None, ''])
+    seen = {norm(r[0]) for r in ros.get('Tennessee', [])}
+    for nm, p0 in UTSTATS.get(y, []):
+        pos = SPOS.get(p0.upper()); 
+        if not pos or norm(nm) in seen: continue
+        prior = sum(1 for yy in range(y - 4, y) if any(norm(n) == norm(nm) for n, _ in UTSTATS.get(yy, [])))
+        ros['Tennessee'].append([nm, pos, min(5, prior + 2), 76 + prior * 2, 0, 0, 0, None, None, None, ''])
+        seen.add(norm(nm))
+    data = {'y': y, 'src': 'real players from the NFL draft record and Tennessee stat sheets; the rest of each roster is generated', 'conf': conf, 'pr': pr, 'ros': dict(ros)}
+    js = 'window.DY_HIST = window.DY_HIST || {}; window.DY_HIST[%d] = %s;\n' % (y, json.dumps(data, separators=(',', ':'), ensure_ascii=False))
+    open(os.path.join(OUT, 'fb-%d.js' % y), 'w').write(js)
+    OLD_CONF[y] = conf
+    ut = ros.get('Tennessee', [])
+    print(y, 'old: teams', len(conf), 'real players', sum(len(v) for v in ros.values()), 'UT', len(ut), [r[0] + ' ' + str(r[3]) for r in sorted(ut, key=lambda r: -r[3])[:4]], 'UT pr', pr.get('Tennessee'), 'top', sorted(pr, key=lambda t: -st[t])[:5])
+POSMAP_D = {'QB': 'QB', 'RB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE', 'T': 'OT', 'OT': 'OT', 'G': 'IOL', 'OG': 'IOL', 'C': 'IOL', 'OL': 'OT',
+            'DE': 'EDGE', 'OLB': 'EDGE', 'DT': 'DT', 'NT': 'DT', 'DL': 'DT', 'LB': 'LB', 'ILB': 'LB', 'MLB': 'LB', 'CB': 'CB', 'DB': 'CB',
+            'S': 'S', 'SAF': 'S', 'FS': 'S', 'SS': 'S', 'K': 'K', 'P': 'P', 'LS': 'LS'}
+OLD_CONF = {}
+for y in range(1990, 2006):
+    build_old(y)
+
 # ---------- schedules for every season (the real slate is played in any historical season up to 2025) ----------
 S = {y: {'conf': CONFS[y], 'g': SCHED[y]} for y in SCHED if 2006 <= y <= 2025}
+for y, c in OLD_CONF.items(): S[y] = {'conf': c, 'g': SCHED.get(y, []) if y >= 2001 else []}
 open(os.path.join(OUT, 'fb-sched.js'), 'w').write('window.DY_HSCHED = %s;\n' % json.dumps(S, separators=(',', ':'), ensure_ascii=False))
 print('fb-sched kb', os.path.getsize(os.path.join(OUT, 'fb-sched.js')) // 1024)
 
