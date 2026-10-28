@@ -4,3 +4,8 @@ tools/__pycache__/
 *.zip
 .DS_Store
 Thumbs.db
+
+# scratch data for the historical build scripts (EA ratings, Sports-Reference,
+# 247 composite, cfbfastR/nflverse pulls) — large, third-party, re-fetched per
+# session, never committed
+/hdata/
