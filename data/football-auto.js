@@ -123,7 +123,7 @@ window.SITE_AUTO.football = {
    ],
    "ypg": [
     394.5,
-    65,
+    66,
     9
    ],
    "rushYpg": [
@@ -1217,23 +1217,23 @@ window.SITE_AUTO.football = {
    "Faizon Brandon": [
     {
      "stat": "Passing TD",
-     "rank": 96
+     "rank": 97
     }
    ],
    "Mike Matthews": [
     {
      "stat": "Receiving yards",
-     "rank": 45
+     "rank": 46
     },
     {
      "stat": "Receptions",
-     "rank": 69
+     "rank": 71
     }
    ],
    "Braylon Staley": [
     {
      "stat": "Receptions",
-     "rank": 87
+     "rank": 89
     }
    ],
    "DeSean Bishop": [
@@ -1492,17 +1492,17 @@ window.SITE_AUTO.football = {
   "Texas A&M": {
    "tv": null,
    "kick": "2026-11-14T05:00Z",
-   "win": 52.3
+   "win": 52.0
   },
   "LSU": {
    "tv": null,
    "kick": "2026-11-21T05:00Z",
-   "win": 35.5
+   "win": 35.6
   },
   "Vanderbilt": {
    "tv": null,
    "kick": "2026-11-28T05:00Z",
-   "win": 85.9
+   "win": 85.7
   }
  },
  "teamSheet": {
@@ -1523,7 +1523,7 @@ window.SITE_AUTO.football = {
     "Total yards per game",
     "Total offense",
     394.5,
-    65,
+    66,
     9,
     false
    ],
@@ -1568,7 +1568,7 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     9.0,
-    103,
+    104,
     14,
     false
    ],
@@ -1586,7 +1586,7 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     20.0,
-    119,
+    118,
     13,
     true
    ],
@@ -1685,7 +1685,7 @@ window.SITE_AUTO.football = {
     "Turnovers lost",
     "Downs",
     11.0,
-    96,
+    95,
     9,
     true
    ],
@@ -1721,7 +1721,7 @@ window.SITE_AUTO.football = {
     "Opponent 3rd down %",
     "Yards allowed",
     31.7,
-    24,
+    23,
     4,
     true
    ],
@@ -1775,7 +1775,7 @@ window.SITE_AUTO.football = {
     "Yards per carry allowed",
     "Run defense",
     3.84,
-    60,
+    59,
     12,
     true
    ],
