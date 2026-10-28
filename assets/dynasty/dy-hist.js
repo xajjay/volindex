@@ -18,7 +18,7 @@
     if (loaded[src]) return loaded[src];
     return (loaded[src] = new Promise((res, rej) => { const s = document.createElement('script'); s.src = src + '?v=' + (root.VI_BUILD || '1'); s.onload = res; s.onerror = () => { delete loaded[src]; rej(new Error('Could not load ' + src)); }; document.head.appendChild(s); }));
   }
-  DY.loadHist = year => Promise.all([script('data/hist/fb-sched.js'), script('data/hist/fb-classes.js'), year ? script('data/hist/fb-' + year + '.js') : null]);
+  DY.loadHist = year => year >= 2026 ? Promise.all([script('data/hist/fb-2026.js').catch(() => null), script('data/hist/fb-classes.js').catch(() => null)]) : Promise.all([script('data/hist/fb-sched.js'), script('data/hist/fb-classes.js'), year ? script('data/hist/fb-' + year + '.js') : null]);
   // a saved historical dynasty: the schedules and classes must be loaded before it runs
   DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); return g; }) : Promise.resolve(g);
 
@@ -55,8 +55,10 @@
       DY.NOCCG = NO_CCG(y);
       g.hx.era = y;
       const wk = g.hx.wk && g.hx.wk[y]; DY.LAST_WK = wk ? wk.last : 13;
+      eraRules(g, y);
     } else {
       DY.LAST_WK = 13;
+      if (g.hx) eraRules(g, y);
       set(DY.CONF_NAME, BASE.name); set(DY.CONF_GAMES, BASE.games); DY.P4.length = 0; BASE.p4.forEach(c => DY.P4.push(c));
       g.teams.forEach(t => { t.conf = BASE.conf[t.id]; t.dorm = false; });
       if (g.hx) g.hx.era = null;
@@ -65,6 +67,16 @@
   // dates on the calendar: a season that starts a week early has its week numbers shifted
   const weekDate0 = DY.weekDate;
   DY.weekDate = (y, w) => { const g = G(), o = g && g.hx && g.hx.wk && g.hx.wk[y] ? g.hx.wk[y].off : 0; return weekDate0(y, w - o); };
+  // real life arrives on schedule: the transfer portal (2018-19) and NIL (July 2021), if they were off only because of the era
+  function eraRules(g, y) {
+    if (!g.settings || !g.hx) return;
+    if (g.hx.eraPortal && y >= 2019 && g.settings.portal === 'off') { g.settings.portal = 'manual'; g.hx.eraPortal = false; if (DY.news && g.news) DY.news('league', 'The NCAA opens the transfer portal', 'Players can now enter the portal and talk to other schools. Manage it each offseason.'); }
+    if (g.hx.eraNil && y >= 2021 && g.settings.nil === 'off') {
+      g.settings.nil = 'manual'; g.hx.eraNil = false;
+      if (DY.initNil && g.teams && g.teams.length) { g.teams.forEach(t => { t.budget = DY.teamBudget(t); }); DY.initNil(DY.userT()); }
+      if (DY.news && g.news) DY.news('league', 'NIL is here', 'Players can now be paid for their name, image and likeness. Your program has an NIL budget: keep your roster happy.');
+    }
+  }
   // the modern game after a historical dynasty reaches 2026, or a plain dynasty: nothing to do
   DY.resetEra = () => { DY.applyEra({ season: 9999, teams: [], hx: null }); };
 
@@ -184,8 +196,10 @@
       const c = Math.round(clamp(0.80 + (ovr - 62 - (yr - 1) * 2.5) * 0.0075, 0.78, 0.9985) * 1e4) / 1e4;
       const p = DY.makePlayer(pos, ovr, { n: n || undefined, t: t.id, yr, el, num: num || undefined, ht: ht || undefined, wt: wt || undefined, st: st || t.st,
         home: extra && extra.home || undefined, grade: c * 100, rec: { c, stars: DY.starsOf(c, pos), g: c * 100 } });
-      if (extra && extra.at) { for (const k in extra.at) if (DY.W[pos] && DY.W[pos][k] != null) { p.at[k] = extra.at[k]; fixed[k] = 1; } }
-      else { if (spd) { p.at.spd = spd; fixed.spd = 1; } if (str) { p.at.str = str; } if (awr) { p.at.awr = awr; } }
+      // the source's attributes give the shape (fast, strong, smart); the overall comes from the era-balanced rating
+      const at = extra && extra.at ? extra.at : { spd, str, awr };
+      for (const k in at) if (at[k] != null && p.at[k] != null) p.at[k] = at[k];
+      if (at.spd && !['OT', 'IOL', 'DT', 'K', 'P'].includes(pos)) fixed.spd = 1;
       DY.fitOvr(p, ovr, fixed);
       p.ceil = Math.round(clamp(ovr + [0, 9, 6, 3.5, 1.5, 0.5][yr] + DY.gauss() * 2.5, ovr, 99));     // room to grow by class
       p.potG = DY.scoutGrade(p.ceil);
@@ -213,7 +227,7 @@
   // called from DY.newDynasty when a start year is picked (the data is already loaded)
   DY.histBuild = (g, year) => {
     const D = root.DY_HIST[year];
-    g.hx = { y: year, src: D.src };
+    g.hx = { y: year, src: D.src, eraNil: year < 2021 && g.settings.nil === 'off', eraPortal: year < 2018 && g.settings.portal === 'off' };
     g.season = year; g.startSeason = year;
     DY.applyEra(g);
     g.teams.forEach(t => {
@@ -231,25 +245,39 @@
     });
   };
 
+  /* ---------- 2026: every team's real roster (Tennessee keeps its hand-built one) ---------- */
+  DY.hasReal2026 = t => !!(root.DY_HIST && root.DY_HIST[2026] && root.DY_HIST[2026].ros[t.name] && root.DY_HIST[2026].ros[t.name].length >= 45);
+  DY.modern2026 = g => {
+    g.teams.forEach(t => { if (t.id !== DY.UT_ID && DY.hasReal2026(t) && !t.roster.length) realRoster(t, root.DY_HIST[2026].ros[t.name], t.user); });
+    g.real2026 = true;
+  };
+
   /* ---------- recruiting: real players, re-ranked by their careers ---------- */
   // replaces the top of a generated class with the real class of that year (stars by where their careers ranked them)
   DY.histClass = (year, list, prospectFn) => {
-    const g = G(); if (!g || !g.hx || !root.DY_HCLASS || !root.DY_HCLASS[year]) return;
-    const real = root.DY_HCLASS[year];
-    list.sort((a, b) => b.rec.c - a.rec.c);
+    const g = G(); if (!g || !root.DY_HCLASS || !root.DY_HCLASS[year]) return;
+    if (!g.hx && year < 2027) return;                      // the 2026 game: real classes from 2027 on
+    const real = root.DY_HCLASS[year], nk = s => String(s || '').toLowerCase().replace(/[^a-z]/g, '');
+    const have = new Set(list.filter(p => p.real).map(p => nk(p.n)));   // Tennessee's real commits are already in the class
+    const gen = list.filter(p => !p.real).sort((a, b) => b.rec.c - a.rec.c);
+    let gi = 0;
     real.forEach((r, i) => {
-      const [name, pos, school, val, , , home] = r;
-      const old = list[i]; if (!old) return;
+      const [name, pos, school, val, , , home, comp] = r;
+      if (have.has(nk(name))) return;
+      const old = gen[gi++]; if (!old) return;
       const hm = /,\s*([A-Z]{2})$/.exec(home || '');
       const st = hm ? hm[1] : (DY.byName(school) || {}).st || old.st;
-      const p = prospectFn(pos, old.rec.c, { n: name, home: home || undefined, st });
-      // what he became: the best careers have the most room to grow
-      p.ceil = Math.max(p.ceil, Math.round(clamp(95 - i * 0.07 + DY.gauss() * 1.2, 83, 99)));
-      p.potG = DY.scoutGrade(p.ceil); p.gem = p.ceil >= p.ovr + 18; p.bust = false;
+      const c = comp ? Math.round(Math.min(0.9999, comp) * 1e4) / 1e4 : old.rec.c;   // 247 composite (modern classes) or the career-ranked slot
+      const p = prospectFn(pos, c, { n: name, home: home || undefined, st });
+      if (!comp) {
+        // what he became: the best careers have the most room to grow
+        p.ceil = Math.max(p.ceil, Math.round(clamp(95 - i * 0.07 + DY.gauss() * 1.2, 83, 99)));
+        p.potG = DY.scoutGrade(p.ceil); p.gem = p.ceil >= p.ovr + 18; p.bust = false; p.realCareer = true;
+      }
       const sch = DY.byName(school);
-      if (sch && sch.fbs) { p.realSchool = sch.id; p.interest[sch.id] = Math.max(p.interest[sch.id] || 0, 45); }
-      p.realCareer = true;
-      list[i] = p;
+      if (sch && sch.fbs) { p.realSchool = sch.id; p.interest[sch.id] = Math.max(p.interest[sch.id] || 0, sch.id === DY.UT_ID ? 60 : 45); }
+      p.realName = true;
+      const at = list.indexOf(old); if (at >= 0) list[at] = p;
     });
   };
 
@@ -273,6 +301,20 @@
       'New Mexico Bowl': y < 2006 ? null : n, 'New Orleans Bowl': y < 2001 ? null : n, 'Independence Bowl': n, 'Holiday Bowl': n, 'Sun Bowl': n, 'Liberty Bowl': n, 'Gator Bowl': n,
     };
     return M[n] === undefined ? n : M[n];
+  };
+
+  /* ---------- the record book as it stood the year you start ---------- */
+  // records set after your start year have not happened yet: they come off the board (blank until someone sets one)
+  const initRecords0 = DY.initRecords;
+  DY.initRecords = () => {
+    initRecords0();
+    const g = G(); if (!g || !g.hx || !g.rec) return;
+    for (const scope of ['game', 'season', 'career']) for (const k in g.rec[scope]) {
+      const r = g.rec[scope][k]; if (!r || !r.real) continue;
+      const yrs = String(r.y || '').match(/\d{4}/g) || [];
+      const first = yrs.length ? Math.min(...yrs.map(Number)) : 0, last = yrs.length ? Math.max(...yrs.map(Number)) : 0;
+      if ((scope === 'career' ? last : first) >= g.startSeason) g.rec[scope][k] = { v: 0, n: '—', y: '', note: 'not set yet in ' + g.startSeason, real: true, blank: true };
+    }
   };
 
   /* ---------- the setup screen: the start-year picker ---------- */

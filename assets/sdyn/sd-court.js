@@ -173,15 +173,20 @@
       // the ball is out of bounds: an inbounder takes it out, the guard comes to get it
       const base = after === 'inb';
       const inb = base ? (O.find(isBig) || O[4]) : O[2];
-      const spot = base ? P(89.6, 25 + clamp(B.p[1] - 25, -5, 5)) : [clamp(B.p[0], 6, 88), B.p[1] < 25 ? -1.4 : 51.4];
+      // a dead ball: in from the sideline where it happened (frontcourt or backcourt)
+      const sdx = clamp(dxOf(B.p), 8, 80), front = !base && sdx < 47, side = B.p[1] < 25 ? -1.4 : 51.4;
+      const spot = base ? P(89.6, 25 + clamp(B.p[1] - 25, -5, 5)) : [F.bx + sg * sdx, side];
       B.hold = null; B.fl = null;
       if (base) { go(inb, B.p.slice(), 15); run(1.6, () => dist(A[inb].p, B.p) < 1.6); }
       else { B.p = spot.slice(); go(inb, spot, 16); run(1.6, () => dist(A[inb].p, spot) < 1.2); }
       B.hold = inb; B.dr = false; go(inb, spot, 9); H = inb;
       const recv = inb === handler ? O[1] : handler;
-      const meet = base ? P(80, 25 + (spot[1] > 25 ? -9 : 9)) : [clamp(spot[0] + sg * 8, 4, 90), spot[1] < 25 ? 9 : 41];
-      go(recv, meet, 15);
-      O.forEach(x => { if (x !== inb && x !== recv) go(x, P(clamp(dxOf(A[x].p), 45, 70), clamp(A[x].p[1], 6, 44)), 11); });
+      // the guard comes to the ball (a V-cut: a step away, then back to it)
+      const meet = base ? P(76, 25 + (spot[1] > 25 ? -10 : 10)) : [F.bx + sg * clamp(sdx + 6, 10, 88), side < 0 ? 10 : 40];
+      pathTo(recv, [toward(meet, P(front ? 10 : 60, 25), 6), meet], 15);
+      if (base) O.forEach(x => { if (x !== inb && x !== recv) go(x, P(clamp(dxOf(A[x].p), 45, 70), clamp(A[x].p[1], 6, 44)), 11); });
+      else if (front) O.forEach(x => { if (x !== inb && x !== recv) free(x, 12); });            // everyone else in the half-court set
+      else O.forEach(x => { if (x !== inb && x !== recv) go(x, P(clamp(sdx - 18, 22, 40), A[x].p[1] * 0.6 + 10), 12); });
       run(1.0, () => dist(A[inb].p, spot) < 1 && dist(A[recv].p, meet) < 2);
       pass(recv); B.dr = true; free(inb, 15);
       O.forEach(x => { if (x !== recv && x !== inb) free(x, 13); });
@@ -189,27 +194,44 @@
       if (H == null) { H = nearestO(B.p); B.hold = H; }
       else B.hold = H;
     }
+    // push it up the floor; a teammate open well ahead of the ball gets it (the ball beats the defense up the court)
+    const openFt = x => Math.min(...D.map(d0 => dist(A[d0].p, A[x].p)));
+    function hitAhead(max, stopDx) {
+      const end = t + max; let passes = 0;
+      while (t < end && dxOf(A[H].p) >= stopDx) {
+        run(0.2);
+        if (passes < 1 && !B.fl && dxOf(A[H].p) > 30) {
+          const ahead = O.filter(x => x !== H && dxOf(A[x].p) < dxOf(A[H].p) - 12 && dxOf(A[x].p) > 4 && openFt(x) > 7).sort((a, b) => (a === shooter ? -1 : 0) - (b === shooter ? -1 : 0) || dxOf(A[a].p) - dxOf(A[b].p))[0];
+          if (ahead != null) {
+            const prev = H; pass(ahead, { v: 52, arc: 3 }); passes++;
+            go(ahead, () => P(Math.max(stopDx - 6, dxOf(A[ahead].p) - 6), 25 + (A[ahead].p[1] - 25) * 0.6), 19);
+            go(prev, () => P(Math.max(26, dxOf(A[prev].p) - 6), 25 + (A[prev].p[1] - 25) * 0.6), 17);   // the passer trails the play
+          }
+        }
+      }
+    }
     // ---------------- 1: up the floor ----------------
     const topSlot = () => { const o = O.find(x => slot[x] === 0); if (o != null && o !== H) { slot[o] = slot[H]; slot[H] = 0; } };
     const ballSide = () => (A[H].p[1] < 25 ? -1 : 1);
     if (H !== handler && isBig(H)) {
       // the outlet: the big who rebounded finds the guard leaking out
-      const lead = [A[H].p[0] - sg * 2, clamp(A[H].p[1] + (A[H].p[1] < 25 ? -8 : 8), 5, 45)];
-      go(handler, () => [clamp(A[H].p[0] + sg * 5, -1, 95), A[handler].p[1] * 0.5 + lead[1] * 0.5], 17);
-      run(0.5); pass(handler);
+      // the guard already up the floor gets a long outlet; one close by comes to the ball on the wing, ahead of it
+      if (dist(A[H].p, A[handler].p) < 26) { const side = A[H].p[1] < 25 ? -1 : 1; go(handler, () => [A[H].p[0] - sg * 9, clamp(A[H].p[1] + side * 12, 4, 46)], 17); run(0.55); }
+      else { go(handler, () => [A[handler].p[0] - sg * 3, A[handler].p[1]], 12); run(0.25); }
+      pass(handler, { v: 50, arc: 2 });
     }
     if (flow === 'trans') {
       // the break: the ball in the middle, wings sprinting wide, the rim runner, the trailer
       const lanes = [[25, 25], [5, 4.5], [5, 45.5], [26, 18], [4, 22]];
       const mid = H;
       O.forEach((x, i) => { if (x !== mid) { const li = x === handler ? 0 : i; go(x, P(lanes[li][0] + rnd(-2, 2), lanes[li][1] + rnd(-1.5, 1.5)), li === 3 ? 16 : 20); } });
-      go(mid, () => P(Math.max(14, dxOf(A[mid].p) - 6), 25 + (A[mid].p[1] - 25) * 0.8), 19);
-      run(4.5, () => dxOf(A[mid].p) < 22);
+      go(mid, () => P(Math.max(14, dxOf(A[H].p) - 6), 25 + (A[mid].p[1] - 25) * 0.8), 19);
+      hitAhead(4.5, 22);
     } else if (flow === 'early') {
       // secondary break: push it, fill the lanes, a trailer for a drag screen
       O.forEach((x, i) => { if (x !== H) go(x, slotPt.bind(null, x), i === 4 || i === 3 ? 14 : 17); });
       go(H, () => P(Math.max(26, dxOf(A[H].p) - 8), 25 + (A[H].p[1] - 25) * 0.7), 16);
-      run(5, () => dxOf(A[H].p) < 30);
+      hitAhead(5, 30);
     } else {
       // walk it up: everyone into the set, the handler sizes up the defense at the top
       O.forEach(x => { if (x !== H) free(x, 12.5); });
@@ -462,7 +484,7 @@
     if (r.drb) {
       // the outlet: guards leak out, the other team sprints back
       const nd = rbId;
-      D.forEach((x, i) => { if (x !== nd && i < 3) go(x, P(58 + i * 4, i === 1 ? 7 : i === 2 ? 43 : 22), 17); else if (x !== nd) go(x, P(40, A[x].p[1]), 12); });
+      D.forEach((x, i) => { if (x !== nd && i < 3) go(x, P(48 + i * 3, i === 1 ? 7 : i === 2 ? 43 : 22), 17); else if (x !== nd) go(x, P(40, A[x].p[1]), 12); });
       go(nd, () => toward(A[nd].p, P(60, 25), 3), 8);
       O.forEach((x, i) => go(x, P(64 + i * 2, 14 + i * 5), 16));
       run(0.55);

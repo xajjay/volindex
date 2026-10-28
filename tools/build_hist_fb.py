@@ -13,6 +13,8 @@ import csv, json, math, os, re, sys, collections, statistics, zlib
 HD, HIST = sys.argv[1], sys.argv[2]
 sys.path.insert(0, HIST)
 import tdb  # noqa: E402
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hist_ratings  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'data', 'hist')
@@ -117,6 +119,35 @@ def ncaa(y):
 def scale(v): return max(45, min(97, round(31 + 0.62 * v)))
 def scale_attr(v): return max(30, min(99, round(22 + 0.78 * v)))
 
+# ---------- EA College Football 25 / 26 ratings (TeamCrafters exports) ----------
+EA_YEAR = {2024: os.path.join(HD, 'ext', 'volindex-ea-cfb25.txt'), 2025: os.path.join(HD, 'ext', 'volindex-ea-cfb26.txt')}
+EAPOS = {'QB': 'QB', 'HB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE', 'LT': 'OT', 'RT': 'OT', 'LG': 'IOL', 'C': 'IOL', 'RG': 'IOL', 'LEDG': 'EDGE', 'REDG': 'EDGE',
+         'LE': 'EDGE', 'RE': 'EDGE', 'DT': 'DT', 'SAM': 'LB', 'WILL': 'LB', 'MIKE': 'LB', 'LOLB': 'LB', 'ROLB': 'LB', 'MLB': 'LB', 'CB': 'CB', 'FS': 'S', 'SS': 'S',
+         'K': 'K', 'P': 'P', 'ATH': 'WR', 'LS': 'LS', 'KR': 'WR', 'PR': 'WR'}
+def ea_team(label):
+    names = sorted(list(DYT) + list(ALIAS), key=len, reverse=True)
+    for n in names:
+        if label.startswith(n): return dyname(n)
+    return None
+def load_ea(path):
+    out, cur, seen = collections.defaultdict(list), None, set()
+    for line in open(path, encoding='utf-8'):
+        line = line.rstrip('\n')
+        if line.startswith('#'): cur = ea_team(line.split('\t', 1)[1] if '\t' in line else ''); continue
+        f = line.split('\t')
+        if cur is None or len(f) < 13: continue
+        nm = f[0].strip()
+        if nm.isupper() and len(nm) > 4: nm = nm.title()          # the site lists some players twice, once in capitals
+        key = (cur, norm(nm))
+        if key in seen: continue
+        seen.add(key)
+        cls = f[5]; yr = {'FR': 1, 'SO': 2, 'JR': 3, 'SR': 4}.get(cls[:2], 2)
+        try: wt = int(f[4]); wt = wt if 150 <= wt <= 400 else 0
+        except ValueError: wt = 0
+        num = lambda v: int(v) if v.isdigit() else 0
+        out[cur].append({'n': nm, 'pos': EAPOS.get(f[1], 'WR'), 'num': num(f[2]), 'ht': num(f[3]), 'wt': wt, 'yr': yr, 'ovr': num(f[6]), 'dev': f[7], 'spd': num(f[8]), 'str': num(f[9]), 'awr': num(f[12])})
+    return out
+
 # ---------- cfbfastR rosters (names, class, size, hometown) for the years without NCAA files ----------
 def cfr_roster(y):
     f = os.path.join(HD, 'cfr/rosters/csv/cfb_rosters_%d.csv' % y)
@@ -146,6 +177,92 @@ for d in DRAFT: DRAFT_BY[d['n'].lower()].append(d)
 def norm(n): return re.sub(r'[^a-z]', '', re.sub(r'\b(jr|sr|ii|iii|iv)\b\.?', '', n.lower()))
 DRAFT_N = collections.defaultdict(list)
 for d in DRAFT: DRAFT_N[norm(d['n'])].append(d)
+
+
+# ---------- season stats and awards (Sports-Reference export, when it is there) ----------
+SRX = {}
+SR_SLUG = {'miami-fl': 'Miami', 'miami-oh': 'Miami (OH)', 'louisiana-state': 'LSU', 'mississippi': 'Ole Miss', 'southern-california': 'USC', 'central-florida': 'UCF',
+           'brigham-young': 'BYU', 'texas-christian': 'TCU', 'southern-methodist': 'SMU', 'alabama-birmingham': 'UAB', 'nevada-las-vegas': 'UNLV', 'texas-el-paso': 'UTEP',
+           'texas-san-antonio': 'UTSA', 'north-carolina-state': 'NC State', 'pittsburgh': 'Pitt', 'california': 'Cal', 'connecticut': 'UConn', 'massachusetts': 'UMass',
+           'florida-atlantic': 'FAU', 'florida-international': 'FIU', 'louisiana-monroe': 'ULM', 'louisiana-lafayette': 'Louisiana', 'appalachian-state': 'App State',
+           'southern-mississippi': 'Southern Miss', 'hawaii': "Hawai'i", 'san-jose-state': 'San José State', 'middle-tennessee-state': 'Middle Tennessee',
+           'sam-houston-state': 'Sam Houston', 'bowling-green-state': 'Bowling Green', 'texas-am': 'Texas A&M', 'mississippi-state': 'Mississippi State',
+           'south-florida': 'South Florida', 'western-kentucky': 'Western Kentucky', 'east-carolina': 'East Carolina', 'james-madison': 'James Madison'}
+def sr_team(slug):
+    if not slug: return None
+    if slug in SR_SLUG: return SR_SLUG[slug]
+    return dyname(' '.join(w.capitalize() for w in slug.split('-')))
+SRROS = collections.defaultdict(list)
+def load_sr():
+    f = os.path.join(HD, 'ext', 'volindex-sr-stats.txt')
+    if not os.path.exists(f): return
+    head, sec = {}, None
+    for line in open(f, encoding='utf-8'):
+        line = line.rstrip('\n')
+        if line.startswith('H\t'): head = json.loads(line[2:]); continue
+        if line.startswith('S\t'): sec = ('S', line[2:]); continue
+        if line.startswith('A\t'): sec = ('A', line[2:]); continue
+        if not sec: continue
+        if sec[0] == 'S':
+            y, page = sec[1].split('-', 1); hd = head.get(page)
+            if not hd: continue
+            fl = dict(zip(hd, line.split('|')))
+            k = (int(y), norm(fl.get('name', '')))
+            d = SRX.setdefault(k, {'school': fl.get('school'), 'aw': '', 'slug': fl.get('slug')})
+            for h in hd[4:-1]:
+                if fl.get(h) and not d.get(h): d[h] = fl[h]
+            if fl.get('awards'): d['aw'] = (d['aw'] + ',' + fl['awards']).strip(',')
+        else:
+            # award pages: caption|slug|school|data-stat=value;...
+            parts = line.split('|', 3)
+            if len(parts) < 4: continue
+            o = dict(kv.split('=', 1) for kv in parts[3].split(';') if '=' in kv)
+            yv = o.get('year_id') or o.get('year') or (sec[1][-4:] if sec[1].startswith('heisman-') else '')
+            m = re.search(r'(\d{4})', yv)
+            nm = o.get('player') or o.get('name_display') or ''
+            if not m or not nm: continue
+            y = int(m.group(1)); k = (y, norm(nm.replace('*', '')))
+            tag = 'AA' if sec[1].startswith('all-america') else ('H-' + (o.get('rank') or o.get('ranker') or '1')) if sec[1].startswith('heisman-') else sec[1].replace('-', ' ').title().replace(' ', '')
+            if sec[1] == 'heisman': tag = 'H-1'
+            d = SRX.setdefault(k, {'school': parts[2], 'aw': ''})
+            if tag not in d['aw']: d['aw'] = (d['aw'] + ',' + tag).strip(',')
+    for fn in sorted(os.listdir(os.path.join(HD, 'ext'))):
+        if not fn.startswith('volindex-sr-rosters'): continue
+        cur = None
+        for line in open(os.path.join(HD, 'ext', fn), encoding='utf-8'):
+            line = line.rstrip('\n')
+            if line.startswith('R\t'):
+                sl, yy = line[2:].split('|'); cur = (int(yy), sr_team(sl)); continue
+            if not cur or not cur[1]: continue
+            slug, nm, cls, pos, summ = (line.split('|') + [''] * 5)[:5]
+            SRROS[cur].append({'slug': slug, 'n': nm, 'cls': cls, 'pos': pos, 'sum': summ})
+            # defense from the stat summary ("45 Tkl, 6.5 TFL, 4 Sk, 2 Int")
+            k = (cur[0], norm(nm)); d = SRX.setdefault(k, {'school': '', 'aw': ''})
+            for val, lab in re.findall(r'([\d.]+) (Tkl|TFL|Sk|Int|PD|FF)', summ):
+                key = {'Tkl': 'tackles_total', 'TFL': 'tackles_loss', 'Sk': 'sacks', 'Int': 'def_int', 'PD': 'pass_defended', 'FF': 'fumbles_forced'}[lab]
+                if not d.get(key): d[key] = val
+load_sr()
+print('SR seasons with stats:', len(SRX), 'roster team-seasons:', len(SRROS))
+def info_for(y, team, sy=None):
+    def f(name, pos):
+        out = {}
+        st = SRX.get((sy or y, norm(name)))
+        if st: out['prod'] = hist_ratings.production(pos, st); out['aw'] = st.get('aw', '')
+        for d in DRAFT_N.get(norm(name), []):
+            if y < d['y'] <= y + 4 and (dyname(d['col']) == team or not team):
+                out['pick'] = d['pick']; out['yrs_out'] = d['y'] - y; break
+        return out
+    return f
+def rate_all(y, rosters, pr, sy=None):
+    for t, rows in rosters.items():
+        for r in rows:      # where he actually played that season, when the stats say so
+            st = SRX.get((sy or y, norm(r[0])))
+            if not st: continue
+            f = lambda k: float(st.get(k) or 0)
+            if f('pass_att') >= 150 and r[1] != 'QB': r[1] = 'QB'
+            elif r[1] == 'QB' and f('pass_att') < 20 and f('rec') >= 10: r[1] = 'WR'
+            elif r[1] == 'QB' and f('pass_att') < 20 and f('rush_att') >= 40: r[1] = 'RB'
+        hist_ratings.rate_team(y, pr.get(t, 60), rows, info_for(y, t, sy))
 
 # ---------- team strength for a season: results (SRS) blended with roster talent ----------
 def team_strength(y, rosters):
@@ -202,6 +319,21 @@ def build_year(y):
                 if t == 'Tennessee': row.append({'at': at, 'home': (h['home_city'] + ', ' + h['home_state']) if h and h['home_city'] not in ('', 'NA') else ''})
                 out.append(row)
             rosters[t] = out
+    elif y in EA_YEAR and os.path.exists(EA_YEAR[y]):
+        # EA College Football 25 (end of 2024) / 26 (end of 2025): every team's real roster and ratings
+        src_note = 'EA Sports College Football %d ratings (TeamCrafters)' % (25 if y == 2024 else 26)
+        E = load_ea(EA_YEAR[y]); cf = cfr_roster(y); homes = {}
+        for t, rs in cf.items():
+            for r in rs: homes[(t, norm(r['first_name'] + r['last_name']))] = r
+        for t, rs in E.items():
+            if t not in conf: continue
+            out = []
+            for r in rs:
+                h = homes.get((t, norm(r['n'])))
+                row = [r['n'], r['pos'], r['yr'], scale(r['ovr']), r['num'], r['ht'], r['wt'], scale_attr(r['spd']), scale_attr(r['str']), scale_attr(r['awr']), h['home_state'] if h and h['home_state'] not in ('', 'NA') else '']
+                if t == 'Tennessee': row.append({'home': (h['home_city'] + ', ' + h['home_state']) if h and h['home_city'] not in ('', 'NA') else ''})
+                out.append(row)
+            rosters[t] = out
     else:
         src_note = 'cfbfastR roster; ratings from class year, team results and later careers'
         cf = cfr_roster(y)
@@ -235,6 +367,7 @@ def build_year(y):
             out.sort(key=lambda r: -r[3]); rosters[t] = out[:85]
     st = team_strength(y, rosters)
     pr = prestige_map(st)
+    rate_all(y, rosters, pr)
     data = {'y': y, 'src': src_note, 'conf': conf, 'pr': pr, 'ros': rosters}
     js = 'window.DY_HIST = window.DY_HIST || {}; window.DY_HIST[%d] = %s;\n' % (y, json.dumps(data, separators=(',', ':'), ensure_ascii=False))
     open(os.path.join(OUT, 'fb-%d.js' % y), 'w').write(js)
@@ -359,6 +492,7 @@ def build_old(y):
         prior = sum(1 for yy in range(y - 4, y) if any(norm(n) == norm(nm) for n, _ in UTSTATS.get(yy, [])))
         ros['Tennessee'].append([nm, pos, min(5, prior + 2), 76 + prior * 2, 0, 0, 0, None, None, None, ''])
         seen.add(norm(nm))
+    rate_all(y, ros, pr)
     data = {'y': y, 'src': 'real players from the NFL draft record and Tennessee stat sheets; the rest of each roster is generated', 'conf': conf, 'pr': pr, 'ros': dict(ros)}
     js = 'window.DY_HIST = window.DY_HIST || {}; window.DY_HIST[%d] = %s;\n' % (y, json.dumps(data, separators=(',', ':'), ensure_ascii=False))
     open(os.path.join(OUT, 'fb-%d.js' % y), 'w').write(js)
@@ -371,6 +505,85 @@ POSMAP_D = {'QB': 'QB', 'RB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE', 'T': 'OT
 OLD_CONF = {}
 for y in range(1990, 2006):
     build_old(y)
+
+# ---------- 2026: every team's real roster (Tennessee keeps its hand-built roster in the game) ----------
+def load_247():
+    f = os.path.join(HD, 'ext', 'volindex-247.txt'); out = collections.defaultdict(list)
+    if not os.path.exists(f): return out
+    for line in open(f, encoding='utf-8'):
+        p = line.rstrip('\n').split('|')
+        if len(p) < 9 or not p[0].isdigit(): continue
+        cls, rk, nm, meta, pos, hw, score, stars, sch = p[:9]
+        m = re.search(r'\(([^,]+), ([A-Z]{2})\)', meta)
+        out[int(cls)].append({'rk': int(rk), 'n': nm.strip(), 'hs': meta.split(' (')[0], 'home': (m.group(1) + ', ' + m.group(2)) if m else '', 'st': m.group(2) if m else '',
+                              'pos': pos, 'hw': hw, 'c': float(score) if score.replace('.', '').isdigit() else 0.0, 'stars': int(stars or 0), 'school': (sch.split('/')[-1] if sch else '')})
+    return out
+R247 = load_247()
+def build_2026():
+    y = 2026
+    cf = cfr_roster(y)
+    E = load_ea(EA_YEAR[2025]) if os.path.exists(EA_YEAR[2025]) else {}
+    ea = {}
+    for t, rs in E.items():
+        for r in rs: ea[norm(r['n'])] = r
+    fr = {norm(r['n']): r for r in R247.get(2026, [])}
+    rosters = {}
+    for t, rs in cf.items():
+        if t == 'Tennessee': continue
+        out = []
+        for r in rs:
+            pos = CPOS.get((r['position'] or '').upper())
+            if not pos: continue
+            nm = (r['first_name'] + ' ' + r['last_name']).strip(); k = norm(nm)
+            try: wt = int(float(r['weight'])) if r['weight'] not in ('', 'NA') else 0
+            except ValueError: wt = 0
+            try: ht = int(float(r['height'])) if r['height'] not in ('', 'NA') else 0
+            except ValueError: ht = 0
+            if pos == 'OL': pos = 'OT' if ht >= 77 else 'IOL'
+            if pos == 'DL': pos = 'DT' if wt >= 285 else 'EDGE'
+            try: yr = max(1, min(5, int(float(r['year']))))
+            except ValueError: yr = 1
+            e = ea.get(k); src = 0; spd = None
+            if e: src = scale(e['ovr']) + 1.5; spd = scale_attr(e['spd']); pos = e['pos'] if e['pos'] != 'WR' or pos == 'WR' else pos     # a year older than his CFB 26 rating
+            elif k in fr: src = scale(55 + (fr[k]['c'] - 0.80) * 140)
+            try: num = int(float(r['jersey'])) if r['jersey'] not in ('', 'NA') else 0
+            except ValueError: num = 0
+            out.append([nm, pos, yr, src, num, ht, wt, spd, None, None, r['home_state'] if r['home_state'] not in ('', 'NA') else ''])
+        rosters[t] = out
+    pr = {l[0]: int(l[3]) for l in TL}
+    rate_all(y, rosters, pr, 2025)      # preseason: last season's production
+    for t in rosters: rosters[t].sort(key=lambda r: -r[3]); rosters[t] = rosters[t][:85]
+    data = {'y': y, 'src': 'real 2026 rosters (cfbfastR); ratings from EA College Football 26, the 247 composite for freshmen, production and the draft', 'conf': {}, 'pr': pr, 'ros': rosters}
+    # real 2026 stats so far for every team (Start Today): Sports-Reference season pages + stat rosters (defense)
+    TS = collections.defaultdict(dict); MAPK = {'games': 'gp', 'pass_cmp': 'pc', 'pass_att': 'pa', 'pass_yds': 'py', 'pass_td': 'ptd', 'pass_int': 'pi', 'rush_att': 'ra', 'rush_yds': 'ry',
+        'rush_td': 'rtd', 'rec': 'rc', 'rec_yds': 'rcy', 'rec_td': 'rctd', 'fgm': 'fgm', 'fga': 'fga', 'xpm': 'xpm', 'xpa': 'xpa', 'punt': 'pn', 'punt_yds': 'pny'}
+    f26 = os.path.join(HD, 'ext', 'volindex-sr-2026.txt')
+    if os.path.exists(f26):
+        for line in open(f26, encoding='utf-8'):
+            line = line.rstrip('\n')
+            if line.startswith('S\t') or not line: continue
+            parts = line.split('|', 3)
+            if len(parts) < 4: continue
+            t = sr_team(parts[2])
+            if not t: continue
+            o = dict(kv.split('=', 1) for kv in parts[3].split(';') if '=' in kv)
+            d = TS[t].setdefault(norm(parts[1]), {})
+            for k, v in o.items():
+                if k in MAPK and v not in ('', None):
+                    try: n = float(v); d[MAPK[k]] = int(n) if n == int(n) else n
+                    except ValueError: pass
+    for (yy, t), rows in SRROS.items():
+        if yy != 2026 or not t: continue
+        for r in rows:
+            d = TS[t].setdefault(norm(r['n']), {})
+            for val, lab in re.findall(r'([\d.]+) (Tkl|TFL|Sk|Int|PD|FF)', r['sum']):
+                d[{'Tkl': 'tk', 'TFL': 'tfl', 'Sk': 'sck', 'Int': 'int', 'PD': 'pd', 'FF': 'ff'}[lab]] = float(val) if '.' in val else int(val)
+    js = 'window.DY_HIST = window.DY_HIST || {}; window.DY_HIST[2026] = %s;\n' % json.dumps(data, separators=(',', ':'), ensure_ascii=False)
+    js += 'window.DY_TODAY_STATS = %s;\n' % json.dumps(TS, separators=(',', ':'), ensure_ascii=False)
+    open(os.path.join(OUT, 'fb-2026.js'), 'w').write(js)
+    print('2026 stats: teams', len(TS), 'players', sum(len(v) for v in TS.values()))
+    print('2026: teams', len(rosters), 'players', sum(len(v) for v in rosters.values()), 'with EA rating', sum(1 for v in rosters.values() for r in v if norm(r[0]) in ea))
+build_2026()
 
 # ---------- schedules for every season (the real slate is played in any historical season up to 2025) ----------
 S = {y: {'conf': CONFS[y], 'g': SCHED[y]} for y in SCHED if 2006 <= y <= 2025}
@@ -387,19 +600,39 @@ for y in range(2004, 2027):
     for t, rs in cfr_roster(y).items():
         for r in rs:
             if r['home_state'] not in ('', 'NA'): HOME[norm(r['first_name'] + r['last_name'])] = (r['home_city'], r['home_state'])
-classes = collections.defaultdict(list)
-for d in DRAFT:
-    enroll = d['y'] - max(3, min(5, d['age'] - 18))     # the fall he arrived on campus
-    cls = enroll                                         # signed in that class
-    if cls < 1990 or cls > 2022: continue
-    pos = POSMAP.get(d['pos'].upper())
-    if not pos: continue
-    school = dyname(d['col']) or d['col']
-    hm = HOME.get(norm(d['n']))
-    classes[cls].append([d['n'], pos, school, round(d['val'], 1), d['y'], d['pick'], (hm[0] + ', ' + hm[1]) if hm else ''])
+P247 = {'QB': 'QB', 'PRO': 'QB', 'DUAL': 'QB', 'RB': 'RB', 'APB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE', 'OT': 'OT', 'IOL': 'IOL', 'OG': 'IOL', 'OC': 'IOL',
+        'EDGE': 'EDGE', 'WDE': 'EDGE', 'SDE': 'EDGE', 'DL': 'DT', 'DT': 'DT', 'LB': 'LB', 'ILB': 'LB', 'OLB': 'LB', 'CB': 'CB', 'S': 'S', 'SAF': 'S', 'ATH': 'WR',
+        'K': 'K', 'P': 'P', 'LS': 'LS'}
+# college production and awards by player across seasons (from the Sports-Reference export)
+CAREER = collections.defaultdict(float)
+for (yy, nk), st in SRX.items():
+    best = max((hist_ratings.production(pp, st) or 0) for pp in ('QB', 'RB', 'WR', 'EDGE', 'LB', 'CB'))
+    CAREER[nk] += best * 4 + hist_ratings.award_points(st.get('aw', '')) * 3
 CL = {}
-for c, ps in classes.items():
-    ps.sort(key=lambda r: -r[3]); CL[c] = ps[:200]
+for c in range(1990, 2030):
+    cand = {}
+    for r in R247.get(c, []):
+        cand[norm(r['n'])] = {'n': r['n'], 'pos': P247.get(r['pos'].upper(), 'WR'), 'school': dyname(r['school']) or r['school'], 'home': r['home'], 'c': r['c'], 'rk': r['rk'], 'val': 0.0}
+    for d in DRAFT:
+        enroll = d['y'] - max(3, min(5, d['age'] - 18))
+        if enroll != c: continue
+        pos = POSMAP.get(d['pos'].upper())
+        if not pos: continue
+        k = norm(d['n']); x = cand.get(k)
+        if not x:
+            hm = HOME.get(k)
+            x = cand[k] = {'n': d['n'], 'pos': pos, 'school': dyname(d['col']) or d['col'], 'home': (hm[0] + ', ' + hm[1]) if hm else '', 'c': 0, 'rk': 9999, 'val': 0.0}
+        x['val'] += d['val']; x['pick'] = d['pick']; x['dy'] = d['y']
+    for k, x in cand.items(): x['val'] += CAREER.get(k, 0)
+    if c <= 2024:
+        # what they became: the class ranked by careers (the composite only breaks ties); busts fall out of the top
+        ps = sorted([x for x in cand.values() if x['val'] > 0 or (c >= 2023 and x['c'] >= 0.95)], key=lambda x: -(x['val'] + max(0, x['c'] - 0.85) * 30))[:250]
+        CL[c] = [[x['n'], x['pos'], x['school'], round(x['val'], 1), x.get('dy', 0), x.get('pick', 0), x['home'], 0] for x in ps]
+    else:
+        # classes still in school or not yet signed: the 247 Sports composite
+        ps = sorted([x for x in cand.values() if x['rk'] < 9999], key=lambda x: x['rk'])[:320]
+        CL[c] = [[x['n'], x['pos'], x['school'], 0, 0, 0, x['home'], x['c']] for x in ps]
+CL = {c: v for c, v in CL.items() if v}
 open(os.path.join(OUT, 'fb-classes.js'), 'w').write('window.DY_HCLASS = %s;\n' % json.dumps(CL, separators=(',', ':'), ensure_ascii=False))
 print('classes', min(CL), max(CL), {c: len(v) for c, v in list(sorted(CL.items()))[-6:]}, 'kb', os.path.getsize(os.path.join(OUT, 'fb-classes.js')) // 1024)
-print('2015 class top 10:', [(r[0], r[1], r[2]) for r in CL[2015][:10]])
+print('2015 class top 10:', [(r[0], r[1], r[2]) for r in CL.get(2015, [])[:10]]); print('2027 top 5:', [(r[0], r[1], r[2], r[7]) for r in CL.get(2027, [])[:5]])

@@ -45,7 +45,7 @@
     p.gem = p.ceil >= exp + 5; p.bust = p.ceil <= exp - 6;
     return p;
   }
-  function prefs() { const ks = shuffle(Object.keys(DY.PREFS)); return { top: ks.slice(0, 3), deal: chance(0.35) ? ks[0] : null }; }
+  function prefs() { const ks = shuffle(Object.keys(DY.PREFS).filter(k => k !== 'nil' || DY.nilOn())); return { top: ks.slice(0, 3), deal: chance(0.35) ? ks[0] : null }; }
   DY.genClass = (year, withReal) => {
     const g = G(), out = [];
     const n5 = 32, n4 = 300, n3 = 170;
@@ -203,10 +203,26 @@
         else if (g.teams[was].user) { logs.push(`DECOMMIT: ${p.n} flips to ${g.teams[lead].name}.`); DY.news('commit', `${p.n} flips from ${DY.UN()} to ${g.teams[lead].name}`, ''); }
       }
     });
+    // the early signing period: by the end of the regular season every prospect in the class has picked a school
+    if (w >= DY.LAST_WK) commitAll(logs, full);
     R.log = logs.concat(R.log).slice(0, 60);
     R.hours = DY.HOURS();
     DY.rankClasses();
   };
+  function commitAll(logs, fullUser) {
+    const g = G(), R = g.recruit, cnt = {};
+    Object.values(R.pool).forEach(p => { if (p.commit != null) cnt[p.commit] = (cnt[p.commit] || 0) + 1; });
+    const cap = t => t.user ? DY.CAP.hs : 27;
+    Object.values(R.pool).filter(p => p.commit == null).sort((a, b) => b.rec.c - a.rec.c).forEach(p => {
+      if (!Object.keys(p.interest).length) seedInterest(p);
+      const order = Object.entries(p.interest).sort((a, b) => b[1] - a[1]).map(x => +x[0]);
+      let tid = order.find(id => { const t = g.teams[id]; return t && !t.dorm && (cnt[id] || 0) < cap(t) && (!t.user || (p.offer && !fullUser && g.settings.recruiting !== 'off')); });
+      if (tid == null) { const t = DY.wpick(g.teams.filter(t => !t.user && !t.dorm && (cnt[t.id] || 0) < cap(t)), t => Math.pow(t.prestige / 60, p.rec.stars >= 4 ? 4 : 1.5)); tid = t ? t.id : null; }
+      if (tid == null) return;
+      p.commit = tid; cnt[tid] = (cnt[tid] || 0) + 1;
+      if (g.teams[tid].user) logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos}, signs with ${DY.UN()} in the early period.`);
+    });
+  }
   // program pull: how much a school's pitch counts with a recruit. Blue-chips discount low-prestige programs,
   // so a rebuild takes years of winning (prestige) instead of one good recruiting season. Tennessee-level programs ~1.0.
   DY.pull = (t, p) => {
@@ -258,7 +274,10 @@
 
   /* ---------- the offseason ---------- */
   DY.OFF_LABEL = { recap: 'Season recap', nil: 'NIL & budget', portal: 'Transfer portal', signing: 'Signing day', draft: 'NFL Draft', progress: 'Progression', cuts: 'Roster cut-down', schedule: 'Non-conference schedule' };
-  DY.OFF_ORDER = ['recap', 'nil', 'portal', 'signing', 'draft', 'progress', 'cuts', 'schedule'];
+  const OFF_ALL = ['recap', 'nil', 'portal', 'signing', 'draft', 'progress', 'cuts', 'schedule'];
+  // NIL turned off at setup (or before the NIL era): no NIL stage in the offseason
+  Object.defineProperty(DY, 'OFF_ORDER', { get: () => (DY.G && DY.G.settings.nil === 'off') ? OFF_ALL.filter(x => x !== 'nil') : OFF_ALL });
+  DY.nilOn = () => !(DY.G && DY.G.settings.nil === 'off');
   // limits per offseason (AJ): 30 newcomers (20 high school, 20 transfers), 30 departures, 15 transfers out, 15 NFL entries
   DY.CAP = { newcomers: 30, hs: 20, tin: 20, out: 30, tout: 15, nfl: 15 };
   DY.ROSTER_MAX = 85;

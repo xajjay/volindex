@@ -682,3 +682,15 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
 .dy-cloudrow { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid var(--line, rgba(127,127,127,.2)); }
 .dy-cloudrow:first-child { border-top: 0; }
 .dy-cloudrow .btn { min-height: 44px; }
+/* team cards, other teams' rosters and depth charts, player search */
+.dy-tl { cursor: pointer; }
+.dy-tl:hover { text-decoration: underline; text-underline-offset: 2px; }
+.dy-vbar { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.dy-vsel { display: flex; align-items: center; gap: 8px; }
+.dy-vsel select { min-height: 40px; max-width: 240px; }
+.dy-tc-head { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.dy-tc-head h3 { margin: 0; }
+.dy-tc-head p { margin: 2px 0 0; }
+.dy-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) { .dy-grid2 { grid-template-columns: 1fr; } .dy-vbar { justify-content: stretch; } .dy-vsel select { max-width: none; flex: 1; } }
+#dyPsearch { width: 100%; margin: 6px 0 10px; min-height: 44px; }

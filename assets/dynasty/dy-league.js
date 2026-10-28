@@ -47,10 +47,10 @@
       t.budget = DY.teamBudget(t);
       g.teams.push(t);
       if (t.id === g.user) t.user = true;
-      if (opts.year) return;      // a historical start: that season's real rosters (below)
+      if (opts.year || (t.id !== DY.UT_ID && DY.hasReal2026 && DY.hasReal2026(t))) return;      // real rosters: a historical season, or every team's 2026 roster (below)
       if (t.id === DY.UT_ID) { DY.importTennessee(t); t.depthEdited = t.user; } else { DY.genRoster(t); if (t.user) DY.fillRoster(t, 84); }
     });
-    if (opts.year) DY.histBuild(g, opts.year); else if (DY.resetEra) DY.resetEra();
+    if (opts.year) DY.histBuild(g, opts.year); else { if (DY.resetEra) DY.resetEra(); if (DY.modern2026) DY.modern2026(g); }
     g.teams.forEach(DY.fixNums);
     const ut = DY.userT();
     ut.style = g.settings.offStyle || 'power'; DY.pickCaptains(ut);
@@ -411,6 +411,12 @@
         if (p.s) p.s.gp = (p.s.gp || 0) + 1; else p.s = Object.assign({ gp: 1 }, {});
       }
     });
+    // every other team: real 2026 season stats so far (Sports-Reference), matched by name
+    const RS = root.DY_TODAY_STATS;
+    if (RS) {
+      const nk = s0 => String(s0 || '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
+      g.teams.forEach(t => { if (t.id === ut.id) return; const T0 = RS[t.name]; if (!T0) return; t.roster.map(DY.P).forEach(p => { const st = T0[nk(p.n)]; p.s = st ? Object.assign({}, st) : null; }); });
+    }
     // records and news start clean: the real record book, then the first headline of your tenure
     DY.initRecords();
     g.news = [];

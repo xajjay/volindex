@@ -522,7 +522,7 @@
   DY.genPlayerFor = (team, pos, yr, opts) => {
     opts = opts || {};
     const mu = team.fcsMu ? 61 + team.prestige * 0.25 : DY.teamMu(team.prestige);
-    const ovr = Math.round(clamp(mu + CLASS_ADJ[yr] + gauss() * 4.6 + (opts.bump || 0), 42, 95));
+    const ovr = Math.round(clamp(mu + CLASS_ADJ[yr] + gauss() * 4.6 + (opts.bump || 0) - (pos === 'K' || pos === 'P' ? 7 : 0), 42, 95));     // specialists rate lower
     const el = 6 - yr;
     const g = clamp(80 + (team.prestige - 50) / 3.2 + gauss() * 4.5, 70, 99.9);
     const comp = clamp(0.70 + (g - 70) * 0.01, 0.7, 0.9999);
