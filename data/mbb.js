@@ -67,7 +67,7 @@ window.SITE.mbb = {
   {
    "num": 0,
    "name": "Braedan Lue",
-   "pos": "PF",
+   "pos": "PF/SF",
    "ht": "6'8\"",
    "wt": "243",
    "cls": "Jr.",
@@ -91,7 +91,7 @@ window.SITE.mbb = {
   {
    "num": 2,
    "name": "Juke Harris",
-   "pos": "SG/SF",
+   "pos": "SG/PF/SF",
    "ht": "6'7\"",
    "wt": "205",
    "cls": "Jr.",
@@ -103,7 +103,7 @@ window.SITE.mbb = {
   {
    "num": 3,
    "name": "Terrence Hill Jr.",
-   "pos": "PG",
+   "pos": "PG/SG",
    "ht": "6'2\"",
    "wt": "186",
    "cls": "Jr.",
@@ -115,7 +115,7 @@ window.SITE.mbb = {
   {
    "num": 4,
    "name": "Dai Dai Ames",
-   "pos": "PG/SG",
+   "pos": "SG/PG",
    "ht": "6'2\"",
    "wt": "199",
    "cls": "Sr.",
@@ -127,7 +127,7 @@ window.SITE.mbb = {
   {
    "num": 6,
    "name": "DeWayne Brown II",
-   "pos": "PF",
+   "pos": "PF/C",
    "ht": "6'8\"",
    "wt": "248",
    "cls": "So.",
@@ -139,7 +139,7 @@ window.SITE.mbb = {
   {
    "num": 7,
    "name": "Tyler Lundblade",
-   "pos": "SG",
+   "pos": "SG/SF",
    "ht": "6'6\"",
    "wt": "216",
    "cls": "6th",
@@ -176,7 +176,7 @@ window.SITE.mbb = {
   {
    "num": 10,
    "name": "Jalen Haralson",
-   "pos": "PF/SF",
+   "pos": "PF/SF/PG",
    "ht": "6'7\"",
    "wt": "222",
    "cls": "So.",
@@ -184,18 +184,6 @@ window.SITE.mbb = {
    "hs": "La Lumiere School",
    "prev": "Notre Dame",
    "note": "16.2 ppg at Notre Dame"
-  },
-  {
-   "num": 11,
-   "name": "Gavin Paull",
-   "pos": "G",
-   "ht": "5'11\"",
-   "wt": "166",
-   "cls": "Jr.",
-   "home": "Austin, Texas",
-   "hs": "Westlake",
-   "prev": null,
-   "note": null
   },
   {
    "num": 12,
@@ -212,7 +200,7 @@ window.SITE.mbb = {
   {
    "num": 13,
    "name": "Ralph Scott",
-   "pos": "SF",
+   "pos": "SF/SG",
    "ht": "6'8\"",
    "wt": "211",
    "cls": "Fr.",
@@ -220,18 +208,6 @@ window.SITE.mbb = {
    "hs": "IMG Academy (Fla.)",
    "prev": null,
    "note": "No. 63 in SC Next 100"
-  },
-  {
-   "num": 21,
-   "name": "Campbell Duncan",
-   "pos": "G",
-   "ht": "6'6\"",
-   "wt": "208",
-   "cls": "Jr.",
-   "home": "Austin, Texas",
-   "hs": "Anderson",
-   "prev": null,
-   "note": null
   },
   {
    "num": 24,
@@ -260,7 +236,7 @@ window.SITE.mbb = {
   {
    "num": 33,
    "name": "Chris Washington Jr.",
-   "pos": "PF",
+   "pos": "PF/C",
    "ht": "6'9\"",
    "wt": "214",
    "cls": "Fr.",

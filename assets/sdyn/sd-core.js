@@ -130,7 +130,8 @@
   const num = v => +String(v == null ? 0 : v).replace(/[^\d.-]/g, '') || 0;
   const GRAN = new Set(['PG', 'SG', 'SF', 'PF', 'C']);
   // explicit granular position(s) on the roster sheet override the height guess below, e.g. "pos": "PG"
-  // or "pos": "PG/SG" for a player who can start at either (the second tag is kept as a secondary position).
+  // or "pos": "PG/SG/SF" for a player who can start at any of them (every tag after the first is kept as
+  // a secondary position — there's no limit to how many).
   function granPos(rp) {
     const parts = String(rp.pos || '').toUpperCase().split('/').map(s => s.trim()).filter(s => GRAN.has(s));
     return parts.length ? parts : null;
@@ -143,7 +144,7 @@
     if (p === 'G/F') return 'SF';
     return h <= (w ? 68 : 74) ? 'PG' : 'SG';
   }
-  function hoopsPos2(rp) { const gp = granPos(rp); return gp && gp[1] ? gp[1] : null; }
+  function hoopsPos2(rp) { const gp = granPos(rp); return gp && gp.length > 1 ? gp.slice(1) : null; }
   // men's and women's hoops: 247 / ESPN ratings plus production last season (at Tennessee or elsewhere)
   function importHoops(team) {
     const sport = G().sport, S = root.SITE && root.SITE[sport], R = root.BB_RATINGS && root.BB_RATINGS[sport] ? root.BB_RATINGS[sport].players : {};
@@ -243,7 +244,7 @@
       if (t.rot && t.rot.length) { const keep = t.rot.map(SD.P).filter(p => p && ps.includes(p)); const rest = ps.filter(p => !keep.includes(p)).sort((a, b) => b.ovr - a.ovr); return keep.concat(rest); }
       // best five by position (falling back to a player's secondary position before giving up on the slot
       // entirely), then the bench by overall
-      const SLOTS = ['PG', 'SG', 'SF', 'PF', 'C'], fits = (p, pos) => p.pos === pos || p.pos2 === pos;
+      const SLOTS = ['PG', 'SG', 'SF', 'PF', 'C'], fits = (p, pos) => p.pos === pos || (p.pos2 && p.pos2.includes(pos));
       const five = [], used = new Set();
       SLOTS.forEach(pos => {
         const c = ps.filter(p => !used.has(p) && p.pos === pos).sort((a, b) => b.ovr - a.ovr)[0]

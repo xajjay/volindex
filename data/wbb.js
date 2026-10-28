@@ -1,4 +1,9 @@
-/* Women's Basketball data for The Vol Index. Gathered 2026-10-12. Edit the lineup in wbb-lineup.js */
+/* Women's Basketball data for The Vol Index. Gathered 2026-10-12. Edit the lineup in wbb-lineup.js.
+   "pos" below is usually just G/F/C (the dynasty guesses PG vs SG, SF vs PF, etc. from height). To set a
+   player's exact position yourself, or give them one or more secondary positions, use granular tags
+   instead, e.g. "pos": "PG" or "pos": "PG/SG/SF" (every tag after the first is a secondary — the dynasty's
+   lineup-builder will only ever start or swap that player into a slot he actually plays, never any open
+   slot regardless of position). */
 window.SITE = window.SITE || {};
 window.SITE.wbb = {
  "key": "wbb",
@@ -63,7 +68,7 @@ window.SITE.wbb = {
   {
    "num": 0,
    "name": "Kaylene Smikle",
-   "pos": "G",
+   "pos": "SF",
    "ht": "6'0\"",
    "cls": "5th",
    "home": "Bay Shore, N.Y.",
@@ -74,7 +79,7 @@ window.SITE.wbb = {
   {
    "num": 1,
    "name": "Avery Mills",
-   "pos": "G",
+   "pos": "SG/SF",
    "ht": "5'9\"",
    "cls": "Jr.",
    "home": "Lynchburg, Va.",
@@ -85,7 +90,7 @@ window.SITE.wbb = {
   {
    "num": 2,
    "name": "Harissoum Coulibaly",
-   "pos": "G",
+   "pos": "SF/SG",
    "ht": "5'10\"",
    "cls": "So.",
    "home": "Paris, France",
@@ -107,7 +112,7 @@ window.SITE.wbb = {
   {
    "num": 8,
    "name": "Zhen Craft",
-   "pos": "F",
+   "pos": "PF/C",
    "ht": "6'2\"",
    "cls": "So.",
    "home": "Waldorf, Md.",
@@ -118,7 +123,7 @@ window.SITE.wbb = {
   {
    "num": 9,
    "name": "Shaelyn Steele",
-   "pos": "G",
+   "pos": "PG/SG",
    "ht": "5'6\"",
    "cls": "Jr.",
    "home": "Ashland, Ky.",
@@ -129,7 +134,7 @@ window.SITE.wbb = {
   {
    "num": 10,
    "name": "Jada Eads",
-   "pos": "G",
+   "pos": "PG/SG",
    "ht": "5'7\"",
    "cls": "Jr.",
    "home": "Orlando, Fla.",
@@ -151,7 +156,7 @@ window.SITE.wbb = {
   {
    "num": 14,
    "name": "Rylie Theuerkauf",
-   "pos": "G",
+   "pos": "SG/SF",
    "ht": "5'9\"",
    "cls": "Sr.",
    "home": "Tenafly, N.J.",
@@ -173,7 +178,7 @@ window.SITE.wbb = {
   {
    "num": 21,
    "name": "Riley Makalusky",
-   "pos": "F",
+   "pos": "PF/C",
    "ht": "6'2\"",
    "cls": "Sr.",
    "home": "Fishers, Ind.",
@@ -184,7 +189,7 @@ window.SITE.wbb = {
   {
    "num": 25,
    "name": "Naomi White",
-   "pos": "G",
+   "pos": "SG/SF",
    "ht": "5'9\"",
    "cls": "Jr.",
    "home": "Omaha, Neb.",
@@ -195,7 +200,7 @@ window.SITE.wbb = {
   {
    "num": 31,
    "name": "Aaliyah Moore",
-   "pos": "F",
+   "pos": "C/PF",
    "ht": "6'3\"",
    "cls": "6th",
    "home": "Moore, Okla.",
@@ -206,7 +211,7 @@ window.SITE.wbb = {
   {
    "num": 35,
    "name": "Kennedy Fauntleroy",
-   "pos": "G",
+   "pos": "PG/SG",
    "ht": "5'7\"",
    "cls": "5th",
    "home": "Upper Marlboro, Md.",
@@ -217,7 +222,7 @@ window.SITE.wbb = {
   {
    "num": 44,
    "name": "Fatmata Janneh",
-   "pos": "F",
+   "pos": "C/PF",
    "ht": "6'2\"",
    "cls": "Sr.",
    "home": "London, England",
