@@ -785,9 +785,10 @@
   }
   // Hoops and Diamond Dynasty (basketball, baseball, softball): one set of scripts for all four, plus the football
   // stylesheet and team colors
-  // basketball, baseball and softball dynasties: built, still being tested. Coming soon on the live site.
-  const SDYN_OPEN = false;
+  // basketball, baseball and softball dynasties: live.
+  const SDYN_OPEN = true;
   const dynOpen = sport => sport === 'football' || SDYN_OPEN;
+  window.dynOpen = dynOpen;
   function renderSoon(app, sport) {
     const s = SP(sport);
     app.innerHTML = `<div class="wrap games"><div class="gcrumb"><a href="#games">Games</a> › <a href="#games-${sport}">${esc(s.name)}</a> › ${esc(gameName(sport, 'dynasty'))}</div>
