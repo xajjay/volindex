@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-10-28. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-10-29. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-10-28",
+ "updated": "2026-10-29",
  "team": {
   "record": "6-2",
   "sec": "3-2",
@@ -123,7 +123,7 @@ window.SITE_AUTO.football = {
    ],
    "ypg": [
     394.5,
-    66,
+    67,
     9
    ],
    "rushYpg": [
@@ -143,7 +143,7 @@ window.SITE_AUTO.football = {
    ],
    "oRushYpg": [
     122.9,
-    43,
+    42,
     10
    ],
    "oPassYpg": [
@@ -1167,7 +1167,7 @@ window.SITE_AUTO.football = {
    "Amare Campbell": [
     {
      "stat": "Tackles for loss",
-     "rank": 32
+     "rank": 33
     }
    ],
    "Tyree Weathersby": [
@@ -1487,22 +1487,26 @@ window.SITE_AUTO.football = {
   "Kentucky": {
    "tv": "ESPN",
    "kick": "2026-11-07T23:15Z",
-   "win": 66.9
+   "line": "TENN -6",
+   "ou": 50.5,
+   "ml": "-205",
+   "book": "DraftKings",
+   "win": 67.4
   },
   "Texas A&M": {
    "tv": null,
    "kick": "2026-11-14T05:00Z",
-   "win": 52.0
+   "win": 52.6
   },
   "LSU": {
    "tv": null,
    "kick": "2026-11-21T05:00Z",
-   "win": 35.6
+   "win": 36.2
   },
   "Vanderbilt": {
    "tv": null,
    "kick": "2026-11-28T05:00Z",
-   "win": 85.7
+   "win": 86.0
   }
  },
  "teamSheet": {
@@ -1523,7 +1527,7 @@ window.SITE_AUTO.football = {
     "Total yards per game",
     "Total offense",
     394.5,
-    66,
+    67,
     9,
     false
    ],
@@ -1532,7 +1536,7 @@ window.SITE_AUTO.football = {
     "Yards per play",
     "Total offense",
     5.65,
-    86,
+    84,
     10,
     false
    ],
@@ -1577,7 +1581,7 @@ window.SITE_AUTO.football = {
     "Interceptions thrown",
     "Passing",
     4.0,
-    40,
+    39,
     3,
     true
    ],
@@ -1604,7 +1608,7 @@ window.SITE_AUTO.football = {
     "Yards per carry",
     "Rushing",
     4.84,
-    41,
+    42,
     3,
     false
    ],
@@ -1622,7 +1626,7 @@ window.SITE_AUTO.football = {
     "Receptions per game",
     "Receiving",
     16.6,
-    103,
+    102,
     16,
     false
    ],
@@ -1631,7 +1635,7 @@ window.SITE_AUTO.football = {
     "Yards per reception",
     "Receiving",
     10.92,
-    110,
+    109,
     15,
     false
    ],
@@ -1685,7 +1689,7 @@ window.SITE_AUTO.football = {
     "Turnovers lost",
     "Downs",
     11.0,
-    95,
+    94,
     9,
     true
    ],
@@ -1739,7 +1743,7 @@ window.SITE_AUTO.football = {
     "Opponent completion %",
     "Pass defense",
     62.3,
-    78,
+    77,
     10,
     true
    ],
@@ -1766,7 +1770,7 @@ window.SITE_AUTO.football = {
     "Rushing yards allowed per game",
     "Run defense",
     122.9,
-    43,
+    42,
     10,
     true
    ],
@@ -1775,7 +1779,7 @@ window.SITE_AUTO.football = {
     "Yards per carry allowed",
     "Run defense",
     3.84,
-    59,
+    58,
     12,
     true
    ],
@@ -1820,7 +1824,7 @@ window.SITE_AUTO.football = {
     "Punt return average",
     "Returning",
     10.5,
-    55,
+    56,
     7,
     false
    ],
