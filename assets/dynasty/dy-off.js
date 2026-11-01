@@ -819,6 +819,7 @@
     const mine = ut.roster.map(DY.P).filter(p => p.firstY === g.season + 1);
     DY.news('signing', `Signing day: ${DY.UN()} signs ${mine.length}`, `Class rank: No. ${R.classRank || '—'}. Headliners: ${mine.sort((a, b) => b.rec.c - a.rec.c).slice(0, 3).map(p => p.n + ' (' + p.rec.stars + '★ ' + p.pos + ')').join(', ')}.`);
     g.recruit.signed = true; g.recruit.finalRank = R.classRank;
+    if (DY.coachClass) DY.coachClass(R);
   };
 
   /* cut-down day: get under the roster limit before the season (you choose, or the staff cuts the lowest) */
@@ -925,7 +926,10 @@
     const peak = Math.max(p.ovr, ...Object.values(p.peakO || {}));
     s += Math.max(0, peak - 70) * 2.2;
     (p.aw || []).forEach(a => { s += { HEIS: 70, HEISF: 18, AA1: 30, AA2: 18, FRAA: 8, SEC1: 12, SEC2: 6, SECO: 16, SECD: 16, SECF: 8, OBRIEN: 20, WALKER: 20, BILET: 20, MACKEY: 16, OUTLAND: 20, BEDNARIK: 22, BUTKUS: 18, THORPE: 18, GROZA: 10, GUY: 8 }[a.a] || 0; });
-    for (const y in p.car) { const c = p.car[y]; s += (c.py || 0) / 400 + (c.ptd || 0) * 0.8 + (c.ry || 0) / 120 + (c.rtd || 0) * 1.2 + (c.rcy || 0) / 100 + (c.rctd || 0) * 1.2 + (c.sck || 0) * 2 + (c.int || 0) * 3 + (c.tk || 0) / 12 + (c.fgm || 0) * 0.5 + (c.gp || 0) * 0.4; }
+    const ab = DY.userT().abbr; let yrs = 0;
+    for (const y in p.car) { const c = p.car[y]; if (c.t !== ab) continue; if ((c.gp || 0) >= 5) yrs++; s += (c.py || 0) / 400 + (c.ptd || 0) * 0.8 + (c.ry || 0) / 120 + (c.rtd || 0) * 1.2 + (c.rcy || 0) / 100 + (c.rctd || 0) * 1.2 + (c.sck || 0) * 2 + (c.int || 0) * 3 + (c.tk || 0) / 12 + (c.fgm || 0) * 0.5 + (c.gp || 0) * 0.4;
+      const h = (G().hist || []).find(z => z.y === +y); if (h && (c.gp || 0) >= 5) { s += Math.max(0, h.w - 8) * 0.9 + (h.sec ? 4 : 0) + (h.finish === 'National champions' ? 25 : h.cfpSeed ? 5 : 0); } }
+    s += Math.max(0, yrs - 1) * 5;
     if (p.draft) s += { 1: 30, 2: 18, 3: 11, 4: 8, 5: 5, 6: 4, 7: 3 }[p.draft.rd] || 0;
     return Math.round(s);
   };
@@ -933,7 +937,7 @@
     const g = G(), ids = new Set(Object.keys(g.legacy).map(Number));
     DY.userT().roster.forEach(id => ids.add(id));
     Object.values(g.P).forEach(p => { if (p.t0 === g.user && p.gone) ids.add(p.id); });
-    ids.forEach(id => { const p = DY.P(id); if (!p) return; const played = Object.values(p.car || {}).some(c => (c.gp || 0) > 0 && c.t === 'TENN'); if (!played && !g.legacy[id]) return; g.legacy[id] = DY.legacyScore(p); });
+    ids.forEach(id => { const p = DY.P(id); if (!p) return; const played = Object.values(p.car || {}).some(c => (c.gp || 0) > 0 && c.t === DY.userT().abbr); if (!played && !g.legacy[id]) return; g.legacy[id] = DY.legacyScore(p); });
   };
   DY.legacyBoard = n => Object.entries(G().legacy).map(([id, v]) => ({ p: DY.P(+id), v })).filter(x => x.p).sort((a, b) => b.v - a.v).slice(0, n || 10);
 

@@ -18,7 +18,7 @@
     if (loaded[src]) return loaded[src];
     return (loaded[src] = new Promise((res, rej) => { const s = document.createElement('script'); s.src = src + '?v=' + (root.VI_BUILD || '1'); s.onload = res; s.onerror = () => { delete loaded[src]; rej(new Error('Could not load ' + src)); }; document.head.appendChild(s); }));
   }
-  DY.loadHist = year => year >= 2026 ? Promise.all([script('data/hist/fb-2026.js').catch(() => null), script('data/hist/fb-classes.js').catch(() => null)]) : Promise.all([script('data/hist/fb-sched.js'), script('data/hist/fb-classes.js'), year ? script('data/hist/fb-' + year + '.js') : null]);
+  DY.loadHist = year => year >= 2026 ? Promise.all([script('data/hist/fb-2026.js').catch(() => null), script('data/hist/fb-classes.js').catch(() => null)]) : Promise.all([script('data/hist/fb-sched.js'), script('data/hist/fb-classes.js'), script('data/hist/fb-tnclasses.js').catch(() => null), year ? script('data/hist/fb-' + year + '.js') : null]);
   // a saved historical dynasty: the schedules and classes must be loaded before it runs
   DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); return g; }) : Promise.resolve(g);
 
@@ -279,6 +279,24 @@
       p.realName = true;
       const at = list.indexOf(old); if (at >= 0) list[at] = p;
     });
+    // Tennessee's real signees for the year (top of the class by 247 rating): in the class, committed to the Vols
+    const tn = root.DY_TNCLASS && root.DY_TNCLASS[year];
+    if (tn && DY.UT_ID != null) {
+      const spare = () => list.filter(p => !p.real && !p.realName).sort((a, b) => a.rec.c - b.rec.c)[0];   // replace the weakest generated recruit
+      tn.forEach(r => {
+        const [name, pos, home, comp] = r, key = nk(name);
+        let p = list.find(x => nk(x.n) === key);
+        if (!p) {
+          const old = spare(); if (!old) return;
+          const hm = /,\s*([A-Z]{2})$/.exec(home || '');
+          p = prospectFn(pos, comp, { n: name, home, st: hm ? hm[1] : old.st });
+          p.realName = true;
+          p.ceil = Math.max(p.ceil, Math.round(clamp(78 + (comp - 0.85) * 90, 76, 95))); p.potG = DY.scoutGrade(p.ceil);
+          list[list.indexOf(old)] = p;
+        }
+        p.real = true; p.commit = DY.UT_ID; p.firm = true; p.offer = true; p.realSchool = DY.UT_ID; p.interest[DY.UT_ID] = 200;
+      });
+    }
   };
 
   /* ---------- bowl names of the time (null: that bowl did not exist yet) ---------- */

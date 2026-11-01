@@ -35,7 +35,7 @@
     const g = DY.G = {
       v: DY.VERSION, fx: { potG: 1 }, seed, season: 2026, startSeason: 2026, startTeam: opts.team || 'Tennessee', phase: 'preseason', week: 0, P: {}, nextId: 1, teams: [], user: (DY.TEAMS.find(t => t.name === opts.team) || { id: DY.UT_ID }).id,
       coach: { name: opts.coach || 'Coach', arch: opts.arch || 'motivator', w: 0, l: 0, hist: [] },
-      settings: Object.assign({ cfp: 'real', recruiting: 'manual', portal: 'manual', nil: 'manual', coachMode: 'offense', speed: 'slow', injuries: true, shake: true, difficulty: 'varsity', autosave: true, offStyle: 'power', watchSeason: false }, opts.settings || {}),
+      settings: Object.assign({ cfp: 'real', g6po: 'off', g6pref: 'cfp', recruiting: 'manual', portal: 'manual', nil: 'manual', coachMode: 'offense', speed: 'slow', injuries: true, shake: true, difficulty: 'varsity', autosave: true, offStyle: 'power', watchSeason: false }, opts.settings || {}),
       sched: [], polls: { ap: [], cfp: null, hist: {} }, news: [], hist: [], awards: {}, rec: null, legacy: {}, post: null, off: null, recruit: null, created: Date.now(),
     };
     g.settings.diffBoost = DY.DIFF[g.settings.difficulty] || 0;
@@ -63,6 +63,7 @@
     DY.preseasonPoll();
     if (DY.initRecruiting) DY.initRecruiting(true);
     DY.initRecords();
+    DY.coachInit();
     DY.news('league', `${g.coach.name} takes over at ${DY.UN()}`, `The ${g.season} season opens ${DY.dateStr(DY.weekDate(g.season, 1))} against ${tname(DY.userGames(1)[0] ? DY.oppOf(DY.userGames(1)[0]) : 0)}. The Vols start the year No. ${DY.apRank(ut.id) || 'NR'} in the preseason AP poll.`);
     return g;
   };
@@ -562,10 +563,14 @@
     const all = g.teams.filter(t => !t.dorm).sort((a, b) => DY.cfpKey(b, true) - DY.cfpKey(a, true));
     const champs = all.filter(t => t.champ === g.season);
     const p4c = champs.filter(t => DY.P4.includes(t.conf));
-    const g6c = champs.filter(t => !DY.P4.includes(t.conf)).slice(0, 1);
+    let g6c = champs.filter(t => !DY.P4.includes(t.conf)).slice(0, 1);
+    // optional G6 + independents 24-team playoff: the user's G6 champion may choose it over the CFP (the CPU always takes the CFP)
+    const g6on = DY.g6On();
+    if (g6on && g6c.length && g6c[0].id === g.user && g.settings.g6pref === 'g6') g6c = [];
     // 12 and 24: conference champions get in; 2, 4 and 8: the committee's top teams, period
     const field = size >= 12 ? [...new Set([...p4c, ...g6c])] : [];
-    for (const t of all) { if (field.length >= size) break; if (!field.includes(t)) field.push(t); }
+    const g6skip = g6on && g.settings.g6pref === 'g6' ? new Set([g.user]) : new Set();
+    for (const t of all) { if (field.length >= size) break; if (!field.includes(t) && !g6skip.has(t.id)) field.push(t); }
     field.sort((a, b) => all.indexOf(a) - all.indexOf(b));
     const autoIds = size >= 12 ? [...new Set([...p4c, ...g6c])].map(t => t.id) : [];
     const atLarge = field.filter(t => !autoIds.includes(t.id)), out = all.filter(t => !field.includes(t));
@@ -588,6 +593,25 @@
     DY.news('cfp', `Selection Day: ${size}-team playoff field set`, `No. 1 seed ${field[0].name}. ${inField >= 0 ? `${DY.UN()} is the No. ${inField + 1} seed.` : `${DY.UN()} is not in the field${bowls.find(x => x.h === g.user || x.a === g.user) ? ' and is headed to the ' + bowls.find(x => x.h === g.user || x.a === g.user).title : ''}.`}`);
     g.phase = 'post';
     DY.buildRound();
+    if (g6on) DY.runG6(field, all);
+  };
+  DY.g6On = () => { const g = G(), v = g.settings.g6po; return v === 'always' || (v === 'on' && g.season >= 2027); };
+  // the G6 + independents 24-team playoff, played out alongside the CFP (seeds 1-8 get byes; the same bracket as the 24-team CFP)
+  DY.runG6 = (field, all) => {
+    const g = G(), S = all.filter(t => !DY.P4.includes(t.conf) && !field.includes(t)).slice(0, 24).map(t => t.id);
+    if (S.length < 24) return;
+    const rounds = [], win = x => x.res.h > x.res.a ? x.h : x.a;
+    const play = (a, b, name, campus) => { const h = S.indexOf(a) <= S.indexOf(b) ? a : b; const x = { id: g.season + '-g6-' + rounds.length, wk: 15 + rounds.length, h, a: h === a ? b : a, neutral: !campus, post: 'g6', title: name, res: null }; DY.simGame(x); return x; };
+    const r1 = [[15, 16], [8, 23], [12, 19], [11, 20], [14, 17], [9, 22], [13, 18], [10, 21]].map(([a, b]) => play(S[a], S[b], 'G6 First Round', true));
+    rounds.push(r1);
+    const r2 = [0, 7, 3, 4, 1, 6, 2, 5].map((seed, i) => play(S[seed], win(r1[i]), 'G6 Second Round', true));
+    rounds.push(r2);
+    let cur = r2.map(win);
+    ['G6 Quarterfinal', 'G6 Semifinal', 'G6 Championship'].forEach(nm => { const rd = []; for (let i = 0; i < cur.length; i += 2) rd.push(play(cur[i], cur[i + 1], nm, false)); rounds.push(rd); cur = rd.map(win); });
+    const champ = cur[0];
+    g.post.g6 = { seeds: S, champ, rounds: rounds.map(r => r.map(x => ({ h: x.h, a: x.a, res: x.res, title: x.title }))) };
+    DY.T(champ).g6t = (DY.T(champ).g6t || 0) + 1;
+    DY.news('cfp', `${tname(champ)} wins the Group of 6 playoff`, `Champions of the 24-team G6 and independents playoff.`);
   };
   // the next round's games from the seeds and winners so far
   const winnerOf = x => x.res.h > x.res.a ? x.h : x.a;
@@ -676,9 +700,12 @@
     const entry = { y: g.season, team: ut.name, w: ut.w, l: ut.l, cw: ut.cw, cl: ut.cl, ap: DY.apRank(ut.id), cfpSeed: P.seeds.indexOf(ut.id) + 1 || null, finish, sec: ut.champ === g.season, ccg: !!ccg,
       champ: tname(P.champ), heis: g.awards[g.season] && g.awards[g.season].heis ? g.awards[g.season].heis.n : null, recRank: g.recruit && g.recruit.classRank || null,
       games: ug.map(x => ({ w: x.wk, o: DY.T(DY.oppOf(x)).abbr, on: tname(DY.oppOf(x)), h: x.h === ut.id, n: x.neutral, us: x.h === ut.id ? x.res.h : x.res.a, th: x.h === ut.id ? x.res.a : x.res.h, t: x.title || null, ot: x.res.ot })) };
+    { const o = DY.teamOvr(ut); entry.ovr = o.ovr; entry.off = o.off; entry.def = o.def; entry.aa = ((g.awards[g.season] || {}).aa1 || []).map(DY.P).filter(p => p && p.t === ut.id).map(p => p.n);
+      entry.top = ut.roster.map(DY.P).filter(Boolean).sort((a, b) => b.ovr - a.ovr).slice(0, 22).map(p => ({ id: p.id, n: p.n, pos: p.pos, ovr: p.ovr, yr: p.yr, st: Object.assign({}, p.s || {}) })); }
     g.hist.push(entry);
     g.coach.w += ut.w; g.coach.l += ut.l;
     g.teams.forEach(t => t.hist.push({ y: g.season, w: t.w, l: t.l, ap: t.ap, champ: t.champ === g.season }));
+    DY.coachStatsSeason();
     DY.updateRecordsSeason();
     g.phase = 'offseason';
     if (DY.startOffseason) DY.startOffseason();
@@ -790,5 +817,63 @@
     const r = DY.apRank(ut.id);
     const prev = (g.polls.hist[g.season + '-' + (w - 1)] || []).indexOf(ut.id) + 1;
     if (r !== (prev || null)) DY.news('poll', r ? `${DY.UN()} ${prev ? (r < prev ? 'climbs' : 'slides') + ' to' : 'enters the poll at'} No. ${r}` : `${DY.UN()} drops out of the AP Top 25`, `AP Top 5: ${g.polls.ap.slice(0, 5).map((x, i) => (i + 1) + '. ' + tname(x.t)).join(', ')}.`);
+  };
+
+  /* ---------- coaches: real head coaches at the start, season-by-season coach stats and prestige ---------- */
+  DY.REAL_COACHES = { 'Georgia': 'Kirby Smart', 'Alabama': 'Kalen DeBoer', 'Texas': 'Steve Sarkisian', 'Ohio State': 'Ryan Day', 'Oregon': 'Dan Lanning', 'Clemson': 'Dabo Swinney', 'Notre Dame': 'Marcus Freeman',
+    'Michigan': 'Kyle Whittingham', 'Penn State': 'Matt Campbell', 'LSU': 'Lane Kiffin', 'Ole Miss': 'Pete Golding', 'Oklahoma': 'Brent Venables', 'Texas A&M': 'Mike Elko', 'Tennessee': 'Josh Heupel',
+    'Florida': 'Jon Sumrall', 'Auburn': 'Alex Golesh', 'Miami': 'Mario Cristobal', 'USC': 'Lincoln Riley', 'Washington': 'Jedd Fisch', 'Wisconsin': 'Luke Fickell', 'Iowa': 'Kirk Ferentz', 'Nebraska': 'Matt Rhule',
+    'Utah': 'Morgan Scalley', 'Arizona State': 'Kenny Dillingham', 'BYU': 'Kalani Sitake', 'Texas Tech': 'Joey McGuire', 'Kansas State': 'Collin Klein', 'Missouri': 'Eli Drinkwitz', 'Vanderbilt': 'Clark Lea',
+    'South Carolina': 'Shane Beamer', 'Mississippi State': 'Jeff Lebby', 'Virginia Tech': 'James Franklin', 'Duke': 'Manny Diaz', 'NC State': 'Dave Doeren', 'Louisville': 'Jeff Brohm', 'SMU': 'Rhett Lashlee',
+    'Indiana': 'Curt Cignetti', 'Illinois': 'Bret Bielema', 'Minnesota': 'PJ Fleck', 'Northwestern': 'David Braun', 'Boise State': 'Spencer Danielson', 'Kentucky': 'Will Stein', 'Florida State': 'Mike Norvell',
+    'Georgia Tech': 'Brent Key', 'Pittsburgh': 'Pat Narduzzi', 'Virginia': 'Tony Elliott', 'Wake Forest': 'Jake Dickert', 'Cincinnati': 'Scott Satterfield', 'Iowa State': 'Matt Campbell', 'Baylor': 'Dave Aranda',
+    'TCU': 'Sonny Dykes', 'Kansas': 'Lance Leipold', 'Oklahoma State': 'Mike Gundy', 'West Virginia': 'Rich Rodriguez', 'Colorado': 'Deion Sanders', 'Arizona': 'Brent Brennan', 'UCLA': 'Bob Chesney',
+    'Michigan State': 'Jonathan Smith', 'Maryland': 'Mike Locksley', 'Rutgers': 'Greg Schiano', 'Army': 'Jeff Monken', 'Navy': 'Brian Newberry', 'Memphis': 'Ryan Silverfield', 'Tulane': 'Jon Sumrall' };
+  DY.csNew = pr => ({ w: 0, l: 0, cw: 0, cl: 0, bw: 0, bl: 0, ct: 0, po: 0, pw: 0, nt: 0, c25: 0, c5: 0, aa: 0, heis: 0, yrs: 0, pr: pr == null ? 45 : pr });
+  DY.cs = name => { const g = G(); g.cst = g.cst || {}; return g.cst[name] || (g.cst[name] = DY.csNew()); };
+  DY.coachInit = () => {
+    const g = G(); g.cst = g.cst || {};
+    g.teams.forEach(t => {
+      if (t.id !== g.user && !g.hx && g.season >= 2026 && DY.REAL_COACHES[t.name] && !t.coachSet) { t.coach = DY.REAL_COACHES[t.name]; }
+      t.coachSet = true;
+      if (t.id !== g.user && !g.cst[t.coach]) g.cst[t.coach] = DY.csNew(Math.round(Math.max(20, Math.min(80, 35 + (t.prestige || 50) * 0.5))));
+    });
+    if (!g.cst[g.coach.name]) {
+      const c = g.cst[g.coach.name] = DY.csNew(50);       // an older save: rebuild the user's totals from the season-by-season book
+      (g.hist || []).forEach(h => { c.cw += h.cw || 0; c.cl += h.cl || 0; c.yrs++; if (h.sec) c.ct++; if (h.cfpSeed) c.po++; if (h.finish === 'National champions') c.nt++;
+        if (/^Won .*Bowl|^Won /.test(h.finish) && !/CFP|Semifinal|Championship/.test(h.finish)) c.bw++; else if (/^Lost .*Bowl/.test(h.finish) && !/CFP|Semifinal|Quarterfinal|Championship/.test(h.finish)) c.bl++;
+        c.pr = Math.round(Math.max(1, Math.min(99, c.pr + ((h.w - 6.5) * 2.4 + (h.sec ? 3 : 0) + (h.cfpSeed ? 4 : 0) + (h.finish === 'National champions' ? 10 : 0)) * 0.5 - (c.pr - 50) * 0.06))); });
+    }
+  };
+  DY.coachClass = R => {
+    const g = G(); if (!R || !R.ranks) return;
+    R.ranks.forEach((tid, i) => { const t = DY.T(tid); if (!t) return; const c = DY.cs(t.id === g.user ? g.coach.name : t.coach);
+      if (i < 25) { c.c25++; t.c25 = (t.c25 || 0) + 1; } if (i < 5) { c.c5++; t.c5 = (t.c5 || 0) + 1; } });
+  };
+  DY.coachStatsSeason = () => {
+    if (!G().cst) DY.coachInit();
+    const g = G(), P = g.post, A = g.awards[g.season] || {};
+    const aaBy = {}; (A.aa1 || []).forEach(id => { const p = DY.P(id); if (p) aaBy[p.t] = (aaBy[p.t] || 0) + 1; });
+    const heisT = A.heis ? A.heis.t : null;
+    const cfpW = {}, cfpIn = new Set(P.seeds || []);
+    (P.rounds || []).flat().forEach(x => { if (x.res) { const w = x.res.h > x.res.a ? x.h : x.a; cfpW[w] = (cfpW[w] || 0) + 1; } });
+    const bowl = {}; (P.bowls || []).forEach(x => { if (x.res) { const w = x.res.h > x.res.a ? x.h : x.a, l = w === x.h ? x.a : x.h; bowl[w] = 'W'; bowl[l] = 'L'; } });
+    g.teams.forEach(t => { if (t.dorm) return;
+      const name = t.id === g.user ? g.coach.name : t.coach, c = DY.cs(name);
+      const natl = P.champ === t.id, conf = t.champ === g.season, pw = cfpW[t.id] || 0, ap = DY.apRank(t.id);
+      const e = { y: g.season, w: t.w, l: t.l, cw: t.cw, cl: t.cl, ap, conf, natl, cfp: cfpIn.has(t.id), pw, bowl: bowl[t.id] || '', aa: aaBy[t.id] || 0, heis: heisT === t.id ? 1 : 0, coach: name };
+      t.hist[t.hist.length - 1] = Object.assign(t.hist[t.hist.length - 1] || {}, e);
+      c.w += t.w; c.l += t.l; c.cw += t.cw; c.cl += t.cl; c.yrs++; if (bowl[t.id] === 'W') c.bw++; else if (bowl[t.id] === 'L') c.bl++;
+      if (conf) c.ct++; if (e.cfp) c.po++; c.pw += pw; if (natl) c.nt++; c.aa += e.aa; c.heis += e.heis;
+      const sc = (t.w - 6.5) * 2.4 + (ap && ap <= 25 ? (26 - ap) * 0.25 : 0) + (conf ? 3 : 0) + (e.cfp ? 4 : 0) + pw * 2 + (natl ? 10 : 0);
+      c.pr = Math.round(Math.max(1, Math.min(99, c.pr + sc * 0.5 - (c.pr - 50) * 0.06)));
+    });
+  };
+  DY.coachLine = name => { const c = DY.cs(name); return c; };
+  DY.schoolBests = () => {
+    const g = G(), rows = g.teams.filter(t => !t.dorm).map(t => { const h = t.hist || []; const sum = k => h.reduce((a, x) => a + (+x[k] || 0), 0), cnt = k => h.filter(x => x[k]).length;
+      return { t, natl: cnt('natl'), heis: sum('heis'), aa: sum('aa'), c5: t.c5 || 0, c25: t.c25 || 0, pw: sum('pw'), wins: sum('w'), conf: cnt('conf'), cfp: cnt('cfp') }; });
+    const cats = [['natl', 'National championships'], ['heis', 'Heisman winners'], ['aa', 'First-team All-Americans'], ['c5', 'Top-5 recruiting classes'], ['pw', 'Playoff wins'], ['wins', 'Wins'], ['conf', 'Conference titles'], ['cfp', 'Playoff appearances']];
+    return cats.map(([k, label]) => ({ k, label, top: rows.filter(r => r[k] > 0).sort((a, b) => b[k] - a[k] || b.wins - a.wins).slice(0, 3).map(r => ({ t: r.t.id, v: r[k] })) }));
   };
 })(typeof window !== 'undefined' ? window : globalThis);
