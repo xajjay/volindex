@@ -246,7 +246,7 @@
     if (el.tagName === 'A') e.preventDefault();
     if (d.tid != null && !d.tab) { e.preventDefault(); return teamCard(+d.tid); }
     if (d.vteam != null) { V.viewTeam = +d.vteam === g.user ? null : +d.vteam; V.tab = d.vtab || V.tab; closeModal(); root.scrollTo(0, 0); return hub(); }
-    if (d.tab) { V.tab = d.tab; V.msg = null; if (d.tab !== 'roster' && d.tab !== 'depth') V.viewTeam = null; return hub(); }
+    if (d.tab) { V.tab = d.tab; V.msg = null; if (d.tab !== 'roster' && d.tab !== 'depth' && d.tab !== 'schedule') V.viewTeam = null; return hub(); }
     if (d.goto) { V.tab = d.goto; root.scrollTo(0, 0); return hub(); }
     if (d.act === 'main' || d.act === 'sim') V.recap = null;
     if (d.act === 'main') return mainAction(false);
@@ -260,6 +260,7 @@
     }
     if (d.act === 'save') { el.disabled = true; el.textContent = 'Saving…'; return DY.saveSlot(g.slot || 1, null).then(err => { V.msg = err || `Saved to slot ${g.slot || 1}.`; hub(); }); }
     if (d.act === 'msgx') { V.msg = null; return hub(); }
+    if (d.act === 'rectut') return modal(recTutHtml());
     if (d.act === 'close') return closeModal();
     if (d.act === 'resume') { const x = g.sched.concat(g.post ? (g.post.games || []).concat(g.post.cur || [], g.post.bowls || []) : []).find(y => y.id === g.live.id); if (x) return playGame(x); }
     if (d.act === 'quit') { DY.G = null; return landing(); }
@@ -335,14 +336,17 @@
     const L = [recapCard()], R = [];
     if (g.live && !(root.DYG && root.DYG.live())) L.push(`<div class="box dy-resume"><b>Game in progress</b> <span class="dim">${esc(T(g.live.T.a).name)} ${g.live.score.a}, ${esc(T(g.live.T.h).name)} ${g.live.score.h} · Q${Math.min(4, g.live.q)}</span> <button class="btn primary" data-act="resume">Resume</button></div>`);
     const a = primaryAction();
+    // top to bottom: preview, preseason camps, news, starters, then the schedule (next game) and the rest
+    if (g.phase === 'preseason' && !(a && a.x)) L.push(previewCard(), preseasonCard());
+    L.push(newsCard(), fieldCard());
     if (a && a.x) L.push(nextGameCard(a.x, a));
-    else if (g.phase === 'preseason') L.push(previewCard(), preseasonCard());
     else if (g.phase === 'season') L.push(`<div class="box"><div class="glabel">Week ${g.week}</div><h3>Bye week</h3><p class="dim">Rest up. Recruiting actions still count this week.</p></div>`);
     if (g.phase === 'post' || g.phase === 'ccg') L.push(bracketCard());
     const P0 = g.post || {}, mine = x => x && x.res && (x.h === ut.id || x.a === ut.id);
+
     const last = [].concat(DY.teamGames(ut.id).filter(x => x.res), (P0.bowls || []).filter(mine), [].concat(...(P0.rounds || [])).filter(mine), (P0.cur || []).filter(x => mine(x) && !(P0.rounds || []).includes(P0.cur))).slice(-1)[0];
     if (last) L.push(lastGameCard(last));
-    L.push(aroundCard(), newsCard(), fieldCard());
+    L.push(aroundCard());
     R.push(jobMini(), pollMini(), standMini(), injuriesMini(), recruitMini(), leadersMini(), captainsMini());
     b.innerHTML = `<div class="dy-grid"><div class="dy-col">${L.join('')}</div><div class="dy-col">${R.join('')}</div></div>`;
   }
@@ -570,12 +574,15 @@
 
   /* ---------- schedule ---------- */
   function schedule(b) {
-    const g = G(), ut = DY.userT();
-    const games = DY.userGames().concat(g.post ? [...(g.post.games || []), ...(g.post.rounds || []).flat(), ...(g.post.cur && !(g.post.rounds || []).includes(g.post.cur) ? g.post.cur : []), ...(g.post.bowls || [])].filter((x, i, arr) => (x.h === ut.id || x.a === ut.id) && arr.indexOf(x) === i) : []);
-    b.innerHTML = `<div class="box"><div class="glabel">${g.season} schedule</div><table class="dyt dy-sched"><thead><tr><th>Wk</th><th>Date</th><th>Opponent</th><th>Result</th><th class="hide-s"></th></tr></thead><tbody>${games.map(x => {
-      const o = DY.oppOf(x), home = x.h === ut.id, r = x.res, us = r && (home ? r.h : r.a), th = r && (home ? r.a : r.h);
+    const g = G(), me = DY.userT(), ut = V.viewTeam != null && T(V.viewTeam) ? T(V.viewTeam) : me, other = ut !== me;
+    const P0 = g.post || {};
+    const post = g.post ? [...(P0.games || []), ...(P0.rounds || []).flat(), ...(P0.cur && !(P0.rounds || []).includes(P0.cur) ? P0.cur : []), ...(P0.bowls || [])].filter((x, i, arr) => (x.h === ut.id || x.a === ut.id) && arr.indexOf(x) === i) : [];
+    const games = g.sched.filter(x => x.h === ut.id || x.a === ut.id).sort((a, b) => a.wk - b.wk).concat(post);
+    const ps = ut.fbs === false ? '' : ` · ${ut.w}-${ut.l}${ut.cw || ut.cl ? ' (' + ut.cw + '-' + ut.cl + ')' : ''}`;
+    b.innerHTML = `<div class="box"><div class="dy-vbar">${teamSel(ut.id)}</div><div class="glabel">${other ? esc(ut.name) + ' ' : ''}${g.season} schedule${ps}</div><table class="dyt dy-sched"><thead><tr><th>Wk</th><th>Date</th><th>Opponent</th><th>Result</th><th class="hide-s"></th></tr></thead><tbody>${games.map(x => {
+      const o = DY.oppOf(x, ut.id), home = x.h === ut.id, r = x.res, us = r && (home ? r.h : r.a), th = r && (home ? r.a : r.h);
       return `<tr class="${g.phase === 'season' && x.wk === g.week ? 'cur' : ''}"><td>${x.post ? '—' : x.wk}</td><td>${x.post ? '' : DY.dateStr(DY.weekDate(g.season, x.wk))}</td><td>${x.neutral ? 'vs' : home ? 'vs' : 'at'} ${tlink(o)} <small class="dim">${T(o).fbs ? T(o).w + '-' + T(o).l : 'FCS'}</small>${x.title ? ' ' + tag(x.title) : x.tag ? ' ' + tag(x.tag) : ''}</td><td>${r ? `<b class="${us > th ? 'dy-w' : 'dy-l'}">${us > th ? 'W' : 'L'} ${us}-${th}${r.ot ? ' OT' : ''}</b>` : ''}</td><td class="hide-s">${r && x.box && x.box.ts ? `<button class="glink" data-box="${x.id}">Box</button>` : ''}</td></tr>`;
-    }).join('')}</tbody></table></div>`;
+    }).join('') || '<tr><td colspan="5" class="dim">No games scheduled yet.</td></tr>'}</tbody></table></div>`;
   }
   function boxModal(id) {
     const g = G(), x = g.sched.concat(g.post ? [...(g.post.games || []), ...(g.post.rounds || []).flat(), ...(g.post.bowls || [])] : []).find(y => y.id === id);
@@ -642,7 +649,7 @@
       <div class="dy-grid2"><div><div class="glabel">Offense</div><table class="dyt dy-tight"><tbody>${row('QB', [L.QB[0]])}${row('RB', [L.RB[0]])}${row('WR', L.WR.slice(0, 3))}${row('TE', [L.TE[0]])}${row('OL', L.OT.slice(0, 2).concat(L.IOL.slice(0, 3)))}</tbody></table></div>
       <div><div class="glabel">Defense</div><table class="dyt dy-tight"><tbody>${row('DL', L.EDGE.slice(0, 2).concat(L.DT.slice(0, 2)))}${row('LB', L.LB.slice(0, 2))}${row('CB', L.CB.slice(0, 2).concat([L.NB]))}${row('S', L.S.slice(0, 2))}${row('K / P', [L.K[0], L.P[0]])}</tbody></table></div></div>
       ${last ? `<p class="small dim">Last games: ${esc(last)}</p>` : ''}
-      <div class="grow"><button class="btn" data-vteam="${t.id}" data-vtab="roster">Full roster</button><button class="btn" data-vteam="${t.id}" data-vtab="depth">Depth chart</button><button class="btn" data-act="close">Close</button></div></div>`);
+      <div class="grow"><button class="btn" data-vteam="${t.id}" data-vtab="schedule">Schedule</button><button class="btn" data-vteam="${t.id}" data-vtab="roster">Full roster</button><button class="btn" data-vteam="${t.id}" data-vtab="depth">Depth chart</button><button class="btn" data-act="close">Close</button></div></div>`);
   }
   const teamSel = cur => `<label class="dy-vsel"><span class="dim small">Team</span><select data-vsel="1" class="dy-in">${G().teams.filter(t => !t.dorm).slice().sort((a, b) => (b.id === G().user) - (a.id === G().user) || a.name.localeCompare(b.name)).map(t => `<option value="${t.id}" ${t.id === cur ? 'selected' : ''}>${esc(t.name)}${t.id === G().user ? ' (you)' : ''}</option>`).join('')}</select></label>`;
   function playerCard(id) {
@@ -756,7 +763,7 @@
     if (!R) { b.innerHTML = '<div class="box">No recruiting class yet.</div>'; return; }
     const commits = DY.myCommits().sort((a, b) => b.rec.c - a.rec.c);
     const promised = commits.reduce((s, p) => s + (p.nilOffer || 0), 0);
-    const budgetBox = `<div class="dy-stats4"><div><b>No. ${R.classRank || '—'}</b><small>${R.signed ? 'Final class rank' : 'Current class rank'}</small></div><div><b>${commits.length}/${DY.CAP.hs}</b><small>Commits</small></div><div><b>${DY.money(promised)}</b><small>NIL promised</small></div><div><b>${DY.money(Math.max(0, ut.budget - DY.payroll(ut)))}</b><small>NIL budget open</small></div></div>
+    const budgetBox = `<div class="dy-stats4"><div><b>No. ${R.classRank || '—'}</b><small>${R.signed ? 'Final class rank' : 'Current class rank'}</small></div><div><b>${commits.length}/${DY.CAP.hs}</b><small>Commits</small></div>${DY.nilOn() ? `<div><b>${DY.money(promised)}</b><small>NIL promised</small></div><div><b>${DY.money(Math.max(0, ut.budget - DY.payroll(ut)))}</b><small>NIL budget open</small></div>` : `<div><b>${Object.values(R.pool).filter(x => x.offer && !x.real).length}/40</b><small>Offers out</small></div><div><b>${R.board.length}/${DY.BOARD_MAX}</b><small>On your board</small></div>`}</div>
       <p class="small dim">Roster limit ${DY.rosterMax()}: ${ut.roster.length} now, ${ut.roster.map(DY.P).filter(p => p.el <= 1).length} out of eligibility after the season.${R.signed ? '' : ' The class rank moves as every school keeps signing players.'}</p>
       ${(() => { const nd = DY.teamNeeds(ut), back = ut.roster.map(DY.P).filter(p => p.el > 1).length, open = Math.max(0, DY.rosterMax() - back), left = Math.max(0, Math.min(DY.CAP.hs, open) - commits.length);
         const list = Object.entries(nd).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
@@ -781,7 +788,7 @@
     const visSel = p => p.visit ? `<small>Visit: wk ${p.visit}${p.visited ? ' ✓' : ''}</small>` : homeGames.length && !closed ? `<select data-rvisit="${p.id}" aria-label="Official visit"><option value="">Official visit…</option>${homeGames.map(x => `<option value="${x.wk}">Wk ${x.wk} vs ${esc(T(DY.oppOf(x)).abbr)}</option>`).join('')}</select>` : '';
     const row = p => `<tr class="${p.commit === g.user ? 'me' : ''}"><td><span class="dy-stars">${stars(p.rec.stars)}</span><br><a href="#" class="dy-pl" data-rid="${p.id}"><b>${esc(p.n)}</b></a> <small>${p.pos}</small>${p.real ? ' <small class="chip">Real</small>' : ''}<br><small class="dim">No. ${p.rec.nat} · ${esc(p.home)}</small></td>
       <td class="dy-intc">${leaders(p)}<small>${status(p)}</small></td>
-      <td>${p.offer ? '<small class="dy-w">Offered</small>' : closed ? '' : `<button class="dy-ra" data-roffer="${p.id}">Offer</button>`}${closed ? '' : nilSel(p) + visSel(p)}</td>
+      <td>${p.offer ? '<small class="dy-w">Offered</small>' : closed ? '' : `<button class="dy-ra" data-roffer="${p.id}">Offer</button>`}${closed ? '' : (DY.nilOn() ? nilSel(p) : '') + visSel(p)}</td>
       <td class="dy-acts">${actBtns(p)}${p.commit === g.user && p.real ? '' : `<button class="glink" data-rrm="${p.id}">Remove</button>`}</td></tr>`;
     const F = V.rfind;
     let pool = Object.values(R.pool).filter(p => !R.board.includes(p.id));
@@ -795,7 +802,7 @@
     if (F.mine) pool.sort((a, b) => myRank(a) - myRank(b) || b.rec.stars - a.rec.stars || b.rec.c - a.rec.c); else pool.sort((a, b) => b.rec.c - a.rec.c);
     const states = [...new Set(Object.values(R.pool).map(p => p.st))].sort();
     b.innerHTML = `<div class="dy-grid"><div class="dy-col wide">
-      <div class="box"><div class="glabel">Class of ${R.year}${auto ? ' · <span class="chip">Auto</span>' : ''}</div>${budgetBox}
+      <div class="box"><div class="glabel">Class of ${R.year}${auto ? ' · <span class="chip">Auto</span>' : ''} <button class="glink" data-act="rectut" style="float:right">How recruiting works</button></div>${budgetBox}
         ${closed ? '<p>Signing day has passed for this class.</p>' : `<div class="dy-hours"><div><b>${hrs - used}</b> of ${hrs} hours left this week</div><div class="dy-ab"><i style="width:${used / hrs * 100}%"></i></div><small class="dim">Actions happen when the week is played. Head coach visits: 4 a week. Official visits are for home games; a win (especially a big one) sells.</small></div>`}</div>
       <div class="box"><div class="glabel">Recruiting board (${board.length}/${DY.BOARD_MAX})</div><div class="dy-scroll"><table class="dyt dy-board"><thead><tr><th>Prospect</th><th>Interest</th><th>Offer</th><th>This week</th></tr></thead><tbody>${board.sort((a, b) => (b.commit === g.user) - (a.commit === g.user) || b.rec.c - a.rec.c).map(row).join('') || '<tr><td colspan="4" class="dim">Add prospects from the list below.</td></tr>'}</tbody></table></div></div>
       <div class="box"><div class="glabel">Find prospects</div>
@@ -803,9 +810,22 @@
         <div class="dy-scroll"><table class="dyt"><thead><tr><th>Rk</th><th>Prospect</th><th>Pos</th><th class="hide-s">Home</th><th>Comp.</th><th>Status</th><th></th></tr></thead><tbody>${pool.slice(0, V.more.pool ? 120 : 40).map(p => `<tr><td>${p.rec.nat}</td><td><span class="dy-stars">${stars(p.rec.stars)}</span> <a href="#" class="dy-pl o" data-rid="${p.id}">${esc(p.n)}</a></td><td>${p.pos}</td><td class="hide-s small">${esc(p.home)}</td><td class="small">${p.rec.c.toFixed(4)}</td><td class="small">${p.commit != null ? esc(T(p.commit).abbr) : (p.interest[g.user] != null ? 'Interested · ' + (r => r + (r === 1 ? 'st' : r === 2 ? 'nd' : r === 3 ? 'rd' : 'th'))(myRank(p)) : '')}</td><td>${closed ? '' : `<button class="dy-ra" data-radd="${p.id}" ${p.commit != null && p.commit !== g.user && p.firm ? 'disabled' : ''}>Add</button>`}</td></tr>`).join('')}</tbody></table></div>${pool.length > 40 ? `<button class="glink" data-more="pool">${V.more.pool ? 'Show fewer' : 'Show more'}</button>` : ''}</div>
       </div><div class="dy-col">
       <div class="box"><div class="glabel">Commits</div><ul class="dy-mini">${commits.map(p => `<li><span class="dy-stars">${stars(p.rec.stars)}</span> <a href="#" class="dy-pl" data-rid="${p.id}">${esc(p.n)}</a> <small>${p.pos}${p.nilOffer ? ' · ' + DY.money(p.nilOffer) : ''}</small></li>`).join('') || '<li class="dim">None yet</li>'}</ul></div>
-      <div class="box"><div class="glabel">Top classes</div><ol class="dy-poll">${(R.ranks || []).slice(0, 15).map((t, i) => `<li class="${t === g.user ? 'me' : ''}"><span>${i + 1}</span>${tlink(t, false)}<small>${(R.commits[t] || []).length}</small></li>`).join('')}</ol></div>
+      <div class="box"><div class="glabel">Top classes</div><ol class="dy-poll dy-cls">${(R.ranks || []).slice(0, 15).map((t, i) => { const c = (R.cstars || {})[t] || { 5: 0, 4: 0, 3: 0, n: (R.commits[t] || []).length }; return `<li class="${t === g.user ? 'me' : ''}"><span>${i + 1}</span>${tlink(t, false)}<small title="5-stars · 4-stars · 3-stars · total commits"><b>${c[5]}</b>·<b>${c[4]}</b>·<b>${c[3]}</b> <em>${c.n}</em></small></li>`; }).join('')}</ol><p class="small dim">Per class: 5★ · 4★ · 3★ and total commits.</p></div>
       <div class="box"><div class="glabel">Recruiting log</div><ul class="dy-mini">${(R.log || []).slice(0, 20).map(l => `<li>${esc(l)}</li>`).join('') || '<li class="dim">Nothing yet</li>'}</ul></div>
       </div></div>`;
+    if (!R.locked && !(g.fx && g.fx.recTut)) { g.fx = g.fx || {}; g.fx.recTut = 1; root.setTimeout(() => modal(recTutHtml()), 80); }
+  }
+  function recTutHtml() {
+    const g = G(), nil = DY.nilOn();
+    return `<div class="glabel">How recruiting works</div>
+      <ol class="dy-tut">
+        <li><b>Build a board.</b> Add up to ${DY.BOARD_MAX} prospects from the list. Each week you spend your hours on them: DMs, calls, and head coach visits (4 a week). Official visits are tied to home games, and a win sells.</li>
+        <li><b>Interest decides it.</b> Every school builds interest in a player. He cares about a few things (playing time, ${nil ? 'NIL, ' : ''}winning, distance from home, brand, development). Top programs get most of the elite names, but a school that offers a spot to play, is close to home, or is on a run can land a big recruit too. Use <b>Scout</b> (1 hour) to see his real ratings and a report.</li>
+        <li><b>Offer, then close.</b> Offers (40 max) open the door; a player commits when your interest is high enough and clearly ahead. Four- and five-stars want an official visit first. Everyone left signs by the end of the regular season.</li>
+        <li><b>Build a whole class.</b> Watch <i>Recruiting needs</i>: positions you are short at after seniors leave. A class of five quarterbacks leaves you without linemen. Roster limit is ${DY.rosterMax()}.</li>
+        ${nil ? '<li><b>NIL.</b> A promise on top of the pitch moves players who care about money. It comes out of your NIL budget.</li>' : '<li><b>No NIL yet.</b> This is before NIL existed (it arrived in 2021), so there are no promises or budgets: it is all scholarships, relationships and winning.</li>'}
+        <li><b>Or let the staff do it.</b> Set <b>Recruiting: Auto</b> in Settings. Auto works the board you built and never removes anyone you added. If your board is short of 20 live targets it adds more, your picks first, chosen to build a complete class: talent, positions of need, and players likely to commit (in a Tennessee dynasty it keeps the real commits). Switch back and forth any time.</li>
+      </ol><p><button class="btn" data-act="close">Got it</button></p>`;
   }
   function prospectCard(id) {
     const g = G(), p = DY.RP(id) || DY.P(id); if (!p) return;
@@ -839,7 +859,7 @@
     const st = DY.standings(V.conf);
     b.innerHTML = `<div class="box"><div class="gchips dy-chips">${confs.map(c => `<button data-conf="${c}" aria-pressed="${V.conf === c}">${esc(DY.CONF_NAME[c])}</button>`).join('')}</div>
       <table class="dyt"><thead><tr><th>#</th><th>Team</th><th>Conf</th><th>Overall</th><th class="hide-s">PF</th><th class="hide-s">PA</th></tr></thead><tbody>${st.map((t, i) => `<tr class="${t.user ? 'me' : ''}"><td>${i + 1}</td><td>${tlink(t.id)}${t.champ === G().season ? ' ' + tag('Champ') : ''}</td><td>${t.cw}-${t.cl}</td><td>${t.w}-${t.l}</td><td class="hide-s">${t.pf}</td><td class="hide-s">${t.pa}</td></tr>`).join('')}</tbody></table>
-      <p class="small dim">Tiebreakers: conference record, head-to-head, overall record, then the committee's rankings. ${DY.cfpSize() === 24 ? 'No title games in the 24-team era: the regular-season leader is the champion.' : 'The top two meet in the title game.'}</p></div>`;
+      <p class="small dim">Tiebreakers: conference record, head-to-head, overall record, then the committee's rankings. The top two meet in the conference title game (a champion always plays 13 games).</p></div>`;
   }
 
   /* ---------- stats ---------- */

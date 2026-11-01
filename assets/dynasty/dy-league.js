@@ -441,12 +441,8 @@
     DY.weekNews(w);
     g.week++;
     if (g.week > DY.LAST_WK) {
-      if (DY.cfpSize() === 24) {
-        // no title games: the regular-season leader is the champion (tiebreakers in standings)
-        for (const conf in DY.CONF_GAMES) { const st = DY.standings(conf); if (st[0]) { st[0].champ = g.season; st[0].confChamp = (st[0].confChamp || 0) + 1; } }
-        g.post = { label: 'Selection', games: [], stage: 'ccg', rounds: [], bowls: [], seeds: [] };
-        DY.updatePolls(14); DY.selection();
-      } else { g.phase = 'ccg'; DY.setupCCG(); }
+      // every conference crowns its champion in a title game: a champion's season is always its 13th game
+      { g.phase = 'ccg'; DY.setupCCG(); }
     }
   };
   DY.healWeek = () => { const g = G(); g.teams.forEach(t => t.roster.forEach(id => { const p = DY.P(id); if (p.inj) { p.inj.wks--; if (p.inj.wks <= 0) p.inj = null; } })); };

@@ -17,7 +17,7 @@
   };
   DY.HOURS = () => 50 + (G().coach.arch === 'recruiter' ? 12 : 0);
   DY.BOARD_MAX = 30;
-  DY.ACTIONS = { dm: { name: 'Social media', hrs: 1, pts: 4 }, call: { name: 'Phone call', hrs: 3, pts: 12 }, coach: { name: 'Head coach visit', hrs: 7, pts: 30 }, scout: { name: 'Scout', hrs: 3, pts: 0 } };
+  DY.ACTIONS = { dm: { name: 'Social media', hrs: 1, pts: 4 }, call: { name: 'Phone call', hrs: 3, pts: 12 }, coach: { name: 'Head coach visit', hrs: 7, pts: 30 }, scout: { name: 'Scout', hrs: 1, pts: 0 } };
   DY.PREFS = { pt: 'Playing time', nil: 'NIL', champ: 'Title contender', prox: 'Close to home', brand: 'Brand exposure', coach: 'Coach stability', pro: 'Pro potential', dev: 'Player development' };
 
   /* ---------- a recruiting class ---------- */
@@ -46,8 +46,10 @@
     return p;
   }
   function prefs() { const ks = shuffle(Object.keys(DY.PREFS).filter(k => k !== 'nil' || DY.nilOn())); return { top: ks.slice(0, 3), deal: chance(0.35) ? ks[0] : null }; }
+  let _needs = {};
   DY.genClass = (year, withReal) => {
     const g = G(), out = [];
+    _needs = {}; g.teams.forEach(t => { _needs[t.id] = DY.teamNeeds(t); });   // what each school actually needs this cycle (drives who chases whom)
     const n5 = 32, n4 = 300, n3 = 170;
     const comps = [];
     for (let i = 0; i < n5; i++) comps.push(rr(0.9834, 0.9999));
@@ -99,13 +101,54 @@
   DY.grade = v => v >= 0.92 ? 'A+' : v >= 0.85 ? 'A' : v >= 0.78 ? 'A-' : v >= 0.7 ? 'B+' : v >= 0.62 ? 'B' : v >= 0.55 ? 'B-' : v >= 0.47 ? 'C+' : v >= 0.4 ? 'C' : v >= 0.3 ? 'C-' : 'D';
   function seedInterest(p) {
     const g = G();
-    const ts = g.teams.filter(t => !t.user || true);
-    const want = p.rec.stars >= 5 ? 9 : p.rec.stars === 4 ? 7 : 5;
-    const scored = ts.map(t => ({ t, w: Math.pow(t.prestige / 60, p.rec.stars >= 4 ? 5 : 2.5) * (0.35 + DY.fit(t, p).prox * 1.2) * (DY.P4.includes(t.conf) || t.abbr === 'ND' ? 1 : (p.rec.stars >= 4 ? 0.12 : 0.6)) * rr(0.5, 1.5) }));
+    const ts = g.teams;
+    const st = p.rec.stars, want = st >= 5 ? 9 : st === 4 ? 8 : 6;
+    // who is in the race: prestige helps (blue-chips go after blue-chips) but home state, distance, an open spot at his position
+    // and a school's recent run all count too, so a Vanderbilt can land the best kid in Nashville and a Ball State can win a few three-stars
+    const scored = ts.map(t => {
+      const d = DY.fit(t, p), nd = (_needs[t.id] || (g.recruit && g.recruit._need && g.recruit._need[t.id]) || {})[p.pos];
+      const room = nd == null ? 1 : nd > 0 ? 1.3 : 0.55;
+      const run = 1 + clamp(((t.hist && t.hist.length ? t.hist.slice(-3).reduce((a, h) => a + h.w, 0) / Math.min(3, t.hist.length) : 7) - 7) / 12, -0.2, 0.45);
+      const home = t.st === p.st ? (st >= 5 ? 2.2 : 3.2) : 1;
+      const lvl = DY.P4.includes(t.conf) || t.abbr === 'ND' ? 1 : (st >= 5 ? 0.06 : st === 4 ? 0.3 : 0.85);
+      return { t, w: Math.pow(t.prestige / 60, st >= 5 ? 3.4 : st === 4 ? 2.5 : 1.7) * (0.3 + d.prox * 1.1) * home * lvl * room * run * rr(0.45, 1.7) };
+    });
     const top = [];
     for (let i = 0; i < want; i++) { const pk = wpick(scored.filter(x => !top.includes(x.t.id)), x => x.w); if (pk) top.push(pk.t.id); }
     top.forEach(id => { if (p.interest[id] == null) p.interest[id] = Math.round(rr(5, 30)); });
   }
+  /* what a CPU school will actually take: a class is built to a roster, not to the best available name. Three QBs and four punters in
+     one class never happens: a school takes about what its depth chart is short (one more for a blue-chip), and keeps its 5-star and
+     4-star counts to what real programs sign. */
+  function cpuState(R) {
+    const g = G(), pc = {}, sc = {}, tot = {};
+    Object.values(R.pool).forEach(p => {
+      if (p.commit == null) return; const k = p.commit;
+      (pc[k] = pc[k] || {})[p.pos] = (pc[k][p.pos] || 0) + 1; const c = (sc[k] = sc[k] || { 5: 0, 4: 0 });
+      if (p.rec.stars >= 5) c[5]++; else if (p.rec.stars === 4) c[4]++; tot[k] = (tot[k] || 0) + 1;
+    });
+    R._pc = pc; R._sc = sc; R._tot = tot;
+    if (!R._need) { R._need = {}; g.teams.forEach(t => { R._need[t.id] = DY.teamNeeds(t); }); }
+  }
+  DY.cpuOk = (t, p, relax) => {
+    const R = G().recruit; if (!R._pc) cpuState(R);
+    const have = (R._pc[t.id] || {})[p.pos] || 0, need = (R._need[t.id] || {})[p.pos] || 0, sc = R._sc[t.id] || { 5: 0, 4: 0 };
+    if ((R._tot[t.id] || 0) >= 27) return false;
+    if (p.rec.stars >= 5 && sc[5] >= 7) return false;
+    if (p.rec.stars >= 4 && sc[4] + sc[5] >= 15) return false;
+    if (relax) return true;
+    if (['K', 'P', 'LS'].includes(p.pos)) return have < Math.min(1, need);
+    return have < Math.max(p.pos === 'QB' ? 1 : 0, need + (p.rec.stars >= 4 ? 1 : 0));
+  };
+  const addCommit = (R, t, p) => {
+    if (!R._pc) cpuState(R);
+    const pc = (R._pc[t] = R._pc[t] || {}); pc[p.pos] = (pc[p.pos] || 0) + 1; R._tot[t] = (R._tot[t] || 0) + 1;
+    const sc = (R._sc[t] = R._sc[t] || { 5: 0, 4: 0 }); if (p.rec.stars >= 5) sc[5]++; else if (p.rec.stars === 4) sc[4]++;
+  };
+  const dropCommit = (R, t, p) => {
+    if (!R._pc || !R._pc[t]) return; R._pc[t][p.pos] = Math.max(0, (R._pc[t][p.pos] || 0) - 1); R._tot[t] = Math.max(0, (R._tot[t] || 0) - 1);
+    const sc = R._sc[t]; if (sc) { if (p.rec.stars >= 5) sc[5]--; else if (p.rec.stars === 4) sc[4]--; }
+  };
   DY.classPoints = (ids) => ids.map(DY.RP).filter(Boolean).sort((a, b) => b.rec.c - a.rec.c).reduce((s, p, i) => s + p.rec.c * 100 * Math.exp(-(i * i) / (2 * 100)), 0);
 
   /* ---------- the recruiting season ---------- */
@@ -116,9 +159,9 @@
     const pool = {}; list.forEach(p => { pool[p.id] = p; });
     // year one: the real class is locked in (with NIL promises sized to each player's market value)
     const locked = !!withReal && !g.hx && year === (g.startSeason || 2026) + 1 && g.user === DY.UT_ID;
-    g.recruit = { year, pool, board: [], hours: DY.HOURS(), log: [], classRank: null, signed: false, locked };
+    g.recruit = { year, pool, board: [], hours: DY.HOURS(), log: [], classRank: null, signed: false, locked, _need: _needs };
     const ut = DY.userT();
-    list.filter(p => p.commit === g.user).forEach(p => { g.recruit.board.push(p.id); p.nilOffer = DY.recruitNil(p); p.nilLocked = true; });
+    list.filter(p => p.commit === g.user).forEach(p => { g.recruit.board.push(p.id); if (DY.nilOn()) { p.nilOffer = DY.recruitNil(p); p.nilLocked = true; } });
     DY.rankClasses();
   };
   DY.boardAdd = id => { const R = G().recruit; if (R.locked) return 'Recruiting is locked in year one: the real 2027 class.'; if (R.board.includes(id)) return null; if (R.board.length >= DY.BOARD_MAX) return 'Your board is full (30). Remove someone first.'; R.board.push(id); const p = DY.RP(id); if (p.interest[G().user] == null) p.interest[G().user] = 0; return null; };
@@ -154,12 +197,15 @@
     if (mode === 'auto') DY.autoRecruit();
     const logs = [];
     const full = DY.myCommits().length >= DY.CAP.hs;
+    // even a great recruiter does not sign half of the nation's five-stars: a class holds about as many as the biggest real classes
+    const starCap = { freshman: 12, varsity: 9, heisman: 7 }[g.settings.difficulty || 'varsity'] || 9;
+    const starRoom = p => p.rec.stars < 5 || DY.myCommits().filter(x => x.rec.stars >= 5).length < starCap;
     if (mode !== 'off') R.board.forEach(id => {
       const p = DY.RP(id); if (!p) return;
       let pts = 0;
       for (const a in p.acts) { if (a === 'scout') { p.scout = Math.min(3, p.scout + 1); continue; } pts += DY.ACTIONS[a].pts; }
       if (p.offer) pts += 3;
-      if (p.nilOffer) pts += Math.min(25, p.nilOffer / Math.max(30000, DY.nilValue(p, ut) * 0.9) * 10) * (p.pref.top.includes('nil') ? 1.6 : 0.8);
+      if (p.nilOffer && DY.nilOn()) pts += Math.min(25, p.nilOffer / Math.max(30000, DY.nilValue(p, ut) * 0.9) * 10) * (p.pref.top.includes('nil') ? 1.6 : 0.8);
       // official visit this week
       if (p.visit === w) {
         const x = DY.userGames(w)[0];
@@ -177,28 +223,31 @@
       if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + DY.fitScore(ut, p)) * (p.offer ? 1 : 0.55) * crowd * DY.pull(ut, p);
     });
     // everyone else
+    cpuState(R);
     Object.values(R.pool).forEach(p => {
       if (p.commit && p.firm) return;
       for (const tid in p.interest) {
         const t = g.teams[tid]; if (t.user) continue;
-        // blue-bloods go hardest after the elite kids
-        const heat = p.rec.stars >= 5 ? 1.12 + Math.max(0, t.prestige - 82) / 80 : p.rec.stars === 4 ? 1.04 + Math.max(0, t.prestige - 82) / 150 : 0.9;
-        p.interest[tid] += (6 + t.prestige / 9) * (0.45 + DY.fitScore(t, p)) * rr(0.35, 1.5) * heat;
+        // blue-bloods go a little harder after the elite kids, but not by much: fit, home and a spot to play decide most of it
+        const heat = p.rec.stars >= 5 ? 1.04 + Math.max(0, t.prestige - 82) / 170 : p.rec.stars === 4 ? 1.0 + Math.max(0, t.prestige - 82) / 280 : 0.95;
+        const ok = DY.cpuOk(t, p), nd = (R._need[t.id] || {})[p.pos] || 0, have = (R._pc[t.id] || {})[p.pos] || 0;
+        const nm = !ok && p.commit !== +tid ? 0.3 : 1 + Math.min(0.4, Math.max(0, nd - have) * 0.1);
+        p.interest[tid] += (6 + t.prestige / 11) * (0.45 + DY.fitScore(t, p)) * rr(0.35, 1.5) * heat * nm;
       }
-      // commits
-      const order = Object.entries(p.interest).sort((a, b) => b[1] - a[1]);
+      // commits: only schools that can use him (a spot at his position, room in the class) are considered
+      const order = Object.entries(p.interest).filter(([tid]) => { const t = g.teams[tid]; return t.user || p.commit === +tid || DY.cpuOk(t, p); }).sort((a, b) => b[1] - a[1]);
       if (!order.length) return;
       const [lead, lv] = order[0], second = order[1] ? order[1][1] : 0;
       // the bar to commit drops as the season goes (most of a class is done by the early signing period)
       const need = (140 + p.rec.stars * 15 + (w <= 4 ? 40 : 0)) * (1 - Math.min(w, 14) / 24);
       // four- and five-stars want to see campus (an official visit) before they commit to you
       const visitOk = p.rec.stars < 4 || p.visited || w >= (p.rec.stars >= 5 ? 12 : 8);
-      if (!p.commit && lv >= need && lv >= second * (w >= 10 ? 1.08 : 1.2) && (!g.teams[lead].user || (p.offer && !full && visitOk))) {
-        p.commit = +lead;
+      if (!p.commit && lv >= need && lv >= second * (w >= 10 ? 1.08 : 1.2) && (!g.teams[lead].user || (p.offer && !full && visitOk && starRoom(p)))) {
+        p.commit = +lead; if (!g.teams[lead].user) addCommit(R, +lead, p);
         if (g.teams[lead].user) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos} from ${p.home}, commits to ${DY.UN()}!`); DY.news('commit', `${p.rec.stars}-star ${DY.POS_NAME[p.pos].toLowerCase()} ${p.n} commits to ${DY.UN()}`, `No. ${p.rec.nat} nationally (${p.rec.c.toFixed(4)} composite). ${p.home}, ${p.hs}.`, { rid: p.id }); }
         else if (p.rec.nat <= 50 && R.board.includes(p.id)) logs.push(`${p.n} (No. ${p.rec.nat}) commits to ${g.teams[lead].name}.`);
       } else if (p.commit && !p.firm && +lead !== p.commit && lv >= (p.interest[p.commit] || 0) * 1.35 && (!g.teams[lead].user || p.offer)) {
-        const was = p.commit; p.commit = +lead;
+        const was = p.commit; p.commit = +lead; if (!g.teams[was].user) dropCommit(R, was, p); if (!g.teams[lead].user) addCommit(R, +lead, p);
         if (g.teams[lead].user) { logs.push(`FLIP: ${p.n} flips from ${g.teams[was].name} to ${DY.UN()}!`); DY.news('commit', `${p.n} flips to ${DY.UN()}`, `The ${p.rec.stars}-star ${p.pos} had been committed to ${g.teams[was].name}.`); }
         else if (g.teams[was].user) { logs.push(`DECOMMIT: ${p.n} flips to ${g.teams[lead].name}.`); DY.news('commit', `${p.n} flips from ${DY.UN()} to ${g.teams[lead].name}`, ''); }
       }
@@ -210,18 +259,25 @@
     DY.rankClasses();
   };
   function commitAll(logs, fullUser) {
-    const g = G(), R = g.recruit, cnt = {};
-    Object.values(R.pool).forEach(p => { if (p.commit != null) cnt[p.commit] = (cnt[p.commit] || 0) + 1; });
+    const g = G(), R = g.recruit; cpuState(R);
     const cap = t => t.user ? DY.CAP.hs : 27;
-    Object.values(R.pool).filter(p => p.commit == null).sort((a, b) => b.rec.c - a.rec.c).forEach(p => {
+    const userOk = p => p.offer && !fullUser && g.settings.recruiting !== 'off';
+    const rest = Object.values(R.pool).filter(p => p.commit == null).sort((a, b) => b.rec.c - a.rec.c);
+    // first pass: his own list, but only schools that can use him; second pass: any school with room and a hole, then any room at all
+    [0, 1, 2].forEach(pass => rest.forEach(p => {
+      if (p.commit != null) return;
       if (!Object.keys(p.interest).length) seedInterest(p);
       const order = Object.entries(p.interest).sort((a, b) => b[1] - a[1]).map(x => +x[0]);
-      let tid = order.find(id => { const t = g.teams[id]; return t && !t.dorm && (cnt[id] || 0) < cap(t) && (!t.user || (p.offer && !fullUser && g.settings.recruiting !== 'off')); });
-      if (tid == null) { const t = DY.wpick(g.teams.filter(t => !t.user && !t.dorm && (cnt[t.id] || 0) < cap(t)), t => Math.pow(t.prestige / 60, p.rec.stars >= 4 ? 4 : 1.5)); tid = t ? t.id : null; }
+      let tid = pass === 0 ? order.find(id => { const t = g.teams[id]; return t && !t.dorm && (t.user ? userOk(p) && (R._tot[id] || 0) < cap(t) : DY.cpuOk(t, p)); }) : null;
+      if (tid == null && pass >= 1) {
+        const pool = g.teams.filter(t => !t.user && !t.dorm && DY.cpuOk(t, p, pass === 2));
+        const pk = DY.wpick(pool, t => Math.pow(t.prestige / 60, p.rec.stars >= 4 ? 2.2 : 1.2) * (1 + Math.max(0, ((R._need[t.id] || {})[p.pos] || 0) - ((R._pc[t.id] || {})[p.pos] || 0)) * 0.4) * (t.st === p.st ? 2 : 1));
+        tid = pk ? pk.id : null;
+      }
       if (tid == null) return;
-      p.commit = tid; cnt[tid] = (cnt[tid] || 0) + 1;
+      p.commit = tid; if (!g.teams[tid].user) addCommit(R, tid, p);
       if (g.teams[tid].user) logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos}, signs with ${DY.UN()} in the early period.`);
-    });
+    }));
   }
   // program pull: how much a school's pitch counts with a recruit. Blue-chips discount low-prestige programs,
   // so a rebuild takes years of winning (prestige) instead of one good recruiting season. Tennessee-level programs ~1.0.
@@ -236,31 +292,56 @@
     Object.values(R.pool).forEach(p => { if (p.commit != null) (by[p.commit] = by[p.commit] || []).push(p.id); });
     const pts = Object.keys(by).map(t => [+t, DY.classPoints(by[t])]).sort((a, b) => b[1] - a[1]);
     R.ranks = pts.map(x => x[0]); R.points = Object.fromEntries(pts);
+    R.cstars = {}; Object.keys(by).forEach(t => { const c = { 5: 0, 4: 0, 3: 0, n: by[t].length }; by[t].forEach(id => { const q = R.pool[id]; if (q) c[q.rec.stars >= 5 ? 5 : q.rec.stars === 4 ? 4 : 3]++; }); R.cstars[t] = c; });
     const i = R.ranks.indexOf(g.user); R.classRank = i >= 0 ? i + 1 : null;
     R.commits = by;
   };
   DY.myCommits = () => Object.values(G().recruit.pool).filter(p => p.commit === G().user);
-  // CPU recruiting for Tennessee: keep a board of the best fits at positions of need and spread the hours
+  /* Auto recruiting. It works the board you built and never takes anyone off it. If you started the season with an empty board it builds
+     one; if you have fewer than 20 prospects still in play it tops the board up to 20, your own picks first. New targets are chosen to
+     build a whole class: talent, then the positions the roster is actually short at (never a pile of quarterbacks or corners), then who
+     is interested and likely to say yes. In a Tennessee dynasty the real Tennessee commits are on the board from day one. */
+  DY.AUTO_TARGETS = 20;
   DY.autoRecruit = () => {
     const g = G(), R = g.recruit, ut = DY.userT();
     if (R.locked) return;
-    const needs = DY.teamNeeds(ut);
-    const cand = Object.values(R.pool).filter(p => !p.commit || p.commit === ut.id).filter(p => !p.real || p.commit === ut.id);
-    // aim where the program can actually land players: value discounted by pull (blue-chips mostly ignore low-prestige schools)
-    cand.forEach(p => {
+    const needs = DY.teamNeeds(ut), SPEC = ['K', 'P', 'LS'];
+    const commits = DY.myCommits(), inPlay = p => p && (p.commit == null || p.commit === ut.id);
+    // real Tennessee commits are always on the board (a Tennessee dynasty)
+    if (ut.id === DY.UT_ID) Object.values(R.pool).filter(p => p.real && p.commit === ut.id && !R.board.includes(p.id)).forEach(p => R.board.push(p.id));
+    commits.forEach(p => { if (!R.board.includes(p.id)) R.board.push(p.id); });
+    // how many of the class slots each position already has (commits plus prospects still in play on the board)
+    const planned = {}; R.board.map(DY.RP).filter(inPlay).forEach(p => { planned[p.pos] = (planned[p.pos] || 0) + 1; });
+    const active = () => R.board.map(DY.RP).filter(inPlay).length;
+    const score = p => {
       const pl = DY.pull(ut, p), rival = Math.max(0, ...Object.entries(p.interest).filter(([t]) => +t !== ut.id).map(([, v]) => v));
-      // smaller programs look for players the big schools aren't already winning
-      p._s = p.rec.c * 100 * (0.55 + pl * 0.45) - (pl < 0.4 ? 25 : 0) + (needs[p.pos] || 0) * 6 + DY.fitScore(ut, p) * 12 + (p.interest[ut.id] || 0) / 20 - rival * (1 - Math.min(1, pl)) * 0.25;
-      if (['K', 'P', 'LS'].includes(p.pos) && !(needs[p.pos] > 0)) p._s -= 1000;
-    });
-    const room = Math.max(0, DY.CAP.hs - DY.myCommits().length);
-    let spec = DY.myCommits().filter(p => ['K', 'P', 'LS'].includes(p.pos)).length;
-    const want = cand.filter(p => p.commit !== ut.id).sort((a, b) => b._s - a._s).filter(p => !['K', 'P', 'LS'].includes(p.pos) || spec++ < 1).slice(0, Math.min(DY.BOARD_MAX - Math.min(18, DY.myCommits().length), room + 6));
-    R.board = DY.myCommits().map(p => p.id).concat(want.map(p => p.id)).slice(0, DY.BOARD_MAX);
+      const open = (needs[p.pos] || 0) - (planned[p.pos] || 0);
+      let v = p.rec.c * 100 * (0.55 + pl * 0.45) - (pl < 0.4 ? 22 : 0)                 // talent, discounted by how likely a program like yours is to land him
+        + (open > 0 ? 7 + Math.min(open, 3) * 3 : -14 - Math.max(0, -open) * 14)    // need: fill holes, never stack a position
+        + (p.interest[ut.id] || 0) / 18 + DY.fitScore(ut, p) * 12                     // interested and a good fit = likely to commit
+        - rival * (1 - Math.min(1, pl)) * 0.22;
+      if (SPEC.includes(p.pos)) v = (needs[p.pos] || 0) > 0 && !(planned[p.pos] > 0) ? v - 8 : -1e3;   // one specialist only when needed
+      if (p.pos === 'QB' && (planned.QB || 0) >= 1 && (needs.QB || 0) <= 1) v -= 40;
+      return v;
+    };
+    // top up the board (own picks stay; additions only until 20 are still in play)
+    let guard = 0;
+    while (active() < DY.AUTO_TARGETS && R.board.length < DY.BOARD_MAX && guard++ < 40) {
+      const pick = Object.values(R.pool).filter(p => !R.board.includes(p.id) && inPlay(p) && !p.real).map(p => [p, score(p)]).sort((a, b) => b[1] - a[1])[0];
+      if (!pick || pick[1] < -500) break;
+      R.board.push(pick[0].id); planned[pick[0].pos] = (planned[pick[0].pos] || 0) + 1; if (pick[0].interest[ut.id] == null) pick[0].interest[ut.id] = 0;
+    }
+    // spend the week: your own additions first, then the best of the rest; offers go out to anyone you are working
+    const order = R.board.map((id, i) => [DY.RP(id), i]).filter(([p]) => inPlay(p) && p.commit !== ut.id)
+      .map(([p, i]) => [p, score(p) + (i < (R._userAdded || R.board.length) ? 0 : 0) - i * 0.01]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
     let hrs = DY.HOURS(), coach = 4;
-    want.forEach(p => { if (p.interest[ut.id] == null) p.interest[ut.id] = 0; if (!p.offer) DY.offer(p.id); p.acts = {}; if (coach > 0 && hrs >= 7 && p.rec.stars >= 4) { p.acts.coach = 1; hrs -= 7; coach--; } else if (hrs >= 3) { p.acts.call = 1; hrs -= 3; } else if (hrs >= 1) { p.acts.dm = 1; hrs -= 1; } });
+    order.forEach(p => {
+      p.acts = {};
+      if (!p.offer) DY.offer(p.id);
+      if (coach > 0 && hrs >= 7 && p.rec.stars >= 4) { p.acts.coach = 1; hrs -= 7; coach--; } else if (hrs >= 3) { p.acts.call = 1; hrs -= 3; } else if (hrs >= 1) { p.acts.dm = 1; hrs -= 1; }
+    });
     const homeWk = DY.userGames().find(x => x.h === ut.id && !x.res && x.wk > g.week);
-    if (homeWk) want.slice(0, 4).forEach(p => { if (!p.visit) DY.setVisit(p.id, homeWk.wk); });
+    if (homeWk) order.slice(0, 4).forEach(p => { if (!p.visit) DY.setVisit(p.id, homeWk.wk); });
   };
   DY.teamNeeds = t => {
     const out = {};
@@ -276,8 +357,9 @@
   DY.OFF_LABEL = { recap: 'Season recap', nil: 'NIL & budget', portal: 'Transfer portal', signing: 'Signing day', draft: 'NFL Draft', progress: 'Progression', cuts: 'Roster cut-down', schedule: 'Non-conference schedule' };
   const OFF_ALL = ['recap', 'nil', 'portal', 'signing', 'draft', 'progress', 'cuts', 'schedule'];
   // NIL turned off at setup (or before the NIL era): no NIL stage in the offseason
-  Object.defineProperty(DY, 'OFF_ORDER', { get: () => (DY.G && DY.G.settings.nil === 'off') ? OFF_ALL.filter(x => x !== 'nil') : OFF_ALL });
-  DY.nilOn = () => !(DY.G && DY.G.settings.nil === 'off');
+  Object.defineProperty(DY, 'OFF_ORDER', { get: () => (DY.G && (DY.G.settings.nil === 'off' || (DY.G.hx && DY.G.season < 2021))) ? OFF_ALL.filter(x => x !== 'nil') : OFF_ALL });
+  // NIL only exists from 2021 on: a historical dynasty has no NIL promises, budgets or raises before that, whatever the setting says
+  DY.nilOn = () => !(DY.G && (DY.G.settings.nil === 'off' || (DY.G.hx && DY.G.season < 2021)));
   // limits per offseason (AJ): 30 newcomers (20 high school, 20 transfers), 30 departures, 15 transfers out, 15 NFL entries
   DY.CAP = { newcomers: 30, hs: 20, tin: 20, out: 30, tout: 15, nfl: 15 };
   DY.ROSTER_MAX = 85;
@@ -616,14 +698,17 @@
     const rounds = final ? 3 : 1;
     for (let r = 0; r < rounds; r++) {
       const left = P.pool.filter(id => DY.P(id).portal);
-      // CPU offers
+      const NEED = {}, needsOf = t => NEED[t.id] || (NEED[t.id] = DY.teamNeeds(t));
+      // CPU offers: schools shop for what they are short at (a hole at a position beats a name at a position they are stacked)
       left.forEach(id => {
         const p = DY.P(id);
         g.teams.forEach(t => {
           if (t.user || t.id === p.portal.from) return;
-          if (chance(0.03 * Math.pow(t.prestige / 70, 2) * (p.ovr >= 80 ? 3 : 1))) {
+          const nd = needsOf(t)[p.pos] || 0;
+          if (nd <= 0 && t.roster.map(DY.P).filter(q => q.pos === p.pos).length >= DY.POS_MAX[p.pos] - 1) return;
+          if (chance(0.03 * Math.pow(t.prestige / 70, 2) * (p.ovr >= 80 ? 3 : 1) * (1 + Math.min(3, nd) * 0.5))) {
             const L = DY.lineup(t), cur = (L[p.pos] || [])[0];
-            if (!cur || p.ovr > cur.ovr - 2) p.portal.offers[t.id] = Math.round(DY.nilValue(p, t) * (p.ovr >= 84 && t.prestige >= 80 ? rr(0.85, 1.4) : rr(0.6, 1.2)) / 5000) * 5000;
+            if (!cur || (nd > 0 ? p.ovr > cur.ovr - 8 : p.ovr > cur.ovr + 2)) p.portal.offers[t.id] = Math.round(DY.nilValue(p, t) * (p.ovr >= 84 && t.prestige >= 80 ? rr(0.85, 1.4) : rr(0.6, 1.2)) / 5000) * 5000;
           }
         });
         if (P.mine[id] != null && g.settings.portal !== 'off') p.portal.offers[ut.id] = P.mine[id];
@@ -636,6 +721,7 @@
         const best = offers.sort((a, b) => val(b) - val(a))[0];
         if (final || chance(0.55) || +best[0] === ut.id && chance(0.3)) {
           const t = g.teams[best[0]];
+          if (NEED[t.id] && NEED[t.id][p.pos] > 0) NEED[t.id][p.pos]--;
           p.t = t.id; p.nil = best[1]; t.roster.push(p.id); p.prevT = p.portal.from; p.tin = g.season; DY.addLog(p, `Transferred from ${g.teams[p.portal.from].name} to ${t.name}.`);
           if (t.user) { P.log.unshift(`${p.n} (${p.pos}, ${p.ovr}) commits to ${DY.UN()} from ${g.teams[p.portal.from].name}.`); DY.news('portal', `Transfer: ${p.n} picks ${DY.UN()}`, `${p.pos}, ${p.ovr} OVR, from ${g.teams[p.portal.from].name}.`, { pid: p.id }); }
           else if (p.portal.from === ut.id) P.log.unshift(`${p.n} transfers to ${t.name}.`);
@@ -646,6 +732,16 @@
       P.pool = P.pool.filter(id => DY.P(id).portal);
     }
     if (final) {
+      // schools that still have a real hole at a position take the best transfer left there (a roster is built, not left to chance)
+      g.teams.forEach(t => {
+        if (t.user) return; const nd = DY.teamNeeds(t);
+        Object.keys(nd).filter(k => nd[k] >= 2 && k !== 'K' && k !== 'P' && k !== 'LS').forEach(pos => {
+          P.pool.map(DY.P).filter(q => q.portal && q.pos === pos && q.portal.from !== t.id && q.ovr >= 58).sort((a, b) => b.ovr - a.ovr).slice(0, Math.min(3, nd[pos])).forEach(q => {
+            q.t = t.id; q.nil = 0; t.roster.push(q.id); q.prevT = q.portal.from; q.tin = g.season; DY.addLog(q, `Transferred from ${g.teams[q.portal.from].name} to ${t.name}.`); q.portal = null;
+          });
+        });
+      });
+      P.pool = P.pool.filter(id => DY.P(id).portal);
       // anyone unsigned goes back to (or stays at) a lower-level school: off our books
       P.pool.forEach(id => { const p = DY.P(id); p.t = null; p.gone = g.season; p.leave = 'portal'; p.portal = null; });
       g.teams.forEach(t => { t.roster = t.roster.filter(id => { const p = DY.P(id); return p.t === t.id; }); });
@@ -903,7 +999,14 @@
     g.teams.forEach(t => {
       t.w = t.l = t.cw = t.cl = t.pf = t.pa = 0; t.res = []; t.ap = null;
       // CPU programs drift with results
-      if (!t.user && t.hist.length) { const h = t.hist[t.hist.length - 1]; t.prestige = clamp(t.prestige + (h.w - 8) * 0.2 + (h.ap && h.ap <= 10 ? 0.3 : 0) - (t.prestige - DY.TEAMS[t.id].prestige) * 0.2, 25, 97); t.budget = DY.teamBudget(t); }
+      if (!t.user && t.hist.length) {
+        const h = t.hist[t.hist.length - 1], base = DY.TEAMS[t.id].prestige;
+        // results move a program (a few good years build a contender, a few bad ones sink a power) and every offseason brings a bit of
+        // coaching and recruiting luck; a hire after a losing run gives a real bump. Pulled gently back toward where the program started.
+        let d = (h.w - 8) * 0.42 + (h.ap && h.ap <= 10 ? 0.7 : 0) + (h.champ ? 1.2 : 0) - (t.prestige - base) * 0.1 + gauss() * 1.1;
+        if (h.w <= 5 && chance(0.45)) { d += rr(1.5, 5); t.coach = DY.coachName(); t.newCoach = g.season + 1; }
+        t.prestige = clamp(t.prestige + d, 25, 97); t.budget = DY.teamBudget(t);
+      }
       t.depthEdited = false; DY.refreshDepth(t);
       const o = DY.teamOvr(t);
       t.elo = t.elo * 0.45 + (1500 + (o.ovr - 76) * 26 + (t.prestige - 70) * 1.2) * 0.55; t.preElo = t.elo;

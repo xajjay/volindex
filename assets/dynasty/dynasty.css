@@ -669,7 +669,7 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
 }
 .cf-skip { display: flex; justify-content: flex-end; margin-bottom: 8px; }
 /* keep the sim options in reach while calling plays */
-.dyg-simbar { position: sticky; bottom: 0; z-index: 6; background: var(--surface); box-shadow: 0 -6px 14px rgba(0,0,0,.08); border-radius: 10px 10px 0 0; }
+.dyg-simbar { position: static; }   /* no longer pinned: it sat over the play-calling buttons */
 .dyg-simbar:empty { display: none; }
 .dyg-full .dyg-fullbar { flex-wrap: wrap; }
 @media (max-width: 560px) { .dy-fp span { display: none; } .dy-fp i { font-size: 9px; } }   /* phone: overall + position only on the mini field (tap a dot for the player) */
