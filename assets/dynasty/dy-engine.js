@@ -52,16 +52,16 @@
 
   /* ---------- who is on the field this snap (rotation, garbage time, injuries) ---------- */
   // how much the backups play (percent of snaps when the game is close); stars play more, QB1 plays every snap
-  DY.ROT_DEFAULT = { RB: 30, WR: 12, TE: 18, DL: 24, LB: 6, DB: 4 };
+  DY.ROT_DEFAULT = { RB: 48, WR: 12, TE: 18, DL: 24, LB: 6, DB: 4 };
   DY.ROT_GROUPS = [['RB', 'Running back'], ['WR', 'Wide receiver'], ['TE', 'Tight end'], ['DL', 'Defensive line'], ['LB', 'Linebacker'], ['DB', 'Secondary']];
   function pers(GM, s) {
     const L = GM.L[s], lead = GM.score[s] - GM.score[other(s)];
-    const garbage = (GM.q === 4 && Math.abs(lead) >= 24) || (GM.q >= 3 && Math.abs(lead) >= 35);
+    const garbage = (GM.q === 4 && Math.abs(lead) >= 21) || (GM.q === 3 && Math.abs(lead) >= 28) || (GM.q >= 3 && Math.abs(lead) >= 35);
     const g = garbage ? 1 : 0;
     const R = Object.assign({}, DY.ROT_DEFAULT, GM.T[s].rot || {});
     const at = (arr, i) => arr[Math.min(arr.length - 1, i)] || arr[0];
     // the backup comes in R% of the time, less when the starter is much better (a star stays on the field)
-    const sw = (st, bk, grp) => { if (!bk || bk === st) return st; if (garbage) return chance(0.75) ? bk : st; const m = clamp(1 - ((st.ovr || 70) - (bk.ovr || 70)) / 16, 0.12, 1.25); return chance(R[grp] / 100 * m) ? bk : st; };
+    const sw = (st, bk, grp) => { if (!bk || bk === st) return st; if (garbage) return chance(0.75) ? bk : st; const m = clamp(1 - ((st.ovr || 70) - (bk.ovr || 70)) / 16, grp === 'RB' ? 0.55 : 0.12, 1.25); const tired = grp === 'RB' ? clamp((((GM.ps[st.id] || {}).ra || 0) - 14) * 0.035, 0, 0.5) : 0; return chance(R[grp] / 100 * m + tired) ? bk : st; };   // a workhorse still tires: backs share the carries
     const QB = garbage && Math.abs(lead) >= 28 ? at(L.QB, 1) : L.QB[0];
     const P = {
       QB, RB: sw(L.RB[0], L.RB[1], 'RB'),
@@ -84,6 +84,14 @@
     return P;
   }
   // snap counts: everyone on the field for the play (by formation), every snap
+  // sacks belong to the front: when a corner, nickel or safety is the one who gets to the quarterback (a blitz), the pocket was
+  // still collapsed by the rush, so most of the credit goes to the lineman or linebacker who forced it (real corners have 0-3 a year)
+  DY.fixSack = (GM, sk) => {
+    if (!sk || (sk.pos !== 'CB' && sk.pos !== 'S') || !chance(0.82)) return sk;
+    const side = GM.T.h.id === sk.t ? 'h' : GM.T.a.id === sk.t ? 'a' : null; if (!side) return sk;
+    const P = pers(GM, side), pool = [...(P.DL || []), ...(P.LB || [])].filter(Boolean);
+    return pool.length ? wpick(pool, p => Math.pow(Math.max(20, (p.at.fmv || 60) + (p.at.pmv || 60) - 80), 2)) : sk;
+  };
   const snap1 = (GM, p) => { if (!p) return; GM.snap[p.id] = 1; add(GM, p, 'sn'); };
   const markSnapF = (GM, P, F) => { [P.QB, ...P.OL].forEach(p => snap1(GM, p)); const wr = F ? F.wr : 3, te = F ? F.te : 1, rb = F ? F.rb : 1;
     if (rb >= 1) snap1(GM, P.RB); if (rb >= 2) snap1(GM, P.FB); [P.WR[0], P.WR[1], P.WR[2], P.WR4, P.WR5].slice(0, wr).forEach(p => snap1(GM, p)); if (te >= 1) snap1(GM, P.TE); if (te >= 2) snap1(GM, P.TE2); };
@@ -199,6 +207,7 @@
     // tempo
     if ((GM.q === 4 && lead < 0 && GM.clock <= 420) || two && lead <= 7) out.tempo = 'hurry';
     else if (GM.q === 4 && lead > 0 && GM.clock <= 600) out.tempo = 'chew';
+    else if ((GM.q >= 3 && lead >= 24) || (GM.q === 4 && lead >= 17)) out.tempo = 'chew';     // a comfortable lead: run it and bleed the clock
     // run or pass
     let pp = GM.style[s].pass;
     if (GM.down === 2) pp += GM.togo >= 8 ? 0.12 : GM.togo <= 3 ? -0.14 : 0;
@@ -206,6 +215,7 @@
     if (GM.down === 4) pp = GM.togo <= 2 ? 0.42 : 0.86;
     if (GM.ball >= 95) pp -= 0.12;
     if (lead < -8 && GM.q >= 3) pp += 0.12;
+    if (lead >= 21 && GM.q >= 3) pp -= 0.2; if (lead >= 35 && GM.q >= 3) pp -= 0.25;     // up big in the second half: pound the ball, do not run up the score
     if (GM.q === 4 && lead < 0 && GM.clock <= 240) pp = Math.max(pp, 0.82);
     if (GM.q === 4 && lead > 0 && GM.clock <= 420) pp -= 0.28;
     if (two && lead <= 0) pp = Math.max(pp, 0.85);
@@ -671,15 +681,15 @@
       y = 2.9 + win * 2.0 + (E(GM, car, 'spd', s) - 76) / 16;
     } else {
       win = (olv - dlv) / 17 + (olv - lbv) / 34 - box * 0.32 + gauss() * 1.12;
-      y = 3.9 + win * 1.9 + (E(GM, car, 'bcv', s) - 76) / 26 + (E(GM, car, 'btk', s) - 76) / 38;
+      y = 4.15 + win * 1.7 + (E(GM, car, 'bcv', s) - 76) / 34 + (E(GM, car, 'btk', s) - 76) / 50;   // a great back adds yards but does not break the sim
     }
     if (GM.ball >= 95) y = Math.min(y, y * 0.75 + 0.6);
     let tackler = tacklerFor(D, y, 'run'), broke = false, big = false;
     if (y > 0 && chance(clamp(0.10 + (E(GM, car, 'btk', s) - E(GM, tackler, 'tak', other(s))) / 230, 0.03, 0.24))) { broke = true; y += rr(2, 8); ev.push(`${last(car)} breaks the tackle of ${last(tackler)}.`); }
     if (y >= 7) {
       const sspd = avg(D.S.map(p => E(GM, p, 'spd', other(s))));
-      const pb = clamp(0.06 + (E(GM, car, 'spd', s) - sspd) / 230 + (E(GM, car, 'elu', s) - 76) / 400, 0.02, 0.2) * (t === 'out' ? 1.3 : t === 'qb' ? 1.1 : 0.85);
-      if (chance(pb)) { y += 8 + -Math.log(1 - rnd()) * 16; big = true; }
+      const pb = clamp(0.06 + (E(GM, car, 'spd', s) - sspd) / 230 + (E(GM, car, 'elu', s) - 76) / 400, 0.02, 0.2) * (t === 'out' ? 1.2 : t === 'qb' ? 1.0 : 0.72);
+      if (chance(pb)) { y += 7 + -Math.log(1 - rnd()) * 12; big = true; }
       tackler = tacklerFor(D, y, 'run');
     }
     y = Math.round(clamp(y, -7, 100));
@@ -770,7 +780,7 @@
     if (margin < -0.5) {
       const sackP = clamp(0.62 - (E(GM, qb, 'agi', s) + E(GM, qb, 'spd', s)) / 420 - (E(GM, qb, 'awr', s) - 70) / 190, 0.16, 0.72) * (t === 'quick' ? 0.45 : 1);
       if (chance(sackP)) {
-        const sk = winner(); const y = -Math.round(rr(4, 10));
+        const sk = DY.fixSack(GM, winner()); const y = -Math.round(rr(4, 10));
         let strip = chance(0.10 + (sk.at.pmv || 60) / 1500);
         if (strip && chance(1 - qb.at.car / 140)) strip = true; else strip = false;
         ev.push(qb.tr.tup < 45 ? `${last(qb)} held it too long (he gets jumpy under pressure).` : `${last(sk)} won with a ${sk.at.fmv > sk.at.pmv ? 'speed rush around the edge' : 'bull rush right through the pocket'}.`);

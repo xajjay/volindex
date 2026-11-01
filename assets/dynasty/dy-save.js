@@ -79,12 +79,19 @@
       g.fx.potG = 1;
     }
   };
+  DY.migrate2 = g => {
+    g.fx = g.fx || {};
+    if (!g.fx.roster1 && DY.ensureRoster) {   // CPU rosters with no kicker/punter, 1 corner, 10 running backs: rebalance every team once
+      g.teams.forEach(t => { if (t.fbs !== false) DY.ensureRoster(t, t.user ? { minOnly: true } : { trim: true }); });
+      g.fx.roster1 = 1;
+    }
+  };
   DY.fromText = txt => {
     const g = JSON.parse(txt);
     if (!g || g.v !== DY.VERSION || !g.teams) throw new Error('Not a dynasty save from this version.');
     DY.G = g; DY.seed(g.rs || g.seed);
     if (DY.seedPast) DY.seedPast(g);
-    DY.migrate(g);
+    DY.migrate(g); DY.migrate2(g);
     return g;
   };
   DY.fromBytes = bytes => gunzip(bytes).then(DY.fromText).then(g => DY.histReady ? DY.histReady(g) : g);

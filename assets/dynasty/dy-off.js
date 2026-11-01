@@ -732,7 +732,7 @@
     const g = G(), ut = DY.userT(), o = g.off;
     o.cut = o.cut || [];
     // CPU teams stay at 54-60
-    if (final) g.teams.forEach(t => { if (t.user) return; const extra = t.roster.length - 60; if (extra > 0) { const out = t.roster.map(DY.P).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)).slice(0, extra); out.forEach(p => { p.t = null; p.gone = g.season; p.leave = 'cut'; }); t.roster = t.roster.filter(id => DY.P(id).t === t.id); } });
+    if (final) g.teams.forEach(t => { if (t.user) return; DY.ensureRoster(t, { trim: true }); const extra = t.roster.length - 60; if (extra > 0) { const out = t.roster.map(DY.P).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)).slice(0, extra); out.forEach(p => { p.t = null; p.gone = g.season; p.leave = 'cut'; }); t.roster = t.roster.filter(id => DY.P(id).t === t.id); } DY.ensureRoster(t); });
     if (!final) return;
     let need = DY.cutsNeeded() - o.cut.length;
     if (need > 0) { const order = ut.roster.map(DY.P).filter(p => !o.cut.includes(p.id) && p.tin !== g.season).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)); order.slice(0, need).forEach(p => o.cut.push(p.id)); }
@@ -899,6 +899,7 @@
     DY.cleanNonconf(g.season + 1);
     g.season++;
     if (g.hx && DY.applyEra) DY.applyEra(g);      // historical: that year's conferences (the modern ones from 2026)
+    g.teams.forEach(t => { DY.ensureRoster(t, t.user ? { minOnly: true } : { trim: true }); });
     g.teams.forEach(t => {
       t.w = t.l = t.cw = t.cl = t.pf = t.pa = 0; t.res = []; t.ap = null;
       // CPU programs drift with results

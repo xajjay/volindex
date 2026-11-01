@@ -1137,7 +1137,7 @@
     if (W.done === 'tackle' && W.tackle && W.ball.holder === q && !W.carrier && !W.caught && !W.int) {
       const y = Math.min(-1, yards(q.x));
       anim.kind = 'sack';
-      const sk = W.tackle.by.p;
+      const sk = DY.fixSack ? DY.fixSack(GM, W.tackle.by.p) : W.tackle.by.p;
       if (q.p.tr.tup < 45 && chance(0.4)) ev.push(`${last(q.p)} held it too long (he gets jumpy under pressure).`);
       else ev.push(`${last(sk)} got home${W.tackle.by.sheddedBy ? ' after beating ' + last(W.tackle.by.sheddedBy.p) : ' untouched'}.`);
       return Object.assign(base, { kind: 'sack', t: call.t, passer: q.p, tackler: sk, sackBy: sk, ast, yards: y, fum: !!W.fumble && chance(0.85), events: ev, text0: `${last(q.p)} SACKED by ${last(sk)}` });

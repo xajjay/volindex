@@ -251,6 +251,7 @@
   DY.startGame = (x, user) => {
     const g = G();
     DY.fixNums(DY.T(x.h)); DY.fixNums(DY.T(x.a));
+    [DY.T(x.h), DY.T(x.a)].forEach(t => { if (DY.ensureRoster && !t.tmp) DY.ensureRoster(t, { minOnly: true }); });   // a game can never start without a kicker, punter or a body at a spot
     const GM = DY.newGame(DY.T(x.h), DY.T(x.a), Object.assign(DY.gameOpts(x), user ? { user: x.h === g.user ? 'h' : 'a', coach: g.settings.coachMode } : {}));
     return GM;
   };

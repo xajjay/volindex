@@ -501,6 +501,8 @@
     fill('QB', 1, ['RB', 'WR']); fill('RB', 1, ['WR', 'S']); fill('WR', 3, ['TE', 'RB', 'CB']); fill('TE', 1, ['IOL', 'OT', 'WR']);
     fill('OT', 2, ['IOL']); fill('IOL', 3, ['OT', 'DT']); fill('EDGE', 2, ['DT', 'LB']); fill('DT', 2, ['EDGE', 'IOL']); fill('LB', 2, ['S', 'EDGE']);
     fill('CB', 2, ['S', 'WR']); fill('S', 2, ['CB', 'LB']); fill('K', 1, ['P']); fill('P', 1, ['K']);
+    // a kicker/punter slot is never left to a random player: use the best leg on the roster even if banged up
+    ['K', 'P'].forEach(k => { if (!L[k].length || !L[k][0] || (L[k][0].pos !== 'K' && L[k][0].pos !== 'P')) { const leg = team.roster.map(DY.P).filter(p => p && (p.pos === 'K' || p.pos === 'P')).sort((a, b) => b.ovr - a.ovr)[0]; if (leg) L[k] = [leg]; } });
     // nickel: the 3rd corner, else the 3rd safety
     L.NB = L.CB[2] || L.S[2] || L.CB[1];
     const ret = team.roster.map(DY.P).filter(p => p && DY.healthy(p) && ['RB', 'WR', 'CB', 'S'].includes(p.pos));
@@ -558,6 +560,38 @@
     }
     team.prestige = pr0;
     team.depth = DY.autoDepth(team);
+  };
+  /* roster integrity: every team always has a legal, balanced roster. POS_MIN = bodies needed at each spot (a kicker and a
+     punter are never optional: a game with no specialist cannot be played), POS_MAX = more than this is dead weight at one spot.
+     CPU teams, and the user's team when recruiting/portal are on auto, are trimmed down to POS_MAX; the user's own roster is
+     only ever topped up (K/P, and any spot below the minimum) and never has players taken away. */
+  DY.POS_MIN = { QB: 2, RB: 3, WR: 5, TE: 2, OT: 4, IOL: 5, EDGE: 4, DT: 4, LB: 4, CB: 4, S: 3, K: 1, P: 1 };
+  DY.POS_MAX = { QB: 4, RB: 6, WR: 10, TE: 5, OT: 8, IOL: 10, EDGE: 8, DT: 8, LB: 9, CB: 8, S: 7, K: 2, P: 2 };
+  DY.ensureRoster = (team, o) => {
+    o = o || {}; const g = DY.G; if (!g || !team || team.tmp) return 0;
+    const cnt = {}; team.roster.forEach(id => { const p = DY.P(id); if (p) cnt[p.pos] = (cnt[p.pos] || 0) + 1; });
+    let changed = 0; const pr0 = team.prestige;
+    team.prestige = Math.max(30, pr0 - 14);                     // the stop-gap players are walk-ons, not scholarship talent
+    for (const pos in DY.POS_MIN) {
+      const min = o.minOnly && pos !== 'K' && pos !== 'P' ? Math.min(DY.POS_MIN[pos], 1) : DY.POS_MIN[pos];
+      while ((cnt[pos] || 0) < min) {
+        const yr = pos === 'K' || pos === 'P' ? DY.wpick([[2, .3], [3, .3], [4, .4]], x => x[1])[0] : DY.wpick(CLASS_DIST, x => x[1])[0];
+        const p = DY.genPlayerFor(team, pos, yr, null); p.walkon = true; p.firstY = p.firstY || g.season + (g.phase === 'offseason' ? 1 : 0);
+        g.P[p.id] = p; team.roster.push(p.id); cnt[pos] = (cnt[pos] || 0) + 1; changed++;
+      }
+    }
+    team.prestige = pr0;
+    if (o.trim && DY.cutScore) {
+      for (const pos in DY.POS_MAX) {
+        let extra = (cnt[pos] || 0) - DY.POS_MAX[pos];
+        if (extra <= 0) continue;
+        const out = team.roster.map(DY.P).filter(p => p && p.pos === pos && !p.captain && p.tin !== g.season).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)).slice(0, extra);
+        out.forEach(p => { p.t0 = team.id; p.t = null; p.gone = g.season; p.leave = 'cut'; }); changed += out.length;
+        team.roster = team.roster.filter(id => { const p = DY.P(id); return p && p.t === team.id; });
+      }
+    }
+    if (changed) DY.refreshDepth(team);
+    return changed;
   };
   // an FCS team for one game, built from a fixed seed (not saved)
   DY.TMP = {};
