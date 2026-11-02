@@ -70,6 +70,7 @@
       <div class="dy-hero"><h1>New dynasty</h1><p>${s.team === 'Tennessee' ? `${esc(sp.name)} at Tennessee, ${sp.label(sp.season)}: the real roster and schedule${played ? `, with the ${played} real game${played > 1 ? 's' : ''} already played` : ''}.` : `${esc(sp.name)} at ${esc(s.team)}, ${sp.label(sp.season)}: a generated roster and schedule. Tennessee keeps its real roster as an opponent.`}</p></div>
       <div class="box gsetup dy-setup">
         <div class="gfield"><div class="glabel">Team</div><select id="sdTeam" class="dy-in">${(() => { const ts = SD.teamsFor(SPORT), confs = [...new Set(ts.map(t => t.conf))].sort((a, b) => (a === 'SEC' ? -1 : b === 'SEC' ? 1 : (SD.CONF_NAME[a] || a).localeCompare(SD.CONF_NAME[b] || b))); return confs.map(c => `<optgroup label="${esc(SD.CONF_NAME[c] || c)}">${ts.filter(t => t.conf === c).sort((a, b) => a.name.localeCompare(b.name)).map(t => `<option ${t.name === s.team ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</optgroup>`).join(''); })()}</select><p class="dim small">${s.team === 'Tennessee' ? 'Tennessee comes with its real players, stats and schedule.' : 'Every other school gets generated players and a generated schedule, with no real-life stats or history.'}</p></div>
+        ${SD.histAvailable && SD.histAvailable(SPORT) ? `<div class="gfield"><div class="glabel">Era</div><select id="sdHx" class="dy-in"><option value="">Current: ${esc(sp.label(sp.season))}</option>${Array.from({ length: SD.HIST_LAST - SD.HIST_FIRST + 1 }, (_, i) => SD.HIST_LAST - i).map(y => `<option value="${y}" ${String(s.hx) === String(y) ? 'selected' : ''}>Historical: ${esc(sp.label(y))}</option>`).join('')}</select><p class="dim small">A historical start uses that season's real rosters, ratings built from their real stats, class years and recruiting ranks, and each team's strength that year. Today's conferences are used. Schools missing from the data get generated rosters.</p></div>` : ''}
         <div class="gfield"><div class="glabel">Start</div>${played ? seg('start', [['today', 'Today: take over mid-season']]) + `<p class="dim small">The season is under way: you take over with the real results so far.</p>` : `<p class="dim small" style="margin:0">The ${sp.label(sp.season)} season hasn't started, so you begin in the preseason (camp, then the opener on ${new Date(Date.UTC(sp.season, +sp.start.slice(0, 2) - 1, +sp.start.slice(3))).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}). Preseason rankings are the real ones where they are out.</p>`}</div>
         <div class="gfield"><div class="glabel">Coach name</div><input id="sdCoach" class="dy-in" maxlength="28" placeholder="Your name" value="${esc(s.coach)}"></div>
         <div class="gfield"><div class="glabel">Difficulty</div>${seg('diff', [['freshman', 'Freshman (easier)'], ['varsity', 'Varsity (default)'], ['heisman', 'Heisman (hard)']])}<p class="dim small">Heisman gives CPU teams a boost in your games and makes recruiting tougher.</p></div>
@@ -83,6 +84,7 @@
           <div class="grow"><button class="btn primary" data-start2="1">Start the dynasty</button></div>
         </details>
       </div></div>`;
+    const hxEl = APP.querySelector('#sdHx'); if (hxEl) hxEl.onchange = ev => { s.hx = ev.target.value; s.team = APP.querySelector('#sdTeam').value; s.coach = APP.querySelector('#sdCoach').value; setup(); };
     APP.querySelector('#sdTeam').onchange = ev => { s.team = ev.target.value; s.coach = APP.querySelector('#sdCoach').value; setup(); };
     APP.querySelector('#sdMore').addEventListener('toggle', ev => { s.more = ev.target.open; });
     APP.firstElementChild.onclick = e => {
@@ -92,11 +94,12 @@
       if (segEl && b.dataset.v != null) { s[segEl.dataset.key] = b.dataset.v; s.coach = APP.querySelector('#sdCoach').value; s.team = APP.querySelector('#sdTeam').value; return setup(); }
       if (b.id === 'sdStart' || b.dataset.start2) {
         s.coach = APP.querySelector('#sdCoach').value.trim() || 'Coach';
-        busy('Building the season…', () => {
-          SD.newDynasty({ sport: SPORT, coach: s.coach, slot: s.slot, team: s.team, settings: { difficulty: s.diff, coachMode: s.mode, recruiting: s.recruiting, portal: s.portal, nil: s.nil, speed: s.speed } });
-          if (SD.startToday) SD.startToday();
+        const go = () => busy('Building the season…', () => {
+          SD.newDynasty({ sport: SPORT, hx: s.hx ? +s.hx : null, coach: s.coach, slot: s.slot, team: s.team, settings: { difficulty: s.diff, coachMode: s.mode, recruiting: s.recruiting, portal: s.portal, nil: s.nil, speed: s.speed } });
+          if (SD.startToday && !s.hx) SD.startToday();
           V.tab = 'home';
         });
+        if (s.hx) { APP.querySelector('#sdStart') && (APP.querySelector('#sdStart').disabled = true); SD.loadHist(+s.hx, ok => { if (!ok) { V.msg = 'Could not load that season. Try another or start from today.'; s.hx = ''; return setup(); } go(); }); } else go();
       }
     };
   }

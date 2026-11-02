@@ -26,14 +26,13 @@
   SD.newDynasty = o => {
     const sp = SD.SPORTS[o.sport];
     SD.seed(o.seed || (Date.now() % 2147483647));
-    const g = SD.G = { v: SD.VERSION, sport: o.sport, startTeam: o.team || 'Tennessee', season: sp.season, coach: { name: o.coach || 'Coach', w: 0, l: 0 }, settings: Object.assign({ coachMode: 'coach', speed: 'slow', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, sound: false, autoPen: true }, o.settings || {}),
+    const g = SD.G = { v: SD.VERSION, sport: o.sport, startTeam: o.team || 'Tennessee', season: o.hx || sp.season, hx: o.hx || null, coach: { name: o.coach || 'Coach', w: 0, l: 0 }, settings: Object.assign({ coachMode: 'coach', speed: 'slow', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, sound: false, autoPen: true }, o.settings || {}),
       teams: SD.teamsFor(o.sport), P: {}, nextId: 1, guests: {}, sched: [], phase: 'preseason', polls: { ap: [], hist: {} }, news: [], hist: [], awards: {}, recruit: null, off: null, slot: o.slot || 1, created: Date.now(), seed: SD.rstate(), rec: { season: {}, career: {} } };
     g.user = (g.teams.find(t => t.name === (o.team || 'Tennessee')) || g.teams.find(t => t.name === 'Tennessee')).id;
-    g.teams.forEach(t => { t.w = 0; t.l = 0; t.cw = 0; t.cl = 0; t.pf = 0; t.pa = 0; t.hist = []; t.roster = t.name === 'Tennessee' ? SD.importTennessee(t) : SD.genRoster(t); t.budget = SD.budgetFor(t); t.coach = t.id === g.user ? g.coach.name : SD.nameOf().split(' ')[1] + ' ' + pick(SD.LAST); });
-    SD.realPollBoost();
-    SD.preseasonTargets();
+    g.teams.forEach(t => { t.w = 0; t.l = 0; t.cw = 0; t.cl = 0; t.pf = 0; t.pa = 0; t.hist = []; t.roster = (g.hx && SD.histRoster && SD.histRoster(t, g)) || (g.hx ? SD.genRoster(t) : t.name === 'Tennessee' ? SD.importTennessee(t) : SD.genRoster(t)); t.budget = SD.budgetFor(t); t.coach = t.id === g.user ? g.coach.name : SD.nameOf().split(' ')[1] + ' ' + pick(SD.LAST); });
+    if (!g.hx) { SD.realPollBoost(); SD.preseasonTargets(); }
     g.teams.forEach(SD.uniqueNums);
-    if (SD.applyPost) SD.applyPost();
+    if (SD.applyPost && !g.hx) SD.applyPost();
     g.teams.forEach(t => { t.elo = 1500 + (SD.teamRating(t) - 75) * 22; t.preElo = t.elo; });
     SD.initNil();
     SD.buildSchedule();

@@ -794,7 +794,7 @@
     app.innerHTML = `<div class="wrap games"><div class="gcrumb"><a href="#games">Games</a> › <a href="#games-${sport}">${esc(s.name)}</a> › ${esc(gameName(sport, 'dynasty'))}</div>
       <div class="hub-hero"><div class="eyebrow">Coming soon</div><h1>${esc(gameName(sport, 'dynasty'))}</h1><p>${esc(gameBlurb(sport, 'dynasty'))}</p><p>It's in final testing. In the meantime, try <a href="#games-football-dynasty">Vol Dynasty</a> for football.</p></div></div>`;
   }
-  const SDYN_FILES = ['sd-data', 'sd-core', 'sd-hoops', 'sd-diamond', 'sd-league', 'sd-off', 'sd-save', 'sd-court', 'sd-game', 'sd-ui'];
+  const SDYN_FILES = ['sd-data', 'sd-core', 'sd-hist', 'sd-hoops', 'sd-diamond', 'sd-league', 'sd-off', 'sd-save', 'sd-court', 'sd-game', 'sd-ui'];
   function renderSdyn(app, sport) {
     if (!document.querySelector('link[data-dyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/dynasty/dynasty.css?v=' + BUILD; l.dataset.dyn = 1; document.head.appendChild(l); }
     if (!document.querySelector('link[data-sdyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/sdyn/sdyn.css?v=' + BUILD; l.dataset.sdyn = 1; document.head.appendChild(l); }
