@@ -104,3 +104,8 @@ tr.st td:first-child { font-weight: 800; color: var(--orange-ink); }
 .ss-prog { color: #9aa4b0; font-size: 13px; margin-left: auto; }
 .ss.done .ss-ctrl { display: none; }
 .ss.live .ss-ln.me small, .ss.live .ss-ln.me .ss-sd { color: #fff; }
+
+/* box score: the two teams never spill over each other or past the window */
+.dyg-boxsides { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.dyg-boxside { min-width: 0; }
+#dyModalBody .dyg-boxsides, .dy-modal .dyg-boxsides { grid-template-columns: minmax(0, 1fr); }

@@ -190,7 +190,7 @@
     const GM = S.GM, g = SD.G;
     const sims = `<div class="dyg-simbar"><div class="dyg-speed"><span class="dyg-lab">Speed</span><button data-g="slow" aria-pressed="${S.speed === 'slow'}">Slow</button><button data-g="fast" aria-pressed="${S.speed === 'fast'}">Fast</button></div>
       ${S.hoops ? '' : `<div class="dyg-speed"><span class="dyg-lab">Pace</span><button data-g="stepmode" aria-pressed="${!!S.stepMode}">Batter by batter</button></div>`}
-      <div class="dyg-sims"><button data-g="pause">${S.paused ? 'Resume' : 'Pause'}</button>${S.hoops ? '<button data-g="simper">Sim to the end of the period</button>' : '<button data-g="siminn">Sim to the next inning</button>'}<button data-g="simend">Sim to the end</button><button data-g="full">Full screen</button></div></div>`;
+      <div class="dyg-sims"><button data-g="pause">${S.paused ? 'Resume' : 'Pause'}</button>${S.hoops ? '<button data-g="sim5">Sim 5 minutes</button><button data-g="simper">Sim to the end of the period</button>' : '<button data-g="siminn">Sim to the next inning</button>'}<button data-g="simend">Sim to the end</button><button data-g="full">Full screen</button></div></div>`;
     if (S.watch) { return setCtrl(ctrl, `${!S.hoops && S.waiting ? `<div class="sdg-next"><button class="btn primary big" data-g="nextpa">Next batter</button></div>` : ''}<div class="dyg-call-h">Watching${S.paused ? ' (paused)' : ''}</div><p class="small dim">Your staff runs the game. Switch to "I coach" in Settings to call it yourself.</p>`, sims); }
     if (S.hoops) {
       const c = GM.coach[S.side];
@@ -251,9 +251,10 @@
     if (g === 'stepmode') { S.stepMode = !S.stepMode; SD.G.settings.stepMode = S.stepMode; if (!S.stepMode && S.waiting) { S.waiting = false; S.timer = setTimeout(next, 100); } return controls(); }
     if (g === 'autopen') { SD.G.settings.autoPen = SD.G.settings.autoPen === false; return controls(); }
     if (g === 'full') return toggleFull(!S.full);
-    if (g === 'simend' || g === 'simper' || g === 'siminn') {
+    if (g === 'simend' || g === 'simper' || g === 'siminn' || g === 'sim5') {
       const per = GM.per, inn = GM.inn;
-      S.simTo = g === 'simend' ? () => GM.over : g === 'simper' ? () => GM.over || GM.per !== per : () => GM.over || GM.inn !== inn;
+      const elapsed = () => GM.per <= GM.nper ? (GM.per - 1) * GM.perLen + (GM.perLen - GM.clock) : GM.nper * GM.perLen + (GM.per - GM.nper - 1) * 300 + (300 - GM.clock), t0 = S.hoops ? elapsed() : 0;
+      S.simTo = g === 'sim5' ? () => GM.over || elapsed() >= t0 + 300 : g === 'simend' ? () => GM.over : g === 'simper' ? () => GM.over || GM.per !== per : () => GM.over || GM.inn !== inn;
       S.pbpDirty = 0; S.paused = false; S.waiting = false;
       if (S.anim) { cancelAnimationFrame(S.raf); S.anim = null; }
       clearTimeout(S.timer); S.timer = setTimeout(next, 0); return;

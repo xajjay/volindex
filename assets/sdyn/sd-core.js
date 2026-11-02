@@ -53,14 +53,64 @@
   const wkey = pos => pos === 'C' && SD.kind() === 'diamond' ? 'C_' : pos;
   SD.isPit = p => p.pos === 'SP' || p.pos === 'RP';
   SD.calcOvr = p => { const w = SD.W[wkey(p.pos)]; let s = 0, t = 0; for (const k in w) { s += w[k] * (p.at[k] || 60); t += w[k]; } return Math.round(clamp(s / t, 40, 99)); };
-  SD.setOvr = p => { p.ovr = SD.calcOvr(p); return p.ovr; };
+  SD.setOvr = p => { p.ovr = SD.calcOvr(p); if (p.at && p.at.ins != null && p.at.thr != null && SD.SP && SD.SP().kind === 'hoops') p.arch = SD.archOf(p); return p.ovr; };
+
+  /* ---------- archetypes: a player's style, built into his ratings and read back from them ---------- */
+  SD.ARCH_BY_POS = {
+    PG: ['Playmaker', 'Combo guard', 'Scoring guard', 'Lockdown defender', '3 and D', 'Shooter'],
+    SG: ['Shooter', '3 and D', 'Scoring guard', 'Combo guard', 'Slasher', 'Lockdown defender'],
+    SF: ['3 and D', 'Slasher', 'Scoring wing', 'Point forward', 'Two-way wing', 'Lockdown defender', 'Shooter'],
+    PF: ['Stretch big', 'Glass cleaner', 'Post scorer', 'Rim runner', 'Two-way big', 'Point forward'],
+    C: ['Rim protector', 'Glass cleaner', 'Post scorer', 'Stretch big', 'Rim runner', 'Playmaking big']
+  };
+  SD.ARCH = {
+    'Playmaker': { pas: 8, hnd: 7, iq: 4, thr: -2 }, 'Combo guard': { pas: 4, hnd: 4, thr: 4, mid: 3 }, 'Scoring guard': { ins: 4, mid: 6, thr: 5, pas: -3 },
+    'Shooter': { thr: 9, mid: 4, ft: 5, ins: -4, reb: -3 }, '3 and D': { thr: 6, pdf: 6, stl: 4, ins: -3 }, 'Lockdown defender': { pdf: 9, stl: 7, ath: 3, thr: -5 },
+    'Slasher': { ins: 8, ath: 6, hnd: 2, thr: -5 }, 'Scoring wing': { ins: 4, mid: 5, thr: 3 }, 'Point forward': { pas: 8, hnd: 5, iq: 4, reb: 2 },
+    'Two-way wing': { pdf: 4, ins: 3, thr: 2, reb: 2 }, 'Stretch big': { thr: 10, mid: 5, ft: 4, reb: -3, blk: -4, idf: -3 }, 'Glass cleaner': { reb: 10, idf: 3, ath: 2, thr: -6 },
+    'Post scorer': { ins: 8, mid: 3, thr: -7, reb: 1 }, 'Rim runner': { ath: 8, ins: 5, blk: 3, thr: -8 }, 'Rim protector': { blk: 10, idf: 8, reb: 3, thr: -8, ft: -3 },
+    'Two-way big': { idf: 5, reb: 3, ins: 3 }, 'Playmaking big': { pas: 9, hnd: 4, iq: 4 }
+  };
+  SD.ARCH_DESC = {
+    'Playmaker': 'Runs the offense and sets the table.', 'Combo guard': 'Handles, passes and shoots; can play either guard spot.', 'Scoring guard': 'Gets buckets at all three levels.',
+    'Shooter': 'Spaces the floor; the best pure shooter on the roster.', '3 and D': 'Hits open threes and guards his man.', 'Lockdown defender': 'Takes the other team\'s best perimeter player.',
+    'Slasher': 'Attacks the rim and finishes in traffic.', 'Scoring wing': 'A big wing who creates his own shot.', 'Point forward': 'A forward who initiates the offense.',
+    'Two-way wing': 'Solid on both ends.', 'Stretch big': 'A big who shoots threes and pulls the rim protector out.', 'Glass cleaner': 'Rebounds everything.',
+    'Post scorer': 'Gets his on the block.', 'Rim runner': 'Lobs, dunks and rim-running.', 'Rim protector': 'Anchors the defense; changes shots at the rim.',
+    'Two-way big': 'Defends and rebounds, scores around the basket.', 'Playmaking big': 'Passes from the high post and the elbow.'
+  };
+  SD.archOf = p => {
+    const A = SD.ARCH_BY_POS[p.pos]; if (!A || !p.at) return null;
+    const ks = Object.keys(SD.ATTR.hoops).filter(k => k !== 'sta'), mean = ks.reduce((s, k) => s + (p.at[k] || 60), 0) / ks.length;
+    let best = A[0], bs = -1e9;
+    A.forEach(a => { const d = SD.ARCH[a]; let sc = 0; for (const k in d) sc += d[k] * ((p.at[k] || 60) - mean) / 10; if (sc > bs) { bs = sc; best = a; } });
+    return best;
+  };
+  // positions a player can also play (besides his main one), from height and what he does well
+  SD.derivePos2 = p => {
+    const w = SD.SP().he === 'she', h = (p.ht || 76) + (w ? 5 : 0), a = p.at, out = [];
+    const guard = (a.hnd + a.pas) / 2, shoot = (a.thr + a.mid) / 2, big = (a.reb + a.idf + a.blk) / 3;
+    if (p.pos === 'PG') { if (shoot >= guard - 6 || h >= 76) out.push('SG'); if (h >= 78 && a.ath >= 72) out.push('SF'); }
+    else if (p.pos === 'SG') { if (guard >= shoot - 2) out.push('PG'); if (h >= 77 || a.pdf >= 76) out.push('SF'); }
+    else if (p.pos === 'SF') { if (shoot >= 70 && h <= 79) out.push('SG'); if (big >= 68 || h >= 79) out.push('PF'); if (a.pas >= 76 && a.hnd >= 74) out.push('PG'); }
+    else if (p.pos === 'PF') { if (a.thr >= 68 || a.ath >= 78) out.push('SF'); if (a.idf >= 72 || a.blk >= 70 || h >= 82) out.push('C'); }
+    else if (p.pos === 'C') { if (a.thr >= 62 || a.ath >= 74 || a.mid >= 66) out.push('PF'); }
+    return out.length ? out : null;
+  };
+  // how well a player fits a lineup slot: 0 at his main position, a small cost at a secondary one, more the farther he is from it
+  SD.SLOTS = ['PG', 'SG', 'SF', 'PF', 'C'];
+  SD.slotCost = (p, pos) => {
+    if (p.pos === pos) return 0; if (p.pos2 && p.pos2.includes(pos)) return 1.5;
+    const i = SD.SLOTS.indexOf(pos), j = SD.SLOTS.indexOf(p.pos); return 3.5 * Math.abs(i - j) + 1;
+  };
   // build attributes around a target overall (some spread, a little archetype flavor)
-  function fillAttrs(pos, target, kind) {
+  function fillAttrs(pos, target, kind, arch) {
     const at = {};
     const keys = kind === 'hoops' ? Object.keys(SD.ATTR.hoops) : SD.isPit({ pos }) ? Object.keys(SD.ATTR.pit).concat(['con', 'pow', 'eye', 'spd', 'fld', 'arm']) : Object.keys(SD.ATTR.bat);
     const w = SD.W[pos === 'C' && kind === 'diamond' ? 'C_' : pos];
     keys.forEach(k => { const inW = w[k] != null; at[k] = Math.round(clamp(target + (inW ? 0 : -8) + gauss() * (inW ? 6 : 8), 50, 99)); });
     if (kind === 'diamond' && SD.isPit({ pos })) ['con', 'pow', 'eye'].forEach(k => { at[k] = Math.round(clamp(45 + gauss() * 5, 50, 70)); });
+    if (kind === 'hoops' && arch && SD.ARCH[arch]) { const d = SD.ARCH[arch]; for (const k in d) at[k] = Math.round(clamp(at[k] + d[k] + gauss() * 1.5, 40, 99)); }
     // pull the weighted overall onto the target
     for (let it = 0; it < 6; it++) { let s = 0, t = 0; for (const k in w) { s += w[k] * at[k]; t += w[k]; } const d = target - s / t; if (Math.abs(d) < 0.4) break; for (const k in w) at[k] = Math.round(clamp(at[k] + d, 50, 99)); }
     if (kind === 'hoops') at.sta = Math.round(clamp(70 + gauss() * 9, 50, 99));
@@ -96,11 +146,13 @@
     o = o || {};
     const g = G(), kind = SD.kind(), id = g.nextId = (g.nextId || 1) + 1;
     const town = o.home ? null : pick(SD.TOWNS);
-    const at = fillAttrs(pos, ovr, kind);
-    const p = { id, n: o.n || SD.nameOf(), pos, pos2: o.pos2 || null, t: o.t == null ? null : o.t, yr: o.yr || 1, el: o.el == null ? 5 - (o.yr || 1) : o.el, num: o.num != null ? o.num : ri(0, 55),
+    const arch0 = kind === 'hoops' ? (o.arch || pick(SD.ARCH_BY_POS[pos] || [null])) : null;
+    const at = fillAttrs(pos, ovr, kind, arch0);
+    const p = { id, n: o.n || SD.nameOf(), pos, pos2: o.pos2 || null, t: o.t == null ? null : o.t, yr: o.yr || 1, el: o.el == null ? (kind === 'hoops' ? 6 : 5) - (o.yr || 1) : o.el, num: o.num != null ? o.num : ri(0, 55),
       ht: o.ht || htFor(pos, kind), home: o.home || (town[0] + ', ' + town[1]), st: o.st || (town ? town[1] : 'TN'), at, tr: SD.makeTraits(), ovr: 0, rec: o.rec || null, nil: 0, s: null, car: {}, aw: [], log: [], inj: null, bt: o.bt || (kind === 'diamond' ? (chance(0.3) ? 'L' : 'R') + '/' + (chance(0.25) ? 'L' : 'R') : null) };
     if (o.at) Object.assign(p.at, o.at);
     SD.setOvr(p);
+    if (kind === 'hoops') { if (!p.pos2) p.pos2 = SD.derivePos2(p); p.arch = SD.archOf(p); }
     SD.setCeil(p, o.grade || (p.rec && p.rec.g) || 82);
     g.P[id] = p;
     return p;
@@ -162,7 +214,7 @@
       if (starters.has(rp.name)) ovr = Math.max(ovr, 75);
       ovr = Math.round(clamp(ovr, 58, 92));
       const comp = r.hs && r.hs.comp ? r.hs.comp : r.hs && r.hs.grade ? clamp(0.8 + (r.hs.grade - 85) * 0.015, 0.8, 0.999) : 0.86;
-      const p = SD.makePlayer(pos, ovr, { n: rp.name, t: team.id, yr, el: Math.max(1, (yr >= 5 ? 6 : 5) - yr), num: rp.num, ht: ht || undefined, home: rp.home, pos2, rec: { c: comp, stars: r.hs ? r.hs.stars || SD.starsOf(comp) : SD.starsOf(comp), g: comp * 100, natl: r.hs ? r.hs.natl : null, tr: r.tr || null } });
+      const p = SD.makePlayer(pos, ovr, { n: rp.name, t: team.id, yr, el: Math.max(1, 6 - yr), num: rp.num, ht: ht || undefined, home: rp.home, pos2, rec: { c: comp, stars: r.hs ? r.hs.stars || SD.starsOf(comp) : SD.starsOf(comp), g: comp * 100, natl: r.hs ? r.hs.natl : null, tr: r.tr || null } });
       p.real = true; p.prev = rp.prev || null; p.note = rp.note || null;
       // shooting split from real numbers when we have them
       if (st) {
@@ -219,7 +271,7 @@
   /* ---------- generated rosters ---------- */
   SD.genRoster = team => {
     const kind = SD.kind(), mu = 38 + team.prestige * 0.47, ids = [];
-    const make = (pos, bump) => { const yr = ri(1, 4), ovr = Math.round(clamp(mu + (yr - 2.5) * 2.4 + (bump || 0) + gauss() * 5, 50, 93)); const g = clamp(78 + (team.prestige - 50) / 2.5 + gauss() * 5, 70, 99.9); const c = clamp(0.7 + (g - 70) * 0.01, 0.7, 0.9999); const p = SD.makePlayer(pos, ovr, { t: team.id, yr, el: 5 - yr, rec: { c, stars: SD.starsOf(c), g } }); ids.push(p.id); };
+    const make = (pos, bump) => { const yr = ri(1, 4), ovr = Math.round(clamp(mu + (yr - 2.5) * 2.4 + (bump || 0) + gauss() * 5, 50, 93)); const g = clamp(78 + (team.prestige - 50) / 2.5 + gauss() * 5, 70, 99.9); const c = clamp(0.7 + (g - 70) * 0.01, 0.7, 0.9999); const p = SD.makePlayer(pos, ovr, { t: team.id, yr, el: (kind === 'hoops' ? 6 : 5) - yr, rec: { c, stars: SD.starsOf(c), g } }); ids.push(p.id); };
     if (kind === 'hoops') { ['PG', 'SG', 'SF', 'PF', 'C'].forEach(p => make(p, 4)); ['PG', 'SG', 'SF', 'PF', 'C', 'SG', 'SF', 'PF'].forEach(p => make(p, -2)); ['PG', 'C'].forEach(p => make(p, -8)); }
     else {
       ['C', '1B', '2B', 'SS', '3B', 'LF', 'CF', 'RF', 'DH'].forEach(p => make(p, 3)); ['C', 'SS', '2B', 'LF', 'RF', '1B'].forEach(p => make(p, -4));
@@ -241,24 +293,29 @@
   SD.lineup = t => {
     const ps = t.roster.map(SD.P).filter(p => p && !(p.inj && p.inj.g > 0));
     if (SD.kind() === 'hoops') {
-      if (t.rot && t.rot.length) { const keep = t.rot.map(SD.P).filter(p => p && ps.includes(p)); const rest = ps.filter(p => !keep.includes(p)).sort((a, b) => b.ovr - a.ovr); return keep.concat(rest); }
-      // best five by position (falling back to a player's secondary position before giving up on the slot
-      // entirely), then the bench by overall
-      const SLOTS = ['PG', 'SG', 'SF', 'PF', 'C'], fits = (p, pos) => p.pos === pos || (p.pos2 && p.pos2.includes(pos));
-      const five = [], used = new Set();
-      SLOTS.forEach(pos => {
-        const c = ps.filter(p => !used.has(p) && p.pos === pos).sort((a, b) => b.ovr - a.ovr)[0]
-          || ps.filter(p => !used.has(p) && fits(p, pos)).sort((a, b) => b.ovr - a.ovr)[0]
-          || ps.filter(p => !used.has(p)).sort((a, b) => b.ovr - a.ovr)[0];
-        if (c) { five.push(c); used.add(c); }
-      });
-      // a much better bench player starts over a weak starter at a slot he actually fits (primary or secondary)
-      const bench = ps.filter(p => !used.has(p)).sort((a, b) => b.ovr - a.ovr);
-      for (let i = 0; i < five.length; i++) {
-        const slotPos = SLOTS[i] || five[i].pos, b0 = bench.find(b => fits(b, slotPos));
-        if (b0 && b0.ovr >= five[i].ovr + 6) { bench.splice(bench.indexOf(b0), 1); bench.push(five[i]); five[i] = b0; bench.sort((a, b) => b.ovr - a.ovr); }
+      // the five starters fill the five slots (PG, SG, SF, PF, C): the coach's picks where they are healthy, the best fit for any
+      // empty slot (primary position first, then secondary, then the closest position), and the bench in the coach's order
+      const slots = t.slots || {}, used = new Set(), five = [], SL = SD.SLOTS;
+      const sig = ps.map(p => p.id + ':' + p.ovr).join(',') + '|' + SL.map(k => slots[k] || 0).join(',');
+      if (t._lsig === sig && t._lcache) return t._lcache.map(SD.P);
+      SL.forEach(pos => { const p = slots[pos] != null && ps.find(q => q.id === slots[pos]); if (p && !used.has(p)) { used.add(p); five[SL.indexOf(pos)] = p; } });
+      const open = SL.filter((pos, i) => !five[i]);
+      if (open.length) {
+        const pool = ps.filter(p => !used.has(p)).sort((a, b) => b.ovr - a.ovr).slice(0, open.length + 5);
+        let best = null, bs = -1e9;
+        const rec = (k, taken, sum) => {
+          if (k === open.length) { if (sum > bs) { bs = sum; best = taken.slice(); } return; }
+          for (const p of pool) { if (taken.includes(p)) continue; taken.push(p); rec(k + 1, taken, sum + p.ovr - SD.slotCost(p, open[k]) * 1.6); taken.pop(); }
+        };
+        rec(0, [], 0);
+        if (best) open.forEach((pos, k) => { five[SL.indexOf(pos)] = best[k]; used.add(best[k]); });
       }
-      return five.concat(bench);
+      const starters = five.filter(Boolean);
+      const keep = (t.bench || []).map(SD.P).filter(p => p && ps.includes(p) && !starters.includes(p));
+      const rest = ps.filter(p => !starters.includes(p) && !keep.includes(p)).sort((a, b) => b.ovr - a.ovr);
+      const out = starters.concat(keep, rest);
+      t._lsig = sig; t._lcache = out.map(p => p.id);
+      return out;
     }
     return null;
   };

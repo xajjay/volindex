@@ -157,16 +157,18 @@
       // motion offense: the ball moves until someone gets a look (a drive, a kick-out three or a cut)
       if (play === 'motion') { r.motion = true; play = SD.wpick(['spot', 'drive', 'cut'], k => ({ spot: 45, drive: 35, cut: 20 })[k]); }
     }
-    const usage = p => Math.pow(Math.max(55, (p.at.ins + p.at.mid + p.at.thr) / 3 + (p.ovr - 75) * 0.6), 2.6) * (p.tr.ego > 75 ? 1.15 : 1);
+    // the coach's first, second and third scoring options take more of the shots
+    const opts = c.opts || [], om = p => { const i = opts.indexOf(p.id); return i === 0 ? 1.7 : i === 1 ? 1.35 : i === 2 ? 1.15 : 1; };
+    const usage = p => Math.pow(Math.max(55, (p.at.ins + p.at.mid + p.at.thr) / 3 + (p.ovr - 75) * 0.6), 2.6) * (p.tr.ego > 75 ? 1.15 : 1) * om(p);
     const pickBy = (arr, f) => SD.wpick(arr, f);
     let shooter, passer = null, type;
     const handler = O.slice().sort((a, b) => (b.at.hnd + b.at.pas) - (a.at.hnd + a.at.pas))[0];
     if (play === 'trans') { shooter = pickBy(O, p => usage(p) * (p.at.ath / 70)); type = chance(0.82) ? 'rim' : '3'; }
     else if (play === 'pnr') { const roll = chance(0.35); shooter = roll ? pickBy(O.filter(p => p !== handler), p => p.pos === 'C' || p.pos === 'PF' ? 3 : 0.4) : handler; passer = roll ? handler : null; type = roll ? (chance(0.75) ? 'rim' : 'mid') : SD.wpick(['rim', 'mid', '3'], t => ({ rim: 30, mid: 30, '3': 40 })[t] * (t === '3' ? handler.at.thr / 75 : 1)); }
-    else if (play === 'drive') { shooter = pickBy(O, p => usage(p) * (p.at.ath + p.at.hnd) / 140); type = chance(0.68) ? 'rim' : chance(0.6) ? 'mid' : '3'; if (type === '3') { passer = shooter; shooter = pickBy(O.filter(p => p !== passer), p => Math.pow(p.at.thr, 3)); } }
-    else if (play === 'post') { shooter = pickBy(O, p => (p.pos === 'C' || p.pos === 'PF' ? 4 : 0.5) * p.at.ins); passer = handler !== shooter ? handler : null; type = chance(0.68) ? 'rim' : 'mid'; }
-    else if (play === 'spot' || play === 'three') { passer = handler; shooter = pickBy(O.filter(p => p !== handler), p => Math.pow(p.at.thr, 3.5)) || handler; type = chance(0.86) ? '3' : 'mid'; play = 'spot'; }
-    else if (play === 'cut') { passer = handler; shooter = pickBy(O.filter(p => p !== handler), p => p.at.ath * p.at.iq) || handler; type = 'rim'; }
+    else if (play === 'drive') { shooter = pickBy(O, p => usage(p) * (p.at.ath + p.at.hnd) / 140); type = chance(0.68) ? 'rim' : chance(0.6) ? 'mid' : '3'; if (type === '3') { passer = shooter; shooter = pickBy(O.filter(p => p !== passer), p => Math.pow(p.at.thr, 3) * om(p)); } }
+    else if (play === 'post') { shooter = pickBy(O, p => (p.pos === 'C' || p.pos === 'PF' ? 4 : 0.5) * p.at.ins * om(p)); passer = handler !== shooter ? handler : null; type = chance(0.68) ? 'rim' : 'mid'; }
+    else if (play === 'spot' || play === 'three') { passer = handler; shooter = pickBy(O.filter(p => p !== handler), p => Math.pow(p.at.thr, 3.5) * om(p)) || handler; type = chance(0.86) ? '3' : 'mid'; play = 'spot'; }
+    else if (play === 'cut') { passer = handler; shooter = pickBy(O.filter(p => p !== handler), p => p.at.ath * p.at.iq * om(p)) || handler; type = 'rim'; }
     else { shooter = pickBy(O, p => Math.pow(usage(p), 1.3)); type = SD.wpick(['rim', 'mid', '3'], t => ({ rim: 38, mid: 34, '3': 28 })[t] * (t === '3' ? shooter.at.thr / 75 : 1)); play = 'iso'; }
     // the defender on him (by position slot)
     const idx = O.indexOf(shooter), dfn = D[idx] || pick(D);
@@ -201,9 +203,10 @@
       const astP = { spot: 0.9, pnr: passer ? 0.92 : 0.55, post: 0.4, drive: 0.42, iso: 0.08, cut: 0.92, trans: 0.55 }[play] || 0.5;
       if (chance(astP)) { ast = passer && passer !== shooter ? passer : SD.wpick(O.filter(p => p !== shooter), p => Math.pow(p.at.pas, 2.5)); add(GM, ast, 'ast'); }
       if (fouled) { const ft = ftOne(GM, shooter); pts += ft ? 1 : 0; r.and1 = true; }
+      if (type === 'rim' && !fouled && shooter.at.ath >= 74 && chance(clamp((shooter.at.ath - 68) / 45 + (play === 'trans' || play === 'cut' ? 0.2 : 0) - (shooter.pos === 'PG' ? 0.15 : 0), 0.03, 0.62))) r.dunk = true;
       r.pts = pts; r.ast = ast;
-      r.text = describe(GM, shooter, type, play, ast, r.and1, pts);
-      r.big = type === '3' && Math.abs(diff) <= 5 && endGame || (play === 'trans' && type === 'rim' && shooter.at.ath >= 85);
+      r.text = describe(GM, shooter, type, play, ast, r.and1, pts, r.dunk);
+      r.big = type === '3' && Math.abs(diff) <= 5 && endGame || (play === 'trans' && type === 'rim' && shooter.at.ath >= 85) || !!r.dunk;
       return finishPoss(GM, r, s, d, pts, shooter, ast, false, dur);
     }
     if (fouled) {
@@ -214,11 +217,12 @@
     r.text = `${H.last(shooter)} misses ${type === '3' ? 'a three' : type === 'mid' ? 'a jumper' : 'at the rim'}${dfn && chance(0.3) ? ' (' + H.last(dfn) + ' with a good contest)' : ''}.`;
     return rebound(GM, r, s, d, O, D, dur);
   };
-  function describe(GM, p, type, play, ast, and1, pts) {
+  function describe(GM, p, type, play, ast, and1, pts, dunk) {
     const n = H.last(p), a = ast ? ` (${H.last(ast)} assist)` : '';
     if (type === '3') return pick([`${n} drills a three`, `${n} from deep: good`, `${n} hits the three`, `${n} buries it from the corner`]) + a + '.';
     if (type === 'mid') return pick([`${n} pulls up and hits`, `${n} with the jumper`, `${n} knocks down the mid-range`]) + a + (and1 ? ' And one!' : '.');
     if (play === 'trans' && p.at.ath >= 82 && chance(0.5)) return `${n} throws it down in transition${a}${and1 ? '. And one!' : '!'}`;
+    if (dunk) return pick([`${n} slams it home`, `${n} with the dunk`, `${n} rises up and throws it down`, `${n} finishes with a monster dunk`]) + a + (and1 ? '. And one!' : '!');
     if (play === 'post') return pick([`${n} scores in the post`, `${n} with the hook`, `${n} backs down and scores`]) + a + (and1 ? '. And one!' : '.');
     return pick([`${n} finishes at the rim`, `${n} with the layup`, `${n} attacks and scores`, `${n} gets to the cup`]) + a + (and1 ? '. And one!' : '.');
   }

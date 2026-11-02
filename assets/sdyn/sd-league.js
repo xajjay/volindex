@@ -333,12 +333,24 @@
       const L = SD.lineup(GM.T[s]).slice(0, 10), mins = [33, 32, 31, 30, 29, 21, 17, 4, 2, 1];
       const u = L.map((p, i) => Math.pow(Math.max(55, (p.at.ins + p.at.mid + p.at.thr) / 3 + (p.ovr - 75) * 0.6), 2.6) * mins[i]);
       const ut = u.reduce((a, b) => a + b, 0), pts = GM.score[s];
-      const reb = 35 + gauss() * 4, ast = 13 + gauss() * 3;
+      // team totals for the night, then each stat handed out one at a time by who is on the floor and what he does best
+      const W = w ? 0.94 : 1, fgmT = Math.round(pts / 2.18);
+      const tot = { reb: Math.round(clamp(35 * W + gauss() * 4.5, 24, 50)), ast: Math.round(clamp(fgmT * 0.58 + gauss() * 2.2, 5, 26)), stl: Math.round(clamp(7 * W + gauss() * 2.4, 1, 15)), blk: Math.round(clamp(3.6 + gauss() * 1.9, 0, 11)), to: Math.round(clamp(12 + gauss() * 3, 4, 22)) };
+      const grp = p => p.pos === 'C' ? 'big' : p.pos === 'PF' ? 'pf' : p.pos === 'SF' ? 'wing' : 'guard';
+      const wts = {
+        reb: L.map((p, i) => mins[i] * Math.pow(p.at.reb / 70, 2.5) * ({ big: 1.55, pf: 1.3, wing: 0.9, guard: 0.68 })[grp(p)]),
+        ast: L.map((p, i) => mins[i] * Math.pow((p.at.pas * 0.6 + p.at.hnd * 0.4) / 70, 2.6) * ({ big: 0.5, pf: 0.65, wing: 0.9, guard: 1.2 })[grp(p)] * (p.pos === 'PG' ? 1.3 : 1)),
+        stl: L.map((p, i) => mins[i] * Math.pow(p.at.stl / 70, 2.5) * ({ big: 0.6, pf: 0.8, wing: 1.1, guard: 1.2 })[grp(p)]),
+        blk: L.map((p, i) => mins[i] * Math.pow(p.at.blk / 70, 3) * ({ big: 2.4, pf: 1.5, wing: 0.5, guard: 0.18 })[grp(p)]),
+        to: L.map((p, i) => mins[i] * Math.pow(u[i] / (ut / L.length), 0.5) * (p.pos === 'PG' ? 1.6 : 1) * (110 - p.at.hnd) / 64)
+      };
+      const give = {}; for (const k in tot) { give[k] = L.map(() => 0); const ws = wts[k], sum = ws.reduce((a, b) => a + b, 0); for (let n = 0; n < tot[k]; n++) { let r = SD.rnd() * sum, ix = 0; for (; ix < ws.length - 1; ix++) { r -= ws[ix]; if (r <= 0) break; } give[k][ix]++; } }
       L.forEach((p, i) => {
         const share = u[i] / ut, pp = Math.max(0, Math.round(pts * share + gauss() * 2.2));
         const fga = Math.round(pp / 1.15 + SD.rr(0, 2)), tpa = Math.round(fga * clamp((p.at.thr - 50) / 80, 0.05, 0.6));
-        const l = GM.ps[p.id] = { t: p.t, min: mins[i], pts: pp, fga, fgm: Math.min(fga, Math.round(pp / 2.3)), tpa, tpm: Math.round(tpa * clamp(0.3 + (p.at.thr - 70) / 200, 0.15, 0.48)), fta: Math.round(pp * 0.22), ftm: Math.round(pp * 0.16),
-          orb: 0, drb: Math.max(0, Math.round(reb * mins[i] / 200 * (p.at.reb / 72) + gauss())), ast: Math.max(0, Math.round(ast * mins[i] / 200 * (p.at.pas / 72) + gauss() * 0.7)), stl: chance(p.at.stl / 140) ? 1 : 0, blk: chance(p.at.blk / 150) ? 1 : 0, to: chance(0.5) ? 1 : 0, pf: SD.ri(0, 3), pm: 0, gs: i < 5 ? 1 : 0 };
+        const rb = give.reb[i], orb = Math.round(rb * 0.3 + gauss() * 0.4);
+        GM.ps[p.id] = { t: p.t, min: mins[i], pts: pp, fga, fgm: Math.min(fga, Math.round(pp / 2.3)), tpa, tpm: Math.round(tpa * clamp(0.3 + (p.at.thr - 70) / 200, 0.15, 0.48)), fta: Math.round(pp * 0.22), ftm: Math.round(pp * 0.16),
+          orb: Math.max(0, Math.min(rb, orb)), drb: Math.max(0, rb - Math.max(0, Math.min(rb, orb))), ast: give.ast[i], stl: give.stl[i], blk: give.blk[i], to: give.to[i], pf: SD.ri(0, 3), pm: 0, gs: i < 5 ? 1 : 0 };
       });
     }
     return GM;

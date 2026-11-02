@@ -21,7 +21,7 @@
     const c = rank <= n ? clamp(1 - Math.pow(rank / n, 0.75) * 0.3 - rr(0, 0.004), 0.7, 0.9999) : clamp(0.7 - (rank - n) / n * 0.03 - rr(0, 0.004), 0.66, 0.7), g = c * 100;
     const pos = pick(posPool());
     const ovr = Math.round(clamp(SD.PROS_BASE + (g - 80) * 0.7 + Math.max(0, g - 95) * 1.2 + gauss() * 2.5, 50, 84));
-    const p = SD.makePlayer(pos, ovr, { t: null, yr: 1, el: 4, grade: g, rec: { c, stars: SD.starsOf(c), g, natl: rank, cls: year } });
+    const p = SD.makePlayer(pos, ovr, { t: null, yr: 1, el: SD.kind() === 'hoops' ? 5 : 4, grade: g, rec: { c, stars: SD.starsOf(c), g, natl: rank, cls: year } });
     p.pros = true; p.interest = {}; p.commit = null; p.offer = false; p.acts = {}; p.visit = null; p.visited = false; p.nilOffer = 0; p.scout = 0;
     p.pref = SD.shuffle(['pt', 'nil', 'champ', 'prox', 'brand', 'dev']).slice(0, 3);
     // a few programs start interested
@@ -129,11 +129,14 @@
     g.teams.forEach(t => t.roster.forEach(id => {
       const p = SD.P(id); if (p.s) { p.car[g.season] = Object.assign({ t: t.abbr }, p.s); } p.lastS = p.s; p.s = null; p.el--;
       if (p.el <= 0) { p.leave = 'grad'; return; }
+      // a senior with a year left: most good players use the fifth year; role players and bench seniors often move on
+      if (hoops && p.yr >= 4 && p.el >= 1 && chance(p.ovr < 68 ? 0.62 : p.ovr < 76 ? 0.38 : p.ovr < 83 ? 0.2 : 0.1) && !(p.tr.loyal > 90 && chance(0.6))) { p.leave = 'grad'; return; }
       const dg = p.ovr + (hoops ? 0 : (SD.isPit(p) ? 2 : 0));
-      if (hoops) { if (p.ovr >= 84 && chance(clamp((p.ovr - 82) * 0.12 * (p.tr.ego > 75 ? 1.2 : 1) * (p.tr.loyal > 90 ? 0.6 : 1), 0, 0.9))) { p.leave = 'pro'; p.dg = dg; } }
+      if (hoops) { if (p.ovr >= 84 && chance(clamp((p.ovr - 82) * 0.12 * (p.tr.ego > 75 ? 1.2 : 1) * (p.tr.loyal > 90 ? 0.6 : 1) * (p.retYear === g.season - 1 ? 0.6 : 1), 0, 0.9))) { p.leave = 'pro'; p.dg = dg; } }
       else if (g.sport === 'baseball' && p.yr >= 3 && p.ovr >= 80 && chance(clamp((p.ovr - 78) * 0.13, 0, 0.92))) { p.leave = 'pro'; p.dg = dg; }
     }));
     g.off.leaving = ut.roster.filter(id => SD.P(id).leave).map(id => ({ id, why: SD.P(id).leave }));
+    g.off.leaving.filter(x => x.why === 'pro').forEach(x => SD.news('nil', `${SD.P(x.id).n} declares for the draft`, 'You can make a pitch to bring him back on the recap screen.'));
     SD.jobReview();
   };
   SD.persuadeChance = (p, raise) => clamp(0.5 - (p.dg - 84) * 0.06 + (p.tr.loyal - 70) / 100 + (raise || 0) / Math.max(50000, SD.nilValue(p, SD.userT())) * 0.3, 0.03, 0.85);
@@ -142,7 +145,7 @@
     if (o.pitched[id] != null) return 'You already made your pitch.';
     if (SD.payroll(ut) + raise > ut.budget * 1.03) return 'That raise is over your NIL budget.';
     const ok = chance(SD.persuadeChance(p, raise)); o.pitched[id] = ok;
-    if (ok) { p.leave = null; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); SD.news('nil', `${p.n} is coming back`, ''); }
+    if (ok) { p.leave = null; p.retYear = g.season; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); SD.news('nil', `${p.n} is coming back`, ''); }
     return ok ? `${p.n} is coming back!` : `${p.n} is turning pro.`;
   };
   /* ---------- the coaching carousel (non-Tennessee dynasties): the AD's goal, job security, offers ---------- */
@@ -358,7 +361,7 @@
     // open spots: what a program can add before the roster limit (CPU teams keep one spot for the portal)
     const room = {}; g.teams.forEach(t => { room[t.id] = t.id === g.user ? SD.CLASS[g.sport] + 2 : Math.max(0, lim - t.roster.length - (SD.kind() === 'hoops' ? 0 : 1)); });
     const sign = (p, t) => {
-      delete p.pros; delete p.interest; delete p.acts; p.t = t.id; p.yr = 1; p.el = 4; p.car = {}; p.firstY = g.season + 1; p.nil = SD.nilValue(p, t) * 0.6 | 0;
+      delete p.pros; delete p.interest; delete p.acts; p.t = t.id; p.yr = 1; p.el = SD.kind() === 'hoops' ? 5 : 4; p.car = {}; p.firstY = g.season + 1; p.nil = SD.nilValue(p, t) * 0.6 | 0;
       t.roster.push(p.id); g.P[p.id] = p; room[t.id]--;
     };
     const list = Object.values(R.pool).sort((a, b) => b.rec.c - a.rec.c);
