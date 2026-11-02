@@ -600,18 +600,30 @@
   DY.runG6 = (field, all) => {
     const g = G(), S = all.filter(t => !DY.P4.includes(t.conf) && !field.includes(t)).slice(0, 24).map(t => t.id);
     if (S.length < 24) return;
-    const rounds = [], win = x => x.res.h > x.res.a ? x.h : x.a;
-    const play = (a, b, name, campus) => { const h = S.indexOf(a) <= S.indexOf(b) ? a : b; const x = { id: g.season + '-g6-' + rounds.length, wk: 15 + rounds.length, h, a: h === a ? b : a, neutral: !campus, post: 'g6', title: name, res: null }; DY.simGame(x); return x; };
-    const r1 = [[15, 16], [8, 23], [12, 19], [11, 20], [14, 17], [9, 22], [13, 18], [10, 21]].map(([a, b]) => play(S[a], S[b], 'G6 First Round', true));
-    rounds.push(r1);
-    const r2 = [0, 7, 3, 4, 1, 6, 2, 5].map((seed, i) => play(S[seed], win(r1[i]), 'G6 Second Round', true));
-    rounds.push(r2);
-    let cur = r2.map(win);
-    ['G6 Quarterfinal', 'G6 Semifinal', 'G6 Championship'].forEach(nm => { const rd = []; for (let i = 0; i < cur.length; i += 2) rd.push(play(cur[i], cur[i + 1], nm, false)); rounds.push(rd); cur = rd.map(win); });
-    const champ = cur[0];
-    g.post.g6 = { seeds: S, champ, rounds: rounds.map(r => r.map(x => ({ h: x.h, a: x.a, res: x.res, title: x.title }))) };
-    DY.T(champ).g6t = (DY.T(champ).g6t || 0) + 1;
-    DY.news('cfp', `${tname(champ)} wins the Group of 6 playoff`, `Champions of the 24-team G6 and independents playoff.`);
+    g.post.g6 = { seeds: S, rounds: [], cur: [], champ: null };
+    DY.buildG6();
+  };
+  // one round at a time, alongside the CFP, so the user's G6 games are played like any other playoff game
+  DY.buildG6 = () => {
+    const g = G(), Q = g.post.g6, S = Q.seeds, r = Q.rounds.length, win = x => x.res.h > x.res.a ? x.h : x.a;
+    const prev = r ? Q.rounds[r - 1].map(win) : [];
+    const mk = (a, b, name, campus) => { const h = S.indexOf(a) <= S.indexOf(b) ? a : b; return { id: g.season + '-g6-' + r + '-' + a, wk: 15 + r, h, a: h === a ? b : a, neutral: !campus, post: 'g6', title: name + ' (G6)', res: null }; };
+    let games = [];
+    if (r === 0) games = [[15, 16], [8, 23], [12, 19], [11, 20], [14, 17], [9, 22], [13, 18], [10, 21]].map(([a, b]) => mk(S[a], S[b], 'G6 First Round', true));
+    else if (r === 1) games = [0, 7, 3, 4, 1, 6, 2, 5].map((seed, i) => mk(S[seed], prev[i], 'G6 Second Round', true));
+    else { const nm = ['', '', 'G6 Quarterfinal', 'G6 Semifinal', 'G6 Championship'][r]; for (let i = 0; i < prev.length; i += 2) games.push(mk(prev[i], prev[i + 1], nm, false)); }
+    Q.cur = games;
+  };
+  // sim what is left of the current G6 round, store it, build the next; true when the G6 bracket is finished
+  DY.advanceG6 = (force) => {
+    const g = G(), Q = g.post && g.post.g6; if (!Q || Q.champ != null) return true;
+    const win = x => x.res.h > x.res.a ? x.h : x.a;
+    const mine = Q.cur.find(x => !x.res && (x.h === g.user || x.a === g.user));
+    if (mine && !force) return false;
+    Q.cur.filter(x => !x.res).forEach(x => DY.simGame(x));
+    Q.rounds.push(Q.cur);
+    if (Q.cur.length === 1) { Q.champ = win(Q.cur[0]); DY.T(Q.champ).g6t = (DY.T(Q.champ).g6t || 0) + 1; DY.news('cfp', `${tname(Q.champ)} wins the Group of 6 playoff`, `Champions of the 24-team G6 and independents playoff.`); Q.cur = []; return true; }
+    DY.buildG6(); return true;
   };
   // the next round's games from the seeds and winners so far
   const winnerOf = x => x.res.h > x.res.a ? x.h : x.a;
@@ -653,21 +665,28 @@
       const cg = (P.cur || []).find(x => !x.res && (x.h === g.user || x.a === g.user));
       if (cg) return cg;
       // the user's bowl is played alongside the first playoff round
-      if (P.rounds.length === 0) return P.bowls.find(x => !x.res && (x.h === g.user || x.a === g.user)) || null;
+      if (P.rounds.length === 0) { const bg = P.bowls.find(x => !x.res && (x.h === g.user || x.a === g.user)); if (bg) return bg; }
     }
+    if (P.g6 && P.g6.champ == null) { const q = (P.g6.cur || []).find(x => !x.res && (x.h === g.user || x.a === g.user)); if (q) return q; }
     return null;
   };
   DY.finishRound = () => {
     const g = G(), P = g.post; P.seen = true;
     if (P.rounds.length === 0) P.bowls.filter(x => !x.res).forEach(x => DY.simGame(x));
-    P.cur.filter(x => !x.res).forEach(x => DY.simGame(x));
+    if (!P.waitG6) { P.cur.filter(x => !x.res).forEach(x => DY.simGame(x)); }
     DY.clearFcs(); DY.healWeek();
-    P.rounds.push(P.cur);
-    const last = P.cur.length === 1;
+    if (!P.waitG6) P.rounds.push(P.cur);
+    const last = P.waitG6 || P.cur.length === 1;
+    if (P.g6 && P.g6.champ == null) {          // the G6 bracket moves one round with the CFP; if the CFP is over, finish it (stopping for the user's games)
+      let more = true; DY.advanceG6();
+      while (last && P.g6.champ == null && more) { if (P.g6.cur.find(x => !x.res && (x.h === g.user || x.a === g.user))) { more = false; } else DY.advanceG6(); }
+      if (last && P.g6.champ == null) { P.waitG6 = true; P.cur = []; g.teams.forEach(t => DY.refreshDepth(t)); return; }
+    }
+    P.waitG6 = false;
     if (last) {
-      const champ = winnerOf(P.cur[0]);
+      const fin = P.rounds[P.rounds.length - 1][0], champ = winnerOf(fin);
       DY.T(champ).natl = (DY.T(champ).natl || 0) + 1; P.champ = champ;
-      DY.news('cfp', `${tname(champ)} wins the national championship`, `${tname(champ)} beat ${tname(P.cur[0].h === champ ? P.cur[0].a : P.cur[0].h)} ${Math.max(P.cur[0].res.h, P.cur[0].res.a)}-${Math.min(P.cur[0].res.h, P.cur[0].res.a)}.`);
+      DY.news('cfp', `${tname(champ)} wins the national championship`, `${tname(champ)} beat ${tname(fin.h === champ ? fin.a : fin.h)} ${Math.max(fin.res.h, fin.res.a)}-${Math.min(fin.res.h, fin.res.a)}.`);
       g.teams.forEach(t => DY.refreshDepth(t));
       DY.finalPoll();
       DY.seasonEnd();

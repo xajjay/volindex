@@ -263,7 +263,7 @@
     if (d.act === 'msgx') { V.msg = null; return hub(); }
     if (d.act === 'rectut') return modal(recTutHtml());
     if (d.act === 'close') return closeModal();
-    if (d.act === 'resume') { const x = g.sched.concat(g.post ? (g.post.games || []).concat(g.post.cur || [], g.post.bowls || []) : []).find(y => y.id === g.live.id); if (x) return playGame(x); }
+    if (d.act === 'resume') { const x = g.sched.concat(g.post ? (g.post.games || []).concat(g.post.cur || [], g.post.bowls || [], (g.post.g6 && g.post.g6.cur) || []) : []).find(y => y.id === g.live.id); if (x) return playGame(x); }
     if (d.act === 'quit') { DY.G = null; return landing(); }
     if (d.act === 'export') return DY.exportBlob(null).then(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `vol-dynasty-${g.season}.vdyn`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); });
     if (d.act === 'autodepth') { const t = DY.userT(); t.depthEdited = false; DY.refreshDepth(t); return keep(); }
@@ -560,7 +560,7 @@
       return `<div class="cf-m ${path.has(r + ':' + i) ? 'path' : ''}">${m.game && m.game.title ? `<small class="cf-ti">${esc(m.game.title.replace(/ \(CFP.*\)/, ''))}</small>` : ''}${row(m.a)}${row(m.b)}</div>`; };
     b.innerHTML = `<div class="tb-hero"><div><span class="glabel">College Football Playoff · ${P.size} teams${P.champ != null ? ' · Champion: ' + esc(T(P.champ).name) : ''}</span><h2>${sd >= 0 ? `No. ${sd + 1} seed` : 'Not in the field'}</h2><p>${status}</p></div>${sd >= 0 && !elim && P.champ == null ? '<span class="tb-alive">Alive</span>' : ''}</div>
       <div class="box"><div class="glabel">The bracket</div><div class="dy-scroll"><div class="cf-br" style="--cols:${tree.length}">${tree.map((rd, r) => `<div class="cf-col"><h4>${names[r]}</h4>${rd.map((m, i) => box(m, r, i)).join('')}</div>`).join('')}</div></div>${P.champ != null ? `<div class="tb-champ">🏆 ${esc(T(P.champ).name)}</div>` : ''}</div>
-      ${P.g6 ? `<div class="box"><div class="glabel">Group of 6 + independents playoff · Champion: ${esc(T(P.g6.champ).name)}</div>${P.g6.rounds.map(r => `<h4 class="small">${esc(r[0].title)}</h4><table class="dyt"><tbody>${r.map(x => `<tr class="${x.h === me || x.a === me ? 'me' : ''}"><td>${tlink(x.h, false)}</td><td>${x.res.h}</td><td>${tlink(x.a, false)}</td><td>${x.res.a}</td></tr>`).join('')}</tbody></table>`).join('')}</div>` : ''}
+      ${P.g6 ? `<div class="box"><div class="glabel">Group of 6 + independents playoff · ${P.g6.champ != null ? 'Champion: ' + esc(T(P.g6.champ).name) : 'In progress'}</div>${P.g6.rounds.concat(P.g6.cur && P.g6.cur.length ? [P.g6.cur] : []).map(r => `<h4 class="small">${esc(r[0].title)}</h4><table class="dyt"><tbody>${r.map(x => `<tr class="${x.h === me || x.a === me ? 'me' : ''}"><td>${tlink(x.h, false)}</td><td>${x.res ? x.res.h : ''}</td><td>${tlink(x.a, false)}</td><td>${x.res ? x.res.a : ''}</td></tr>`).join('')}</tbody></table>`).join('')}</div>` : ''}
       <div class="box"><div class="glabel">Seeds</div><ol class="dy-seeds">${P.seeds.map((id, i) => `<li class="${id === me ? 'me' : ''}"><span>${i + 1}</span>${tlink(id, false)}<small>${T(id).w}-${T(id).l}${(P.autos || []).includes(id) ? ' · auto bid' : ''}</small></li>`).join('')}</ol></div>`;
   }
 

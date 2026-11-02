@@ -61,7 +61,7 @@
     const R = Object.assign({}, DY.ROT_DEFAULT, GM.T[s].rot || {});
     const at = (arr, i) => arr[Math.min(arr.length - 1, i)] || arr[0];
     // the backup comes in R% of the time, less when the starter is much better (a star stays on the field)
-    const sw = (st, bk, grp) => { if (!bk || bk === st) return st; if (garbage) return chance(0.75) ? bk : st; const m = clamp(1 - ((st.ovr || 70) - (bk.ovr || 70)) / 16, grp === 'RB' ? 0.55 : 0.12, 1.25); const tired = grp === 'RB' ? clamp((((GM.ps[st.id] || {}).ra || 0) - 14) * 0.035, 0, 0.5) : 0; return chance(R[grp] / 100 * m + tired) ? bk : st; };   // a workhorse still tires: backs share the carries
+    const sw = (st, bk, grp) => { if (!bk || bk === st) return st; if (garbage) return chance(0.75) ? bk : st; const m = clamp(1 - ((st.ovr || 70) - (bk.ovr || 70)) / 16, grp === 'RB' ? 0.95 : 0.12, 1.25); const tired = grp === 'RB' ? clamp((((GM.ps[st.id] || {}).ra || 0) - 14) * 0.035, 0, 0.5) : 0; return chance(R[grp] / 100 * m + tired) ? bk : st; };   // a workhorse still tires: backs share the carries
     const QB = garbage && Math.abs(lead) >= 28 ? at(L.QB, 1) : L.QB[0];
     const P = {
       QB, RB: sw(L.RB[0], L.RB[1], 'RB'),
@@ -681,8 +681,10 @@
       y = 2.9 + win * 2.0 + (E(GM, car, 'spd', s) - 76) / 16;
     } else {
       win = (olv - dlv) / 17 + (olv - lbv) / 34 - box * 0.32 + gauss() * 1.12;
-      y = 4.15 + win * 1.7 + (E(GM, car, 'bcv', s) - 76) / 34 + (E(GM, car, 'btk', s) - 76) / 50;   // a great back adds yards but does not break the sim
+      y = 4.75 + win * 1.1 + (E(GM, car, 'bcv', s) - 76) / 34 + (E(GM, car, 'btk', s) - 76) / 50;   // a great back adds yards but does not break the sim
     }
+    y += clamp((GM.score[other(s)] - GM.score[s] - 10) / 28, 0, 0.9);
+    if (car && t !== 'qb') y -= clamp((((GM.ps[car.id] || {}).ra || 0) - 16) * 0.06, 0, 1.4);      // a back who has carried 25+ times is not as fresh as at the start
     if (GM.ball >= 95) y = Math.min(y, y * 0.75 + 0.6);
     let tackler = tacklerFor(D, y, 'run'), broke = false, big = false;
     if (y > 0 && chance(clamp(0.10 + (E(GM, car, 'btk', s) - E(GM, tackler, 'tak', other(s))) / 230, 0.03, 0.24))) { broke = true; y += rr(2, 8); ev.push(`${last(car)} breaks the tackle of ${last(tackler)}.`); }
@@ -757,7 +759,7 @@
     let need = { quick: 1.5, med: 2.5, deep: 3.15, screen: 1.0, pa: 2.95 }[t];
     if (t === 'pa' && def.box > 0.5) need -= 0.35;
     const margin = time - need;
-    const winner = () => weighted(rushers.slice(0, 3).map(x => x.p), p => Math.pow(rushers.find(r => r.p === p).v, 3));
+    const winner = () => weighted(rushers.slice(0, 3).map(x => x.p), p => Math.pow(rushers.find(r => r.p === p).v, 1.2));
     // screens
     if (t === 'screen') {
       const tgt = chance(0.45) ? O.RB : chance(0.5) ? O.WR[2] : O.WR[0];
@@ -808,10 +810,11 @@
       return { kind: 'inc', t, passer: qb, target: tgt, yards: 0, events: ev, text0: `${last(qb)} pass to ${last(tgt)} incomplete`, time: 4, anim: { kind: 'pass', t, inc: true, role: rt.role }, inc: true, bust: true };
     }
     const acc = rt.depth === 'd' ? E(GM, qb, 'dac', s) : rt.depth === 'm' ? E(GM, qb, 'mac', s) : E(GM, qb, 'sac', s);
-    const base = { s: 0.71, m: 0.59, d: 0.39 }[rt.depth] + (t === 'pa' ? 0.03 : 0);
+    const base = { s: 0.79, m: 0.67, d: 0.46 }[rt.depth] + (t === 'pa' ? 0.03 : 0);
     let pc = base + (rt.sep - 1) * 0.05 + (acc - 82) * 0.0045 + (E(GM, tgt, 'cth', s) - 80) * 0.002 - (hurried ? 0.11 : 0);
     if (rt.depth === 'd') pc += (E(GM, qb, 'thp', s) - 82) * 0.002;
     if (hurried && qb.tr.tup < 45) { pc -= 0.05; }
+    pc += clamp((GM.score[ds] - GM.score[s] - 10) / 260, 0, 0.07);      // a team being run out of the building finds some completions (defenses ease up, drives get a few breaks)
     pc = clamp(pc, 0.07, 0.93);
     const air = rt.depth === 'd' ? Math.round(rr(18, 42)) : rt.depth === 'm' ? Math.round(rr(8, 17)) : Math.round(rr(1, 7));
     const toGoal = 100 - GM.ball;
@@ -827,7 +830,7 @@
       return complete(GM, s, qb, tgt, tk, y, Math.min(air, toGoal), t, ev, rt.depth !== 'd' && chance(in2min(GM) && GM.score[s] <= GM.score[ds] ? 0.5 : 0.22), { kind: 'pass', t, role: rt.role, air: Math.min(air, toGoal) });
     }
     // incomplete: interception, drop, pass breakup, interference
-    let pint = { s: 0.013, m: 0.022, d: 0.036 }[rt.depth] * (1 + Math.max(0, 1 - rt.sep) * 0.3) * (1 + (80 - E(GM, qb, 'awr', s)) / 70) * ((cov.at.cth || 55) / 68) * (hurried ? 1.6 : 1);
+    let pint = { s: 0.010, m: 0.017, d: 0.029 }[rt.depth] * (1 + Math.max(0, 1 - rt.sep) * 0.3) * (1 + (80 - E(GM, qb, 'awr', s)) / 70) * ((cov.at.cth || 55) / 68) * (hurried ? 1.6 : 1);
     if (qb.arch === 'Gunslinger') pint *= 1.15;
     if (chance(clamp(pint / (1 - pc), 0.01, 0.3))) return interception(GM, s, O, D, qb, tgt, cov, t, ev, null);
     if (rt.depth !== 's' && rt.sep < 0.6 && chance(0.075)) {

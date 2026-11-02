@@ -111,7 +111,7 @@
       const run = 1 + clamp(((t.hist && t.hist.length ? t.hist.slice(-3).reduce((a, h) => a + h.w, 0) / Math.min(3, t.hist.length) : 7) - 7) / 12, -0.2, 0.45);
       const home = t.st === p.st ? (st >= 5 ? 2.2 : 3.2) : 1;
       const lvl = DY.P4.includes(t.conf) || t.abbr === 'ND' ? 1 : (st >= 5 ? 0.06 : st === 4 ? 0.3 : 0.85);
-      return { t, w: Math.pow(t.prestige / 60, st >= 5 ? 3.4 : st === 4 ? 2.5 : 1.7) * (0.3 + d.prox * 1.1) * home * lvl * room * run * rr(0.45, 1.7) };
+      return { t, w: Math.pow(t.prestige / 60, st >= 5 ? 2.6 : st === 4 ? 2.2 : 1.7) * (0.3 + d.prox * 1.1) * home * lvl * room * run * rr(0.45, 1.7) };
     });
     const top = [];
     for (let i = 0; i < want; i++) { const pk = wpick(scored.filter(x => !top.includes(x.t.id)), x => x.w); if (pk) top.push(pk.t.id); }
@@ -134,11 +134,9 @@
     const R = G().recruit; if (!R._pc) cpuState(R);
     const have = (R._pc[t.id] || {})[p.pos] || 0, need = (R._need[t.id] || {})[p.pos] || 0, sc = R._sc[t.id] || { 5: 0, 4: 0 };
     if ((R._tot[t.id] || 0) >= 27) return false;
-    if (p.rec.stars >= 5 && sc[5] >= 7) return false;
-    if (p.rec.stars >= 4 && sc[4] + sc[5] >= 15) return false;
     if (relax) return true;
     if (['K', 'P', 'LS'].includes(p.pos)) return have < Math.min(1, need);
-    return have < Math.max(p.pos === 'QB' ? 1 : 0, need + (p.rec.stars >= 4 ? 1 : 0));
+    return have < Math.max(p.pos === 'QB' ? 1 : 0, need + (p.rec.stars >= 5 ? 2 : p.rec.stars >= 4 ? 1 : 0));
   };
   const addCommit = (R, t, p) => {
     if (!R._pc) cpuState(R);
@@ -199,7 +197,7 @@
     const full = DY.myCommits().length >= DY.CAP.hs;
     // even a great recruiter does not sign half of the nation's five-stars: a class holds about as many as the biggest real classes
     const starCap = { freshman: 12, varsity: 9, heisman: 7 }[g.settings.difficulty || 'varsity'] || 9;
-    const starRoom = p => p.rec.stars < 5 || DY.myCommits().filter(x => x.rec.stars >= 5).length < starCap;
+    const starRoom = () => true;     // no cap on the user's five-stars
     if (mode !== 'off') R.board.forEach(id => {
       const p = DY.RP(id); if (!p) return;
       let pts = 0;
@@ -232,7 +230,10 @@
         const heat = p.rec.stars >= 5 ? 1.04 + Math.max(0, t.prestige - 82) / 170 : p.rec.stars === 4 ? 1.0 + Math.max(0, t.prestige - 82) / 280 : 0.95;
         const ok = DY.cpuOk(t, p), nd = (R._need[t.id] || {})[p.pos] || 0, have = (R._pc[t.id] || {})[p.pos] || 0;
         const nm = !ok && p.commit !== +tid ? 0.3 : 1 + Math.min(0.4, Math.max(0, nd - have) * 0.1);
-        p.interest[tid] += (6 + t.prestige / 11) * (0.45 + DY.fitScore(t, p)) * rr(0.35, 1.5) * heat * nm;
+        // a recruit's own taste (a dream school, a coach he clicked with) is fixed for the cycle; a class already heavy in stars is a harder sell (playing time, one more star at a spot is less appealing)
+        p.aff = p.aff || {}; if (p.aff[tid] == null) p.aff[tid] = Math.exp(gauss() * (p.rec.stars >= 4 ? 0.42 : 0.25));
+        const scT = R._sc[t.id] || { 5: 0, 4: 0 }, crowdS = p.rec.stars >= 5 ? 1 / (1 + 0.16 * Math.max(0, scT[5] - 3)) : p.rec.stars === 4 ? 1 / (1 + 0.05 * Math.max(0, scT[4] + scT[5] - 9)) : 1;
+        p.interest[tid] += (6 + t.prestige / 11) * (0.45 + DY.fitScore(t, p)) * rr(0.35, 1.5) * heat * nm * p.aff[tid] * crowdS;
       }
       // commits: only schools that can use him (a spot at his position, room in the class) are considered
       const order = Object.entries(p.interest).filter(([tid]) => { const t = g.teams[tid]; return t.user || p.commit === +tid || DY.cpuOk(t, p); }).sort((a, b) => b[1] - a[1]);
@@ -242,7 +243,7 @@
       const need = (140 + p.rec.stars * 15 + (w <= 4 ? 40 : 0)) * (1 - Math.min(w, 14) / 24);
       // four- and five-stars want to see campus (an official visit) before they commit to you
       const visitOk = p.rec.stars < 4 || p.visited || w >= (p.rec.stars >= 5 ? 12 : 8);
-      if (!p.commit && lv >= need && lv >= second * (w >= 10 ? 1.08 : 1.2) && (!g.teams[lead].user || (p.offer && !full && visitOk && starRoom(p)))) {
+      if (!p.commit && lv >= need * (g.teams[lead].user && p.rec.stars >= 5 ? 1 + 0.12 * Math.max(0, DY.myCommits().filter(x => x.rec.stars >= 5).length - 3) : 1) && lv >= second * (w >= 10 ? 1.08 : 1.2) && (!g.teams[lead].user || (p.offer && !full && visitOk && starRoom(p)))) {
         p.commit = +lead; if (!g.teams[lead].user) addCommit(R, +lead, p);
         if (g.teams[lead].user) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos} from ${p.home}, commits to ${DY.UN()}!`); DY.news('commit', `${p.rec.stars}-star ${DY.POS_NAME[p.pos].toLowerCase()} ${p.n} commits to ${DY.UN()}`, `No. ${p.rec.nat} nationally (${p.rec.c.toFixed(4)} composite). ${p.home}, ${p.hs}.`, { rid: p.id }); }
         else if (p.rec.nat <= 50 && R.board.includes(p.id)) logs.push(`${p.n} (No. ${p.rec.nat}) commits to ${g.teams[lead].name}.`);
