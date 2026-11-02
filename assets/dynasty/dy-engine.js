@@ -689,7 +689,7 @@
       y = 2.9 + win * 2.0 + (E(GM, car, 'spd', s) - 76) / 16;
     } else {
       win = (olv - dlv) / 17 + (olv - lbv) / 34 - box * 0.32 + gauss() * 1.12;
-      y = 4.9 + win * 1.1 + (E(GM, car, 'bcv', s) - 76) / 34 + (E(GM, car, 'btk', s) - 76) / 50;   // a great back adds yards but does not break the sim
+      y = 5.0 + win * 1.1 + (E(GM, car, 'bcv', s) - 76) / 34 + (E(GM, car, 'btk', s) - 76) / 50;   // a great back adds yards but does not break the sim
     }
     y += clamp((GM.score[other(s)] - GM.score[s] - 10) / 28, 0, 0.9);
     if (car && t !== 'qb') y -= clamp((((GM.ps[car.id] || {}).ra || 0) - 16) * 0.06, 0, 1.4);      // a back who has carried 25+ times is not as fresh as at the start
@@ -708,7 +708,9 @@
     const hitter = tackler;
     if (chance(0.0085 * (1 + (72 - ballSec) / 22) * (hitter ? (hitter.at.hit || 60) / 75 : 1))) fum = true;
     const oob = t === 'out' ? chance(0.34) && y > 2 : chance(0.05);
-    const text0 = `${last(car)} ${t === 'qb' ? (dir === 'M' ? 'keeps it up the middle' : 'keeps it ' + (dir === 'L' ? 'left' : 'right')) : t === 'out' ? 'runs wide ' + (dir === 'L' ? 'left' : 'right') : 'runs ' + ({ L: 'left', M: 'up the middle', R: 'right' }[dir])}`;
+    // a quarterback run is a called play: a sneak in short yardage, otherwise power, blast, draw, keeper or a shotgun run
+    const qlab = t === 'qb' ? (call.play || (GM.togo <= 1 && dir === 'M' ? 'QB sneak' : pick(['QB power', 'QB blast', 'QB draw', 'QB keeper', 'Shotgun QB run', 'Shotgun QB run', 'QB counter', 'Zone read keep']))) : null;
+    const text0 = `${last(car)} ${t === 'qb' ? qlab + ' ' + (dir === 'M' ? 'up the middle' : dir === 'L' ? 'left' : 'right') : t === 'out' ? 'runs wide ' + (dir === 'L' ? 'left' : 'right') : 'runs ' + ({ L: 'left', M: 'up the middle', R: 'right' }[dir])}`;
     return { kind: 'run', t, dir, carrier: car, tackler, yards: y, fum, oob, broke, big, events: ev, text0, time: Math.round(5 + Math.abs(y) / 6 + rnd() * 2), anim: { kind: 'run', t, dir, broke } };
   }
   function pickTarget(GM, s, O, D, t, def, hurried, ctx) {
@@ -832,6 +834,7 @@
     if (chance(pc)) {
       let yac = rt.depth === 'd' ? (rt.sep > 1.6 ? rr(3, 30) : rr(0, 7)) : rt.depth === 'm' ? rr(0.5, 7) + gauss() * 2 : rr(1.5, 8.5) + gauss() * 2;
       yac += ((E(GM, tgt, 'elu', s) || 60) + E(GM, tgt, 'spd', s) - 160) / 24;
+      yac *= 0.88;
       const tk = tacklerFor(D, air + yac, rt.depth === 's' ? 'short' : 'deep');
       if (chance(clamp(0.1 + ((E(GM, tgt, 'btk', s) || tgt.at.str || 60) - E(GM, tk, 'tak', ds)) / 130, 0.03, 0.25))) { yac += rr(3, 12); ev.push(`${last(tgt)} shakes off ${last(tk)}.`); }
       if (air + yac > 14 && chance(0.12 + (tgt.at.spd - 85) / 100)) yac += -Math.log(1 - rnd()) * 14;

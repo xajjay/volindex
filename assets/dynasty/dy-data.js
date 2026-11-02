@@ -381,9 +381,9 @@ Sacramento State|SAC|42|#043927|#C4B581|CA`;
     power: { name: 'Run heavy', desc: 'Under center and pistol, two tight ends, a standard-to-slow pace. Run first and play action off it.', pass: 0.42, tempo: 34, rpo: 0.06, forms: { ace12: 0.32, pistol: 0.2, trips: 0.18, iform: 0.16, doubles: 0.1, goal: 0.04 } },
     pro: { name: 'Pro style', desc: 'Balanced and multiple: under center, I-form and 12 personnel, play action, a deliberate pace.', pass: 0.48, tempo: 34, rpo: 0.06, forms: { ace12: 0.28, iform: 0.24, doubles: 0.18, trips: 0.15, pistol: 0.1, spread: 0.05 } },
     spread: { name: 'Spread offense', desc: 'Shotgun and three or four wide, RPOs, quick game and the QB run.', pass: 0.5, tempo: 31, rpo: 0.2, forms: { trips: 0.36, doubles: 0.3, pistol: 0.14, spread: 0.14, ace12: 0.06 } },
-    tempo: { name: 'Up-tempo', desc: 'No-huddle spread: snap it fast, stress the defense sideline to sideline.', pass: 0.53, tempo: 24, rpo: 0.2, forms: { trips: 0.4, doubles: 0.24, spread: 0.2, empty: 0.06, pistol: 0.1 } },
+    tempo: { name: 'Up-tempo', desc: 'No-huddle spread: snap it fast, stress the defense sideline to sideline.', pass: 0.5, tempo: 25, rpo: 0.2, forms: { trips: 0.4, doubles: 0.24, spread: 0.2, empty: 0.06, pistol: 0.1 } },
     option: { name: 'Triple option', desc: 'Flexbone triple option: dive, keep or pitch, then the play-action shot.', pass: 0.14, tempo: 36, rpo: 0, forms: { flexbone: 0.62, pistol: 0.18, iform: 0.12, ace12: 0.08 } },
-    air: { name: 'Air Raid', desc: 'Four wide, throw it all over the field.', pass: 0.6, tempo: 29, rpo: 0.08, forms: { spread: 0.4, trips: 0.28, empty: 0.15, doubles: 0.17 }, cpu: true },
+    air: { name: 'Air Raid', desc: 'Four wide, throw it all over the field.', pass: 0.55, tempo: 31, rpo: 0.08, forms: { spread: 0.4, trips: 0.28, empty: 0.15, doubles: 0.17 }, cpu: true },
   };
   DY.USER_STYLES = ['pro', 'spread', 'tempo', 'option', 'power'];
   // formations: personnel (RB-TE), receivers on the field, and what they do for the run game, protection and the passing game

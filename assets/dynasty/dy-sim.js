@@ -1154,7 +1154,7 @@
     anim.kind = 'run'; anim.t = W.scramble ? 'scr' : call.t;
     const t = W.scramble ? 'scr' : (c === q ? 'qb' : call.t === 'qb' ? 'in' : call.t);
     const dirW = c ? (c.y < -3 ? 'left' : c.y > 3 ? 'right' : 'up the middle') : 'up the middle';
-    const text0 = W.scramble ? `${last(q.p)} scrambles` : c === q ? `${last(q.p)} keeps it ${dirW === 'up the middle' ? 'up the middle' : dirW}` : `${last(c && c.p)} runs ${dirW === 'up the middle' ? 'up the middle' : (Math.abs(c.y) > 7 ? 'wide ' : '') + dirW}`;
+    const text0 = W.scramble ? `${last(q.p)} scrambles` : c === q ? `${last(q.p)} ${call && call.play ? call.play : (GM.togo <= 1 && dirW === 'up the middle' ? 'QB sneak' : ['QB power', 'QB blast', 'QB draw', 'QB keeper', 'Shotgun QB run', 'Shotgun QB run', 'Zone read keep'][Math.floor(Math.random() * 7)])} ${dirW}` : `${last(c && c.p)} runs ${dirW === 'up the middle' ? 'up the middle' : (Math.abs(c.y) > 7 ? 'wide ' : '') + dirW}`;
     if (y <= -1 && W.tackle && !W.scramble) ev.push(`${last(tk)} blew it up in the backfield.`);
     return Object.assign(base, { kind: 'run', t, dir: call.dir || 'M', carrier: c ? c.p : q.p, tackler: W.oob || W.td ? null : tk, ast, yards: y, fum: !!W.fumble, oob: !!W.oob, broke: !!(W.broke && W.broke.length), big: y >= 20, text0 });
   }

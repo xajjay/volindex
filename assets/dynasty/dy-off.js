@@ -213,7 +213,8 @@
         pts += v; logs.push(`${p.n} (${p.rec.stars}★ ${p.pos}) took his official visit: ${won ? (DY.isTN && DY.isTN() ? 'Neyland delivered' : 'the home crowd delivered') : 'a tough loss to watch'}.`);
         p.visited = true;
       }
-      p.acts = {};
+      // actions carry over week to week until you change them (a scouting report is one-time, and a recruit who commits elsewhere frees his hours)
+      if (p.commit != null && p.commit !== ut.id) p.acts = {}; else if (p.acts) delete p.acts.scout;
       // fairness: stacking everything on one kid has diminishing returns, fit matters, and a crowded position room scares off players who want to play
       const atPos = DY.myCommits().filter(x => x.pos === p.pos && x !== p).length, room = Math.max(2, Math.round((DY.STARTERS[p.pos] || 1) * 1.5));
       const crowd = atPos >= room ? (p.pref.top.includes('pt') ? 0.65 : 0.88) : 1;
@@ -1008,12 +1009,12 @@
       t.w = t.l = t.cw = t.cl = t.pf = t.pa = 0; t.res = []; t.ap = null;
       // CPU programs drift with results
       if (!t.user && t.hist.length) {
-        const h = t.hist[t.hist.length - 1], base = DY.TEAMS[t.id].prestige;
+        const h = t.hist[t.hist.length - 1], h2 = t.hist[t.hist.length - 2], base = t.hb != null ? t.hb : DY.TEAMS[t.id].prestige;   // base = the program's long-run standing (history), which itself slowly follows results
         // results move a program (a few good years build a contender, a few bad ones sink a power) and every offseason brings a bit of
         // coaching and recruiting luck; a hire after a losing run gives a real bump. Pulled gently back toward where the program started.
-        let d = (h.w - 8) * 0.42 + (h.ap && h.ap <= 10 ? 0.7 : 0) + (h.champ ? 1.2 : 0) - (t.prestige - base) * 0.2 + gauss() * 1.1;
+        let d = ((h.w - 8) * 0.34 + (h2 ? (h2.w - 8) * 0.14 : 0)) + (h.ap && h.ap <= 10 ? 0.7 : 0) + (h.champ ? 1.2 : 0) - (t.prestige - base) * 0.2 + gauss() * 1.1;
         if (h.w <= 5 && chance(0.45)) { d += rr(1.5, 5); t.coach = DY.coachName(); t.newCoach = g.season + 1; }
-        t.prestige = clamp(t.prestige + d, 25, 97); t.budget = DY.teamBudget(t);
+        t.prestige = clamp(t.prestige + d, 25, 97); t.hb = clamp(base + (t.prestige - base) * 0.15, 25, 97); t.budget = DY.teamBudget(t);
       }
       t.depthEdited = false; DY.refreshDepth(t);
       const o = DY.teamOvr(t);
@@ -1023,7 +1024,11 @@
     // Tennessee's program prestige follows the coach
     const ut = DY.userT(), h = g.hist[g.hist.length - 1];
     // the user's program climbs with wins and titles, and is pulled back toward its starting standing so a few good years don't make it a juggernaut
-    if (h) ut.prestige = clamp(ut.prestige + (h.w - 8) * 0.34 + (h.finish === 'National champions' ? 2.4 : h.cfpSeed ? 0.8 : 0) - (ut.prestige - DY.TEAMS[ut.id].prestige) * 0.09, 55, 97);
+    if (h) {
+      const ub = ut.hb != null ? ut.hb : DY.TEAMS[ut.id].prestige, h2 = g.hist[g.hist.length - 2];
+      ut.prestige = clamp(ut.prestige + (h.w - 8) * 0.3 + (h2 ? (h2.w - 8) * 0.1 : 0) + (h.finish === 'National champions' ? 2.4 : h.cfpSeed ? 0.8 : 0) - (ut.prestige - ub) * 0.1, 55, 97);
+      ut.hb = clamp(ub + (ut.prestige - ub) * 0.15, 25, 97);
+    }
     trimPlayers();
     g.post = null; g.off = null; g.polls.cfp = null; g.phase = 'preseason'; g.week = 0;
     g.teams.forEach(t => DY.pickCaptains(t));

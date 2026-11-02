@@ -694,3 +694,5 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
 .dy-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 640px) { .dy-grid2 { grid-template-columns: 1fr; } .dy-vbar { justify-content: stretch; } .dy-vsel select { max-width: none; flex: 1; } }
 #dyPsearch { width: 100%; margin: 6px 0 10px; min-height: 44px; }
+
+.dy-stage{height:5px;border-radius:3px;background:rgba(128,128,128,.25);margin:4px 0 1px;overflow:hidden}.dy-stage i{display:block;height:100%;background:#ff8200}

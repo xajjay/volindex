@@ -795,6 +795,7 @@
   };
   DY.checkRecords = (GM, x) => {
     const g = G();
+    for (const id in GM.ps) { const p = DY.P(+id), l = GM.ps[id]; if (!p) continue; for (const k in NAT.game) if (l[k] && l[k] >= NAT.game[k][0][0] * 0.6) DY.checkNat('game', k, l[k], p, 'vs. ' + DY.T(DY.oppOf(x)).name); }
     for (const id in GM.ps) {
       const p = DY.P(+id); if (!p || p.t !== g.user) continue; const l = GM.ps[id];
       for (const name in REC_MAP) {
@@ -810,6 +811,7 @@
   };
   DY.updateRecordsSeason = () => {
     const g = G(), ut = DY.userT();
+    DY.natSeason();
     ut.roster.map(DY.P).forEach(p => {
       for (const name in REC_MAP) {
         const k = REC_MAP[name];
@@ -821,6 +823,37 @@
         else if (cv && cc && cv > cc.v) { g.rec.career[k] = { v: cv, n: p.n, y: (p.firstY || g.season) + '–' + g.season, pid: p.id, prev: cc.n }; }
       }
     });
+  };
+  /* ---------- national (FBS) record book: the real marks as of the year you are in, updated when anyone in the dynasty breaks one ---------- */
+  // [value, holder, school, year]; the last entry whose year is before the season is the mark standing at that point
+  const NAT = {
+    game: { py: [[716, 'David Klingler', 'Houston', 1990], [819, 'Patrick Mahomes', 'Texas Tech', 2016]], ptd: [[11, 'David Klingler', 'Houston', 1990]],
+      ry: [[406, 'LaDainian Tomlinson', 'TCU', 1999], [427, 'Samaje Perine', 'Oklahoma', 2014]], rtd: [[8, 'Howard Griffith', 'Illinois', 1990]] },
+    season: { py: [[5188, 'Ty Detmer', 'BYU', 1990], [5833, 'B.J. Symons', 'Texas Tech', 2003], [5967, 'Bailey Zappe', 'Western Kentucky', 2021]],
+      ptd: [[54, 'David Klingler', 'Houston', 1990], [58, 'Colt Brennan', 'Hawaii', 2006], [62, 'Bailey Zappe', 'Western Kentucky', 2021]],
+      ry: [[2628, 'Barry Sanders', 'Oklahoma State', 1988]], rtd: [[37, 'Barry Sanders', 'Oklahoma State', 1988]],
+      rc: [[142, 'Manny Hazard', 'Houston', 1989]], rcy: [[2060, 'Trevor Insley', 'Nevada', 1999]], rctd: [[27, 'Troy Edwards', 'Louisiana Tech', 1998]],
+      sck: [[24, 'Terrell Suggs', 'Arizona State', 2002]], int: [[14, 'Al Worley', 'Washington', 1968]] },
+    career: { py: [[17072, 'Timmy Chang', 'Hawaii', 2004], [19217, 'Case Keenum', 'Houston', 2011]], ptd: [[134, 'Graham Harrell', 'Texas Tech', 2008], [155, 'Case Keenum', 'Houston', 2011]],
+      ry: [[6397, 'Ron Dayne', 'Wisconsin', 1999], [6405, 'Donnel Pumphrey', 'San Diego State', 2016]] }
+  };
+  DY.NAT_LABEL = { py: 'Passing yards', ptd: 'Passing TDs', ry: 'Rushing yards', rtd: 'Rushing TDs', rc: 'Receptions', rcy: 'Receiving yards', rctd: 'Receiving TDs', sck: 'Sacks', int: 'Interceptions' };
+  DY.nat = () => {
+    const g = G(); if (g.nat) return g.nat;
+    const yr = g.startSeason || g.season; g.nat = { game: {}, season: {}, career: {} };
+    for (const sc in NAT) for (const k in NAT[sc]) { const e = NAT[sc][k].filter(r => r[3] < yr).pop() || NAT[sc][k][0]; g.nat[sc][k] = { v: e[0], n: e[1], t: e[2], y: String(e[3]) }; }
+    return g.nat;
+  };
+  // any player in the dynasty breaking a national mark: the record changes hands and the news says so
+  DY.checkNat = (scope, k, v, p, note) => {
+    const g = G(), N = DY.nat(), cur = N[scope][k]; if (!cur || !(v > cur.v) || !p) return;
+    const t = p.t != null && DY.T(p.t) ? DY.T(p.t).name : '';
+    N[scope][k] = { v, n: p.n, t, y: String(g.season), pid: p.id, prev: cur.n, note: note || '' };
+    DY.news('record', `NATIONAL RECORD: ${p.n} (${t}) sets the ${scope === 'game' ? 'single-game' : scope} FBS mark in ${DY.NAT_LABEL[k].toLowerCase()}`, `${v}, passing ${cur.n} (${cur.v}, ${cur.y}).`, { pid: p.id });
+  };
+  DY.natSeason = () => {
+    const g = G();
+    g.teams.filter(t => t.fbs).forEach(t => t.roster.forEach(id => { const p = DY.P(id); if (!p || !p.s) return; for (const k in NAT.season) if (p.s[k]) DY.checkNat('season', k, p.s[k], p); }));
   };
   DY.careerTotal = (p, k, incl) => { let v = 0; for (const y in p.car) v += p.car[y][k] || 0; if (incl && p.s) v += p.s[k] || 0; return v; };
 
