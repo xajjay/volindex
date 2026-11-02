@@ -4,7 +4,7 @@ usage: build_bb_hist.py bb_data.json"""
 import json, sys, re, os, collections
 SD = open(os.path.join(os.path.dirname(__file__), '..', 'assets/sdyn/sd-data.js'), encoding='utf-8').read()
 NAMES = set(re.findall(r"^(?:\s*)([A-Za-z&.' ]+)\|[A-Za-z0-9]+\|", SD, re.M))
-ALIAS = {'Connecticut': 'UConn', 'Pittsburgh': 'Pitt', 'California': 'Cal', 'Southern California': 'USC', 'Mississippi': 'Ole Miss', 'North Carolina State': 'NC State', 'Central Florida': 'UCF',
+ALIAS = {'Nevada–Las Vegas': 'UNLV', 'Connecticut': 'UConn', 'Pittsburgh': 'Pitt', 'California': 'Cal', 'Southern California': 'USC', 'Mississippi': 'Ole Miss', 'North Carolina State': 'NC State', 'Central Florida': 'UCF',
          'Brigham Young': 'BYU', 'Louisiana State': 'LSU', 'Southern Methodist': 'SMU', 'Virginia Commonwealth': 'VCU', 'Florida Atlantic': 'FAU', "Saint Mary's (CA)": "Saint Mary's",
          "St. John's (NY)": "St. John's", 'Loyola (IL)': 'Loyola Chicago', 'Appalachian State': 'App State', 'Tennessee-Martin': 'UT Martin', 'Louisiana-Lafayette': 'Louisiana', 'Miami (FL)': 'Miami',
          'Texas Christian': 'TCU', 'Mississippi State': 'Mississippi State', 'Southern Mississippi': 'Southern Miss', 'North Carolina-Greensboro': 'UNC Greensboro', 'North Carolina-Asheville': 'UNC Asheville',

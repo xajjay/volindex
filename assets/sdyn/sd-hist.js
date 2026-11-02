@@ -5,8 +5,8 @@
   const SD = root.SD, clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const CLS = { FR: 1, SO: 2, JR: 3, SR: 4, GR: 4 };
   root.BB_HIST = root.BB_HIST || {};
-  SD.HIST_FIRST = 2010; SD.HIST_LAST = 2026;       // season start years (2010 = 2010-11)
-  SD.HIST_ENABLED = false;       // flipped on when data/hist/bb-*.js ship
+  SD.HIST_FIRST = 2009; SD.HIST_LAST = 2025;       // season start years (2009 = 2009-10)
+  SD.HIST_ENABLED = true;        // data/hist/bb-2010..2026.js ship (top ~70 teams per year)
   SD.histAvailable = sport => SD.HIST_ENABLED && sport === 'mbb';
   SD.loadHist = (startYear, cb) => {
     const y = startYear + 1; if (root.BB_HIST[y]) return cb(true);
