@@ -631,11 +631,19 @@
   const HCOLS = [['GP', s => s.gp], ['MIN', s => f1(s.min, s.gp)], ['PTS', s => f1(s.pts, s.gp)], ['REB', s => f1(s.orb + s.drb, s.gp)], ['AST', s => f1(s.ast, s.gp)], ['STL', s => f1(s.stl, s.gp)], ['BLK', s => f1(s.blk, s.gp)], ['FG%', s => s.fga ? (s.fgm / s.fga * 100).toFixed(1) : '-'], ['3P%', s => s.tpa ? (s.tpm / s.tpa * 100).toFixed(1) : '-'], ['FT%', s => s.fta ? (s.ftm / s.fta * 100).toFixed(1) : '-']];
   const BCOLS = [['G', s => s.gp], ['AVG', s => avg3(s.h, s.ab)], ['OBP', s => avg3(s.h + s.bb + s.hbp, s.ab + s.bb + s.hbp)], ['SLG', s => avg3(s.h + s.d2 + s.d3 * 2 + s.hr * 3, s.ab)], ['AB', s => s.ab], ['H', s => s.h], ['HR', s => s.hr], ['RBI', s => s.rbi], ['R', s => s.r], ['BB', s => s.bb], ['SO', s => s.so], ['SB', s => s.sb]];
   const PCOLS = () => [['APP', s => s.gp], ['GS', s => s.gs || 0], ['W-L', s => (s.w || 0) + '-' + (s.l || 0)], ['SV', s => s.sv || 0], ['IP', s => Math.floor(s.ipo / 3) + '.' + s.ipo % 3], ['ERA', s => s.ipo ? (s.er * (G().sport === 'softball' ? 7 : 9) / (s.ipo / 3)).toFixed(2) : '-'], ['K', s => s.k], ['BB', s => s.bbp], ['H', s => s.ha], ['WHIP', s => s.ipo ? ((s.ha + s.bbp) / (s.ipo / 3)).toFixed(2) : '-']];
+  function coachBoard() {
+    const g = G(), B = SD.coachBoard(), me = g.coach.name, mine = g.cst && g.cst[me];
+    const ranks = B.cats.map(c => { const all = B.rows.filter(r => (c.k === 'pct' ? r.yrs >= 3 : true)).sort((a, b) => c.f(b) - c.f(a)); const i = all.findIndex(r => r.n === me); return { l: c.label, i: i + 1, n: all.length, v: mine ? c.fmt(c.f(Object.assign({ n: me }, mine))) : '-' }; });
+    const head = mine ? `<div class="box"><div class="glabel">Coach ${esc(me)} · ${esc(SD.UN())}</div><div class="dy-stats4"><div><b>${mine.w}-${mine.l}</b><small>Career record</small></div><div><b>${mine.cw}-${mine.cl}</b><small>Conference</small></div><div><b>${mine.po}</b><small>NCAA trips</small></div><div><b>${mine.nt}</b><small>National titles</small></div></div>
+      <p class="small dim">${ranks.filter(r => r.i && r.i <= 25).map(r => `No. ${r.i} in ${r.l.toLowerCase()}`).join(' · ') || 'Your rankings show up once you have a few seasons on the books.'}</p></div>` : '';
+    return head + `<div class="dy-grid">${B.cats.map(c => `<div class="box"><div class="glabel">${c.label}</div><ol class="dy-poll">${c.top.map((r, i) => `<li class="${r.n === me ? 'me' : ''}"><span>${i + 1}</span>${esc(r.n)} <small>${esc(r.t)}</small><small>${c.fmt(c.f(r))}</small></li>`).join('') || '<li class="dim">After the first season.</li>'}</ol></div>`).join('')}</div>`;
+  }
   function stats(b) {
     const g = G(), ut = SD.userT();
     const ps = ut.roster.map(SD.P).filter(p => sStats(p));
     const tbl = (title, list, cols) => list.length ? `<div class="box"><div class="glabel">${title}</div><div class="dy-scroll"><table class="dyt"><thead><tr><th>Player</th>${cols.map(c => `<th>${c[0]}</th>`).join('')}</tr></thead><tbody>${list.map(p => `<tr><td>${plink(p)} <small>${p.pos}</small></td>${cols.map(c => `<td>${c[1](sStats(p))}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>` : '';
-    const tabs = `<div class="gchips dy-chips">${[['team', SD.UN()], ['sec', SD.UCN() + ' leaders'], ['nat', 'National leaders']].map(([k, l]) => `<button data-stab="${k}" aria-pressed="${V.stab === k}">${l}</button>`).join('')}</div>`;
+    const tabs = `<div class="gchips dy-chips">${[['team', SD.UN()], ['sec', SD.UCN() + ' leaders'], ['nat', 'National leaders'], ['coach', 'Coaches']].map(([k, l]) => `<button data-stab="${k}" aria-pressed="${V.stab === k}">${l}</button>`).join('')}</div>`;
+    if (V.stab === 'coach') { b.innerHTML = tabs + coachBoard(); return; }
     if (V.stab === 'team') {
       if (hoops()) b.innerHTML = tabs + tbl(`${SD.SP().label(g.season)} · per game`, ps.filter(p => sStats(p).gp).sort((a, b) => sStats(b).pts / sStats(b).gp - sStats(a).pts / sStats(a).gp), HCOLS);
       else b.innerHTML = tabs + tbl('Hitting', ps.filter(p => sStats(p).pa).sort((a, b) => sStats(b).pa - sStats(a).pa), BCOLS) + tbl('Pitching', ps.filter(p => sStats(p).bf).sort((a, b) => sStats(b).ipo - sStats(a).ipo), PCOLS());

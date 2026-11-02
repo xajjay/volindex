@@ -894,7 +894,7 @@
     });
     if (!g.cst[g.coach.name]) {
       const c = g.cst[g.coach.name] = DY.csNew(50);       // an older save: rebuild the user's totals from the season-by-season book
-      (g.hist || []).forEach(h => { c.cw += h.cw || 0; c.cl += h.cl || 0; c.yrs++; if (h.sec) c.ct++; if (h.cfpSeed) c.po++; if (h.finish === 'National champions') c.nt++;
+      (g.hist || []).forEach(h => { c.w += h.w || 0; c.l += h.l || 0; c.cw += h.cw || 0; c.cl += h.cl || 0; c.yrs++; if (h.sec) c.ct++; if (h.cfpSeed) c.po++; if (h.finish === 'National champions') c.nt++;
         if (/^Won .*Bowl|^Won /.test(h.finish) && !/CFP|Semifinal|Championship/.test(h.finish)) c.bw++; else if (/^Lost .*Bowl/.test(h.finish) && !/CFP|Semifinal|Quarterfinal|Championship/.test(h.finish)) c.bl++;
         c.pr = Math.round(Math.max(1, Math.min(99, c.pr + ((h.w - 6.5) * 2.4 + (h.sec ? 3 : 0) + (h.cfpSeed ? 4 : 0) + (h.finish === 'National champions' ? 10 : 0)) * 0.5 - (c.pr - 50) * 0.06))); });
     }
@@ -924,6 +924,16 @@
     });
   };
   DY.coachLine = name => { const c = DY.cs(name); return c; };
+  DY.coachBoard = () => {
+    const g = G(); if (!g.cst) DY.coachInit();
+    const uc = DY.cs(g.coach.name); if (uc.w < uc.cw && (g.hist || []).length) { uc.w = g.hist.reduce((a, h) => a + (h.w || 0), 0); uc.l = g.hist.reduce((a, h) => a + (h.l || 0), 0); }
+    const rows = []; g.teams.forEach(t => { if (t.dorm) return; const n = t.id === g.user ? g.coach.name : t.coach, c = DY.cs(n); rows.push(Object.assign({ n, t: t.name, tid: t.id }, c)); });
+    const pct = c => (c.w + c.l) ? c.w / (c.w + c.l) : 0;
+    const cats = [['w', 'Wins', c => c.w, v => v, 1], ['pct', 'Win % (3+ seasons)', pct, v => (v * 100).toFixed(1) + '%', 3], ['cw', 'Conference wins', c => c.cw, v => v, 1], ['ct', 'Conference titles', c => c.ct, v => v, 1], ['nt', 'National titles', c => c.nt, v => v, 1],
+      ['po', 'Playoff trips', c => c.po, v => v, 1], ['pw', 'Playoff wins', c => c.pw, v => v, 1], ['bw', 'Bowl wins', c => c.bw, v => v, 1], ['c5', 'Top-5 recruiting classes', c => c.c5, v => v, 1], ['c25', 'Top-25 recruiting classes', c => c.c25, v => v, 1],
+      ['aa', 'First-team All-Americans', c => c.aa, v => v, 1], ['heis', 'Heisman winners', c => c.heis, v => v, 1], ['pr', 'Coach prestige', c => c.pr, v => v, 1]];
+    return { rows, cats: cats.map(([k, label, f, fmt, min]) => ({ k, label, fmt, f, top: rows.filter(c => (c.yrs >= min || k === 'pr') && f(c) > 0).sort((a, b) => f(b) - f(a) || b.w - a.w).slice(0, 10) })) };
+  };
   DY.schoolBests = () => {
     const g = G(), rows = g.teams.filter(t => !t.dorm).map(t => { const h = t.hist || []; const sum = k => h.reduce((a, x) => a + (+x[k] || 0), 0), cnt = k => h.filter(x => x[k]).length;
       return { t, natl: cnt('natl'), heis: sum('heis'), aa: sum('aa'), c5: t.c5 || 0, c25: t.c25 || 0, pw: sum('pw'), wins: sum('w'), conf: cnt('conf'), cfp: cnt('cfp') }; });

@@ -549,6 +549,30 @@
     g.post.cur = ffGames; g.sched.push(...ffGames);
   }
   const PAIRS = [[1, 16], [8, 9], [5, 12], [4, 13], [6, 11], [3, 14], [7, 10], [2, 15]];
+
+  /* ---------- coach stats: every head coach's career book, updated each season ---------- */
+  SD.csNew = () => ({ w: 0, l: 0, cw: 0, cl: 0, yrs: 0, ct: 0, rs: 0, po: 0, pw: 0, ff: 0, nt: 0, ap: 0, t: '' });
+  SD.coachName = t => { const g = G(); return t.id === g.user ? g.coach.name : (typeof t.coach === 'string' ? t.coach : (t.coachName || t.name + ' staff')); };
+  SD.cs = name => { const g = G(); g.cst = g.cst || {}; return g.cst[name] || (g.cst[name] = SD.csNew()); };
+  SD.uniqCoaches = () => { const g = G(), seen = new Set([g.coach.name]); g.teams.forEach(t => { if (t.id === g.user || typeof t.coach !== 'string') return; let n = t.coach, k = 1; const base = n; while (seen.has(n)) n = base + ' ' + ['Jr.', 'II', 'III', 'IV', 'V', 'VI', 'VII'][k++ - 1 % 7] + (k > 8 ? k : ''); t.coach = n; seen.add(n); }); };
+  SD.coachStatsSeason = () => {
+    SD.uniqCoaches();
+    const g = G(), P = g.post || {}, pw = {}, ff = {}, inF = new Set(P.field || []);
+    (P.rounds || []).forEach(rd => (rd || []).forEach(x => { if (!x.res) return; const w = x.res.h > x.res.a ? x.h : x.a; pw[w] = (pw[w] || 0) + 1; if (/Final Four/.test(x.title || '')) { ff[x.h] = 1; ff[x.a] = 1; } }));
+    g.teams.forEach(t => { if (t.dorm) return; const name = SD.coachName(t), c = SD.cs(name); g.tcoach = g.tcoach || {}; if (!t.hist.length) return;
+      const st = SD.standings(t.conf), rs = st[0] && st[0].id === t.id, ctn = g.ct && g.ct[t.conf] && g.ct[t.conf].champ === t.id;
+      c.w += t.w; c.l += t.l; c.cw += t.cw; c.cl += t.cl; c.yrs++; c.t = t.name; if (rs) c.rs++; if (ctn) c.ct++; if (inF.has(t.id)) c.po++; c.pw += pw[t.id] || 0; if (ff[t.id]) c.ff++; if (P.champ === t.id) c.nt++;
+      if (t.ap && t.ap <= 25) c.ap++;
+      const e = t.hist[t.hist.length - 1]; if (e) e.coach = name; });
+  };
+  SD.coachBoard = () => {
+    SD.uniqCoaches(); const g = G(); g.cst = g.cst || {}; g.teams.forEach(t => { if (!t.dorm) { const c = SD.cs(SD.coachName(t)); c.t = t.name; } });
+    const rows = Object.entries(g.cst).map(([n, c]) => Object.assign({ n }, c)).filter(c => c.t);
+    const pct = c => (c.w + c.l) ? c.w / (c.w + c.l) : 0;
+    const cats = [['w', 'Wins', c => c.w, v => v, 1], ['pct', 'Win % (3+ seasons)', pct, v => (v * 100).toFixed(1) + '%', 3], ['cw', 'Conference wins', c => c.cw, v => v, 1], ['rs', 'Regular-season conference titles', c => c.rs, v => v, 1], ['ct', 'Conference tournament titles', c => c.ct, v => v, 1],
+      ['po', 'NCAA tournament trips', c => c.po, v => v, 1], ['pw', 'NCAA tournament wins', c => c.pw, v => v, 1], ['ff', 'Final Fours', c => c.ff, v => v, 1], ['nt', 'National titles', c => c.nt, v => v, 1], ['ap', 'Seasons ranked in the top 25', c => c.ap, v => v, 1]];
+    return { rows, cats: cats.map(([k, label, f, fmt, min]) => ({ k, label, fmt, f, top: rows.filter(c => c.yrs >= min && f(c) > 0).sort((a, b) => f(b) - f(a) || b.w - a.w).slice(0, 10) })) };
+  };
   SD.madnessNext = () => {
     const g = G(), P = g.post, sp = SD.SP(), days = sp.ncaa.days;
     if (P.cur && P.cur.some(x => !x.res)) return false;
@@ -696,6 +720,7 @@
     const entry = { y: g.season, w: ut.w, l: ut.l, cw: ut.cw, cl: ut.cl, ap: SD.apRank(ut.id), seed: P && P.seedOf ? P.seedOf[g.user] || null : null, finish, secReg: SD.standings(ut.conf)[0] && SD.standings(ut.conf)[0].id === g.user, secT: secC, champ: P && P.champ != null ? T(P.champ).name : null, poy: A.poy ? SD.P(A.poy).n : null };
     g.hist.push(entry);
     g.teams.forEach(t => t.hist.push({ y: g.season, w: t.w, l: t.l, ap: t.ap }));
+    try { SD.coachStatsSeason(); } catch (e) { }
     SD.news('season', `${SD.SP().label(g.season)} in the books: ${ut.w}-${ut.l}`, finish + '.');
     g.phase = 'offseason';
     if (SD.startOffseason) SD.startOffseason();

@@ -881,10 +881,18 @@
       <p class="small dim">A PFF-style grade built from every snap: did he win his block, beat his man, make the tackle, make the right throw. 60-65 is average, 80+ very good, 90+ elite.</p>
       <div class="dy-scroll"><table class="dyt"><thead><tr><th>Player</th><th>Pos</th><th>Snaps</th><th>Grade</th></tr></thead><tbody>${list.map(x => `<tr><td>${plink(x.p)}</td><td>${x.p.pos}</td><td>${x.s.sn}</td><td>${gchip(x.gr)}</td></tr>`).join('')}</tbody></table></div></div>`;
   }
+  function coachBoard() {
+    const g = G(), B = DY.coachBoard(), me = g.coach.name, mine = DY.cs(me);
+    const ranks = B.cats.map(c => { const all = B.rows.filter(r => (c.k === 'pct' ? r.yrs >= 3 : true)).sort((a, b) => c.f(b) - c.f(a)); return { l: c.label, i: all.findIndex(r => r.n === me) + 1 }; });
+    const head = `<div class="box"><div class="glabel">Coach ${esc(me)} · ${esc(DY.UN())}</div><div class="dy-stats4"><div><b>${mine.w}-${mine.l}</b><small>Career record</small></div><div><b>${mine.ct}</b><small>Conf. titles</small></div><div><b>${mine.po}</b><small>Playoff trips</small></div><div><b>${mine.nt}</b><small>National titles</small></div></div>
+      <p class="small dim">Coach prestige <b>${mine.pr}</b> · bowls ${mine.bw}-${mine.bl}${ranks.filter(r => r.i && r.i <= 25 && r.l !== 'Coach prestige').length ? ' · ' + ranks.filter(r => r.i && r.i <= 25 && r.l !== 'Coach prestige').map(r => `No. ${r.i} in ${r.l.toLowerCase()}`).join(' · ') : ''}</p></div>`;
+    return head + `<div class="dy-grid">${B.cats.map(c => `<div class="box"><div class="glabel">${c.label}</div><ol class="dy-poll">${c.top.map((r, i) => `<li class="${r.n === me ? 'me' : ''}"><span>${i + 1}</span>${esc(r.n)} <small>${esc(r.t)}</small><small>${c.fmt(c.f(r))}</small></li>`).join('') || '<li class="dim">After the first season.</li>'}</ol></div>`).join('')}</div>`;
+  }
   function stats(b) {
     const g = G(), ut = DY.userT();
     const yrNote = g.phase === 'offseason' ? ` · ${g.season} final` : '';
-    const tabs = `<div class="gchips dy-chips">${[['team', DY.UN()], ['sec', (DY.userT().conf === 'IND' ? 'Independent' : DY.userT().conf) + ' leaders'], ['nat', 'National leaders']].map(([k, l]) => `<button data-stab="${k}" aria-pressed="${V.stab === k}">${l}</button>`).join('')}</div>`;
+    const tabs = `<div class="gchips dy-chips">${[['team', DY.UN()], ['sec', (DY.userT().conf === 'IND' ? 'Independent' : DY.userT().conf) + ' leaders'], ['nat', 'National leaders'], ['coach', 'Coaches']].map(([k, l]) => `<button data-stab="${k}" aria-pressed="${V.stab === k}">${l}</button>`).join('')}</div>`;
+    if (V.stab === 'coach') { b.innerHTML = tabs + coachBoard(); return; }
     if (V.stab === 'team') {
       // season team totals from Tennessee's box scores
       const games = DY.teamGames(ut.id).filter(x => x.res && x.box && x.box.ts);
