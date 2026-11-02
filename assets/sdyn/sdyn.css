@@ -110,8 +110,8 @@ tr.st td:first-child { font-weight: 800; color: var(--orange-ink); }
 .dyg-boxside { min-width: 0; }
 #dyModalBody .dyg-boxsides, .dy-modal .dyg-boxsides { grid-template-columns: minmax(0, 1fr); }
 
-.sdg-pop { top: 22%; }
-.sdg-pop.big { font-size: clamp(26px, 6.4vw, 54px); padding: 8px 22px; border-radius: 12px; box-shadow: 0 0 0 3px currentColor, 0 8px 30px rgba(0,0,0,.5); animation-duration: 1.9s; }
+.sdg-pop { top: 12%; } .sdg-pop.small { font-size: clamp(13px, 2.2vw, 17px); }
+.sdg-pop.big { font-size: clamp(18px, 3.6vw, 30px); padding: 5px 16px; border-radius: 10px; box-shadow: 0 0 0 2px currentColor, 0 6px 20px rgba(0,0,0,.45); animation-duration: 1.6s; }
 .sdg-pop.three.on { text-shadow: 0 0 14px #7CF2A3; }
 .sdg-pop.dunk.on { text-shadow: 0 0 16px #FFD54A; color: #FFD54A; }
 .sdg-pop.bad.big { background: rgba(60,12,12,.92); }

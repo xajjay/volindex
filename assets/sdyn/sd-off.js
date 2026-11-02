@@ -12,6 +12,7 @@
   /* ---------- recruiting ---------- */
   SD.CLASS = { mbb: 4, wbb: 4, baseball: 13, softball: 8 };
   SD.HOURS = () => 40;
+  SD.MAXC = () => ({ mbb: 7, wbb: 7, baseball: 15, softball: 10 })[G().sport] || 7;   // the most commits a class can hold
   SD.ACTIONS = { dm: { name: 'Social media', hrs: 1, pts: 4 }, call: { name: 'Phone call', hrs: 3, pts: 12 }, coach: { name: 'Head coach visit', hrs: 7, pts: 30 } };
   const posPool = () => SD.kind() === 'hoops' ? ['PG', 'SG', 'SF', 'PF', 'C'] : G().sport === 'softball' ? ['C', '1B', '2B', 'SS', '3B', 'LF', 'CF', 'RF', 'SP', 'SP', 'RP'] : ['C', '1B', '2B', 'SS', '3B', 'LF', 'CF', 'RF', 'SP', 'SP', 'SP', 'RP', 'RP', 'RP'];
   SD.PROS_BASE = 66;   // freshman rating at a .80 composite (tuned so league talent holds steady season to season)
@@ -60,7 +61,7 @@
   SD.setVisit = (id, d) => { const g = G(), p = g.recruit.pool[id]; const x = SD.userGames().find(y => y.d === d && y.h === g.user && !y.res); if (!x) return 'Official visits are for home games.'; if (Object.values(g.recruit.pool).filter(q => q.visit === d).length >= 4) return 'Four visitors a game is the limit.'; p.visit = d; return null; };
   SD.recruitWeek = () => {
     const g = G(), R = g.recruit; if (!R || R.signed) return;
-    const ut = SD.userT(), mode = g.settings.recruiting, full = SD.myCommits().length >= SD.CLASS[g.sport] + 2;
+    const ut = SD.userT(), mode = g.settings.recruiting, full = SD.myCommits().length >= SD.MAXC();
     if (mode === 'auto') autoRecruit();
     const logs = [];
     if (mode !== 'off') R.board.forEach(id => {
@@ -70,7 +71,7 @@
       // an official visit this week
       if (p.visit && p.visit <= g.date && !p.visited) { const x = SD.userGames().find(y => y.d === p.visit); const won = x && x.res && ((x.h === ut.id) === (x.res.h > x.res.a)); pts += won ? 50 : 18; p.visited = true; logs.push(`${p.n} (${p.rec.stars}★ ${p.pos}) took an official visit${won ? ' and saw a win' : ''}.`); }
       pts = 70 * (1 - Math.exp(-pts / 70));
-      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + fitScore(ut, p) * 0.9) * (p.offer ? 1 : 0.5) * SD.recruitMult() * (mode === 'auto' ? 0.6 : 1);
+      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + fitScore(ut, p) * 0.9) * (p.offer ? 1 : 0.5) * SD.recruitMult() * 1;
     });
     Object.values(R.pool).forEach(p => {
       if (p.commit != null && p.commit !== ut.id && p.acts) p.acts = {};
@@ -104,16 +105,28 @@
     const g = G(), R = g.recruit, ut = SD.userT();
     // open spots next season: the limit minus players coming back (seniors leave), capped by the class size
     const back = ut.roster.map(SD.P).filter(p => p.el > 1).length;
-    const room = Math.min(SD.CLASS[g.sport] + 2, Math.max(1, SD.LIMIT[g.sport] - back + 1)) - SD.myCommits().length; if (room <= 0) return;
-    // chase who you can get: quality, fit, and how close you are to the leader
-    const winnable = p => { const mine = p.interest[ut.id] || 0, top = Math.max(0, ...Object.entries(p.interest).filter(([t]) => +t !== ut.id).map(([, v]) => v)); return Math.min(1, (mine + 12) / (top + 12)); };
-    const score = p => p.rec.c * 60 + winnable(p) * 45 + fitScore(ut, p) * 10;
-    const cand = Object.values(R.pool).filter(p => p.commit == null || (p.commit === ut.id)).filter(p => p.commit !== ut.id).sort((a, b) => score(b) - score(a)).slice(0, room * 3);
-    R.board = SD.myCommits().map(p => p.id).concat(cand.map(p => p.id)).slice(0, 20);
+    const room = Math.min(SD.MAXC(), Math.max(1, SD.LIMIT[g.sport] - back + 1)) - SD.myCommits().length; if (room <= 0) return;
+    // auto never takes anyone off your board: your own targets stay and are worked first; it only adds names to fill the board
+    const mine = p => (p.interest[ut.id] || 0), top = p => Math.max(0, ...Object.entries(p.interest).filter(([t]) => +t !== ut.id).map(([, v]) => v));
+    const winnable = p => Math.min(1.2, (mine(p) + 12) / (top(p) + 12));
+    const late = Math.min(1, Math.max(0, (SD.period().n - 2) / 3));
+    const score = p => p.rec.c * 60 * (1 - late * 0.5) + winnable(p) * (45 + late * 40) + fitScore(ut, p) * 10;
+    const active = () => R.board.map(id => R.pool[id]).filter(p => p && (p.commit == null)).length;
+    const want = Math.min(20, Math.max(8, room * 3 + SD.period().n * 2));
+    Object.values(R.pool).filter(p => p.commit == null && !R.board.includes(p.id)).sort((a, b) => score(b) - score(a)).slice(0, Math.max(0, Math.min(20 - R.board.length, want - active()))).forEach(p => R.board.push(p.id));
+    const cand = R.board.map(id => R.pool[id]).filter(p => p && p.commit == null);
     let hrs = SD.HOURS(), coach = 3;
-    cand.forEach(p => { if (!p.offer) p.offer = true; p.acts = {}; if (coach > 0 && hrs >= 7 && p.rec.stars >= 4) { p.acts.coach = 1; hrs -= 7; coach--; } else if (hrs >= 3) { p.acts.call = 1; hrs -= 3; } else if (hrs >= 1) { p.acts.dm = 1; hrs -= 1; } });
-    const home = SD.userGames().filter(x => x.h === ut.id && !x.res && x.d > g.date).slice(0, 2);
-    cand.slice(0, 4).forEach((p, i) => { if (!p.visit && home[i % Math.max(1, home.length)]) SD.setVisit(p.id, home[i % home.length].d); });
+    cand.forEach(p => { p.acts = {}; p.offer = true; });
+    cand.forEach(p => { if (hrs >= 1) { p.acts.dm = 1; hrs -= 1; } });
+    const leads = p => mine(p) >= top(p);
+    const ranked = cand.slice().sort((a, b) => ((leads(b) ? 2 : 0) + winnable(b) + b.rec.c * 0.4) - ((leads(a) ? 2 : 0) + winnable(a) + a.rec.c * 0.4));
+    ranked.forEach(p => { if (coach > 0 && hrs >= 6 && p.rec.stars >= 4 && winnable(p) >= 0.45) { delete p.acts.dm; p.acts.coach = 1; hrs -= 6; coach--; } });
+    ranked.forEach(p => { if (!p.acts.coach && hrs >= 2 && winnable(p) >= 0.35) { delete p.acts.dm; p.acts.call = 1; hrs -= 2; } });
+    for (let pass = 0; pass < 4 && hrs > 3; pass++) ranked.forEach(p => { if (hrs <= 3) return; if (!p.acts.call && hrs >= SD.ACTIONS.call.hrs) { p.acts.call = 1; hrs -= SD.ACTIONS.call.hrs; } else if (!p.acts.dm && hrs >= 1) { p.acts.dm = 1; hrs -= 1; } else if (!p.acts.coach && coach > 0 && hrs >= SD.ACTIONS.coach.hrs) { p.acts.coach = 1; hrs -= SD.ACTIONS.coach.hrs; coach--; } });
+    const home = SD.userGames().filter(x => x.h === ut.id && !x.neutral && !x.res && x.d > g.date);
+    if (home.length) ranked.filter(p => !p.visit && (p.rec.stars >= 4 || leads(p))).slice(0, 8).forEach((p, i) => { SD.setVisit(p.id, home[i % home.length].d); });
+    // the final period: settle the class with the best prospects still open that this board has been working
+    if (SD.period().n >= 5 && room > 0) ranked.filter(p => p.commit == null).sort((a, b) => (mine(b) + b.rec.c * 40) - (mine(a) + a.rec.c * 40)).slice(0, room).forEach(p => { p.commit = ut.id; p.cwk = 99; p.cper = 5; });
   }
   function rankClasses() {
     const g = G(), R = g.recruit, pts = {}, cs = {};
@@ -364,7 +377,7 @@
   function signingDay() {
     const g = G(), R = g.recruit, lim = SD.LIMIT[g.sport], ut = SD.userT();
     // open spots: what a program can add before the roster limit (CPU teams keep one spot for the portal)
-    const room = {}; g.teams.forEach(t => { room[t.id] = t.id === g.user ? SD.CLASS[g.sport] + 2 : Math.max(0, lim - t.roster.length - (SD.kind() === 'hoops' ? 0 : 1)); });
+    const room = {}; g.teams.forEach(t => { room[t.id] = t.id === g.user ? SD.MAXC() : Math.max(0, lim - t.roster.length - (SD.kind() === 'hoops' ? 0 : 1)); });
     const sign = (p, t) => {
       delete p.pros; delete p.interest; delete p.acts; p.t = t.id; p.yr = 1; p.el = SD.kind() === 'hoops' ? 5 : 4; p.car = {}; p.firstY = g.season + 1; p.nil = SD.nilValue(p, t) * 0.6 | 0;
       t.roster.push(p.id); g.P[p.id] = p; room[t.id]--;

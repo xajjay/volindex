@@ -26,7 +26,7 @@
   SD.newDynasty = o => {
     const sp = SD.SPORTS[o.sport];
     SD.seed(o.seed || (Date.now() % 2147483647));
-    const g = SD.G = { v: SD.VERSION, sport: o.sport, startTeam: o.team || 'Tennessee', season: o.hx || sp.season, hx: o.hx || null, coach: { name: o.coach || 'Coach', w: 0, l: 0 }, settings: Object.assign({ coachMode: 'coach', speed: 'slow', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, sound: false, autoPen: true }, o.settings || {}),
+    const g = SD.G = { v: SD.VERSION, sport: o.sport, startTeam: o.team || 'Tennessee', season: o.hx || sp.season, s0: o.hx || sp.season, hx: o.hx || null, coach: { name: o.coach || 'Coach', w: 0, l: 0 }, settings: Object.assign({ coachMode: 'coach', speed: 'slow', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, sound: false, autoPen: true }, o.settings || {}),
       teams: SD.teamsFor(o.sport), P: {}, nextId: 1, guests: {}, sched: [], phase: 'preseason', polls: { ap: [], hist: {} }, news: [], hist: [], awards: {}, recruit: null, off: null, slot: o.slot || 1, created: Date.now(), seed: SD.rstate(), rec: { season: {}, career: {} } };
     g.user = (g.teams.find(t => t.name === (o.team || 'Tennessee')) || g.teams.find(t => t.name === 'Tennessee')).id;
     g.teams.forEach(t => { t.w = 0; t.l = 0; t.cw = 0; t.cl = 0; t.pf = 0; t.pa = 0; t.hist = []; t.roster = (g.hx && SD.histRoster && SD.histRoster(t, g)) || (g.hx ? SD.genRoster(t) : t.name === 'Tennessee' ? SD.importTennessee(t) : SD.genRoster(t)); t.budget = SD.budgetFor(t); t.coach = t.id === g.user ? g.coach.name : SD.nameOf().split(' ')[1] + ' ' + pick(SD.LAST); });
@@ -707,7 +707,34 @@
   SD.natBook = () => { const g = G(); if (!g.natRec) { const src = SD.NATREC[g.sport === 'wbb' ? 'wbb' : 'mbb'], o = {}; for (const sc in src) { o[sc] = {}; for (const k in src[sc]) { const r = src[sc][k]; o[sc][k] = { v: r[0], n: r[1], t: r[2], y: r[3] }; } } g.natRec = o; g.natBroken = []; } return g.natRec; };
   SD.natTry = (scope, k, v, p, y) => { const B = SD.natBook(), r = B[scope][k]; if (!r || v <= r.v) return; const old = r.v, was = r.n; B[scope][k] = { v, n: p.n, t: T(p.t != null ? p.t : p.t0) ? T(p.t != null ? p.t : p.t0).name : '', y, brk: true };
     G().natBroken.unshift({ scope, k, v, old, was, n: p.n, y }); G().natBroken = G().natBroken.slice(0, 40); SD.news('record', `${p.n} breaks the national ${scope} record for ${SD.NATLAB[k].toLowerCase()}`, `${v} (previous: ${old} by ${was}).`); };
-  SD.natGame = (p, l) => { if (SD.kind() !== 'hoops') return; const B = SD.natBook(), y = G().season; ['pts', 'tpm', 'stl', 'blk', 'ast'].forEach(k => { if (l[k] >= B.game[k].v * 0.6) SD.natTry('game', k, l[k], p, y); }); SD.natTry('game', 'reb', (l.orb || 0) + (l.drb || 0), p, y); };
+  // the school's own record book (the user's team): single-game marks are tracked here, season and career marks are read from the stat lines
+  SD.s0 = () => { const g = G(); return g.s0 || (g.hist && g.hist[0] && g.hist[0].y) || g.season; };
+  SD.SREC_KEYS = ['pts', 'reb', 'ast', 'stl', 'blk', 'tpm'];
+  SD.schoolGame = (p, l) => { const g = G(); if (p.t !== g.user) return; g.srec = g.srec || { game: {} }; const y = g.season;
+    SD.SREC_KEYS.forEach(k => { const v = k === 'reb' ? (l.orb || 0) + (l.drb || 0) : (l[k] || 0), r = g.srec.game[k]; if (v > 0 && (!r || v > r.v)) g.srec.game[k] = { v, n: p.n, pid: p.id, y, prev: r && r.pid !== p.id ? r.n : null }; }); };
+  SD.schoolRecs = () => { const g = G(), ut = SD.userT(), out = { game: (g.srec && g.srec.game) || {}, season: {}, career: {} };
+    Object.values(g.P).forEach(p => { if (!p) return; const car = p.car || {}; const tot = {};
+      const add = (y, x) => { if (!x || !(x.gp > 0)) return; const o = { pts: x.pts || 0, reb: x.reb != null ? x.reb : (x.orb || 0) + (x.drb || 0), ast: x.ast || 0, stl: x.stl || 0, blk: x.blk || 0, tpm: x.tpm || 0 };
+        SD.SREC_KEYS.forEach(k => { tot[k] = (tot[k] || 0) + o[k]; if (o[k] > 0 && (!out.season[k] || o[k] > out.season[k].v)) out.season[k] = { v: o[k], n: p.n, pid: p.id, y }; }); };
+      for (const y in car) if (car[y] && (car[y].t === ut.abbr || (car[y].t === 'TENN' && ut.name === 'Tennessee'))) add(y, car[y]);
+      if (p.s && p.t === g.user) add(g.season, p.s);
+      SD.SREC_KEYS.forEach(k => { if (tot[k] > 0 && (!out.career[k] || tot[k] > out.career[k].v)) out.career[k] = { v: tot[k], n: p.n, pid: p.id, y: '' }; }); });
+    return out; };
+  // the players this coach has coached at the school, best first (optionally one position group)
+  SD.coachLegacy = (n, set) => { const g = G(), ut = SD.userT(), rows = [];
+    Object.values(g.P).forEach(p => { if (!p || (set && !set.includes(p.pos))) return; const ys = [];
+      for (const y in (p.car || {})) { const x = p.car[y]; if (x && x.gp > 0 && (x.t === ut.abbr || (x.t === 'TENN' && ut.name === 'Tennessee')) && (+y >= SD.s0())) ys.push(x); }
+      if (p.s && p.t === g.user && p.s.gp > 0) ys.push(p.s); if (!ys.length) return;
+      const s = ys.reduce((a, x) => { a.gp += x.gp || 0; a.pts += x.pts || 0; a.reb += x.reb != null ? x.reb : (x.orb || 0) + (x.drb || 0); a.ast += x.ast || 0; a.stl += x.stl || 0; a.blk += x.blk || 0; return a; }, { gp: 0, pts: 0, reb: 0, ast: 0, stl: 0, blk: 0 });
+      const aw = (p.aw || []).filter(x => x.y >= SD.s0());
+      const sc = s.pts * 0.1 + s.reb * 0.12 + s.ast * 0.2 + s.stl * 0.25 + s.blk * 0.25 + aw.reduce((a, x) => a + ({ POY: 120, AA1: 50, SECPOY: 30, SEC1: 15, SECFR: 12 }[x.a] || 5), 0) + (p.draft ? Math.max(0, 40 - (p.draft.pk || 40)) : 0);
+      rows.push({ p, sc: Math.round(sc), s, yrs: ys.length, aw }); });
+    return rows.sort((a, b) => b.sc - a.sc).slice(0, n || 10); };
+  SD.schoolBests = () => { const g = G(), rows = g.teams.filter(t => !t.dorm).map(t => { const h = t.hist || [], sum = k => h.reduce((a, x) => a + (+x[k] || 0), 0);
+      return { t, natl: sum('natl'), ff: sum('ff'), ncaa: sum('ncaa'), ct: sum('ct'), rs: sum('rs'), wins: sum('w'), top25: h.filter(x => x.ap && x.ap <= 25).length }; });
+    const cats = [['natl', 'National championships'], ['ff', 'Final Fours'], ['ncaa', 'NCAA Tournament trips'], ['ct', 'Conference tournament titles'], ['rs', 'Regular-season conference titles'], ['top25', 'Top-25 finishes'], ['wins', 'Wins']];
+    return cats.map(([k, label]) => ({ k, label, top: rows.filter(r => r[k] > 0).sort((a, b) => b[k] - a[k] || b.wins - a.wins).slice(0, 5).map(r => ({ t: r.t.id, v: r[k] })) })); };
+  SD.natGame = (p, l) => { if (SD.kind() !== 'hoops') return; try { SD.schoolGame(p, l); } catch (e) { } const B = SD.natBook(), y = G().season; ['pts', 'tpm', 'stl', 'blk', 'ast'].forEach(k => { if (l[k] >= B.game[k].v * 0.6) SD.natTry('game', k, l[k], p, y); }); SD.natTry('game', 'reb', (l.orb || 0) + (l.drb || 0), p, y); };
   SD.natSeason = () => { if (SD.kind() !== 'hoops') return; const g = G(), y = g.season;
     g.teams.forEach(t => t.roster.forEach(id => { const p = SD.P(id), s = p && p.s; if (!s || !s.gp) return; const tot = { pts: s.pts, reb: (s.orb || 0) + (s.drb || 0), ast: s.ast, stl: s.stl, blk: s.blk, tpm: s.tpm };
       const car = Object.values(p.car || {}).concat([s]); const c = { pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, tpm: 0 }; car.forEach(x => { c.pts += x.pts || 0; c.reb += (x.orb || 0) + (x.drb || 0); c.ast += x.ast || 0; c.stl += x.stl || 0; c.blk += x.blk || 0; c.tpm += x.tpm || 0; });
@@ -743,7 +770,9 @@
     const secC = g.ct && g.ct[ut.conf] && g.ct[ut.conf].champ === g.user;
     const entry = { y: g.season, w: ut.w, l: ut.l, cw: ut.cw, cl: ut.cl, ap: SD.apRank(ut.id), seed: P && P.seedOf ? P.seedOf[g.user] || null : null, finish, secReg: SD.standings(ut.conf)[0] && SD.standings(ut.conf)[0].id === g.user, secT: secC, champ: P && P.champ != null ? T(P.champ).name : null, poy: A.poy ? SD.P(A.poy).n : null };
     g.hist.push(entry);
-    g.teams.forEach(t => t.hist.push({ y: g.season, w: t.w, l: t.l, ap: t.ap }));
+    { const inF = new Set((P && P.field) || []), ffs = new Set(); ((P && P.rounds) || []).forEach(rd => (rd || []).forEach(x => { if (x.res && /Final Four/.test(x.title || '')) { ffs.add(x.h); ffs.add(x.a); } }));
+      g.teams.forEach(t => { const st = t.dorm ? [] : SD.standings(t.conf), ctn = g.ct && g.ct[t.conf] && g.ct[t.conf].champ === t.id;
+        t.hist.push({ y: g.season, w: t.w, l: t.l, ap: t.ap, natl: P && P.champ === t.id ? 1 : 0, ff: ffs.has(t.id) ? 1 : 0, ncaa: inF.has(t.id) ? 1 : 0, ct: ctn ? 1 : 0, rs: st[0] && st[0].id === t.id ? 1 : 0, cw: t.cw, cl: t.cl }); }); }
     try { SD.coachStatsSeason(); } catch (e) { }
     SD.news('season', `${SD.SP().label(g.season)} in the books: ${ut.w}-${ut.l}`, finish + '.');
     g.phase = 'offseason';

@@ -177,8 +177,8 @@
       const sdx = clamp(dxOf(B.p), 8, 80), front = !base && sdx < 47, side = B.p[1] < 25 ? -1.4 : 51.4;
       const spot = base ? P(89.6, 25 + clamp(B.p[1] - 25, -5, 5)) : [F.bx + sg * sdx, side];
       B.hold = null; B.fl = null;
-      if (base) { go(inb, B.p.slice(), 15); run(1.6, () => dist(A[inb].p, B.p) < 1.6); }
-      else { B.p = spot.slice(); go(inb, spot, 16); run(1.6, () => dist(A[inb].p, spot) < 1.2); }
+      if (base) { B.p = spot.slice(); A[inb].p = spot.slice(); A[inb].v = [0, 0]; }                // the ball is taken out of the net and he is already there
+      else { B.p = spot.slice(); A[inb].p = spot.slice(); A[inb].v = [0, 0]; }                  // a dead ball: the ball is placed, the inbounder is already holding it (no ball lying on the sideline)
       B.hold = inb; B.dr = false; go(inb, spot, 9); H = inb;
       const recv = inb === handler ? O[1] : handler;
       // the guard comes to the ball (a V-cut: a step away, then back to it)
@@ -497,14 +497,23 @@
   };
 
   /* ---------- drawing ---------- */
-  const COL = { floor: '#0d1520', floor2: '#101a27', line: 'rgba(214,226,240,.22)', line2: 'rgba(214,226,240,.12)', text: 'rgba(214,226,240,.35)' };
+  const DARKC = { dark: 1, floor: '#0d1520', floor2: '#101a27', line: 'rgba(214,226,240,.22)', line2: 'rgba(214,226,240,.12)', text: 'rgba(214,226,240,.35)', lab: 'rgba(214,226,240,.55)', hold: 'rgba(255,255,255,.96)', alpha: 0.16 };
+  const WOODC = { dark: 0, floor: '#a8763c', floor2: '#d4a468', line: 'rgba(255,255,255,.9)', line2: 'rgba(255,255,255,.5)', text: 'rgba(60,35,10,.22)', lab: 'rgba(45,25,5,.8)', hold: '#2a1500', alpha: 0.32 };
+  const pal = () => (document.documentElement.dataset.theme === 'dark' ? DARKC : WOODC);
   SDC.court = (c, W, H, GM) => {
+    const COL = pal();
     const k = Math.min(W / 94, H / 50), ox = (W - 94 * k) / 2, oy = (H - 50 * k) / 2;
     const X = x => ox + x * k, Y = y => oy + y * k;
     c.fillStyle = COL.floor; c.fillRect(0, 0, W, H);
     c.fillStyle = COL.floor2; c.fillRect(X(0), Y(0), 94 * k, 50 * k);
+    if (!COL.dark) { // hardwood planks
+      c.save(); c.beginPath(); c.rect(X(0), Y(0), 94 * k, 50 * k); c.clip();
+      const pw = 2 * k; let i = 0;
+      for (let y = 0; y < 50 * k; y += pw, i++) { c.fillStyle = i % 2 ? 'rgba(120,70,20,.07)' : 'rgba(255,230,170,.07)'; c.fillRect(X(0), Y(0) + y, 94 * k, pw); c.fillStyle = 'rgba(90,50,10,.12)'; c.fillRect(X(0), Y(0) + y, 94 * k, 1); }
+      c.restore();
+    }
     const home = GM.T.h.c1 || '#FF8200';
-    c.save(); c.globalAlpha = 0.16; c.fillStyle = home; c.fillRect(X(0), Y(19), 19 * k, 12 * k); c.fillRect(X(75), Y(19), 19 * k, 12 * k); c.restore();
+    c.save(); c.globalAlpha = COL.alpha; c.fillStyle = home; c.fillRect(X(0), Y(19), 19 * k, 12 * k); c.fillRect(X(75), Y(19), 19 * k, 12 * k); c.restore();
     c.strokeStyle = COL.line; c.lineWidth = Math.max(1, k * 0.15);
     c.strokeRect(X(0), Y(0), 94 * k, 50 * k);
     c.beginPath(); c.moveTo(X(47), Y(0)); c.lineTo(X(47), Y(50)); c.stroke();
@@ -518,7 +527,7 @@
       c.arc(X(bx), Y(25), r3 * k, Math.atan2(yc - 25, dir * dx), Math.atan2(25 - yc, dir * dx), !!side); c.lineTo(X(side ? 94 : 0), Y(50 - yc)); c.stroke();
       c.strokeStyle = COL.line2; c.beginPath(); c.arc(X(bx), Y(25), 4 * k, side ? Math.PI / 2 : -Math.PI / 2, side ? Math.PI * 1.5 : Math.PI / 2); c.stroke(); c.strokeStyle = COL.line;
       c.beginPath(); c.moveTo(X(side ? 90 : 4), Y(22)); c.lineTo(X(side ? 90 : 4), Y(28)); c.stroke();
-      c.strokeStyle = '#ff7a1a'; c.beginPath(); c.arc(X(bx), Y(25), 0.75 * k, 0, Math.PI * 2); c.stroke(); c.strokeStyle = COL.line;
+      c.strokeStyle = '#ff5a00'; c.beginPath(); c.arc(X(bx), Y(25), 0.75 * k, 0, Math.PI * 2); c.stroke(); c.strokeStyle = COL.line;
     }
     c.fillStyle = COL.text; c.font = `800 ${Math.max(10, k * 3)}px "Barlow Condensed", "Arial Narrow", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
     if (!GM.neutral) c.fillText(GM.T.h.abbr || '', X(47), Y(25));
@@ -538,7 +547,7 @@
       c.beginPath(); c.arc(X(p[0]), Y(p[1]), r, 0, Math.PI * 2); c.fillStyle = fill; c.fill();
       c.lineWidth = hold ? 2.5 : 1.2; c.strokeStyle = hold ? '#ffffff' : 'rgba(0,0,0,.55)'; c.stroke();
       c.fillStyle = ink(fill); c.font = `700 ${Math.max(8, r * 0.95)}px "IBM Plex Mono", ui-monospace, monospace`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(String(pl.num ?? ''), X(p[0]), Y(p[1]) + 0.5);
-      if (r >= 7) { c.font = `${hold ? 700 : 500} ${Math.max(8, r * (hold ? 0.85 : 0.72))}px "IBM Plex Sans", system-ui, sans-serif`; c.fillStyle = hold ? 'rgba(255,255,255,.96)' : 'rgba(214,226,240,.55)'; c.fillText(SD.H.last(pl), X(p[0]), Y(p[1]) + r + Math.max(7, r * 0.8)); }
+      if (r >= 7) { c.font = `${hold ? 700 : 500} ${Math.max(8, r * (hold ? 0.85 : 0.72))}px "IBM Plex Sans", system-ui, sans-serif`; c.fillStyle = hold ? pal().hold : pal().lab; c.fillText(SD.H.last(pl), X(p[0]), Y(p[1]) + r + Math.max(7, r * 0.8)); }
     };
     for (const id in st.pos) if (st.side[id] !== st.s) dot(+id, st.pos[id], st.side[id], false);
     for (const id in st.pos) if (st.side[id] === st.s) dot(+id, st.pos[id], st.side[id], +id === st.hold);
