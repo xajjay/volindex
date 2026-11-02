@@ -87,10 +87,18 @@
   // sacks belong to the front: when a corner, nickel or safety is the one who gets to the quarterback (a blitz), the pocket was
   // still collapsed by the rush, so most of the credit goes to the lineman or linebacker who forced it (real corners have 0-3 a year)
   DY.fixSack = (GM, sk) => {
-    if (!sk || (sk.pos !== 'CB' && sk.pos !== 'S') || !chance(0.82)) return sk;
+    if (!sk) return sk;
     const side = GM.T.h.id === sk.t ? 'h' : GM.T.a.id === sk.t ? 'a' : null; if (!side) return sk;
-    const P = pers(GM, side), pool = [...(P.DL || []), ...(P.LB || [])].filter(Boolean);
-    return pool.length ? wpick(pool, p => Math.pow(Math.max(20, (p.at.fmv || 60) + (p.at.pmv || 60) - 80), 2)) : sk;
+    const P = pers(GM, side);
+    const dbOf = () => { const pool = [P.NB, ...(P.S || []), ...(P.CB || [])].filter(Boolean); return pool.length ? wpick(pool, p => Math.pow(Math.max(20, (p.at.spd || 60) * 0.5 + (p.at.pmv || 55) * 0.5 - 30), 2) * (p === P.NB ? 1.6 : 1)) : sk; };
+    if (sk.pos === 'CB' || sk.pos === 'S') {
+      // a defensive back who reaches the quarterback was usually helped by a collapsed pocket: most credit goes to the front, but a blitzer can still get home
+      if (!chance(0.7)) return sk;
+      const pool = [...(P.DL || []), ...(P.LB || [])].filter(Boolean);
+      return pool.length ? wpick(pool, p => Math.pow(Math.max(20, (p.at.fmv || 60) + (p.at.pmv || 60) - 80), 2)) : sk;
+    }
+    // a few sacks a year come off the secondary (nickel and safety blitzes, the odd corner), spread across the backs
+    return chance(0.085) ? dbOf() : sk;
   };
   const snap1 = (GM, p) => { if (!p) return; GM.snap[p.id] = 1; add(GM, p, 'sn'); };
   const markSnapF = (GM, P, F) => { [P.QB, ...P.OL].forEach(p => snap1(GM, p)); const wr = F ? F.wr : 3, te = F ? F.te : 1, rb = F ? F.rb : 1;
@@ -681,7 +689,7 @@
       y = 2.9 + win * 2.0 + (E(GM, car, 'spd', s) - 76) / 16;
     } else {
       win = (olv - dlv) / 17 + (olv - lbv) / 34 - box * 0.32 + gauss() * 1.12;
-      y = 4.75 + win * 1.1 + (E(GM, car, 'bcv', s) - 76) / 34 + (E(GM, car, 'btk', s) - 76) / 50;   // a great back adds yards but does not break the sim
+      y = 4.9 + win * 1.1 + (E(GM, car, 'bcv', s) - 76) / 34 + (E(GM, car, 'btk', s) - 76) / 50;   // a great back adds yards but does not break the sim
     }
     y += clamp((GM.score[other(s)] - GM.score[s] - 10) / 28, 0, 0.9);
     if (car && t !== 'qb') y -= clamp((((GM.ps[car.id] || {}).ra || 0) - 16) * 0.06, 0, 1.4);      // a back who has carried 25+ times is not as fresh as at the start
@@ -759,7 +767,10 @@
     let need = { quick: 1.5, med: 2.5, deep: 3.15, screen: 1.0, pa: 2.95 }[t];
     if (t === 'pa' && def.box > 0.5) need -= 0.35;
     const margin = time - need;
-    const winner = () => weighted(rushers.slice(0, 3).map(x => x.p), p => Math.pow(rushers.find(r => r.p === p).v, 1.2));
+    // who gets home: edge rushers most, tackles less, linebackers on a blitz (and now and then when they just beat a back)
+    const sackPool = D.DL.slice(0, 4).map((p, i) => ({ p, w: Math.pow(rushers.find(r => r.p === p).v, 1.2) * (i === 0 || i === 3 ? 1 : 0.55) }))
+      .concat([D.LB[0], D.LB[1]].filter(Boolean).map((p, i) => ({ p, w: Math.pow(Math.max(30, (E(GM, p, 'pmv', ds) || 60) * 0.5 + (E(GM, p, 'spd', ds) || 60) * 0.5), 1.2) * (def.blitz ? (i ? 0.7 : 1.0) : (i ? 0.22 : 0.3)) })));
+    const winner = () => weighted(sackPool.map(x => x.p), p => sackPool.find(r => r.p === p).w);
     // screens
     if (t === 'screen') {
       const tgt = chance(0.45) ? O.RB : chance(0.5) ? O.WR[2] : O.WR[0];
@@ -810,16 +821,16 @@
       return { kind: 'inc', t, passer: qb, target: tgt, yards: 0, events: ev, text0: `${last(qb)} pass to ${last(tgt)} incomplete`, time: 4, anim: { kind: 'pass', t, inc: true, role: rt.role }, inc: true, bust: true };
     }
     const acc = rt.depth === 'd' ? E(GM, qb, 'dac', s) : rt.depth === 'm' ? E(GM, qb, 'mac', s) : E(GM, qb, 'sac', s);
-    const base = { s: 0.79, m: 0.67, d: 0.46 }[rt.depth] + (t === 'pa' ? 0.03 : 0);
+    const base = { s: 0.805, m: 0.69, d: 0.475 }[rt.depth] + (t === 'pa' ? 0.03 : 0);
     let pc = base + (rt.sep - 1) * 0.05 + (acc - 82) * 0.0045 + (E(GM, tgt, 'cth', s) - 80) * 0.002 - (hurried ? 0.11 : 0);
     if (rt.depth === 'd') pc += (E(GM, qb, 'thp', s) - 82) * 0.002;
     if (hurried && qb.tr.tup < 45) { pc -= 0.05; }
-    pc += clamp((GM.score[ds] - GM.score[s] - 10) / 260, 0, 0.07);      // a team being run out of the building finds some completions (defenses ease up, drives get a few breaks)
+    pc += clamp((GM.score[ds] - GM.score[s] - 8) / 190, 0, 0.1);      // a team being run out of the building finds some completions (defenses ease up, drives get a few breaks)
     pc = clamp(pc, 0.07, 0.93);
     const air = rt.depth === 'd' ? Math.round(rr(18, 42)) : rt.depth === 'm' ? Math.round(rr(8, 17)) : Math.round(rr(1, 7));
     const toGoal = 100 - GM.ball;
     if (chance(pc)) {
-      let yac = rt.depth === 'd' ? (rt.sep > 1.6 ? rr(3, 30) : rr(0, 7)) : rt.depth === 'm' ? rr(0, 6) + gauss() * 2 : rr(1, 7) + gauss() * 2;
+      let yac = rt.depth === 'd' ? (rt.sep > 1.6 ? rr(3, 30) : rr(0, 7)) : rt.depth === 'm' ? rr(0.5, 7) + gauss() * 2 : rr(1.5, 8.5) + gauss() * 2;
       yac += ((E(GM, tgt, 'elu', s) || 60) + E(GM, tgt, 'spd', s) - 160) / 24;
       const tk = tacklerFor(D, air + yac, rt.depth === 's' ? 'short' : 'deep');
       if (chance(clamp(0.1 + ((E(GM, tgt, 'btk', s) || tgt.at.str || 60) - E(GM, tk, 'tak', ds)) / 130, 0.03, 0.25))) { yac += rr(3, 12); ev.push(`${last(tgt)} shakes off ${last(tk)}.`); }
@@ -912,7 +923,7 @@
     T.plays++;
     if (c.startDown === 3 && (r.kind === 'run' || r.kind === 'pass' || r.kind === 'inc' || r.kind === 'sack' || r.kind === 'int' || r.kind === 'dpi')) T.a3++;
     if (c.startDown === 4 && (r.kind === 'run' || r.kind === 'pass' || r.kind === 'inc' || r.kind === 'sack' || r.kind === 'int' || r.kind === 'dpi')) T.a4++;
-    const tm = Math.min(GM.q <= 4 ? GM.clock : 0, r.time || 5);
+    const tm = Math.min(GM.q <= 4 ? GM.clock : 0, Math.max(2, Math.round((r.time || 5) * 0.92)));
     if (GM.q <= 4) { GM.clock = Math.max(0, GM.clock - tm); T.top += tm; }
 
     if (r.kind === 'punt' || r.kind === 'puntblk') {

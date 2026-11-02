@@ -602,6 +602,8 @@
     if (S.length < 24) return;
     g.post.g6 = { seeds: S, rounds: [], cur: [], champ: null };
     DY.buildG6();
+    // unless the user's own team is in the field, the whole G6 bracket plays out in the background, no waiting on it
+    if (!S.includes(g.user)) { let n = 0; while (g.post.g6.champ == null && n++ < 8) DY.advanceG6(true); }
   };
   // one round at a time, alongside the CFP, so the user's G6 games are played like any other playoff game
   DY.buildG6 = () => {

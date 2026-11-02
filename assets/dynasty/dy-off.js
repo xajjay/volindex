@@ -218,7 +218,9 @@
       const atPos = DY.myCommits().filter(x => x.pos === p.pos && x !== p).length, room = Math.max(2, Math.round((DY.STARTERS[p.pos] || 1) * 1.5));
       const crowd = atPos >= room ? (p.pref.top.includes('pt') ? 0.65 : 0.88) : 1;
       pts = 140 * (1 - Math.exp(-pts / 140));
-      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + DY.fitScore(ut, p)) * (p.offer ? 1 : 0.55) * crowd * DY.pull(ut, p);
+      // auto recruiting is a decent assistant, not a great recruiter: it lands a class near where the program's standing says it should
+      const eff = mode === 'auto' ? DY.AUTO_EFF : 1;
+      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * eff * (0.45 + DY.fitScore(ut, p)) * (p.offer ? 1 : 0.55) * crowd * DY.pull(ut, p);
     });
     // everyone else
     cpuState(R);
@@ -303,6 +305,7 @@
      build a whole class: talent, then the positions the roster is actually short at (never a pile of quarterbacks or corners), then who
      is interested and likely to say yes. In a Tennessee dynasty the real Tennessee commits are on the board from day one. */
   DY.AUTO_TARGETS = 20;
+  DY.AUTO_EFF = 0.6;
   DY.autoRecruit = () => {
     const g = G(), R = g.recruit, ut = DY.userT();
     if (R.locked) return;
@@ -1008,7 +1011,7 @@
         const h = t.hist[t.hist.length - 1], base = DY.TEAMS[t.id].prestige;
         // results move a program (a few good years build a contender, a few bad ones sink a power) and every offseason brings a bit of
         // coaching and recruiting luck; a hire after a losing run gives a real bump. Pulled gently back toward where the program started.
-        let d = (h.w - 8) * 0.42 + (h.ap && h.ap <= 10 ? 0.7 : 0) + (h.champ ? 1.2 : 0) - (t.prestige - base) * 0.1 + gauss() * 1.1;
+        let d = (h.w - 8) * 0.42 + (h.ap && h.ap <= 10 ? 0.7 : 0) + (h.champ ? 1.2 : 0) - (t.prestige - base) * 0.2 + gauss() * 1.1;
         if (h.w <= 5 && chance(0.45)) { d += rr(1.5, 5); t.coach = DY.coachName(); t.newCoach = g.season + 1; }
         t.prestige = clamp(t.prestige + d, 25, 97); t.budget = DY.teamBudget(t);
       }
@@ -1019,7 +1022,8 @@
     });
     // Tennessee's program prestige follows the coach
     const ut = DY.userT(), h = g.hist[g.hist.length - 1];
-    if (h) ut.prestige = clamp(ut.prestige + (h.w - 8) * 0.4 + (h.finish === 'National champions' ? 3 : h.cfpSeed ? 1 : 0), 60, 97);
+    // the user's program climbs with wins and titles, and is pulled back toward its starting standing so a few good years don't make it a juggernaut
+    if (h) ut.prestige = clamp(ut.prestige + (h.w - 8) * 0.34 + (h.finish === 'National champions' ? 2.4 : h.cfpSeed ? 0.8 : 0) - (ut.prestige - DY.TEAMS[ut.id].prestige) * 0.09, 55, 97);
     trimPlayers();
     g.post = null; g.off = null; g.polls.cfp = null; g.phase = 'preseason'; g.week = 0;
     g.teams.forEach(t => DY.pickCaptains(t));
