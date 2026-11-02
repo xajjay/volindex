@@ -168,7 +168,7 @@
     else if (play === 'pnr') { const roll = chance(0.35); shooter = roll ? pickBy(O.filter(p => p !== handler), p => p.pos === 'C' || p.pos === 'PF' ? 3 : 0.4) : handler; passer = roll ? handler : null; type = roll ? (chance(0.75) ? 'rim' : 'mid') : SD.wpick(['rim', 'mid', '3'], t => ({ rim: 30, mid: 30, '3': 40 })[t] * (t === '3' ? handler.at.thr / 75 : 1)); }
     else if (play === 'drive') { shooter = pickBy(O, p => usage(p) * (p.at.ath + p.at.hnd) / 140); type = chance(0.68) ? 'rim' : chance(0.6) ? 'mid' : '3'; if (type === '3') { passer = shooter; shooter = pickBy(O.filter(p => p !== passer), p => Math.pow(p.at.thr, 3) * om(p)); } }
     else if (play === 'post') { shooter = pickBy(O, p => (p.pos === 'C' || p.pos === 'PF' ? 4 : 0.5) * p.at.ins * om(p)); passer = handler !== shooter ? handler : null; type = chance(0.68) ? 'rim' : 'mid'; }
-    else if (play === 'spot' || play === 'three') { passer = handler; shooter = pickBy(O.filter(p => p !== handler), p => Math.pow(p.at.thr, 3.5) * om(p)) || handler; type = chance(0.86) ? '3' : 'mid'; play = 'spot'; }
+    else if (play === 'spot' || play === 'three') { passer = handler; shooter = pickBy(O.filter(p => p !== handler), p => Math.pow(p.at.thr, 2.8) * om(p)) || handler; type = chance(0.86) ? '3' : 'mid'; play = 'spot'; }
     else if (play === 'cut') { passer = handler; shooter = pickBy(O.filter(p => p !== handler), p => p.at.ath * p.at.iq * om(p)) || handler; type = 'rim'; }
     else { shooter = pickBy(O, p => Math.pow(usage(p), 1.3)); type = SD.wpick(['rim', 'mid', '3'], t => ({ rim: 38, mid: 34, '3': 28 })[t] * (t === '3' ? shooter.at.thr / 75 : 1)); play = 'iso'; }
     // the defender on him (by position slot)

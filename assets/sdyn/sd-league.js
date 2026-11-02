@@ -347,9 +347,9 @@
       const give = {}; for (const k in tot) { give[k] = L.map(() => 0); const ws = wts[k], sum = ws.reduce((a, b) => a + b, 0); for (let n = 0; n < tot[k]; n++) { let r = SD.rnd() * sum, ix = 0; for (; ix < ws.length - 1; ix++) { r -= ws[ix]; if (r <= 0) break; } give[k][ix]++; } }
       L.forEach((p, i) => {
         const share = u[i] / ut, pp = Math.max(0, Math.round(pts * share + gauss() * 2.2));
-        const fga = Math.round(pp / 1.15 + SD.rr(0, 2)), tpa = Math.round(fga * clamp((p.at.thr - 50) / 80, 0.05, 0.6));
+        const fga = Math.round(pp / 1.15 + SD.rr(0, 2)), tpa = Math.round(fga * clamp((p.at.thr - 50) / 100, 0.05, 0.48));
         const rb = give.reb[i], orb = Math.round(rb * 0.3 + gauss() * 0.4);
-        GM.ps[p.id] = { t: p.t, min: mins[i], pts: pp, fga, fgm: Math.min(fga, Math.round(pp / 2.3)), tpa, tpm: Math.round(tpa * clamp(0.3 + (p.at.thr - 70) / 200, 0.15, 0.48)), fta: Math.round(pp * 0.22), ftm: Math.round(pp * 0.16),
+        GM.ps[p.id] = { t: p.t, min: mins[i], pts: pp, fga, fgm: Math.min(fga, Math.round(pp / 2.3)), tpa, tpm: Math.round(tpa * clamp(0.3 + (p.at.thr - 70) / 230, 0.15, 0.41)), fta: Math.round(pp * 0.22), ftm: Math.round(pp * 0.16),
           orb: Math.max(0, Math.min(rb, orb)), drb: Math.max(0, rb - Math.max(0, Math.min(rb, orb))), ast: give.ast[i], stl: give.stl[i], blk: give.blk[i], to: give.to[i], pf: SD.ri(0, 3), pm: 0, gs: i < 5 ? 1 : 0 };
       });
     }
@@ -361,7 +361,7 @@
     x.res = { h: GM.score.h, a: GM.score.a, ot: GM.ot || (GM.inn && GM.inn > GM.maxInn ? GM.inn : 0), inn: GM.inn || null };
     const hw = GM.score.h > GM.score.a, W = hw ? Ht : At, L = hw ? At : Ht;
     // stats into players
-    for (const id in GM.ps) { const p = SD.P(+id); if (!p) continue; const s = p.s = p.s || { gp: 0 }, l = GM.ps[id]; s.gp++; for (const k in l) if (k !== 't' && typeof l[k] === 'number') s[k] = (s[k] || 0) + l[k]; }
+    for (const id in GM.ps) { const p = SD.P(+id); if (!p) continue; const s = p.s = p.s || { gp: 0 }, l = GM.ps[id]; s.gp++; for (const k in l) if (k !== 't' && typeof l[k] === 'number') s[k] = (s[k] || 0) + l[k]; try { SD.natGame(p, l); } catch (e) { } }
     if (x.h === g.user || x.a === g.user) {
       x.box = { ps: Object.fromEntries(Object.entries(GM.ps).map(([id, l]) => [id, Object.assign({}, l)])), ls: GM.lineScore };
       for (const id in GM.ps) { const p = SD.P(+id); if (!p || p.t !== g.user) continue; (p.gl = p.gl || []).push({ d: x.d, o: T(SD.oppOf(x)).abbr, h: SD.isHome(x), l: GM.ps[id], r: (x.h === g.user) === hw ? 'W' : 'L', sc: x.h === g.user ? GM.score.h + '-' + GM.score.a : GM.score.a + '-' + GM.score.h }); if (p.gl.length > 70) p.gl.shift(); }
@@ -695,8 +695,33 @@
     if (s.ab < 40) return 0; const avg = s.h / s.ab, obp = (s.h + s.bb + s.hbp) / Math.max(1, s.ab + s.bb + s.hbp), slg = (s.h + s.d2 + s.d3 * 2 + s.hr * 3) / s.ab;
     return (obp + slg) * 60 + s.hr * 1.2 + s.rbi * 0.25 + s.sb * 0.2 + p.at.fld * 0.05;
   };
+
+  /* ---------- national record book (real-life NCAA Division I marks; breaks are recorded with the player, school and year) ---------- */
+  SD.NATREC = {
+    mbb: { game: { pts: [100, 'Frank Selvy', 'Furman', 1954], reb: [51, 'Bill Chambers', 'William & Mary', 1953], ast: [22, 'Avery Johnson', 'Southern', 1988], stl: [13, 'Mookie Blaylock', 'Oklahoma', 1988], blk: [16, 'Mickell Gladness', 'Alabama A&M', 2007], tpm: [16, 'Keith Veney', 'Marshall', 1996] },
+      season: { pts: [1381, 'Pete Maravich', 'LSU', 1970], reb: [734, 'Walt Dukes', 'Seton Hall', 1953], ast: [406, 'Mark Wade', 'UNLV', 1987], stl: [160, 'Darron Brittman', 'Chicago State', 1986], blk: [207, 'David Robinson', 'Navy', 1986], tpm: [158, 'Stephen Curry', 'Davidson', 2009] },
+      career: { pts: [3667, 'Pete Maravich', 'LSU', 1970], reb: [2201, 'Tom Gola', 'La Salle', 1955], ast: [1076, 'Bobby Hurley', 'Duke', 1993], stl: [385, 'Michael Anderson', 'Drexel', 1988], blk: [535, 'Jarvis Varnado', 'Mississippi State', 2010], tpm: [504, 'Travis Bader', 'Oakland', 2014] } },
+    wbb: { game: { pts: [60, 'Kelsey Plum', 'Washington', 2017], reb: [40, 'Deborah Temple', 'Delta State', 1983], ast: [23, 'Tamika Catchings', 'Tennessee', 2000], stl: [14, 'Tonya Edwards', 'Tennessee', 1986], blk: [14, 'Anne Donovan', 'Old Dominion', 1983], tpm: [14, 'Kelsey Mitchell', 'Ohio State', 2018] },
+      season: { pts: [1109, 'Kelsey Plum', 'Washington', 2017], reb: [534, 'Courtney Paris', 'Oklahoma', 2007], ast: [454, 'Suzie McConnell', 'Penn State', 1987], stl: [150, 'Jeri Ingram', 'Houston', 1987], blk: [223, 'Brittney Griner', 'Baylor', 2012], tpm: [155, 'Kelsey Mitchell', 'Ohio State', 2018] },
+      career: { pts: [3951, 'Caitlin Clark', 'Iowa', 2024], reb: [2000, 'Courtney Paris', 'Oklahoma', 2009], ast: [1144, 'Caitlin Clark', 'Iowa', 2024], stl: [534, 'Jeri Ingram', 'Houston', 1989], blk: [748, 'Brittney Griner', 'Baylor', 2013], tpm: [548, 'Caitlin Clark', 'Iowa', 2024] } } };
+  SD.NATLAB = { pts: 'Points', reb: 'Rebounds', ast: 'Assists', stl: 'Steals', blk: 'Blocks', tpm: 'Threes made' };
+  SD.natBook = () => { const g = G(); if (!g.natRec) { const src = SD.NATREC[g.sport === 'wbb' ? 'wbb' : 'mbb'], o = {}; for (const sc in src) { o[sc] = {}; for (const k in src[sc]) { const r = src[sc][k]; o[sc][k] = { v: r[0], n: r[1], t: r[2], y: r[3] }; } } g.natRec = o; g.natBroken = []; } return g.natRec; };
+  SD.natTry = (scope, k, v, p, y) => { const B = SD.natBook(), r = B[scope][k]; if (!r || v <= r.v) return; const old = r.v, was = r.n; B[scope][k] = { v, n: p.n, t: T(p.t != null ? p.t : p.t0) ? T(p.t != null ? p.t : p.t0).name : '', y, brk: true };
+    G().natBroken.unshift({ scope, k, v, old, was, n: p.n, y }); G().natBroken = G().natBroken.slice(0, 40); SD.news('record', `${p.n} breaks the national ${scope} record for ${SD.NATLAB[k].toLowerCase()}`, `${v} (previous: ${old} by ${was}).`); };
+  SD.natGame = (p, l) => { if (SD.kind() !== 'hoops') return; const B = SD.natBook(), y = G().season; ['pts', 'tpm', 'stl', 'blk', 'ast'].forEach(k => { if (l[k] >= B.game[k].v * 0.6) SD.natTry('game', k, l[k], p, y); }); SD.natTry('game', 'reb', (l.orb || 0) + (l.drb || 0), p, y); };
+  SD.natSeason = () => { if (SD.kind() !== 'hoops') return; const g = G(), y = g.season;
+    g.teams.forEach(t => t.roster.forEach(id => { const p = SD.P(id), s = p && p.s; if (!s || !s.gp) return; const tot = { pts: s.pts, reb: (s.orb || 0) + (s.drb || 0), ast: s.ast, stl: s.stl, blk: s.blk, tpm: s.tpm };
+      const car = Object.values(p.car || {}).concat([s]); const c = { pts: 0, reb: 0, ast: 0, stl: 0, blk: 0, tpm: 0 }; car.forEach(x => { c.pts += x.pts || 0; c.reb += (x.orb || 0) + (x.drb || 0); c.ast += x.ast || 0; c.stl += x.stl || 0; c.blk += x.blk || 0; c.tpm += x.tpm || 0; });
+      for (const k in tot) { SD.natTry('season', k, tot[k], p, y); SD.natTry('career', k, c[k], p, y); } })); };
+  SD.legacyBoard = (n) => { const g = G(), rows = [];
+    Object.values(g.P).forEach(p => { if (!p || !p.car && !p.s) return; const car = Object.values(p.car || {}).concat(p.s ? [p.s] : []); if (!car.length) return;
+      const s = car.reduce((a, x) => { for (const k of ['gp', 'pts', 'orb', 'drb', 'ast', 'stl', 'blk']) a[k] = (a[k] || 0) + (x[k] || 0); return a; }, {});
+      let sc = (s.pts || 0) * 0.1 + ((s.orb || 0) + (s.drb || 0)) * 0.12 + (s.ast || 0) * 0.2 + (s.stl || 0) * 0.25 + (s.blk || 0) * 0.25 + (p.aw || []).reduce((a, x) => a + ({ POY: 120, AA1: 50, SECPOY: 30, SEC1: 15, SECFR: 12 }[x.a] || 5), 0);
+      rows.push({ p, sc: Math.round(sc), s }); });
+    return rows.sort((a, b) => b.sc - a.sc).slice(0, n || 10); };
   SD.endSeason = () => {
     const g = G(), ut = SD.userT(), sp = SD.SP();
+    try { SD.natSeason(); } catch (e) { }
     // awards
     const all = []; g.teams.forEach(t => t.roster.forEach(id => { const p = SD.P(id); const sc = SD.awardScore(p, t); if (sc > 0) all.push({ p, t, sc }); }));
     all.sort((a, b) => b.sc - a.sc);

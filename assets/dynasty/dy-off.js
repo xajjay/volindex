@@ -306,7 +306,7 @@
      build a whole class: talent, then the positions the roster is actually short at (never a pile of quarterbacks or corners), then who
      is interested and likely to say yes. In a Tennessee dynasty the real Tennessee commits are on the board from day one. */
   DY.AUTO_TARGETS = 20;
-  DY.AUTO_EFF = 0.6;
+  DY.AUTO_EFF = 0.8;
   DY.autoRecruit = () => {
     const g = G(), R = g.recruit, ut = DY.userT();
     if (R.locked) return;
@@ -339,12 +339,15 @@
     // spend the week: your own additions first, then the best of the rest; offers go out to anyone you are working
     const order = R.board.map((id, i) => [DY.RP(id), i]).filter(([p]) => inPlay(p) && p.commit !== ut.id)
       .map(([p, i]) => [p, score(p) + (i < (R._userAdded || R.board.length) ? 0 : 0) - i * 0.01]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+    // hours: everybody on the board gets at least a social media touch each week (a recruit with no contact goes cold), then the hours left go
+    // to the kids you can actually win: head coach visits for the top four- and five-star targets, calls for the rest, in order of how winnable they are
     let hrs = DY.HOURS(), coach = 4;
-    order.forEach(p => {
-      p.acts = {};
-      if (!p.offer) DY.offer(p.id);
-      if (coach > 0 && hrs >= 7 && p.rec.stars >= 4) { p.acts.coach = 1; hrs -= 7; coach--; } else if (hrs >= 3) { p.acts.call = 1; hrs -= 3; } else if (hrs >= 1) { p.acts.dm = 1; hrs -= 1; }
-    });
+    const winn = p => { const mine = p.interest[ut.id] || 0, top = Math.max(0, ...Object.entries(p.interest).filter(([t]) => +t !== ut.id).map(([, v]) => v)); return Math.min(1.2, (mine + 15) / (top + 15)); };
+    order.forEach(p => { p.acts = {}; if (!p.offer) DY.offer(p.id); });
+    order.forEach(p => { if (hrs >= 1) { p.acts.dm = 1; hrs -= 1; } });
+    const ranked = order.slice().sort((a, b) => (winn(b) * (0.6 + b.rec.c * 0.4)) - (winn(a) * (0.6 + a.rec.c * 0.4)));
+    ranked.forEach(p => { if (coach > 0 && hrs >= 6 && p.rec.stars >= 4 && winn(p) >= 0.45) { delete p.acts.dm; p.acts.coach = 1; hrs -= 6; coach--; } });
+    ranked.forEach(p => { if (!p.acts.coach && hrs >= 2) { delete p.acts.dm; p.acts.call = 1; hrs -= 2; } });
     const homeWk = DY.userGames().find(x => x.h === ut.id && !x.res && x.wk > g.week);
     if (homeWk) order.slice(0, 4).forEach(p => { if (!p.visit) DY.setVisit(p.id, homeWk.wk); });
   };
