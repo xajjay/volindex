@@ -89,7 +89,7 @@ for y in (2025,):
 print('CONFS[2025] teams:', len(CONFS[2025]), 'SRS[2025] teams:', len(SRS[2025]))
 
 # ---------- EA ratings loader ----------
-EA_YEAR = {2025: os.path.join(HD, 'ext', 'volindex-ea-cfb26.txt')}
+EA_YEAR = {2025: os.path.join(HD, 'ext', 'volindex-ea-cfb26.txt'), 2026: os.path.join(HD, 'ext', 'volindex-ea-cfb27.txt')}
 EAPOS = {'QB': 'QB', 'HB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE', 'LT': 'OT', 'RT': 'OT', 'LG': 'IOL', 'C': 'IOL', 'RG': 'IOL', 'LEDG': 'EDGE', 'REDG': 'EDGE',
          'LE': 'EDGE', 'RE': 'EDGE', 'DT': 'DT', 'SAM': 'LB', 'WILL': 'LB', 'MIKE': 'LB', 'LOLB': 'LB', 'ROLB': 'LB', 'MLB': 'LB', 'CB': 'CB', 'FS': 'S', 'SS': 'S',
          'K': 'K', 'P': 'P', 'ATH': 'WR', 'LS': 'LS', 'KR': 'WR', 'PR': 'WR'}
@@ -307,10 +307,11 @@ print('247 classes:', sorted(R247.keys()))
 def build_2026():
     y = 2026
     cf = cfr_roster(y)
-    E = load_ea(EA_YEAR[2025]) if os.path.exists(EA_YEAR[2025]) else {}
     ea = {}
-    for t, rs in E.items():
-        for r in rs: ea[norm(r['n'])] = r
+    for yk in (2025, 2026):  # CFB26 first, CFB27 overrides where present
+        E = load_ea(EA_YEAR[yk]) if os.path.exists(EA_YEAR[yk]) else {}
+        for t, rs in E.items():
+            for r in rs: ea[norm(r['n'])] = r
     fr = {norm(r['n']): r for r in R247.get(2026, [])}
     rosters = {}
     for t, rs in cf.items():
@@ -338,7 +339,7 @@ def build_2026():
     pr = {l[0]: int(l[3]) for l in TL}
     rate_all(y, rosters, pr, 2025)
     for t in rosters: rosters[t].sort(key=lambda r: -r[3]); rosters[t] = rosters[t][:85]
-    data = {'y': y, 'src': 'real 2026 rosters (cfbfastR); ratings from EA College Football 26, the 247 composite for freshmen, production and the draft', 'conf': {}, 'pr': pr, 'ros': rosters}
+    data = {'y': y, 'src': 'real 2026 rosters (cfbfastR); ratings from EA College Football 27 (CFB26 where missing), the 247 composite for freshmen, production and the draft', 'conf': {}, 'pr': pr, 'ros': rosters}
     TS = collections.defaultdict(dict); MAPK = {'games': 'gp', 'pass_cmp': 'pc', 'pass_att': 'pa', 'pass_yds': 'py', 'pass_td': 'ptd', 'pass_int': 'pi', 'rush_att': 'ra', 'rush_yds': 'ry',
         'rush_td': 'rtd', 'rec': 'rc', 'rec_yds': 'rcy', 'rec_td': 'rctd', 'fgm': 'fgm', 'fga': 'fga', 'xpm': 'xpm', 'xpa': 'xpa', 'punt': 'pn', 'punt_yds': 'pny'}
     f26 = os.path.join(HD, 'ext', 'volindex-sr-2026.txt')
