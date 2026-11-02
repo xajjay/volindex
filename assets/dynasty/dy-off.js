@@ -246,7 +246,7 @@
       const need = (140 + p.rec.stars * 15 + (w <= 4 ? 40 : 0)) * (1 - Math.min(w, 14) / 24);
       // four- and five-stars want to see campus (an official visit) before they commit to you
       const visitOk = p.rec.stars < 4 || p.visited || w >= (p.rec.stars >= 5 ? 12 : 8);
-      if (!p.commit && lv >= need * (g.teams[lead].user && p.rec.stars >= 5 ? 1 + 0.12 * Math.max(0, DY.myCommits().filter(x => x.rec.stars >= 5).length - 3) : 1) && lv >= second * (w >= 10 ? 1.08 : 1.2) && (!g.teams[lead].user || (p.offer && !full && visitOk && starRoom(p)))) {
+      if (!p.commit && lv >= need * (g.teams[lead].user && p.rec.stars >= 5 ? 1 + 0.12 * Math.max(0, DY.myCommits().filter(x => x.rec.stars >= 5).length - 3) : 1) && lv >= second * (g.teams[lead].user ? 1.05 : (w >= 10 ? 1.08 : 1.2)) && (!g.teams[lead].user || (p.offer && !full && visitOk && starRoom(p)))) {
         p.commit = +lead; if (!g.teams[lead].user) addCommit(R, +lead, p);
         if (g.teams[lead].user) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos} from ${p.home}, commits to ${DY.UN()}!`); DY.news('commit', `${p.rec.stars}-star ${DY.POS_NAME[p.pos].toLowerCase()} ${p.n} commits to ${DY.UN()}`, `No. ${p.rec.nat} nationally (${p.rec.c.toFixed(4)} composite). ${p.home}, ${p.hs}.`, { rid: p.id }); }
         else if (p.rec.nat <= 50 && R.board.includes(p.id)) logs.push(`${p.n} (No. ${p.rec.nat}) commits to ${g.teams[lead].name}.`);
@@ -306,7 +306,7 @@
      build a whole class: talent, then the positions the roster is actually short at (never a pile of quarterbacks or corners), then who
      is interested and likely to say yes. In a Tennessee dynasty the real Tennessee commits are on the board from day one. */
   DY.AUTO_TARGETS = 20;
-  DY.AUTO_EFF = 0.8;
+  DY.AUTO_EFF = 1;
   DY.autoRecruit = () => {
     const g = G(), R = g.recruit, ut = DY.userT();
     if (R.locked) return;
@@ -345,11 +345,13 @@
     const winn = p => { const mine = p.interest[ut.id] || 0, top = Math.max(0, ...Object.entries(p.interest).filter(([t]) => +t !== ut.id).map(([, v]) => v)); return Math.min(1.2, (mine + 15) / (top + 15)); };
     order.forEach(p => { p.acts = {}; if (!p.offer) DY.offer(p.id); });
     order.forEach(p => { if (hrs >= 1) { p.acts.dm = 1; hrs -= 1; } });
-    const ranked = order.slice().sort((a, b) => (winn(b) * (0.6 + b.rec.c * 0.4)) - (winn(a) * (0.6 + a.rec.c * 0.4)));
+    // invest where it closes: kids you already lead (and can hold) get the big hours first, then the contested ones, longshots only a touch
+    const leads = p => { const o = Object.entries(p.interest).filter(([t]) => +t !== ut.id).map(([, v]) => v), top = Math.max(0, ...o); return (p.interest[ut.id] || 0) >= top; };
+    const ranked = order.slice().sort((a, b) => ((leads(b) ? 2 : 0) + winn(b) + b.rec.c * 0.4) - ((leads(a) ? 2 : 0) + winn(a) + a.rec.c * 0.4));
     ranked.forEach(p => { if (coach > 0 && hrs >= 6 && p.rec.stars >= 4 && winn(p) >= 0.45) { delete p.acts.dm; p.acts.coach = 1; hrs -= 6; coach--; } });
-    ranked.forEach(p => { if (!p.acts.coach && hrs >= 2) { delete p.acts.dm; p.acts.call = 1; hrs -= 2; } });
-    const homeWk = DY.userGames().find(x => x.h === ut.id && !x.res && x.wk > g.week);
-    if (homeWk) order.slice(0, 4).forEach(p => { if (!p.visit) DY.setVisit(p.id, homeWk.wk); });
+    ranked.forEach(p => { if (!p.acts.coach && hrs >= 2 && winn(p) >= 0.35) { delete p.acts.dm; p.acts.call = 1; hrs -= 2; } });
+    const homeWks = DY.userGames().filter(x => x.h === ut.id && !x.res && x.wk > g.week).map(x => x.wk);
+    if (homeWks.length) ranked.filter(p => !p.visit && (p.rec.stars >= 4 || leads(p))).forEach((p, k) => { for (let m = 0; m < homeWks.length; m++) if (!DY.setVisit(p.id, homeWks[(k + m) % homeWks.length])) break; });
   };
   DY.teamNeeds = t => {
     const out = {};
