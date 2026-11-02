@@ -1,11 +1,12 @@
-/* Written by tools/update_data.py on 2026-10-29. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-02. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-10-29",
+ "updated": "2026-11-02",
  "team": {
   "record": "6-2",
   "sec": "3-2",
-  "pollWeek": "Week 9",
+  "pollWeek": "Week 10",
+  "coaches": 16,
   "ap": 16,
   "apTop25": [
    [
@@ -14,43 +15,43 @@ window.SITE_AUTO.football = {
    ],
    [
     2,
-    "Ohio State"
-   ],
-   [
-    3,
     "Georgia"
    ],
    [
-    4,
-    "Indiana"
-   ],
-   [
-    5,
-    "Notre Dame"
-   ],
-   [
-    6,
+    3,
     "Utah"
    ],
    [
-    7,
+    4,
+    "Notre Dame"
+   ],
+   [
+    5,
     "UCLA"
    ],
    [
-    8,
+    6,
+    "Indiana"
+   ],
+   [
+    7,
     "BYU"
    ],
    [
-    9,
+    8,
     "Kentucky"
    ],
    [
-    10,
+    9,
     "Alabama"
    ],
    [
-    11,
+    10,
     "Texas"
+   ],
+   [
+    11,
+    "Ohio State"
    ],
    [
     12,
@@ -74,61 +75,60 @@ window.SITE_AUTO.football = {
    ],
    [
     17,
-    "Florida"
-   ],
-   [
-    18,
     "Houston"
    ],
    [
+    18,
+    "USC"
+   ],
+   [
     19,
-    "SMU"
+    "Missouri"
    ],
    [
     20,
     "Boise State"
    ],
    [
-    20,
-    "Northwestern"
+    21,
+    "Iowa"
    ],
    [
     22,
-    "Arizona"
+    "New Mexico"
    ],
    [
     23,
-    "Missouri"
+    "South Carolina"
    ],
    [
     24,
-    "Oklahoma State"
+    "Arizona"
    ],
    [
     25,
-    "Wisconsin"
+    "Florida"
    ]
   ],
-  "coaches": 17,
   "ranks": {
    "ppg": [
     32.2,
-    48,
+    46,
     8
    ],
    "oppg": [
     16.2,
-    20,
+    17,
     3
    ],
    "ypg": [
     394.5,
-    67,
+    61,
     9
    ],
    "rushYpg": [
     213.0,
-    17,
+    16,
     2
    ],
    "passYpg": [
@@ -138,18 +138,18 @@ window.SITE_AUTO.football = {
    ],
    "oypg": [
     288.5,
-    16,
-    5
+    15,
+    4
    ],
    "oRushYpg": [
     122.9,
-    42,
-    10
+    36,
+    9
    ],
    "oPassYpg": [
     165.6,
-    12,
-    2
+    9,
+    1
    ]
   }
  },
@@ -1167,33 +1167,33 @@ window.SITE_AUTO.football = {
    "Amare Campbell": [
     {
      "stat": "Tackles for loss",
-     "rank": 33
+     "rank": 48
     }
    ],
    "Tyree Weathersby": [
     {
      "stat": "Sacks",
-     "rank": 6
+     "rank": 7
     },
     {
      "stat": "Tackles for loss",
-     "rank": 27
+     "rank": 39
     }
    ],
    "Xavier Gilliam": [
     {
      "stat": "Tackles for loss",
-     "rank": 7
+     "rank": 9
     },
     {
      "stat": "Sacks",
-     "rank": 12
+     "rank": 16
     }
    ],
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 25
+     "rank": 34
     }
    ],
    "Ty Redmond": [
@@ -1205,45 +1205,29 @@ window.SITE_AUTO.football = {
    "Dejuan Lane": [
     {
      "stat": "Interceptions",
-     "rank": 12
+     "rank": 16
     }
    ],
    "Kayin Lee": [
     {
      "stat": "Interceptions",
-     "rank": 41
-    }
-   ],
-   "Faizon Brandon": [
-    {
-     "stat": "Passing TD",
-     "rank": 97
+     "rank": 49
     }
    ],
    "Mike Matthews": [
     {
      "stat": "Receiving yards",
-     "rank": 46
-    },
-    {
-     "stat": "Receptions",
-     "rank": 71
-    }
-   ],
-   "Braylon Staley": [
-    {
-     "stat": "Receptions",
-     "rank": 89
+     "rank": 61
     }
    ],
    "DeSean Bishop": [
     {
      "stat": "Rushing yards",
-     "rank": 2
+     "rank": 6
     },
     {
      "stat": "Rushing TD",
-     "rank": 6
+     "rank": 9
     }
    ]
   }
@@ -1487,26 +1471,26 @@ window.SITE_AUTO.football = {
   "Kentucky": {
    "tv": "ESPN",
    "kick": "2026-11-07T23:15Z",
-   "line": "TENN -6",
+   "line": "TENN -6.5",
    "ou": 50.5,
-   "ml": "-205",
+   "ml": "-245",
    "book": "DraftKings",
-   "win": 67.4
+   "win": 66.8
   },
   "Texas A&M": {
    "tv": null,
    "kick": "2026-11-14T05:00Z",
-   "win": 52.6
+   "win": 50.5
   },
   "LSU": {
    "tv": null,
    "kick": "2026-11-21T05:00Z",
-   "win": 36.2
+   "win": 33.4
   },
   "Vanderbilt": {
    "tv": null,
    "kick": "2026-11-28T05:00Z",
-   "win": 86.0
+   "win": 85.6
   }
  },
  "teamSheet": {
@@ -1518,7 +1502,7 @@ window.SITE_AUTO.football = {
     "Points per game",
     "Total offense",
     32.2,
-    48,
+    46,
     8,
     false
    ],
@@ -1527,7 +1511,7 @@ window.SITE_AUTO.football = {
     "Total yards per game",
     "Total offense",
     394.5,
-    67,
+    61,
     9,
     false
    ],
@@ -1536,7 +1520,7 @@ window.SITE_AUTO.football = {
     "Yards per play",
     "Total offense",
     5.65,
-    84,
+    85,
     10,
     false
    ],
@@ -1554,8 +1538,8 @@ window.SITE_AUTO.football = {
     "Completion %",
     "Passing",
     64.3,
-    57,
-    9,
+    56,
+    10,
     false
    ],
    [
@@ -1572,7 +1556,7 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     9.0,
-    104,
+    108,
     14,
     false
    ],
@@ -1581,7 +1565,7 @@ window.SITE_AUTO.football = {
     "Interceptions thrown",
     "Passing",
     4.0,
-    39,
+    32,
     3,
     true
    ],
@@ -1590,8 +1574,8 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     20.0,
-    118,
-    13,
+    107,
+    11,
     true
    ],
    [
@@ -1599,7 +1583,7 @@ window.SITE_AUTO.football = {
     "Rushing yards per game",
     "Rushing",
     213.0,
-    17,
+    16,
     2,
     false
    ],
@@ -1608,7 +1592,7 @@ window.SITE_AUTO.football = {
     "Yards per carry",
     "Rushing",
     4.84,
-    42,
+    40,
     3,
     false
    ],
@@ -1617,7 +1601,7 @@ window.SITE_AUTO.football = {
     "Rushing TDs",
     "Rushing",
     21.0,
-    8,
+    12,
     2,
     false
    ],
@@ -1635,7 +1619,7 @@ window.SITE_AUTO.football = {
     "Yards per reception",
     "Receiving",
     10.92,
-    109,
+    107,
     15,
     false
    ],
@@ -1644,8 +1628,8 @@ window.SITE_AUTO.football = {
     "First downs per game",
     "Downs",
     22.4,
-    35,
-    6,
+    32,
+    5,
     false
    ],
    [
@@ -1653,7 +1637,7 @@ window.SITE_AUTO.football = {
     "3rd down conversion %",
     "Downs",
     37.0,
-    91,
+    93,
     14,
     false
    ],
@@ -1671,8 +1655,8 @@ window.SITE_AUTO.football = {
     "Penalty yards per game",
     "Downs",
     62.1,
-    92,
-    9,
+    93,
+    8,
     true
    ],
    [
@@ -1680,7 +1664,7 @@ window.SITE_AUTO.football = {
     "Time of possession per game (min)",
     "Downs",
     31.3,
-    40,
+    39,
     5,
     false
    ],
@@ -1689,8 +1673,8 @@ window.SITE_AUTO.football = {
     "Turnovers lost",
     "Downs",
     11.0,
-    94,
-    9,
+    73,
+    4,
     true
    ],
    [
@@ -1698,7 +1682,7 @@ window.SITE_AUTO.football = {
     "Points allowed per game",
     "Points allowed",
     16.2,
-    20,
+    17,
     3,
     true
    ],
@@ -1707,8 +1691,8 @@ window.SITE_AUTO.football = {
     "Yards allowed per game",
     "Yards allowed",
     288.5,
-    16,
-    5,
+    15,
+    4,
     true
    ],
    [
@@ -1716,7 +1700,7 @@ window.SITE_AUTO.football = {
     "Yards per play allowed",
     "Yards allowed",
     4.69,
-    18,
+    19,
     4,
     true
    ],
@@ -1725,7 +1709,7 @@ window.SITE_AUTO.football = {
     "Opponent 3rd down %",
     "Yards allowed",
     31.7,
-    23,
+    24,
     4,
     true
    ],
@@ -1734,8 +1718,8 @@ window.SITE_AUTO.football = {
     "Passing yards allowed per game",
     "Pass defense",
     165.6,
-    12,
-    2,
+    9,
+    1,
     true
    ],
    [
@@ -1743,8 +1727,8 @@ window.SITE_AUTO.football = {
     "Opponent completion %",
     "Pass defense",
     62.3,
-    77,
-    10,
+    78,
+    8,
     true
    ],
    [
@@ -1752,8 +1736,8 @@ window.SITE_AUTO.football = {
     "Interceptions",
     "Pass defense",
     8.0,
-    17,
-    3,
+    23,
+    4,
     false
    ],
    [
@@ -1770,8 +1754,8 @@ window.SITE_AUTO.football = {
     "Rushing yards allowed per game",
     "Run defense",
     122.9,
-    42,
-    10,
+    36,
+    9,
     true
    ],
    [
@@ -1779,8 +1763,8 @@ window.SITE_AUTO.football = {
     "Yards per carry allowed",
     "Run defense",
     3.84,
-    58,
-    12,
+    54,
+    10,
     true
    ],
    [
@@ -1788,7 +1772,7 @@ window.SITE_AUTO.football = {
     "Tackles for loss",
     "Run defense",
     65.0,
-    3,
+    9,
     1,
     false
    ],
@@ -1797,8 +1781,8 @@ window.SITE_AUTO.football = {
     "Takeaways",
     "Run defense",
     14.0,
-    10,
-    3,
+    13,
+    4,
     false
    ],
    [
@@ -1806,8 +1790,8 @@ window.SITE_AUTO.football = {
     "Turnover margin",
     "Run defense",
     3.0,
-    36,
-    4,
+    35,
+    5,
     false
    ],
    [
@@ -1815,7 +1799,7 @@ window.SITE_AUTO.football = {
     "Kick return average",
     "Returning",
     16.2,
-    121,
+    126,
     15,
     false
    ],
@@ -1824,7 +1808,7 @@ window.SITE_AUTO.football = {
     "Punt return average",
     "Returning",
     10.5,
-    56,
+    58,
     7,
     false
    ],
@@ -12949,12 +12933,12 @@ window.SITE_AUTO.football = {
    },
    "fpi": {
     "opp": [
-     13.075,
-     24
+     13.006,
+     26
     ],
     "ut": [
-     16.818,
-     12
+     16.694,
+     14
     ]
    },
    "impact": [
@@ -13256,12 +13240,12 @@ window.SITE_AUTO.football = {
    },
    "fpi": {
     "opp": [
-     13.401,
-     22
+     13.842,
+     23
     ],
     "ut": [
-     16.818,
-     12
+     16.694,
+     14
     ]
    },
    "impact": [
@@ -13555,12 +13539,12 @@ window.SITE_AUTO.football = {
    },
    "fpi": {
     "opp": [
-     24.042,
-     7
+     24.696,
+     5
     ],
     "ut": [
-     16.818,
-     12
+     16.694,
+     14
     ]
    },
    "impact": [
@@ -13862,12 +13846,12 @@ window.SITE_AUTO.football = {
    },
    "fpi": {
     "opp": [
-     0.259,
-     68
+     0.308,
+     71
     ],
     "ut": [
-     16.818,
-     12
+     16.694,
+     14
     ]
    },
    "impact": [
@@ -14005,101 +13989,101 @@ window.SITE_AUTO.football = {
   }
  },
  "pear": {
-  "week": 9,
+  "week": 10,
   "ratings": [
    [
     "TSR",
-    "16.7",
+    "17.0",
     12
    ],
    [
     "SP+",
-    "17.9",
+    "17.6",
     11
    ],
    [
     "FPI",
-    "16.8",
-    12
-   ],
-   [
-    "FEI",
-    "0.93",
-    13
-   ],
-   [
-    "Massey",
-    "8.59",
+    "16.7",
     14
    ],
    [
+    "FEI",
+    "0.87",
+    11
+   ],
+   [
+    "Massey",
+    "8.61",
+    15
+   ],
+   [
     "Dokter",
-    "67.23",
-    12
+    "67.33",
+    13
    ],
    [
     "Sagarin",
-    "86.83",
+    "86.67",
     11
    ],
    [
     "RQI",
-    "0.220",
-    17
+    "0.206",
+    19
    ],
    [
     "SOS",
-    "10.58",
-    26
+    "10.53",
+    25
    ]
   ],
   "offense": [
    [
     "Rating",
     "38.40",
-    14
+    15
    ],
    [
     "Success rate",
     "0.04",
-    43
+    35
    ],
    [
     "EPA/play (PPA)",
-    "0.01",
-    80
+    "0.02",
+    73
    ],
    [
     "Rush PPA",
-    "0.11",
-    33
+    "0.10",
+    29
    ],
    [
     "Pass PPA",
-    "-0.09",
-    104
+    "-0.06",
+    97
    ],
    [
     "Points per opportunity",
-    "0.44",
-    61
+    "0.47",
+    55
    ],
    [
     "Drive quality",
-    "15.70",
-    24
+    "15.90",
+    21
    ]
   ],
   "defense": [
    [
     "Rating",
-    "21.70",
-    14
+    "21.40",
+    16
    ],
    [
     "Success rate",
     "-0.05",
-    27
+    29
    ],
    [
     "EPA/play (PPA)",
@@ -14108,59 +14092,59 @@ window.SITE_AUTO.football = {
    ],
    [
     "Rush PPA",
-    "-0.15",
-    23
+    "-0.14",
+    31
    ],
    [
     "Pass PPA",
     "-0.24",
-    19
+    16
    ],
    [
     "Points per opportunity",
-    "-1.31",
-    8
+    "-1.27",
+    6
    ],
    [
     "Drive quality",
-    "-20.20",
+    "-18.90",
     12
    ]
   ],
   "games": [
    [
     "Kentucky",
-    20,
-    "Tennessee -6.4",
-    "33.9-27.5",
-    67.2
+    22,
+    "Tennessee -6.6",
+    "33.9-27.4",
+    67.7
    ],
    [
     "Texas A&M",
-    25,
-    "Tennessee -1.1",
-    "29.8-28.8",
-    53.1
+    24,
+    "Tennessee -0.9",
+    "29.6-28.8",
+    52.5
    ],
    [
     "LSU",
-    6,
-    "LSU -3.1",
-    "29.6-32.6",
-    41.4
+    5,
+    "LSU -3.3",
+    "29.2-32.6",
+    40.8
    ],
    [
     "Vanderbilt",
-    68,
-    "Tennessee -13.1",
-    "35.4-22.3",
-    81.3
+    70,
+    "Tennessee -13.2",
+    "35.4-22.2",
+    81.5
    ]
   ],
   "played": [
    [
     "Furman",
-    57
+    58
    ],
    [
     "Georgia Tech",
@@ -14168,241 +14152,241 @@ window.SITE_AUTO.football = {
    ],
    [
     "Kennesaw State",
-    123
+    116
    ],
    [
     "Texas",
-    8
+    6
    ],
    [
     "Auburn",
-    34
+    37
    ],
    [
     "Arkansas",
-    61
+    67
    ],
    [
     "Alabama",
-    7
+    6
    ],
    [
     "South Carolina",
-    28
+    21
    ]
   ],
   "record": "6-2",
   "sec": {
    "Georgia": [
-    24.3,
-    4,
-    44.5,
+    25.0,
+    1,
+    44.0,
     5,
-    20.2,
+    19.0,
     5,
-    39
+    32
    ],
    "LSU": [
-    22.8,
-    6,
-    43.5,
-    6,
-    20.7,
-    10,
-    20
+    23.3,
+    5,
+    43.6,
+    7,
+    20.2,
+    9,
+    22
    ],
    "Alabama": [
+    22.7,
+    6,
+    45.2,
+    2,
     22.5,
-    7,
-    45.1,
-    3,
-    22.6,
-    26,
-    4
-   ],
-   "Texas": [
-    21.5,
-    8,
-    42.3,
-    8,
-    20.7,
-    11,
-    7
-   ],
-   "Ole Miss": [
-    17.8,
-    9,
-    43.0,
-    7,
-    25.2,
-    53,
-    3
-   ],
-   "Tennessee": [
-    16.7,
-    12,
-    38.4,
-    14,
-    21.7,
-    14,
-    26
-   ],
-   "Florida": [
-    14.3,
-    17,
-    40.0,
-    10,
-    25.7,
-    60,
-    13
-   ],
-   "Oklahoma": [
-    13.6,
-    18,
-    33.5,
-    33,
-    20.0,
-    4,
+    29,
     8
    ],
-   "Kentucky": [
-    13.3,
-    20,
-    38.0,
-    16,
+   "Texas": [
+    22.7,
+    7,
+    42.2,
+    8,
+    19.5,
+    6,
+    10
+   ],
+   "Ole Miss": [
+    20.0,
+    9,
+    44.6,
+    4,
     24.7,
-    50,
-    6
+    49,
+    7
+   ],
+   "Tennessee": [
+    17.0,
+    12,
+    38.4,
+    15,
+    21.4,
+    16,
+    25
    ],
    "Missouri": [
-    13.1,
-    21,
-    35.3,
-    28,
-    22.2,
-    20,
-    30
+    14.9,
+    16,
+    36.3,
+    22,
+    21.4,
+    17,
+    33
    ],
-   "Texas A&M": [
-    12.6,
-    26,
-    34.9,
-    30,
-    22.3,
-    21,
-    9
+   "Florida": [
+    13.9,
+    20,
+    39.6,
+    12,
+    25.7,
+    60,
+    3
    ],
    "South Carolina": [
-    12.0,
+    13.7,
+    21,
+    38.0,
+    18,
+    24.2,
+    44,
+    15
+   ],
+   "Kentucky": [
+    13.4,
+    22,
+    38.1,
+    17,
+    24.7,
+    50,
+    13
+   ],
+   "Texas A&M": [
+    13.1,
+    24,
+    35.1,
     27,
-    36.7,
-    20,
-    24.6,
-    46,
-    16
+    22.0,
+    22,
+    9
+   ],
+   "Oklahoma": [
+    11.8,
+    29,
+    32.9,
+    35,
+    21.1,
+    14,
+    4
    ],
    "Auburn": [
-    10.5,
-    34,
-    34.0,
-    31,
-    23.5,
-    32,
-    1
-   ],
-   "Mississippi State": [
-    9.1,
+    9.2,
     37,
-    35.6,
-    27,
-    26.5,
-    69,
+    33.6,
+    32,
+    24.4,
+    48,
     2
    ],
-   "Arkansas": [
-    2.2,
-    61,
-    28.8,
-    60,
+   "Mississippi State": [
+    8.3,
+    40,
+    34.9,
+    28,
     26.6,
-    73,
-    14
+    70,
+    1
+   ],
+   "Arkansas": [
+    1.0,
+    68,
+    27.8,
+    64,
+    26.8,
+    75,
+    12
    ],
    "Vanderbilt": [
-    0.6,
-    68,
-    28.0,
-    63,
-    27.3,
+    0.8,
+    70,
+    28.1,
+    62,
+    27.2,
     80,
-    15
+    17
    ]
   }
  },
  "fpi": {
   "Arkansas": [
-   2.0,
-   59
+   0.6,
+   69
   ],
   "Georgia": [
-   26.5,
+   25.4,
    4
   ],
   "Ole Miss": [
-   18.9,
+   21.5,
    9
   ],
   "Vanderbilt": [
    0.3,
-   68
+   71
   ],
   "Alabama": [
    24.5,
-   5
+   6
   ],
   "South Carolina": [
-   12.4,
-   26
+   13.5,
+   25
   ],
   "Tennessee": [
-   16.8,
-   12
+   16.7,
+   14
   ],
   "LSU": [
-   24.0,
-   7
+   24.7,
+   5
   ],
   "Kentucky": [
-   13.1,
-   24
+   13.0,
+   26
   ],
   "Oklahoma": [
-   14.1,
-   19
+   12.1,
+   30
   ],
   "Florida": [
-   14.5,
-   17
+   13.9,
+   22
   ],
   "Texas": [
    24.0,
-   8
+   7
   ],
   "Missouri": [
-   12.2,
-   28
+   14.1,
+   19
   ],
   "Texas A&M": [
-   13.4,
-   22
+   13.8,
+   23
   ],
   "Mississippi State": [
-   8.5,
-   40
+   7.8,
+   42
   ],
   "Auburn": [
-   12.1,
-   29
+   9.6,
+   37
   ]
  },
  "log": [
@@ -14418,7 +14402,7 @@ window.SITE_AUTO.football = {
   "OK   box scores for finished games (ESPN)",
   "OK   matchup previews for remaining games (CFBD)",
   "OK   season-by-season schedules and team leaders (cached after the first run)",
-  "OK   PEAR ratings (week 9)",
+  "OK   PEAR ratings (week 10)",
   "OK   FPI ratings and ranks for the SEC (CFBD)"
  ]
 };
