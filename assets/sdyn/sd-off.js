@@ -69,18 +69,19 @@
       if (p.nilOffer) pts += Math.min(22, p.nilOffer / Math.max(15000, SD.nilValue(p, ut)) * 9) * (p.pref.includes('nil') ? 1.5 : 0.8);
       // an official visit this week
       if (p.visit && p.visit <= g.date && !p.visited) { const x = SD.userGames().find(y => y.d === p.visit); const won = x && x.res && ((x.h === ut.id) === (x.res.h > x.res.a)); pts += won ? 50 : 18; p.visited = true; logs.push(`${p.n} (${p.rec.stars}★ ${p.pos}) took an official visit${won ? ' and saw a win' : ''}.`); }
-      p.acts = {};
       pts = 70 * (1 - Math.exp(-pts / 70));
-      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + fitScore(ut, p) * 0.9) * (p.offer ? 1 : 0.5) * SD.recruitMult();
+      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + fitScore(ut, p) * 0.9) * (p.offer ? 1 : 0.5) * SD.recruitMult() * (mode === 'auto' ? 0.6 : 1);
     });
     Object.values(R.pool).forEach(p => {
+      if (p.commit != null && p.commit !== ut.id && p.acts) p.acts = {};
       if (p.commit != null && p.firm) return;
       for (const tid in p.interest) { const t = g.teams[tid]; if (!t || t.user || +tid === g.user) continue; const heat = p.rec.stars >= 4 ? 1 + Math.max(0, t.prestige - 75) / 50 : 1; p.interest[tid] += (3 + t.prestige / 10) * (0.5 + fitScore(t, p)) * rr(0.3, 1.4) * heat; }
       const order = Object.entries(p.interest).sort((a, b) => b[1] - a[1]); if (!order.length) return;
       const [lead, lv] = order[0], second = order[1] ? order[1][1] : 0, isMe = +lead === g.user;
       const need = (130 + p.rec.stars * 15) * (1 - Math.min(20, weekNo()) / 34);
-      if (p.commit == null && lv >= need && lv >= second * 1.15 && (!isMe || (p.offer && !full && (p.rec.stars < 4 || p.visited || weekNo() >= 14)))) {
-        p.commit = +lead; p.cwk = weekNo();
+      const per = SD.period().n, early = per === 1 ? 99 : per === 2 ? 1.25 : 1;
+      if (p.commit == null && lv >= need * early && lv >= second * (per === 2 ? 1.35 : 1.15) && (!isMe || (p.offer && !full && (p.rec.stars < 4 || p.visited || weekNo() >= 14)))) {
+        p.commit = +lead; p.cwk = weekNo(); p.cper = per; if (per <= 2) p.early = true;
         if (isMe) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos}, commits to ${SD.UN()}!`); SD.news('commit', `${p.rec.stars}-star ${p.pos} ${p.n} commits to ${SD.UN()}`, `No. ${p.rec.natl} nationally.`); }
       } else if (p.commit != null && !p.firm && weekNo() - (p.cwk || 0) < 5 && !(p.commit === g.user && p.visited) && +lead !== p.commit && lv >= (p.interest[p.commit] || 0) * 1.35 && (!isMe || p.offer)) {
         const was = p.commit; p.commit = +lead;
@@ -90,6 +91,9 @@
     R.log = logs.concat(R.log).slice(0, 50);
     rankClasses();
   };
+  // five recruiting periods over the season; commitments open up after period 1 (early commits in period 2 need a clear lead)
+  SD.PERIOD_NAMES = ['Summer and fall evaluation', 'Early signing window', 'Conference play', 'Postseason stretch', 'Final push'];
+  SD.period = () => { const w = weekNo(), B = [0, 4, 8, 12, 17]; let n = 0; B.forEach((b, i) => { if (w >= b) n = i + 1; }); return { n, name: SD.PERIOD_NAMES[n - 1], wk: w, next: B[n] != null ? B[n] - w : null }; };
   function weekNo() { const g = G(); return Math.max(0, Math.round((Date.parse(g.date) - Date.parse(SD.dateOf(SD.SP().start))) / (7 * 864e5))); }
   function fitScore(t, p) {
     let f = 0.35;
@@ -112,8 +116,9 @@
     cand.slice(0, 4).forEach((p, i) => { if (!p.visit && home[i % Math.max(1, home.length)]) SD.setVisit(p.id, home[i % home.length].d); });
   }
   function rankClasses() {
-    const g = G(), R = g.recruit, pts = {};
-    Object.values(R.pool).forEach(p => { if (p.commit == null) return; pts[p.commit] = (pts[p.commit] || 0) + Math.pow(p.rec.c * 100 - 70, 2); });
+    const g = G(), R = g.recruit, pts = {}, cs = {};
+    Object.values(R.pool).forEach(p => { if (p.commit == null) return; pts[p.commit] = (pts[p.commit] || 0) + Math.pow(p.rec.c * 100 - 70, 2); const c = cs[p.commit] = cs[p.commit] || { 5: 0, 4: 0, 3: 0, n: 0 }; c.n++; if (p.rec.stars >= 3) c[Math.min(5, p.rec.stars)]++; });
+    R.cstars = cs;
     const order = Object.entries(pts).sort((a, b) => b[1] - a[1]).map(x => +x[0]);
     R.classRank = order.indexOf(g.user) + 1 || null; R.order = order;
   }

@@ -116,3 +116,6 @@ tr.st td:first-child { font-weight: 800; color: var(--orange-ink); }
 .sdg-pop.dunk.on { text-shadow: 0 0 16px #FFD54A; color: #FFD54A; }
 .sdg-pop.bad.big { background: rgba(60,12,12,.92); }
 .dy-t[data-team] { cursor: pointer; } .dy-t[data-team]:hover { text-decoration: underline; }
+
+.dy-periods { display: flex; gap: 6px; margin: 8px 0 2px; } .dy-periods span { flex: 1; text-align: center; padding: 4px 0; border-radius: 6px; background: rgba(128,128,128,.2); font-weight: 800; } .dy-periods .past { background: rgba(255,130,0,.35); } .dy-periods .on { background: #ff8200; color: #141414; }
+.dy-stage{height:5px;border-radius:3px;background:rgba(128,128,128,.25);margin:4px 0 1px;overflow:hidden}.dy-stage i{display:block;height:100%;background:#ff8200}
