@@ -246,7 +246,7 @@
       const need = (140 + p.rec.stars * 15 + (w <= 4 ? 40 : 0)) * (1 - Math.min(w, 14) / 24);
       // four- and five-stars want to see campus (an official visit) before they commit to you
       const visitOk = p.rec.stars < 4 || p.visited || w >= (p.rec.stars >= 5 ? 12 : 8);
-      if (!p.commit && lv >= need * (g.teams[lead].user && p.rec.stars >= 5 ? 1 + 0.12 * Math.max(0, DY.myCommits().filter(x => x.rec.stars >= 5).length - 3) : 1) && lv >= second * (g.teams[lead].user ? 1.05 : (w >= 10 ? 1.08 : 1.2)) && (!g.teams[lead].user || (p.offer && !full && visitOk && starRoom(p)))) {
+      if (!p.commit && lv >= need * (g.teams[lead].user && p.rec.stars >= 5 ? 1 + 0.12 * Math.max(0, DY.myCommits().filter(x => x.rec.stars >= 5).length - 3) : 1) && lv >= second * (g.teams[lead].user ? (w >= 10 ? 1.08 : 1.15) : (w >= 10 ? 1.08 : 1.2)) && (!g.teams[lead].user || (p.offer && !full && visitOk && starRoom(p)))) {
         p.commit = +lead; if (!g.teams[lead].user) addCommit(R, +lead, p);
         if (g.teams[lead].user) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos} from ${p.home}, commits to ${DY.UN()}!`); DY.news('commit', `${p.rec.stars}-star ${DY.POS_NAME[p.pos].toLowerCase()} ${p.n} commits to ${DY.UN()}`, `No. ${p.rec.nat} nationally (${p.rec.c.toFixed(4)} composite). ${p.home}, ${p.hs}.`, { rid: p.id }); }
         else if (p.rec.nat <= 50 && R.board.includes(p.id)) logs.push(`${p.n} (No. ${p.rec.nat}) commits to ${g.teams[lead].name}.`);
@@ -266,6 +266,13 @@
     const g = G(), R = g.recruit; cpuState(R);
     const cap = t => t.user ? DY.CAP.hs : 27;
     const userOk = p => p.offer && !fullUser && g.settings.recruiting !== 'off';
+    // auto recruiting finishes the job: if the class is short of 20, the staff settles for the best prospects still open that it was working, three-stars included
+    if (g.settings.recruiting === 'auto' && !R.locked) {
+      const ut = DY.userT(), have = DY.myCommits().length;
+      const open = Object.values(R.pool).filter(p => p.commit == null && !p.real && !['K', 'P', 'LS'].includes(p.pos))
+        .sort((a, b) => ((b.interest[ut.id] || 0) + b.rec.c * 60) - ((a.interest[ut.id] || 0) + a.rec.c * 60));
+      let n = have; for (const p of open) { if (n >= DY.CAP.hs) break; p.commit = ut.id; p.offer = true; n++; logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos}, signs with ${DY.UN()} late.`); }
+    }
     const rest = Object.values(R.pool).filter(p => p.commit == null).sort((a, b) => b.rec.c - a.rec.c);
     // first pass: his own list, but only schools that can use him; second pass: any school with room and a hole, then any room at all
     [0, 1, 2].forEach(pass => rest.forEach(p => {
@@ -321,7 +328,8 @@
     const score = p => {
       const pl = DY.pull(ut, p), rival = Math.max(0, ...Object.entries(p.interest).filter(([t]) => +t !== ut.id).map(([, v]) => v));
       const open = (needs[p.pos] || 0) - (planned[p.pos] || 0);
-      let v = p.rec.c * 100 * (0.55 + pl * 0.45) - (pl < 0.4 ? 22 : 0)                 // talent, discounted by how likely a program like yours is to land him
+      const late = Math.min(1, Math.max(0, ((G().week || 0) - 4) / 8)), wn = Math.min(1.2, ((p.interest[ut.id] || 0) + 15) / (rival + 15));
+      let v = p.rec.c * 100 * (0.55 + pl * 0.45) * (1 - late * 0.5) + late * wn * 30 - (pl < 0.4 && late < 0.5 ? 22 : 0)                 // talent, discounted by how likely a program like yours is to land him
         + (open > 0 ? 7 + Math.min(open, 3) * 3 : -14 - Math.max(0, -open) * 14)    // need: fill holes, never stack a position
         + (p.interest[ut.id] || 0) / 18 + DY.fitScore(ut, p) * 12                     // interested and a good fit = likely to commit
         - rival * (1 - Math.min(1, pl)) * 0.22;
@@ -331,7 +339,9 @@
     };
     // top up the board (own picks stay; additions only until 20 are still in play)
     let guard = 0;
-    while (active() < DY.AUTO_TARGETS && R.board.length < DY.BOARD_MAX && guard++ < 40) {
+    // aim at a full class: the number of live targets scales with the spots still open and how late it is (late, a winnable three-star beats a longshot five-star)
+    const wkNow = g.week || 0, spots = Math.max(0, DY.CAP.hs - commits.length), tgt = Math.min(DY.BOARD_MAX, Math.max(DY.AUTO_TARGETS, Math.round(spots * (1.3 + wkNow / 8))));
+    while (active() < tgt && R.board.length < DY.BOARD_MAX && guard++ < 40) {
       const pick = Object.values(R.pool).filter(p => !R.board.includes(p.id) && inPlay(p) && !p.real).map(p => [p, score(p)]).sort((a, b) => b[1] - a[1])[0];
       if (!pick || pick[1] < -500) break;
       R.board.push(pick[0].id); planned[pick[0].pos] = (planned[pick[0].pos] || 0) + 1; if (pick[0].interest[ut.id] == null) pick[0].interest[ut.id] = 0;
@@ -350,6 +360,16 @@
     const ranked = order.slice().sort((a, b) => ((leads(b) ? 2 : 0) + winn(b) + b.rec.c * 0.4) - ((leads(a) ? 2 : 0) + winn(a) + a.rec.c * 0.4));
     ranked.forEach(p => { if (coach > 0 && hrs >= 6 && p.rec.stars >= 4 && winn(p) >= 0.45) { delete p.acts.dm; p.acts.coach = 1; hrs -= 6; coach--; } });
     ranked.forEach(p => { if (!p.acts.coach && hrs >= 2 && winn(p) >= 0.35) { delete p.acts.dm; p.acts.call = 1; hrs -= 2; } });
+    // use the whole week: after commits free hours up, top up the best targets (call, then DM, then another head coach visit) until about 3 hours are left
+    for (let pass = 0; pass < 4 && hrs > 3; pass++) {
+      ranked.forEach(p => {
+        if (hrs <= 3) return;
+        if (!p.acts.call && hrs >= DY.ACTIONS.call.hrs + 0) { p.acts.call = 1; hrs -= DY.ACTIONS.call.hrs; }
+        else if (!p.acts.dm && hrs >= 1) { p.acts.dm = 1; hrs -= 1; }
+        else if (!p.acts.coach && coach > 0 && hrs >= DY.ACTIONS.coach.hrs && p.rec.stars >= 3) { p.acts.coach = 1; hrs -= DY.ACTIONS.coach.hrs; coach--; }
+      });
+    }
+    DY._autoHrsLeft = hrs;
     const homeWks = DY.userGames().filter(x => x.h === ut.id && !x.res && x.wk > g.week).map(x => x.wk);
     if (homeWks.length) ranked.filter(p => !p.visit && (p.rec.stars >= 4 || leads(p))).forEach((p, k) => { for (let m = 0; m < homeWks.length; m++) if (!DY.setVisit(p.id, homeWks[(k + m) % homeWks.length])) break; });
   };
