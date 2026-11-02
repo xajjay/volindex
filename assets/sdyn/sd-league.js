@@ -758,6 +758,10 @@
   };
   // sim the user's next game without playing it
   SD.simNext = () => { const x = SD.advanceToUser(); if (!x) return null; SD.simGame(x); SD.afterUserGame(x); return x; };
+  // sim one round of the NCAA tournament (every game of the current round), then stop
+  SD.simRound = () => { const g = G(); if (g.phase !== 'ncaa' || !g.post) return 0; const stage = g.post.stage, lab = g.post.label; g.skipShow = true; let n = 0;
+    try { while (g.phase === 'ncaa' && g.post && g.post.stage === stage && n++ < 40) { const pend = g.sched.filter(y => !y.res); if (!pend.length) { SD.postAfterDay(); continue; } const d = pend.map(y => y.d).sort()[0]; SD.simTo(SD.addDays(d, 1), true); SD.postAfterDay(); } } finally { g.skipShow = false; }
+    return n; };
   SD.simToEnd = (stopPhase) => { const g = G(); let guard = 0; g.skipShow = true; try { SD._simToEnd(stopPhase); } finally { g.skipShow = false; if (g.post) g.post.seen = true; } };
   SD._simToEnd = (stopPhase) => { const g = G(); let guard = 0; while (g.phase !== 'offseason' && guard++ < 200) { if (stopPhase && g.phase !== stopPhase && stopPhase !== 'end') break; const x = SD.simNext(); if (!x && g.phase !== 'offseason') { SD.advanceToUser(); if (!SD.nextUserGame() && g.phase !== 'offseason') { /* out of the postseason: play it out */ let n = 0; while (g.phase !== 'offseason' && n++ < 60) { const pend = g.sched.filter(y => !y.res); if (!pend.length) { SD.postAfterDay(); continue; } const d = pend.map(y => y.d).sort()[0]; SD.simTo(SD.addDays(d, 1), true); SD.postAfterDay(); } } } } };
   SD.phaseLabel = () => {

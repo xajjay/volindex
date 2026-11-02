@@ -43,6 +43,7 @@
     const base = [34, 33, 32, 31, 30, 22, 18, 13, 8, 4, 2][i] || 0;
     const depth = c.depth || 9, cut = i >= depth ? 0.15 : 1;
     const p = GM.L[s][i], star = p && i < 5 && p.ovr >= 85 ? 2 * (c.star || 1) : 0;
+    if (p && c.mins && c.mins[p.id] != null && c.mins[p.id] !== '') return Math.max(0, +c.mins[p.id]) * total / 40;
     return (base + star) * cut * total / 40;
   }
   function subs(GM, s, force) {

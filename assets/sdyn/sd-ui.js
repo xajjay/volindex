@@ -14,7 +14,7 @@
   const stars = n => '★'.repeat(n || 0) + '<span class="dy-off">' + '★'.repeat(Math.max(0, 5 - (n || 0))) + '</span>';
   const ovrCls = o => o >= 90 ? 'e' : o >= 84 ? 'g' : o >= 76 ? 'm' : 'l';
   const ovrB = o => `<span class="dy-ovr ${ovrCls(o)}">${o}</span>`;
-  const tlink = (id, rk) => { const t = T(id); if (!t) return ''; const r = rk === false ? null : SD.apRank(id); return `<span class="dy-t" style="--tc:${t.c1}">${r ? `<small>${r}</small> ` : ''}${esc(t.name)}</span>`; };
+  const tlink = (id, rk) => { const t = T(id); if (!t) return ''; const r = rk === false ? null : SD.apRank(id); return `<span class="dy-t" role="button" tabindex="0" data-team="${id}" style="--tc:${t.c1}">${r ? `<small>${r}</small> ` : ''}${esc(t.name)}</span>`; };
   const plink = (p, txt) => p ? `<a href="#" class="dy-pl${p.t === G().user ? '' : ' o'}" data-pid="${p.id}">${esc(txt || p.n)}</a>` : '';
   const sStats = p => p.s || (G().phase === 'offseason' && p.car && p.car[G().season]) || null;
   const f1 = (a, b) => b ? (a / b).toFixed(1) : '0.0';
@@ -113,7 +113,7 @@
         <div class="wrap dyh-in">
           <div class="dyh-id"><span class="dyh-badge">${esc(ut.abbr)}</span><div><div class="dyh-name">${rk ? `<small>No. ${rk}</small> ` : ''}${SD.isTN() && sp.he === 'she' && hoops() ? 'Lady Vols' : esc(ut.name)}</div><div class="dyh-sub">Coach ${esc(g.coach.name)} · ${esc(SD.phaseLabel())}</div></div></div>
           <div class="dyh-rec"><b>${ut.w}-${ut.l}</b><small>${ut.cw}-${ut.cl} ${esc(SD.UC())}</small></div>
-          <div class="dyh-act">${act ? `<button class="btn primary big" data-act="main">${esc(act.label)}</button>${act.sim ? `<button class="btn" data-act="sim">${esc(act.sim)}</button>` : ''}` : ''}
+          <div class="dyh-act">${act ? `<button class="btn primary big" data-act="main">${esc(act.label)}</button>${act.sim ? `<button class="btn" data-act="sim">${esc(act.sim)}</button>` : ''}${act.alt ? `<button class="btn" data-act="simall">${esc(act.alt)}</button>` : ''}` : ''}
             ${g.phase !== 'offseason' ? `<div class="dy-menu"><button class="btn" data-act="simmenu">Sim ahead ▾</button><div class="dy-menu-in" hidden><p class="small dim" style="margin:2px 8px 6px">Your games get simmed too.</p>${g.phase === 'season' || g.phase === 'preseason' ? '<button data-ahead="7">One week</button><button data-ahead="reg">End of the regular season</button>' : ''}<button data-ahead="end">End of the season</button></div></div>` : ''}
             <button class="btn" data-act="save">Save</button></div>
         </div>
@@ -135,7 +135,7 @@
     if (g.post && g.post.seen === false) return { label: hoops() ? 'Watch Selection Sunday' : 'Watch the selection show', main: () => { V.tab = 'home'; hub(); } };
     const nx = SD.nextUserGame();
     if (!nx) {
-      if (g.phase === 'ncaa' && !(g.post && g.post.field.includes(g.user) && alive(g.user))) return { label: 'Play out the tournament', main: () => busy('Playing out the tournament…', () => SD.simToEnd('end')) };
+      if (g.phase === 'ncaa' && !(g.post && g.post.field.includes(g.user) && alive(g.user))) return { label: 'Sim the next round', alt: 'Play out the tournament', main: () => busy('Simming the round…', () => { SD.simRound(); }), altMain: () => busy('Playing out the tournament…', () => SD.simToEnd('end')), main: () => busy('Playing out the tournament…', () => SD.simToEnd('end')) };
       if (g.phase === 'ncaa') return { label: 'Continue to your next game', main: () => busy('Moving ahead…', () => { SD.advanceToUser(); }) };
       const lab = g.phase === 'ct' ? (hoops() ? 'Continue to Selection Sunday' : 'Continue to the NCAA field announcement') : g.phase === 'season' ? 'Continue to the conference tournaments' : 'Continue';
       return { label: lab, main: () => busy('Moving ahead…', () => { SD.advanceToUser(); }) };
@@ -157,7 +157,7 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-tab],[data-job],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-ord],[data-gid]'); if (!el) return;
+    const el = e.target.closest('[data-tab],[data-job],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-rotauto],[data-ord],[data-gid]'); if (!el) return;
     const d = el.dataset, g = G();
     if (el.tagName === 'A') e.preventDefault();
     if (d.tab) { V.tab = d.tab; V.msg = null; return hub(); }
@@ -167,6 +167,8 @@
     if (d.gid) return boxCard(d.gid);
     if (d.act === 'close') return closeModal();
     if (d.act === 'msgx') { V.msg = null; return hub(); }
+    if (d.act === 'sstourney') { if (g.post) g.post.seen = true; return busy('Playing out the tournament…', () => { SD.simToEnd('end'); V.tab = 'home'; }); }
+    if (d.act === 'simround') return busy('Simming the round…', () => { const n = SD.simRound(); V.msg = n || ''; });
     if (d.act === 'ssdone') { if (g.post) g.post.seen = true; V.tab = 'tourney'; V.treg = null; autosave(); return hub(); }
     if (d.treg) { V.treg = d.treg; return keep(); }
     if (d.team) return teamCard(+d.team);
@@ -177,6 +179,7 @@
     if (d.campp) { const C = SD.campState(), id = +d.campp, i = C.picks.indexOf(id); if (i >= 0) C.picks.splice(i, 1); else if (C.picks.length < 3) C.picks.push(id); else V.msg = 'Three players max: tap one to take him out.'; return keep(); }
     if (d.act === 'camp') { SD.runCamp(false); autosave(); return keep(); }
     if (d.act === 'main' || d.act === 'sim') V.recap = null;
+    if (d.act === 'simall') { const a = primaryAction(); if (a && a.altMain) a.altMain(); return; }
     if (d.act === 'main') { const a = primaryAction(); if (a) a.main(); return; }
     if (d.act === 'sim') { return busy('Simming…', () => { const x = SD.simNext(); if (x) { const me = x.h === g.user ? 'h' : 'a'; V.msg = `Final: ${T(x.a).name} ${x.res.a}, ${T(x.h).name} ${x.res.h}.`; } }); }
     if (d.act === 'simmenu') { const m = el.parentNode.querySelector('.dy-menu-in'); m.hidden = !m.hidden; return; }
@@ -212,10 +215,11 @@
     if (d.poffer) { const sel = APP.querySelector(`[data-pofferamt="${d.poffer}"]`); V.msg = SD.portalOffer(+d.poffer, +sel.value) || 'Offer made.'; return keep(); }
     if (d.cut) { V.msg = SD.toggleCut(+d.cut); return keep(); }
     if (d.set) { const [k, v] = d.set.split('|'); g.settings[k] = v === 'true' ? true : v === 'false' ? false : v; return keep(); }
-    if (d.rot) { // rotation order (hoops): move up/down
+    if (d.rot) { // bench order (hoops): move up/down
       const [id, dir] = d.rot.split('|'), t = SD.userT(), L = SD.lineup(t).map(p => p.id), i = L.indexOf(+id), j = i + (+dir);
-      if (i >= 0 && j >= 0 && j < L.length) { [L[i], L[j]] = [L[j], L[i]]; t.rot = L; } return keep();
+      if (i >= 5 && j >= 5 && j < L.length) { [L[i], L[j]] = [L[j], L[i]]; t.bench = L.slice(5); t._lsig = null; } return keep();
     }
+    if (d.rotauto) { const t = SD.userT(); t.slots = null; t.bench = null; t._lsig = null; if (t.coach && typeof t.coach === 'object') { delete t.coach.mins; delete t.coach.opts; } return keep(); }
     if (d.ord) { const [id, dir] = d.ord.split('|'), t = SD.userT(), D = SD.diamondLineup(t), O = D.order.map(p => p.id), i = O.indexOf(+id), j = i + (+dir); if (i >= 0 && j >= 0 && j < O.length) { [O[i], O[j]] = [O[j], O[i]]; t.dl = Object.assign(t.dl || {}, { order: O }); } return keep(); }
   }
   function onChange(e) {
@@ -226,6 +230,9 @@
     if (el.dataset.fpos) { const D = SD.diamondLineup(t); const field = Object.fromEntries(Object.entries(D.field).map(([k, p]) => [k, p ? p.id : null])); const pid = +el.value; for (const k in field) if (field[k] === pid) field[k] = null; field[el.dataset.fpos] = pid; t.dl = Object.assign(t.dl || {}, { field, order: null }); return keep(); }
     if (el.dataset.rotsp) { const D = SD.diamondLineup(t); const rot = D.rotation.map(p => p.id); rot[+el.dataset.rotsp] = +el.value; t.dl = Object.assign(t.dl || {}, { rot: rot.filter((x, i, a) => a.indexOf(x) === i) }); return keep(); }
     if (el.dataset.closer) { t.dl = Object.assign(t.dl || {}, { closer: +el.value }); return keep(); }
+    if (el.dataset.slot) { const pos = el.dataset.slot, id = +el.value; t.slots = Object.assign({}, t.slots || {}); SD.SLOTS.forEach(k => { if (t.slots[k] === id) delete t.slots[k]; }); t.slots[pos] = id; t._lsig = null; return keep(); }
+    if (el.dataset.mins) { const c = typeof t.coach === 'object' && t.coach ? t.coach : (t.coach = {}); c.mins = Object.assign({}, c.mins || {}); if (el.value === '') delete c.mins[el.dataset.mins]; else c.mins[el.dataset.mins] = +el.value; return keep(); }
+    if (el.dataset.optn) { const c = typeof t.coach === 'object' && t.coach ? t.coach : (t.coach = {}); const o = (c.opts || []).slice(); o[+el.dataset.optn] = el.value === '' ? null : +el.value; const seen = new Set(); c.opts = o.map(x => x != null && !seen.has(x) && seen.add(x) ? x : null); while (c.opts.length && c.opts[c.opts.length - 1] == null) c.opts.pop(); return keep(); }
     if (el.dataset.coach) { t.coach = Object.assign({}, t.coach || {}, { [el.dataset.coach]: el.value }); return keep(); }
     if (el.id === 'sdRq') { V.rfind.q = el.value; return keep(true); }
   }
@@ -417,12 +424,17 @@
   }
   function teamCard(id) {
     const t = T(id); if (!t) return;
-    const ps = t.roster.map(SD.P).filter(Boolean).sort((a, b) => b.ovr - a.ovr).slice(0, 3);
-    const n = t.net || {};
-    modal(`<div class="dy-pc" style="--tc:${t.c1}"><h3>${esc(t.name)}</h3><p class="dim">${esc(SD.CONF_NAME[t.conf] || t.conf)} · ${t.w}-${t.l} (${t.cw}-${t.cl} conference)${t.confChamp === G().season ? ' · conference champion' : ''}</p>
-      <div class="dy-stats4"><div><b>${n.rank || '—'}</b><small>${SD.netName()}</small></div><div><b>${n.sos || '—'}</b><small>Schedule rank</small></div><div><b>${SD.teamRating(t)}</b><small>Team rating</small></div><div><b>${G().post && G().post.seedOf ? G().post.seedOf[id] || '—' : '—'}</b><small>${hoops() ? 'Seed' : 'National seed'}</small></div></div>
+    const g = G(), L = hoops() ? SD.lineup(t) : null, ps = t.roster.map(SD.P).filter(Boolean).sort((a, b) => b.ovr - a.ovr), top = hoops() ? L.slice(0, 8) : ps.slice(0, 8);
+    const n = t.net || {}, cn = SD.coachName(t), cs = g.cst && g.cst[cn], rk = SD.apRank(id);
+    const games = (g.sched || []).filter(x => (x.h === id || x.a === id));
+    const done = games.filter(x => x.res).slice(-4), next = games.filter(x => !x.res).slice(0, 2);
+    const gl = x => { const home = x.h === id, won = home === (x.res.h > x.res.a); return `<li><b class="${won ? 'dy-w' : 'dy-l'}">${won ? 'W' : 'L'}</b> ${home ? x.res.h + '-' + x.res.a : x.res.a + '-' + x.res.h} ${home ? 'vs' : 'at'} ${tlink(home ? x.a : x.h, false)} <small>${SD.dayStr(x.d)}</small></li>`; };
+    modal(`<div class="dy-pc" style="--tc:${t.c1}"><h3>${rk ? `<small>No. ${rk}</small> ` : ''}${esc(t.name)}</h3><p class="dim">${esc(SD.CONF_NAME[t.conf] || t.conf)} · ${t.w}-${t.l} (${t.cw}-${t.cl} conference)${t.confChamp === G().season ? ' · conference champion' : ''} · Coach ${esc(cn)}${cs ? ` (${cs.w}-${cs.l}, ${cs.po} NCAA trips, ${cs.nt} titles)` : ''}</p>
+      <div class="dy-stats4"><div><b>${n.rank || '—'}</b><small>${SD.netName()}</small></div><div><b>${n.sos || '—'}</b><small>Schedule rank</small></div><div><b>${SD.teamRating(t)}</b><small>Team rating</small></div><div><b>${g.post && g.post.seedOf ? g.post.seedOf[id] || '—' : '—'}</b><small>${hoops() ? 'Seed' : 'National seed'}</small></div></div>
       ${hoops() && n.q ? `<p class="small">Quad 1: <b>${n.q[0][0]}-${n.q[0][1]}</b> · Quad 2: ${n.q[1][0]}-${n.q[1][1]} · Quad 3: ${n.q[2][0]}-${n.q[2][1]} · Quad 4: ${n.q[3][0]}-${n.q[3][1]}</p>` : ''}
-      <div class="glabel">Best players</div><ul class="dy-mini">${ps.map(p => `<li>${plink(p)} <small>${p.pos} · ${yrLabel(p)} · ${p.ovr}</small></li>`).join('')}</ul></div>`);
+      <div class="glabel">${hoops() ? 'Rotation' : 'Best players'}</div><ul class="dy-mini">${top.map((p, i) => `<li>${hoops() && i < 5 ? '<small>S</small> ' : ''}${plink(p)} <small>${p.pos}${(p.pos2 || []).length ? '/' + p.pos2.join(',') : ''} · ${yrLabel(p)} · ${p.ovr}${p.arch ? ' · ' + esc(p.arch) : ''}</small></li>`).join('')}</ul>
+      ${done.length || next.length ? `<div class="glabel">Games</div><ul class="dy-mini">${done.map(gl).join('')}${next.map(x => `<li><small>${SD.dayStr(x.d)}</small> ${x.h === id ? 'vs' : 'at'} ${tlink(x.h === id ? x.a : x.h, false)}</li>`).join('')}</ul>` : ''}
+      ${(t.hist || []).length ? `<div class="glabel">Recent seasons</div><p class="small">${t.hist.slice(-6).map(h => `${h.y}: ${h.w}-${h.l}`).join(' · ')}</p>` : ''}</div>`);
   }
 
   /* ---------- the selection show ---------- */
@@ -447,9 +459,9 @@
     }
     const bub = P.bubble || { lastIn: [], firstOut: [] };
     body += `<div class="ss-box"><div class="glabel">On the bubble</div><div class="ss-bub"><div><b>Last four in</b><ol class="ss-list">${bub.lastIn.map(t => line('', t, null, i++)).join('')}</ol></div><div><b>First four out</b><ol class="ss-list">${bub.firstOut.map(t => line('', t, null, i++)).join('')}</ol></div></div></div>`;
-    b.innerHTML = `<div class="ss" id="ssRoot" style="--n:${i}"><div class="ss-hero"><span class="glabel">${hoops() ? 'Selection Sunday' : 'NCAA Tournament selection show'} · ${SD.dateStr(g.date)}</span><h2>${hoops() ? 'The field of 68' : 'The field of 64'}</h2><p>${P.autos.length} automatic bids, ${P.field.length - P.autos.length} at-large picks. The committee ranks teams by the ${SD.netName()}${hoops() ? ' (results by quadrant, scoring margin and strength of schedule)' : ' (winning percentage and strength of schedule, road wins count more)'}.</p><button class="btn" id="ssSkip">Show everything</button><button class="btn" data-act="ssdone">Skip to the bracket ›</button></div>
+    b.innerHTML = `<div class="ss" id="ssRoot" style="--n:${i}"><div class="ss-hero"><span class="glabel">${hoops() ? 'Selection Sunday' : 'NCAA Tournament selection show'} · ${SD.dateStr(g.date)}</span><h2>${hoops() ? 'The field of 68' : 'The field of 64'}</h2><p>${P.autos.length} automatic bids, ${P.field.length - P.autos.length} at-large picks. The committee ranks teams by the ${SD.netName()}${hoops() ? ' (results by quadrant, scoring margin and strength of schedule)' : ' (winning percentage and strength of schedule, road wins count more)'}.</p><button class="btn" id="ssSkip">Show everything</button><button class="btn" data-act="ssdone">Skip to the bracket ›</button> <button class="btn" data-act="sstourney">Sim the whole tournament</button></div>
       ${body}
-      <div class="ss-me ${P.field.includes(me) ? 'in' : 'out'}"><b>${mineTxt}</b><button class="btn primary big" data-act="ssdone">Open the bracket</button></div></div>`;
+      <div class="ss-me ${P.field.includes(me) ? 'in' : 'out'}"><b>${mineTxt}</b><button class="btn primary big" data-act="ssdone">Open the bracket</button> <button class="btn" data-act="sstourney">Sim the whole tournament</button></div></div>`;
     const root = b.querySelector('#ssRoot');
     // broadcast-style reveal: line by line, Auto on by default; it holds on your team's line, then keeps going
     root.classList.add('live');
@@ -564,11 +576,21 @@
   function lineup(b) {
     const ut = SD.userT(), c = Object.assign({ pace: 'normal', focus: 'bal', def: 'man', depth: '9' }, ut.coach || {});
     if (hoops()) {
-      const L = SD.lineup(ut);
+      const L = SD.lineup(ut), five = L.slice(0, 5), bench = L.slice(5), all = ut.roster.map(SD.P).filter(Boolean);
       const sel = (k, opts) => `<select data-coach="${k}">${opts.map(([v, l]) => `<option value="${v}" ${String(c[k]) === String(v) ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`;
-      b.innerHTML = `<div class="dy-grid"><div class="dy-col"><div class="box"><div class="glabel">Rotation</div><p class="small dim">The first five start; the order sets who gets minutes. Stars play more, foul trouble and fatigue change it in the game, and the closing lineup is your best five.</p>
-        <div class="dy-scroll"><table class="dyt"><tbody>${L.map((p, i) => `<tr class="${i < 5 ? 'st' : ''}"><td class="dim">${i < 5 ? 'Starter' : i + 1}</td><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${ovrB(p.ovr)}</td><td><button class="dy-ra" data-rot="${p.id}|-1" ${i === 0 ? 'disabled' : ''}>▲</button><button class="dy-ra" data-rot="${p.id}|1" ${i === L.length - 1 ? 'disabled' : ''}>▼</button></td></tr>`).join('')}</tbody></table></div></div></div>
-        <div class="dy-col"><div class="box"><div class="glabel">Team strategy</div>
+      const dflt = [34, 33, 32, 31, 30, 22, 18, 13, 8, 4, 2], depth = +(c.depth || 9), mins = c.mins || {};
+      const proj = (p, i) => mins[p.id] != null && mins[p.id] !== '' ? +mins[p.id] : Math.round((dflt[i] || 0) * (i >= depth ? 0.15 : 1) + (i < 5 && p.ovr >= 85 ? 2 : 0));
+      const total = L.reduce((a, p, i) => a + proj(p, i), 0);
+      const fit = (p, pos) => p.pos === pos ? 'primary' : (p.pos2 || []).includes(pos) ? 'secondary' : 'out of position';
+      const slotRow = (pos, i) => { const p = five[i]; return `<tr class="st"><td class="dim">${pos}</td><td><select data-slot="${pos}">${all.filter(q => !(q.inj && q.inj.g > 0) || q === p).sort((a, b) => b.ovr - a.ovr).map(q => `<option value="${q.id}" ${q === p ? 'selected' : ''}>${esc(q.n)} · ${q.pos}${(q.pos2 || []).length ? '/' + q.pos2.join(',') : ''} · ${q.ovr}${q.pos === pos ? '' : (q.pos2 || []).includes(pos) ? ' (secondary)' : ' (out of position)'}</option>`).join('')}</select></td><td>${p ? `<small class="dim">${esc(p.arch || '')} · ${fit(p, pos)}</small>` : ''}</td><td>${minSel(p, i)}</td></tr>`; };
+      const minSel = (p, i) => p ? `<select data-mins="${p.id}"><option value="">Auto (${proj({ id: -1, ovr: p.ovr }, i)})</option>${[0, 5, 10, 15, 20, 25, 28, 30, 32, 34, 36, 38].map(m => `<option value="${m}" ${mins[p.id] != null && mins[p.id] !== '' && +mins[p.id] === m ? 'selected' : ''}>${m} min</option>`).join('')}</select>` : '';
+      const opt = n => { const cur = (c.opts || [])[n]; return `<div class="gfield"><div class="glabel">${['First', 'Second', 'Third'][n]} option</div><select data-optn="${n}"><option value="">${n === 0 ? 'Let the offense decide' : 'None'}</option>${five.concat(bench.slice(0, 3)).map(p => `<option value="${p.id}" ${cur === p.id ? 'selected' : ''}>${esc(p.n)} · ${esc(p.arch || p.pos)} · ${p.ovr}</option>`).join('')}</select></div>`; };
+      b.innerHTML = `<div class="dy-grid"><div class="dy-col wide"><div class="box"><div class="glabel">Starting five</div><p class="small dim">One starter per spot. Primary and secondary positions play at full strength; out of position costs a few points. Minutes below are what the coach aims for; foul trouble, fatigue and blowouts still move them.</p>
+        <div class="dy-scroll"><table class="dyt"><tbody>${SD.SLOTS.map(slotRow).join('')}</tbody></table></div></div>
+        <div class="box"><div class="glabel">Bench</div><div class="dy-scroll"><table class="dyt"><tbody>${bench.map((p, i) => `<tr><td class="dim">${i + 6}</td><td>${plink(p)} <small>${p.pos}${(p.pos2 || []).length ? '/' + p.pos2.join(',') : ''} · ${yrLabel(p)} · ${esc(p.arch || '')}</small></td><td>${ovrB(p.ovr)}</td><td>${minSel(p, i + 5)}</td><td><button class="dy-ra" data-rot="${p.id}|-1" ${i === 0 ? 'disabled' : ''}>▲</button><button class="dy-ra" data-rot="${p.id}|1" ${i === bench.length - 1 ? 'disabled' : ''}>▼</button></td></tr>`).join('')}</tbody></table></div>
+        <p class="small dim">Planned minutes add up to <b>${total}</b> of 200. Over 200, the lowest players get cut short; under 200, the starters pick up the rest. <button class="dy-ra" data-rotauto="1">Reset to automatic</button></p></div></div>
+        <div class="dy-col"><div class="box"><div class="glabel">Scoring options</div><p class="small dim">Who the offense looks for first. Options take more of the shots, so the better the shooter, the better it works.</p>${opt(0)}${opt(1)}${opt(2)}</div>
+        <div class="box"><div class="glabel">Team strategy</div>
         <div class="gfield"><div class="glabel">Pace</div>${sel('pace', [['slow', 'Slow it down'], ['normal', 'Normal'], ['fast', 'Push the pace']])}</div>
         <div class="gfield"><div class="glabel">Offense</div>${sel('focus', [['bal', 'Balanced'], ['rim', 'Attack the rim'], ['three', 'Let it fly (threes)'], ['post', 'Feed the post'], ['star', 'Ride the star']])}</div>
         <div class="gfield"><div class="glabel">Defense</div>${sel('def', [['man', 'Man-to-man'], ['zone', '2-3 zone'], ['press', 'Full-court press']])}</div>

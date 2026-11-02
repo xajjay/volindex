@@ -45,7 +45,7 @@
     S.el.innerHTML = `<div class="dyg sdg ${S.hoops ? 'hoops' : 'diamond'}">
       <div class="dyg-stick">
         <div class="dyg-board" id="sdgBoard"></div>
-        <div class="dyg-fieldwrap sdg-fieldwrap"><canvas id="sdgCv"></canvas><div class="dyg-banner" id="sdgBan"></div></div>
+        <div class="dyg-fieldwrap sdg-fieldwrap"><canvas id="sdgCv"></canvas><div class="dyg-banner" id="sdgBan"></div><div class="dyg-pop sdg-pop" id="sdgPop"></div></div>
         <div class="dyg-cap" id="sdgCap"><div class="dyg-head">${esc(GM.title || (GM.neutral ? 'Neutral site' : H.name))}</div><div class="dyg-text">${esc(A.name)} at ${esc(H.name)}. ${S.hoops ? 'Tip-off is coming up.' : 'First pitch is coming up.'}</div></div>
         <div class="dyg-fullbar"><button data-g="pause">Pause</button><button data-g="speed">Speed</button>${S.hoops ? '<button data-g="timeout">Timeout</button><button data-g="simper">Sim period</button>' : '<button data-g="nextpa">Next batter</button><button data-g="siminn">Sim inning</button>'}<button data-g="full">Exit full screen</button></div>
       </div>
@@ -164,6 +164,19 @@
     const out = r.bip ? ({ gb: 'GROUNDOUT', fb: 'FLYOUT', ld: 'LINEOUT', pu: 'POP OUT' })[r.bip.type] : null;
     const sm = { k: 'STRIKEOUT', bb: 'WALK', ibb: 'INTENTIONAL WALK', hbp: 'HIT BY PITCH', '1b': 'SINGLE', e: 'ERROR', sf: 'SAC FLY', sac: 'SAC BUNT', out: out || 'OUT' }[r.result];
     if (sm) banner(sm + (r.result === 'out' || r.result === 'k' ? '' : runs), ['k', 'out'].includes(r.result) ? def : off, true);
+  }
+  // make / miss popups at the end of every shot; threes, dunks and blocks get a bigger one with a screen shake
+  function shotFx(r) {
+    const p = S.el.querySelector('#sdgPop'), w = S.el.querySelector('.sdg-fieldwrap'); if (!p) return;
+    const who = r.shooter && r.shooter.n ? r.shooter.n.split(' ').slice(-1)[0] : '', made = r.pts > 0;
+    let txt, cls, shake = 0;
+    if (r.blk) { txt = 'BLOCKED!'; cls = 'bad big'; shake = 2; }
+    else if (made && r.dunk) { txt = 'SLAM DUNK! +' + r.pts; cls = 'good big dunk'; shake = 2; }
+    else if (made && r.pts >= 3) { txt = 'BANG! THREE'; cls = 'good big three'; shake = 1; }
+    else if (made) { txt = (r.type === 'rim' ? 'LAYUP' : r.type === 'mid' ? 'JUMPER' : 'BUCKET') + ' +' + r.pts; cls = 'good small'; }
+    else { txt = r.type === '3' ? 'MISSED THREE' : 'MISS'; cls = 'bad small'; }
+    p.textContent = txt + (who && !r.blk && (shake || made) ? ' · ' + who : ''); p.className = 'dyg-pop sdg-pop ' + cls; void p.offsetWidth; p.className += ' on';
+    if (shake && w && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) { w.classList.remove('shake', 'shake2'); void w.offsetWidth; w.classList.add(shake === 2 ? 'shake2' : 'shake'); }
   }
   function banner(txt, c, small) { const b = S.el.querySelector('#sdgBan'); if (!b) return; b.textContent = txt; b.style.setProperty('--bc', c); b.style.setProperty('--bi', ink(c)); b.classList.toggle('sm', !!small); b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); }
   function end() {
@@ -399,10 +412,8 @@
         if (tm >= C.T) {
           S.anim = null;
           const end = C.kf[C.kf.length - 1]; S.pos = Object.assign({}, end.pos, { _ball: C.ball, _hold: C.hold });
-          if (r.pts >= 3 && r.kind === 'shot') banner(r.and1 ? 'AND ONE!' : 'THREE!', S.col[r.s]);
-          else if (r.and1) banner('AND ONE!', S.col[r.s]);
-          else if (r.blk && r.big) banner('REJECTED', S.col[other(r.s)]);
-          else if (/throws it down/.test(r.text)) banner('SLAM!', S.col[r.s]);
+          if (r.kind === 'shot') shotFx(r);
+          if (r.and1) banner('AND ONE!', S.col[r.s]);
           else if (r.kind === 'to' && r.thief && r.big) banner('STEAL', S.col[other(r.s)]);
           else if (r.flow === 'trans' && r.pts) banner('FAST BREAK', S.col[r.s], true);
           return done();
