@@ -81,6 +81,11 @@
   };
   DY.migrate2 = g => {
     g.fx = g.fx || {};
+    if (!g.fx.tr2) {   // personalities were too low (work ethic in the 60s): stretch every player to 65-99 around a low-80s average (ego is left alone)
+      const f = tr => { if (!tr) return; for (const k in tr) if (k !== 'ego') tr[k] = Math.max(65, Math.min(99, Math.round(82 + (tr[k] - 70) * 0.9))); };
+      Object.values(g.P || {}).forEach(p => p && f(p.tr)); if (g.recruit && g.recruit.pool) Object.values(g.recruit.pool).forEach(p => p && f(p.tr));
+      g.fx.tr2 = 1;
+    }
     if (!g.fx.roster1 && DY.ensureRoster) {   // CPU rosters with no kicker/punter, 1 corner, 10 running backs: rebalance every team once
       g.teams.forEach(t => { if (t.fbs !== false) DY.ensureRoster(t, t.user ? { minOnly: true } : { trim: true }); });
       g.fx.roster1 = 1;

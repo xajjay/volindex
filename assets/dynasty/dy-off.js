@@ -409,7 +409,7 @@
         else if (p.yr >= 3) {
           const dg = DY.draftGrade(p);
           const pr = dg >= 91 ? 0.85 : dg >= 87 ? 0.55 : dg >= 84 ? 0.2 : dg >= 81 ? 0.05 : 0;
-          if (chance(pr * (p.tr.ego > 75 ? 1.15 : 1) * (p.tr.loyal > 90 ? 0.7 : 1))) { p.leave = 'nfl'; p.dg = dg; }
+          if (chance(pr * (p.tr.ego > 75 ? 1.15 : 1) * (p.tr.loyal > 96 ? 0.7 : 1))) { p.leave = 'nfl'; p.dg = dg; }
         }
       });
       // never more than 15 early entries from one school
@@ -544,7 +544,7 @@
     if (o.pitched[id] != null) return 'You already made your pitch.';
     if (DY.payroll(ut) + raise > ut.budget * 1.02) return `That raise would put you over your NIL budget (${DY.money(ut.budget - DY.payroll(ut))} open).`;
     const dg = p.dg || DY.draftGrade(p);
-    const ch = clamp(0.55 - (dg - 82) * 0.06 + (p.tr.loyal - 60) / 140 + raise / Math.max(100000, p.nilV || DY.nilValue(p, ut)) * 0.3, 0.02, 0.85);
+    const ch = clamp(0.55 - (dg - 82) * 0.06 + (p.tr.loyal - 72) / 140 + raise / Math.max(100000, p.nilV || DY.nilValue(p, ut)) * 0.3, 0.02, 0.85);
     const ok = chance(ch);
     o.pitched[id] = ok;
     if (ok) { p.leave = null; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); DY.addLog(p, `Returned for another season (NIL now ${DY.money(p.nil)}).`); DY.news('nil', `${p.n} is coming back to ${DY.UN()}`, `He had declared for the NFL Draft.`, { pid: p.id }); }
@@ -554,7 +554,7 @@
   DY.declareChance = p => {
     if (!p || p.el <= 1 || p.yr < 3) return 0;
     const dg = DY.draftGrade(p), pr = dg >= 91 ? 0.85 : dg >= 87 ? 0.55 : dg >= 84 ? 0.2 : dg >= 81 ? 0.05 : 0;
-    return Math.min(0.95, pr * (p.tr.ego > 75 ? 1.15 : 1) * (p.tr.loyal > 90 ? 0.7 : 1));
+    return Math.min(0.95, pr * (p.tr.ego > 75 ? 1.15 : 1) * (p.tr.loyal > 96 ? 0.7 : 1));
   };
   DY.draftProj = p => { const dg = DY.draftGrade(p); return dg >= 91 ? 'Round 1' : dg >= 87 ? 'Rounds 1-2' : dg >= 84 ? 'Rounds 2-3' : 'Day 3'; };
   // the projected roster for next season at any point of the offseason: who is still here, who is coming
@@ -568,7 +568,7 @@
     Object.keys(DY.STARTERS).forEach(pos => { by[pos] = all.filter(x => x.p.pos === pos).sort((a, b) => b.p.ovr - a.p.ovr); });
     return { by, n: all.length, out: ut.roster.length - stay.length, inc: inc.length };
   };
-  DY.persuadeChance = (p, raise) => { const dg = p.dg || DY.draftGrade(p); return clamp(0.55 - (dg - 82) * 0.06 + (p.tr.loyal - 60) / 140 + (raise || 0) / Math.max(100000, p.nilV || DY.nilValue(p, DY.userT())) * 0.3, 0.02, 0.85); };
+  DY.persuadeChance = (p, raise) => { const dg = p.dg || DY.draftGrade(p); return clamp(0.55 - (dg - 82) * 0.06 + (p.tr.loyal - 72) / 140 + (raise || 0) / Math.max(100000, p.nilV || DY.nilValue(p, DY.userT())) * 0.3, 0.02, 0.85); };
   // one tap through the rest of the offseason: the staff makes the remaining calls like Auto (stops only for a fired coach)
   DY.offAdvance = () => {
     const g = G(), keep = { nil: g.settings.nil, portal: g.settings.portal };
@@ -634,7 +634,7 @@
     const v = p.nilV || DY.nilValue(p, DY.userT()), r = amt / Math.max(1000, v);
     let risk = r >= 1 ? 0.03 : r >= 0.85 ? 0.12 : r >= 0.65 ? 0.3 : 0.55;
     if (amt < (p.nil0 != null ? p.nil0 : p.nil)) risk += 0.2;
-    risk *= 1 + (p.tr.ego - 60) / 120; risk *= 1 - (p.tr.loyal - 60) / 160;
+    risk *= 1 + (p.tr.ego - 60) / 120; risk *= 1 - (p.tr.loyal - 72) / 160;
     return clamp(risk, 0.01, 0.9);
   };
   DY.riskLabel = r => r < 0.05 ? 'None' : r < 0.12 ? 'Low' : r < 0.3 ? 'Medium' : 'High';
@@ -662,14 +662,14 @@
   /* the transfer portal */
   DY.portalChance = (p, t) => {
     const g = G();
-    if (p.tr.loyal >= 93) return 0.01;
+    if (p.tr.loyal >= 98) return 0.01;
     let c = 0.025;
     const depth = (t.depth[p.pos] || []).indexOf(p.id), st = DY.STARTERS[p.pos] || 1;
     if (depth >= st && p.ovr >= 74) c += 0.12 + (p.ovr - 74) / 60;
     if ((p.lastGp || 0) < 4 && p.yr >= 2) c += 0.1;
     if (p.unhappy) c += 0.22;
     if (t.w < t.l) c += 0.05;
-    c += (p.tr.ego - 55) / 400 - (p.tr.loyal - 55) / 260;
+    c += (p.tr.ego - 55) / 400 - (p.tr.loyal - 67) / 260;
     if (p.el <= 1) c *= 0.7;
     return clamp(c, 0.005, 0.6);
   };
@@ -707,7 +707,7 @@
     const g = G(), P = g.off.portal, p = DY.P(id), ut = DY.userT();
     if (P.retain[id] != null) return 'You already made your pitch.';
     if (DY.payroll(ut) + raise > ut.budget * 1.02) return 'That raise would put you over your NIL budget.';
-    const ch = clamp(0.25 + (p.tr.loyal - 50) / 120 + raise / Math.max(40000, p.nilV || 50000) * 0.25 + (p.portal.why === 'NIL' ? 0.15 : 0), 0.05, 0.9);
+    const ch = clamp(0.25 + (p.tr.loyal - 62) / 120 + raise / Math.max(40000, p.nilV || 50000) * 0.25 + (p.portal.why === 'NIL' ? 0.15 : 0), 0.05, 0.9);
     const ok = chance(ch);
     P.retain[id] = ok;
     if (ok) { p.nil += raise; p.unhappy = false; p.portal = null; P.pool = P.pool.filter(x => x !== id); DY.addLog(p, 'Pulled his name out of the portal and stayed.'); }
@@ -888,13 +888,13 @@
   DY.develop = (p, t) => {
     const g = G(), arch = g.coach.arch, side = DY.SIDE(p.pos);
     const before = p.ovr, ceil0 = p.ceil;
-    let mult = (0.7 + p.tr.work / 170);
+    let mult = (0.7 + (p.tr.work - 12) / 170);
     if (t.user) { if (arch === 'developer') mult *= 1.06; if (arch === 'guru' && side === 'O') mult *= 1.1; if (arch === 'architect' && side === 'D') mult *= 1.1; }
     const base0 = Math.max(0, p.ceil - p.ovr) * (GROW[Math.min(6, p.yr)] || 0.05) * mult * 0.9;
     let gr = base0;
     // performance last season vs what you would expect from his rating (players who play and produce grow faster)
     const notes = [], why = [];
-    why.push(`expected path ${base0 >= 0.5 ? '+' + base0.toFixed(1) : '0'} (${p.potG} potential, year ${p.yr}${p.tr.work >= 86 ? ', strong work ethic' : p.tr.work <= 58 ? ', questionable work ethic' : ''})`);
+    why.push(`expected path ${base0 >= 0.5 ? '+' + base0.toFixed(1) : '0'} (${p.potG} potential, year ${p.yr}${p.tr.work >= 94 ? ', strong work ethic' : p.tr.work <= 70 ? ', questionable work ethic' : ''})`);
     if ((p.lastGp || 0) >= 6 && p.lastScore > 0) {
       const exp = { QB: 95, RB: 75, WR: 70, TE: 70, OT: 110, IOL: 110, EDGE: 60, DT: 66, LB: 75, CB: 50, S: 50, K: 50, P: 30 }[p.pos] || 60;
       const z = clamp((p.lastScore - exp * (p.ovr / 82)) / (exp * 0.45), -1.5, 2);

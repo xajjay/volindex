@@ -33,7 +33,13 @@
     if (!bytes) { const b64 = root.localStorage.getItem('vi-sdyn-' + sport + n); if (!b64) return null; const s = root.atob(b64), a = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) a[i] = s.charCodeAt(i); bytes = a; }
     return gunzip(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)).then(txt => SD.fromText(txt));
   });
-  SD.fromText = txt => { const g = JSON.parse(txt); if (!g || g.v !== SD.VERSION || !g.teams) throw new Error('Not a save from this version.'); SD.G = g; SD.seed(g.rs || g.seed); return g; };
+  SD.fromText = txt => { const g = JSON.parse(txt); if (!g || g.v !== SD.VERSION || !g.teams) throw new Error('Not a save from this version.'); g.fx = g.fx || {};
+    if (!g.fx.tr2) {   // personalities were too low: stretch every player to 65-99 around a low-80s average (ego is left alone)
+      const f = tr => { if (!tr) return; for (const k in tr) if (k !== 'ego') tr[k] = Math.max(65, Math.min(99, Math.round(82 + (tr[k] - 70) * 0.9))); };
+      Object.values(g.P || {}).forEach(p => p && f(p.tr)); if (g.recruit && g.recruit.pool) Object.values(g.recruit.pool).forEach(p => p && f(p.tr)); (g.guests ? Object.values(g.guests) : []).forEach(() => 0);
+      g.fx.tr2 = 1;
+    }
+    SD.G = g; SD.seed(g.rs || g.seed); return g; };
   SD.fromBytes = bytes => gunzip(bytes).then(SD.fromText);
   SD.deleteSlot = (sport, n) => { del(sport + '-slot' + n); try { root.localStorage.removeItem('vi-sdyn-' + sport + n); } catch (e) { /* ignore */ } const m = SD.readMeta(sport); delete m[n]; writeMeta(sport, m); };
   SD.exportBlob = () => { const g = SD.G; g.rs = SD.rstate(); return gzip(SD.pack(g)).then(b => new root.Blob([b], { type: 'application/gzip' })); };

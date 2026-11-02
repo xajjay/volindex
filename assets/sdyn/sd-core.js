@@ -119,7 +119,7 @@
 
   /* ---------- personality (same traits as Vol Dynasty football, 50-99, about 70 on average; ego: lower is better) ---------- */
   SD.TRAITS = { disc: 'Discipline', clutch: 'Clutch', cons: 'Consistency', ego: 'Ego', lead: 'Leadership', work: 'Work ethic', tough: 'Toughness', loyal: 'Loyalty' };
-  SD.makeTraits = () => { const t = {}; for (const k in SD.TRAITS) t[k] = k === 'ego' ? Math.round(clamp(52 + gauss() * 14, 20, 95)) : Math.round(clamp(70 + gauss() * 9.5, 50, 99)); return t; };
+  SD.makeTraits = () => { const t = {}; for (const k in SD.TRAITS) t[k] = k === 'ego' ? Math.round(clamp(52 + gauss() * 14, 20, 95)) : Math.round(clamp(82 + gauss() * 8.5, 65, 99)); return t; };
   SD.persLabel = p => {
     const t = p.tr;
     if (t.clutch >= 88) return ['Ice Water', 'Wants the ball with the game on the line.'];

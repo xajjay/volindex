@@ -40,7 +40,7 @@
     GM.adj = { h: { o: 'none', d: 'none' }, a: { o: 'none', d: 'none' } };
     GM.planSet = !GM.user || GM.coach === 'watch';
     GM.cap = {};
-    for (const s of ['h', 'a']) { const caps = GM.T[s].roster.map(DY.P).filter(p => p && p.captain); const lead = caps.length ? avg(caps.map(p => p.tr.lead)) : 70; GM.cap[s] = clamp((lead - 75) / 14, 0, 1.4); }
+    for (const s of ['h', 'a']) { const caps = GM.T[s].roster.map(DY.P).filter(p => p && p.captain); const lead = caps.length ? avg(caps.map(p => p.tr.lead)) : 82; GM.cap[s] = clamp((lead - 87) / 14, 0, 1.4); }
     GM.wiped = null; GM.by = 26.67; GM.live = !!o.live;
     return GM;
   };
@@ -114,8 +114,8 @@
     v = 78 + (v - 78) * DY.SENS;
     v += (GM.form[p.id] || 0) + (GM.hot[p.id] || 0);
     const m = side === 'h' ? GM.mom : -GM.mom; v += m * 1.6;
-    if (side === 'a' && GM.crowd > 0 && GM.poss === 'a') v -= GM.crowd * 1.8 * (1 - (GM.L.a.QB[0] ? (GM.L.a.QB[0].tr.lead - 50) / 120 : 0)) * (1 - (GM.cap ? GM.cap.a * 0.25 : 0));
-    if (bigMoment(GM) || (GM.down >= 3 && GM.q >= 3 && Math.abs(GM.score.h - GM.score.a) <= 8)) v += (p.tr.clutch - 55) / 9 + (GM.cap ? GM.cap[side] || 0 : 0);
+    if (side === 'a' && GM.crowd > 0 && GM.poss === 'a') v -= GM.crowd * 1.8 * (1 - (GM.L.a.QB[0] ? (GM.L.a.QB[0].tr.lead - 62) / 120 : 0)) * (1 - (GM.cap ? GM.cap.a * 0.25 : 0));
+    if (bigMoment(GM) || (GM.down >= 3 && GM.q >= 3 && Math.abs(GM.score.h - GM.score.a) <= 8)) v += (p.tr.clutch - 67) / 9 + (GM.cap ? GM.cap[side] || 0 : 0);
     if (DY.G && DY.G.settings && DY.G.settings.diffBoost && GM.T[side] && !GM.T[side].user && (GM.T.h.user || GM.T.a.user)) v += DY.G.settings.diffBoost;
     return v;
   }
@@ -551,12 +551,12 @@
     const olDisc = avg(P.OL.map(p => p.tr.disc)), qb = P.QB;
     const loud = road > 0.75 && GM.big;
     const fs = 0.016 + road * 0.019 + (60 - olDisc) / 2400 + (GM.down === 3 ? road * 0.01 : 0);
-    const dg = 0.0025 + road * 0.009 + (qb ? (60 - qb.tr.lead) / 3500 : 0);
-    const off = 0.008 + (60 - avg(D.DL.map(p => p.tr.disc))) / 3000;
+    const dg = 0.0025 + road * 0.009 + (qb ? (72 - qb.tr.lead) / 3500 : 0);
+    const off = 0.008 + (72 - avg(D.DL.map(p => p.tr.disc))) / 3000;
     let text, yds, on, who;
     if (chance(fs)) {
       who = chance(0.85) ? pick(P.OL) : pick([P.TE, ...P.WR]);
-      const why = road > 0.6 ? (chance(0.5) ? `the ${GM.T.h.name} crowd got to him` : 'he could not hear the snap count') : who.yr === 1 ? 'young-player jitters' : who.tr.disc < 58 ? 'his discipline let him down again' : 'jumped early';
+      const why = road > 0.6 ? (chance(0.5) ? `the ${GM.T.h.name} crowd got to him` : 'he could not hear the snap count') : who.yr === 1 ? 'young-player jitters' : who.tr.disc < 70 ? 'his discipline let him down again' : 'jumped early';
       text = `False start, #${who.num} ${last(who)} — ${why}. 5-yard penalty.`; yds = -5; on = s; GM.jump = 1;
     } else if (chance(dg)) {
       text = road > 0.6 ? `Delay of game on ${GM.T[s].name}. ${last(qb)} could not get the play in over the noise.` : `Delay of game, ${GM.T[s].name}.`; yds = -5; on = s;
@@ -840,7 +840,7 @@
       if (air + yac > 14 && chance(0.12 + (tgt.at.spd - 85) / 100)) yac += -Math.log(1 - rnd()) * 14;
       let y = Math.round(Math.min(toGoal, air + Math.max(0, yac)));
       if (air >= toGoal) y = toGoal;
-      if (bigMoment(GM) && tgt.tr.clutch >= 88 && chance(0.5)) ev.push(`${last(tgt)} — Ice Water — comes up big again.`);
+      if (bigMoment(GM) && tgt.tr.clutch >= 96 && chance(0.5)) ev.push(`${last(tgt)} — Ice Water — comes up big again.`);
       return complete(GM, s, qb, tgt, tk, y, Math.min(air, toGoal), t, ev, rt.depth !== 'd' && chance(in2min(GM) && GM.score[s] <= GM.score[ds] ? 0.5 : 0.22), { kind: 'pass', t, role: rt.role, air: Math.min(air, toGoal) });
     }
     // incomplete: interception, drop, pass breakup, interference
@@ -854,7 +854,7 @@
       return { kind: 'dpi', t, passer: qb, target: tgt, defender: cov, yards: Math.max(1, pi), events: ev, text0: `${last(qb)} pass deep to ${last(tgt)} — pass interference, ${last(cov)}`, time: 5, anim: { kind: 'pass', t, inc: true, role: rt.role, flag: true }, firstDown: true, pen: true };
     }
     const dropped = rt.sep > 0.6 && chance(clamp((84 - tgt.at.cth) / 70 + 0.05, 0.05, 0.42));
-    if (dropped) ev.push(`DROPPED. ${last(tgt)} had it in his hands${tgt.tr.cons < 58 ? ' (Streaky: the focus comes and goes)' : ''}.`);
+    if (dropped) ev.push(`DROPPED. ${last(tgt)} had it in his hands${tgt.tr.cons < 70 ? ' (Streaky: the focus comes and goes)' : ''}.`);
     else if (rt.sep < 0.3 && chance(0.55)) { add(GM, cov, 'pd'); ev.push(`Broken up by ${last(cov)}.`); }
     add(GM, tgt, 'tg');
     return { kind: 'inc', t, passer: qb, target: tgt, defender: cov, yards: 0, events: ev, text0: `${last(qb)} pass ${rt.depth === 'd' ? 'deep' : 'short'} ${pick(['left', 'right', 'middle'])} to ${last(tgt)} incomplete`, time: 5, anim: { kind: 'pass', t, inc: true, role: rt.role, air }, inc: true, drop: dropped };
@@ -907,13 +907,13 @@
     const P = pers(GM, s), K = P.K, dist = Math.round(100 - GM.ball + 17);
     let p = DY.fgProb(GM, K, dist);
     if (s === 'a' && GM.crowd > 0.6 && GM.big) p -= 0.03;
-    if (bigMoment(GM)) p += ((K ? K.tr.clutch : 55) - 55) / 400;
+    if (bigMoment(GM)) p += ((K ? K.tr.clutch : 67) - 67) / 400;
     const blocked = chance(0.014 + Math.max(0, dist - 45) / 1500);
     const ok = !blocked && chance(p);
     add(GM, K, 'fga'); if (ok) { add(GM, K, 'fgm'); maxs(GM, K, 'fglg', dist); }
     const ev = [];
-    if (!ok && !blocked && bigMoment(GM) && K && K.tr.clutch < 58) ev.push(`${last(K)} has struggled with big kicks.`);
-    if (ok && bigMoment(GM) && K && K.tr.clutch >= 85) ev.push(`Ice in the veins from ${last(K)}.`);
+    if (!ok && !blocked && bigMoment(GM) && K && K.tr.clutch < 70) ev.push(`${last(K)} has struggled with big kicks.`);
+    if (ok && bigMoment(GM) && K && K.tr.clutch >= 95) ev.push(`Ice in the veins from ${last(K)}.`);
     return { kind: 'fg', ok, blocked, dist, kicker: K, yards: 0, time: 5, events: ev, text: `${last(K)} ${dist}-yard field goal is ${ok ? 'GOOD' : blocked ? 'BLOCKED' : 'no good, ' + pick(['wide left', 'wide right', 'short', 'off the upright'])}.`, anim: { kind: 'fg', ok, dist, blocked } };
   }
 
@@ -1010,7 +1010,7 @@
             score(GM, s, 6); endDrive(GM, 'TD'); td = true; tag = 'TOUCHDOWN'; GM.next = 'pat'; swing(GM, s, 0.3); big = true; stop = true;
             text = `${r.text0} for ${y} yards. TOUCHDOWN ${GM.T[s].name.toUpperCase()}!`;
             // taunting / celebration flag, enforced on the kickoff
-            if (scorer && chance(Math.max(0, scorer.tr.ego - 68) / 350 + Math.max(0, 55 - scorer.tr.disc) / 600)) { GM.kickPen = 15; ev.push(`Flag on the celebration — #${scorer.num} ${last(scorer)} (Showman) draws an unsportsmanlike penalty. 15 yards on the kickoff.`); add(GM, scorer, 'pen'); }
+            if (scorer && chance(Math.max(0, scorer.tr.ego - 68) / 350 + Math.max(0, 67 - scorer.tr.disc) / 600)) { GM.kickPen = 15; ev.push(`Flag on the celebration — #${scorer.num} ${last(scorer)} (Showman) draws an unsportsmanlike penalty. 15 yards on the kickoff.`); add(GM, scorer, 'pen'); }
             return;
           }
           if (GM.ball <= 0) {
@@ -1049,7 +1049,7 @@
     // injuries
     if (!GM.noInj && (r.kind === 'run' || r.kind === 'pass' || r.kind === 'sack')) {
       const pool = [r.carrier, r.target, r.tackler, r.passer].filter(Boolean);
-      pool.forEach(p => { if (chance(0.0019 * (1 + (60 - p.tr.tough) / 80))) injure(GM, p, ev); });
+      pool.forEach(p => { if (chance(0.0019 * (1 + (72 - p.tr.tough) / 80))) injure(GM, p, ev); });
     }
     // where the ball is spotted across the field (between the hashes)
     if (r.kind === 'run' || r.kind === 'pass' || r.kind === 'sack' || r.kind === 'int') {
@@ -1098,7 +1098,7 @@
     if (r.kind === 'pass' && chance(0.011)) { const c = pick(D.CB); add(GM, c, 'pen'); return { on: other(s), y: 5, text: `Defensive holding on #${c.num} ${last(c)}: 5 yards and an automatic first down.` }; }
     if (chance(0.0055)) {
       const hh = weighted([...D.DL, ...D.LB, ...D.S], p => Math.pow(Math.max(5, p.tr.ego - p.tr.disc + 50), 2)); add(GM, hh, 'pen');
-      const hot = hh.tr.ego >= 78 && hh.tr.disc <= 58;
+      const hot = hh.tr.ego >= 78 && hh.tr.disc <= 70;
       return { on: other(s), y: 15, text: `Personal foul, #${hh.num} ${last(hh)}${hot ? ' — the Hot Head after the whistle again' : ''}. 15 yards.` };
     }
     return null;

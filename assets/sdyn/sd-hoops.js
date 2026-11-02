@@ -176,14 +176,14 @@
     const help = zone ? D.slice().sort((a, b) => b.at.idf - a.at.idf)[0] : D.filter(p => p !== dfn).sort((a, b) => b.at.blk - a.at.blk)[0];
     // make probability
     const w = sp.he === 'she';
-    const clutchB = endGame && GM.clock < 120 && Math.abs(diff) <= 6 ? (shooter.tr.clutch - 70) / 900 : 0;
+    const clutchB = endGame && GM.clock < 120 && Math.abs(diff) <= 6 ? (shooter.tr.clutch - 82) / 900 : 0;
     const home = GM.neutral ? 0 : (s === 'h' ? 0.012 : -0.008);
     const mom = (GM.run.s === s ? Math.min(4, GM.run.n / 3) * 0.004 : 0);
     let pm;
     if (type === 'rim') pm = (w ? 0.56 : 0.6) + sq(R(GM, shooter, 'ins') - R(GM, help || dfn, 'idf')) / 170 + sq(R(GM, shooter, 'ath') - R(GM, dfn, 'ath')) / 320 + (play === 'trans' ? 0.1 : play === 'cut' ? 0.05 : 0) - (zone ? 0.03 : 0);
     else if (type === 'mid') pm = (w ? 0.39 : 0.41) + sq(R(GM, shooter, 'mid') - R(GM, dfn, 'pdf')) / 210;
     else pm = (w ? 0.32 : 0.345) + sq(R(GM, shooter, 'thr') - R(GM, dfn, 'pdf')) / 200 + (play === 'spot' ? 0.018 : play === 'iso' ? -0.02 : 0) + (zone ? 0.012 : 0) + (passer ? (passer.at.pas - 70) / 1400 : 0);
-    pm = clamp(pm + clutchB + home + mom + (shooter.tr.cons < 60 ? gauss() * 0.04 : 0), 0.12, 0.86);
+    pm = clamp(pm + clutchB + home + mom + (shooter.tr.cons < 72 ? gauss() * 0.04 : 0), 0.12, 0.86);
     const val = type === '3' ? 3 : 2;
     // blocks and shooting fouls
     const blkP = type === 'rim' ? clamp(0.055 + ((help || dfn).at.blk - 65) / 350, 0.02, 0.16) : type === 'mid' ? 0.02 : 0.008;
@@ -227,7 +227,7 @@
     if (play === 'post') return pick([`${n} scores in the post`, `${n} with the hook`, `${n} backs down and scores`]) + a + (and1 ? '. And one!' : '.');
     return pick([`${n} finishes at the rim`, `${n} with the layup`, `${n} attacks and scores`, `${n} gets to the cup`]) + a + (and1 ? '. And one!' : '.');
   }
-  function ftOne(GM, p) { add(GM, p, 'fta'); const pct = clamp(0.5 + (p.at.ft - 50) / 105 + (GM.per >= GM.nper && GM.clock < 60 ? (p.tr.clutch - 70) / 600 : 0) - (GM.neutral || GM.poss === 'h' ? 0 : 0.01), 0.35, 0.95); const m = chance(pct); if (m) { add(GM, p, 'ftm'); add(GM, p, 'pts'); } return m; }
+  function ftOne(GM, p) { add(GM, p, 'fta'); const pct = clamp(0.5 + (p.at.ft - 50) / 105 + (GM.per >= GM.nper && GM.clock < 60 ? (p.tr.clutch - 82) / 600 : 0) - (GM.neutral || GM.poss === 'h' ? 0 : 0.01), 0.35, 0.95); const m = chance(pct); if (m) { add(GM, p, 'ftm'); add(GM, p, 'pts'); } return m; }
   function shoot2(GM, p, n) { let m = 0; for (let i = 0; i < n; i++) m += ftOne(GM, p) ? 1 : 0; return m; }
   function rebound(GM, r, s, d, O, D, dur) {
     const orb = clamp((GM.women ? 0.3 : 0.28) + (avg(O.map(p => R(GM, p, 'reb'))) - avg(D.map(p => R(GM, p, 'reb')))) / 230 - (r.type === '3' ? 0.02 : 0), 0.14, 0.42);

@@ -111,7 +111,7 @@
   /* ---------- personality (Burger Town-style traits that explain what happens on the field) ---------- */
   DY.TRAITS = { disc: 'Discipline', clutch: 'Clutch', cons: 'Consistency', ego: 'Ego', lead: 'Leadership', work: 'Work ethic', tough: 'Toughness', loyal: 'Loyalty' };
   // personality on the same 50-99 scale as ratings (about 70 on average); ego is the one where lower is better
-  DY.makeTraits = () => { const t = {}; for (const k in DY.TRAITS) t[k] = k === 'ego' ? Math.round(clamp(52 + gauss() * 14, 20, 95)) : Math.round(clamp(70 + gauss() * 9.5, 50, 99)); return t; };
+  DY.makeTraits = () => { const t = {}; for (const k in DY.TRAITS) t[k] = k === 'ego' ? Math.round(clamp(52 + gauss() * 14, 20, 95)) : Math.round(clamp(82 + gauss() * 8.5, 65, 99)); return t; };
   DY.persLabel = p => {
     const t = p.tr;
     if (t.ego >= 80 && t.disc <= 58) return ['Hot Head', 'Plays with an edge that can boil over: personal fouls and taunting flags follow him.'];

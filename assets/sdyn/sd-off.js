@@ -135,16 +135,16 @@
       const p = SD.P(id); if (p.s) { p.car[g.season] = Object.assign({ t: t.abbr }, p.s); } p.lastS = p.s; p.s = null; p.el--;
       if (p.el <= 0) { p.leave = 'grad'; return; }
       // a senior with a year left: most good players use the fifth year; role players and bench seniors often move on
-      if (hoops && p.yr >= 4 && p.el >= 1 && chance(p.ovr < 68 ? 0.62 : p.ovr < 76 ? 0.38 : p.ovr < 83 ? 0.2 : 0.1) && !(p.tr.loyal > 90 && chance(0.6))) { p.leave = 'grad'; return; }
+      if (hoops && p.yr >= 4 && p.el >= 1 && chance(p.ovr < 68 ? 0.62 : p.ovr < 76 ? 0.38 : p.ovr < 83 ? 0.2 : 0.1) && !(p.tr.loyal > 96 && chance(0.6))) { p.leave = 'grad'; return; }
       const dg = p.ovr + (hoops ? 0 : (SD.isPit(p) ? 2 : 0));
-      if (hoops) { if (p.ovr >= 84 && chance(clamp((p.ovr - 82) * 0.12 * (p.tr.ego > 75 ? 1.2 : 1) * (p.tr.loyal > 90 ? 0.6 : 1) * (p.retYear === g.season - 1 ? 0.6 : 1), 0, 0.9))) { p.leave = 'pro'; p.dg = dg; } }
+      if (hoops) { if (p.ovr >= 84 && chance(clamp((p.ovr - 82) * 0.12 * (p.tr.ego > 75 ? 1.2 : 1) * (p.tr.loyal > 96 ? 0.6 : 1) * (p.retYear === g.season - 1 ? 0.6 : 1), 0, 0.9))) { p.leave = 'pro'; p.dg = dg; } }
       else if (g.sport === 'baseball' && p.yr >= 3 && p.ovr >= 80 && chance(clamp((p.ovr - 78) * 0.13, 0, 0.92))) { p.leave = 'pro'; p.dg = dg; }
     }));
     g.off.leaving = ut.roster.filter(id => SD.P(id).leave).map(id => ({ id, why: SD.P(id).leave }));
     g.off.leaving.filter(x => x.why === 'pro').forEach(x => SD.news('nil', `${SD.P(x.id).n} declares for the draft`, 'You can make a pitch to bring him back on the recap screen.'));
     SD.jobReview();
   };
-  SD.persuadeChance = (p, raise) => clamp(0.5 - (p.dg - 84) * 0.06 + (p.tr.loyal - 70) / 100 + (raise || 0) / Math.max(50000, SD.nilValue(p, SD.userT())) * 0.3, 0.03, 0.85);
+  SD.persuadeChance = (p, raise) => clamp(0.5 - (p.dg - 84) * 0.06 + (p.tr.loyal - 82) / 100 + (raise || 0) / Math.max(50000, SD.nilValue(p, SD.userT())) * 0.3, 0.03, 0.85);
   SD.persuade = (id, raise) => {
     const g = G(), o = g.off, p = SD.P(id), ut = SD.userT();
     if (o.pitched[id] != null) return 'You already made your pitch.';
@@ -284,7 +284,7 @@
     const g = G(), ut = SD.userT();
     g.off.nilAsk = ut.roster.map(SD.P).filter(p => SD.nilValue(p, ut) > (p.nil || 0) * 1.3 && p.el >= 1 && chance(0.6 + (p.tr.ego - 60) / 100)).map(p => ({ id: p.id, ask: Math.round(SD.nilValue(p, ut) * rr(0.85, 1.1) / 5000) * 5000, ans: null }));
   }
-  SD.nilRisk = (p, amt) => { const v = SD.nilValue(p, SD.userT()), r = amt / Math.max(1000, v); let k = r >= 1 ? 0.03 : r >= 0.85 ? 0.12 : r >= 0.65 ? 0.3 : 0.55; k *= 1 + (p.tr.ego - 60) / 120; k *= 1 - (p.tr.loyal - 70) / 120; return clamp(k, 0.01, 0.9); };
+  SD.nilRisk = (p, amt) => { const v = SD.nilValue(p, SD.userT()), r = amt / Math.max(1000, v); let k = r >= 1 ? 0.03 : r >= 0.85 ? 0.12 : r >= 0.65 ? 0.3 : 0.55; k *= 1 + (p.tr.ego - 60) / 120; k *= 1 - (p.tr.loyal - 82) / 120; return clamp(k, 0.01, 0.9); };
   SD.riskLabel = r => r < 0.05 ? 'None' : r < 0.12 ? 'Low' : r < 0.3 ? 'Medium' : 'High';
   SD.adjustNil = (id, amt) => { const ut = SD.userT(), p = SD.P(id); amt = Math.max(0, Math.round(amt / 5000) * 5000); if (SD.payroll(ut) - p.nil + amt > ut.budget * 1.02) return 'Over budget.'; p.nil = amt; return null; };
   function resolveNil() {
@@ -296,7 +296,7 @@
     g.teams.forEach(t => {
       t.roster.map(SD.P).forEach(p => {
         let c = 0.03; const better = t.roster.map(SD.P).filter(x => x.pos === p.pos && x.ovr > p.ovr).length;
-        if (better >= (SD.kind() === 'hoops' ? 1 : 2) && p.ovr >= 70) c += 0.12; if (p.unhappy) c += 0.25; c += (p.tr.ego - 60) / 400 - (p.tr.loyal - 70) / 250;
+        if (better >= (SD.kind() === 'hoops' ? 1 : 2) && p.ovr >= 70) c += 0.12; if (p.unhappy) c += 0.25; c += (p.tr.ego - 60) / 400 - (p.tr.loyal - 82) / 250;
         if (p.pushOut || (chance(clamp(c, 0.005, 0.5)) && pool.filter(id => SD.P(id).portal.from === t.id).length < (SD.kind() === 'hoops' ? 4 : 8))) { p.portal = { from: t.id, offers: {}, pushed: !!p.pushOut }; pool.push(p.id); }
       });
     });
@@ -323,7 +323,7 @@
     if (auto && !C.picks.length) C.picks = ut.roster.map(SD.P).filter(p => p.yr <= 2).sort((a, b) => (b.ceil - b.ovr) - (a.ceil - a.ovr)).slice(0, 3).map(p => p.id);
     const keys = SD.CAMP[SD.kind()][C.focus][1], res = [];
     ut.roster.map(SD.P).forEach(p => {
-      const before = p.ovr, extra = C.picks.includes(p.id), wk = (p.tr.work - 70) / 30;
+      const before = p.ovr, extra = C.picks.includes(p.id), wk = (p.tr.work - 82) / 30;
       keys.forEach(k => { if (p.at[k] != null) p.at[k] = Math.round(clamp(p.at[k] + rr(0.5, 2.2) + wk + (extra ? rr(1, 3) : 0), 40, 99)); });
       if (extra) Object.keys(p.at).forEach(k => { if (!keys.includes(k)) p.at[k] = Math.round(clamp(p.at[k] + rr(0, 1.5), 40, 99)); });
       SD.setOvr(p); if (p.ovr !== before || extra) res.push({ id: p.id, before, after: p.ovr, extra });
@@ -391,7 +391,7 @@
     if (mine.length) SD.news('draft', `${mine.length} ${SD.UN()} player${mine.length > 1 ? 's' : ''} drafted`, mine.map(x => SD.P(x.id).n + ' (No. ' + x.pk + ')').join(', '));
   }
   function develop(p) {
-    const work = (p.tr.work - 70) / 40, room = Math.max(0, p.ceil - p.ovr);
+    const work = (p.tr.work - 82) / 40, room = Math.max(0, p.ceil - p.ovr);
     const mins = p.lastS ? (SD.kind() === 'hoops' ? (p.lastS.min || 0) / Math.max(1, p.lastS.gp) / 30 : (p.lastS.pa || p.lastS.bf || 0) / 150) : 0;
     let gain = clamp(room * (0.36 + work * 0.12 + Math.min(0.15, mins * 0.1)) + gauss() * 1.2, -2, 9);
     if (p.yr >= 4) gain = Math.min(gain, 3);
@@ -400,7 +400,7 @@
     const before = p.ovr;
     for (const k in p.at) p.at[k] = Math.round(clamp(p.at[k] + gain * rr(0.6, 1.3), 50, 99));
     SD.setOvr(p); p.yr++; p.lastDelta = p.ovr - before;
-    const why = []; if (p.tr.work >= 82) why.push('work ethic'); if (p.tr.work < 60) why.push('coasting'); if (mins >= 0.7) why.push('big minutes'); else if (mins < 0.15 && p.yr <= 3) why.push('little playing time'); if (room >= 12) why.push('high ceiling'); if (p.yr > 4) why.push('near his ceiling'); if (p.lastDelta >= 6) why.unshift('BREAKOUT'); if (p.lastDelta <= 0) why.unshift('stalled'); p.devWhy = why;
+    const why = []; if (p.tr.work >= 92) why.push('work ethic'); if (p.tr.work < 72) why.push('coasting'); if (mins >= 0.7) why.push('big minutes'); else if (mins < 0.15 && p.yr <= 3) why.push('little playing time'); if (room >= 12) why.push('high ceiling'); if (p.yr > 4) why.push('near his ceiling'); if (p.lastDelta >= 6) why.unshift('BREAKOUT'); if (p.lastDelta <= 0) why.unshift('stalled'); p.devWhy = why;
   }
   function progressPreview() { const ut = SD.userT(); return ut.roster.map(id => ({ id, before: SD.P(id).ovr })); }
   SD.cutsNeeded = () => Math.max(0, SD.userT().roster.length - SD.LIMIT[G().sport]);
