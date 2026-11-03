@@ -241,7 +241,7 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-tid],[data-vteam],[data-tab],[data-act],[data-pid],[data-pedit],[data-psave],[data-push],[data-job],[data-rid],[data-box],[data-sort],[data-rpos],[data-dmove],[data-ract],[data-roffer],[data-radd],[data-rrm],[data-nilans],[data-retain],[data-poffer],[data-conf],[data-ppos],[data-prpos],[data-statk],[data-stab],[data-more],[data-slot],[data-set],[data-rfind],[data-goto],[data-recs],[data-hview],[data-lpos],[data-ahead],[data-dview],[data-nilstep],[data-persuade],[data-cut],[data-camp],[data-nilf],[data-dunit],[data-dproj],[data-gside]');
+    const el = e.target.closest('[data-tid],[data-vteam],[data-tab],[data-act],[data-pid],[data-pedit],[data-psave],[data-push],[data-job],[data-rid],[data-box],[data-sort],[data-rpos],[data-dmove],[data-ract],[data-roffer],[data-radd],[data-rrm],[data-rradd],[data-nilans],[data-retain],[data-poffer],[data-conf],[data-ppos],[data-prpos],[data-statk],[data-stab],[data-more],[data-slot],[data-set],[data-rfind],[data-goto],[data-recs],[data-hview],[data-lpos],[data-ahead],[data-dview],[data-nilstep],[data-persuade],[data-cut],[data-camp],[data-nilf],[data-dunit],[data-dproj],[data-gside]');
     if (!el) { const m = APP.querySelector('.dy-menu-in'); if (m && !m.hidden && !e.target.closest('.dy-menu')) m.hidden = true; return; }
     const g = G(), d = el.dataset;
     if (el.tagName === 'A') e.preventDefault();
@@ -299,7 +299,8 @@
     if (d.ract) { const [id, act] = d.ract.split('|'); const p = DY.RP(+id); V.msg = DY.setAct(+id, act, !p.acts[act]); return keep(); }
     if (d.roffer) { V.msg = DY.offer(+d.roffer); return keep(); }
     if (d.radd) { V.msg = DY.boardAdd(+d.radd); return keep(); }
-    if (d.rrm) { DY.boardRemove(+d.rrm); return keep(); }
+    if (d.rrm) { const q = DY.RP(+d.rrm); if (q && q.commit === g.user) V.msg = DY.releaseCommit(+d.rrm); else DY.boardRemove(+d.rrm); return keep(); }
+    if (d.rradd) { V.msg = DY.readdCommit(+d.rradd); return keep(); }
     if (d.rfind) { const [k, v] = d.rfind.split('|'); V.rfind[k] = k === 'stars' ? +v : k === 'mine' ? !V.rfind.mine : v; return keep(); }
     if (d.nilans) { const [id, yes] = d.nilans.split('|'); DY.answerNil(+id, yes === '1'); return keep(); }
     if (d.nilstep) { const [id, dir] = d.nilstep.split('|'); const p = DY.P(+id); const step = Math.max(5000, Math.round(Math.max(p.nil, 20000) * 0.1 / 5000) * 5000); V.msg = DY.adjustNil(+id, p.nil + (+dir) * step); return keep(); }
@@ -796,7 +797,7 @@
     const row = p => `<tr class="${p.commit === g.user ? 'me' : ''}"><td><span class="dy-stars">${stars(p.rec.stars)}</span><br><a href="#" class="dy-pl" data-rid="${p.id}"><b>${esc(p.n)}</b></a> <small>${p.pos}</small>${p.real ? ' <small class="chip">Real</small>' : ''}<br><small class="dim">No. ${p.rec.nat} · ${esc(p.home)}</small></td>
       <td class="dy-intc">${leaders(p)}<small>${status(p)}</small>${stage(p)}</td>
       <td>${p.offer ? '<small class="dy-w">Offered</small>' : closed ? '' : `<button class="dy-ra" data-roffer="${p.id}">Offer</button>`}${closed ? '' : (DY.nilOn() ? nilSel(p) : '') + visSel(p)}</td>
-      <td class="dy-acts">${actBtns(p)}${p.commit === g.user && p.real ? '' : `<button class="glink" data-rrm="${p.id}">Remove</button>`}</td></tr>`;
+      <td class="dy-acts">${actBtns(p)}${closed || (R.locked && p.commit === g.user) ? '' : `<button class="glink" data-rrm="${p.id}" title="${p.commit === g.user ? 'Release this commit' : 'Take off the board'}">${p.commit === g.user ? 'Remove commit' : 'Remove'}</button>`}</td></tr>`;
     const F = V.rfind;
     let pool = Object.values(R.pool).filter(p => !R.board.includes(p.id));
     if (F.pos !== 'ALL') pool = pool.filter(p => p.pos === F.pos);
@@ -816,6 +817,7 @@
         <div class="dy-filt"><input id="dyRfq" class="dy-in" placeholder="Name" value="${esc(F.q)}"><select data-rfsel="pos">${['ALL', 'QB', 'RB', 'WR', 'TE', 'OT', 'IOL', 'EDGE', 'DT', 'LB', 'CB', 'S', 'K', 'P'].map(x => `<option ${F.pos === x ? 'selected' : ''}>${x}</option>`).join('')}</select><select data-rfsel="st"><option value="ALL">All states</option>${states.map(s => `<option ${F.st === s ? 'selected' : ''}>${s}</option>`).join('')}</select>${[0, 5, 4, 3].map(s => `<button data-rfind="stars|${s}" aria-pressed="${F.stars === s}">${s ? s + '★' : 'All'}</button>`).join('')}<button data-rfind="mine|1" aria-pressed="${F.mine}">Interested in UT</button></div>
         <div class="dy-scroll"><table class="dyt"><thead><tr><th>Rk</th><th>Prospect</th><th>Pos</th><th class="hide-s">Home</th><th>Comp.</th><th>Status</th><th></th></tr></thead><tbody>${pool.slice(0, V.more.pool ? 120 : 40).map(p => `<tr><td>${p.rec.nat}</td><td><span class="dy-stars">${stars(p.rec.stars)}</span> <a href="#" class="dy-pl o" data-rid="${p.id}">${esc(p.n)}</a></td><td>${p.pos}</td><td class="hide-s small">${esc(p.home)}</td><td class="small">${p.rec.c.toFixed(4)}</td><td class="small">${p.commit != null ? esc(T(p.commit).abbr) : (p.interest[g.user] != null ? 'Interested · ' + (r => r + (r === 1 ? 'st' : r === 2 ? 'nd' : r === 3 ? 'rd' : 'th'))(myRank(p)) : '')}</td><td>${closed ? '' : `<button class="dy-ra" data-radd="${p.id}" ${p.commit != null && p.commit !== g.user && p.firm ? 'disabled' : ''}>Add</button>`}</td></tr>`).join('')}</tbody></table></div>${pool.length > 40 ? `<button class="glink" data-more="pool">${V.more.pool ? 'Show fewer' : 'Show more'}</button>` : ''}</div>
       </div><div class="dy-col">
+      ${(R.removed || []).length ? `<div class="box"><div class="glabel">Removed commits</div><ul class="dy-mini">${R.removed.map(DY.RP).filter(Boolean).map(p => `<li>${esc(p.n)} <small>${p.pos}</small> ${p.commit != null ? `<small class="dim">Committed: ${esc(T(p.commit).name)}</small>` : closed ? '' : `<button class="glink" data-rradd="${p.id}">Re-add</button>`}</li>`).join('')}</ul></div>` : ''}
       <div class="box"><div class="glabel">Commits</div><ul class="dy-mini">${commits.map(p => `<li><span class="dy-stars">${stars(p.rec.stars)}</span> <a href="#" class="dy-pl" data-rid="${p.id}">${esc(p.n)}</a> <small>${p.pos}${p.nilOffer ? ' · ' + DY.money(p.nilOffer) : ''}</small></li>`).join('') || '<li class="dim">None yet</li>'}</ul></div>
       <div class="box"><div class="glabel">Top classes</div><ol class="dy-poll dy-cls">${(R.ranks || []).slice(0, 15).map((t, i) => { const c = (R.cstars || {})[t] || { 5: 0, 4: 0, 3: 0, n: (R.commits[t] || []).length }; return `<li class="${t === g.user ? 'me' : ''}"><span>${i + 1}</span>${tlink(t, false)}<small title="5-stars · 4-stars · 3-stars · total commits"><b>${c[5]}</b>·<b>${c[4]}</b>·<b>${c[3]}</b> <em>${c.n}</em></small></li>`; }).join('')}</ol><p class="small dim">Per class: 5★ · 4★ · 3★ and total commits.</p></div>
       <div class="box"><div class="glabel">Recruiting log</div><ul class="dy-mini">${(R.log || []).slice(0, 20).map(l => `<li>${esc(l)}</li>`).join('') || '<li class="dim">Nothing yet</li>'}</ul></div>

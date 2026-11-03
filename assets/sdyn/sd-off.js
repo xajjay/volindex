@@ -49,10 +49,27 @@
       const p = prospect(year, Math.round((1 - comp) * 1000), n); p.n = c.name; p.pos = pos; p.rec.c = comp; p.rec.stars = st; p.commit = SD.tnT().id; p.firm = true; p.real = true; p.home = c.from || p.home;
       SD.setOvr(p); pool[p.id] = p;
     });
+    // real Tennessee commits do not hand themselves over: pursue them (board + offer, or let the assistant run it) and they always commit
+    if (SD.tnT && g.user === SD.tnT().id) Object.values(pool).forEach(p => { if (p.real && p.commit === g.user) { p.realUT = true; p.commit = null; p.firm = false; p.offer = false; p.interest[g.user] = 40; } });
   };
   SD.myCommits = () => Object.values(G().recruit.pool).filter(p => p.commit === G().user);
   SD.boardAdd = id => { const R = G().recruit; if (R.board.includes(id)) return null; if (R.board.length >= 20) return 'Your board is full (20).'; R.board.push(id); const p = R.pool[id]; if (p.interest[G().user] == null) p.interest[G().user] = 0; return null; };
   SD.boardRemove = id => { const R = G().recruit; R.board = R.board.filter(x => x !== id); };
+  // Remove a commit (a pick the assistant made that you do not want). He is released and stays out of your class until you re-add him, which makes him a
+  // commit again if nobody else has landed him and you have a spot.
+  SD.releaseCommit = id => {
+    const g = G(), R = g.recruit, p = R.pool[id]; if (!p || p.commit !== g.user) return 'He is not one of your commits.'; if (R.signed) return 'Signing day has passed.';
+    p.commit = null; p.firm = false; p.dropped = true; p.acts = {}; p.interest[g.user] = 0; p.offer = false; p.visit = null;
+    R.board = R.board.filter(x => x !== id); R.removed = (R.removed || []).filter(x => x !== id).concat(id);
+    R.log = [`You removed ${p.n} from your class.`].concat(R.log || []); return `${p.n} removed from your class.`;
+  };
+  SD.readdCommit = id => {
+    const g = G(), R = g.recruit, p = R.pool[id]; if (!p || !p.dropped) return null;
+    if (p.commit != null) return `${p.n} has already committed to ${T(p.commit).name}.`; if (R.signed) return 'Signing day has passed.';
+    if (SD.myCommits().length >= SD.MAXC()) return 'Your class is full.';
+    p.commit = g.user; p.cwk = 99; p.firm = !!p.realUT; p.dropped = false; p.offer = true; p.interest[g.user] = Math.max(200, p.interest[g.user] || 0);
+    R.removed = (R.removed || []).filter(x => x !== id); R.log = [`COMMIT: ${p.n} is back in your class.`].concat(R.log || []); return `${p.n} is a commit again.`;
+  };
   SD.hoursUsed = () => { const R = G().recruit; let h = 0; R.board.forEach(id => { const p = R.pool[id]; for (const a in p.acts) h += SD.ACTIONS[a].hrs; }); return h; };
   SD.setAct = (id, act, on) => {
     const p = G().recruit.pool[id]; if (!p) return 'Not found.';
@@ -84,11 +101,14 @@
         // a real recruit's real school is his default first option (he sticks about 88% of the time), unless the school never pushes him
         let rs = 1; if (p.realSchool != null) { if (p.stick == null) p.stick = chance(SD.REAL_STICK); rs = +tid === p.realSchool ? (p.stick ? SD.REAL_PULL : 1) : (p.stick ? 0.7 : 1); }
         p.interest[tid] += (3 + t.prestige / 10) * (0.5 + fitScore(t, p)) * rr(0.3, 1.4) * heat * rs; }
+      if (p.realUT && p.commit == null && !p.dropped && ut.id === g.user && R.board.includes(p.id) && p.offer && !full) {
+        p.commit = g.user; p.cwk = weekNo(); p.cper = SD.period().n; p.firm = true; logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos}, commits to ${SD.UN()}!`); SD.news('commit', `${p.rec.stars}-star ${p.pos} ${p.n} commits to ${SD.UN()}`, 'A real Tennessee commit, landed.'); return;
+      }
       const order = Object.entries(p.interest).sort((a, b) => b[1] - a[1]); if (!order.length) return;
       const [lead, lv] = order[0], second = order[1] ? order[1][1] : 0, isMe = +lead === g.user;
       const need = (130 + p.rec.stars * 15) * (1 - Math.min(20, weekNo()) / 34);
       const per = SD.period().n, early = per === 1 ? 99 : per === 2 ? 1.25 : 1;
-      if (p.commit == null && lv >= need * early && lv >= second * (per === 2 ? 1.35 : 1.15) && (!isMe || (p.offer && !full && (p.rec.stars < 4 || p.visited || weekNo() >= 14)))) {
+      if (p.commit == null && !(p.realUT && SD.period().n < 3 && !isMe) && lv >= need * early && lv >= second * (per === 2 ? 1.35 : 1.15) && (!isMe || (p.offer && !full && (p.rec.stars < 4 || p.visited || weekNo() >= 14)))) {
         p.commit = +lead; p.cwk = weekNo(); p.cper = per; if (per <= 2) p.early = true;
         if (isMe) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos}, commits to ${SD.UN()}!`); SD.news('commit', `${p.rec.stars}-star ${p.pos} ${p.n} commits to ${SD.UN()}`, `No. ${p.rec.natl} nationally.`); }
       } else if (p.commit != null && !p.firm && weekNo() - (p.cwk || 0) < 5 && !(p.commit === g.user && p.visited) && +lead !== p.commit && lv >= (p.interest[p.commit] || 0) * 1.35 && (!isMe || p.offer)) {
@@ -114,13 +134,14 @@
     const back = ut.roster.map(SD.P).filter(p => p.el > 1).length;
     const room = Math.min(SD.MAXC(), Math.max(1, SD.LIMIT[g.sport] - back + 1)) - SD.myCommits().length; if (room <= 0) return;
     // auto never takes anyone off your board: your own targets stay and are worked first; it only adds names to fill the board
+    Object.values(R.pool).filter(p => p.realUT && p.commit == null && !p.dropped && !R.board.includes(p.id)).forEach(p => { if (R.board.length < 20) R.board.push(p.id); p.offer = true; });
     const mine = p => (p.interest[ut.id] || 0), top = p => Math.max(0, ...Object.entries(p.interest).filter(([t]) => +t !== ut.id).map(([, v]) => v));
     const winnable = p => Math.min(1.2, (mine(p) + 12) / (top(p) + 12));
     const late = Math.min(1, Math.max(0, (SD.period().n - 2) / 3));
     const score = p => p.rec.c * 60 * (1 - late * 0.5) + winnable(p) * (45 + late * 40) + fitScore(ut, p) * 10;
     const active = () => R.board.map(id => R.pool[id]).filter(p => p && (p.commit == null)).length;
     const want = Math.min(20, Math.max(8, room * 3 + SD.period().n * 2));
-    Object.values(R.pool).filter(p => p.commit == null && !R.board.includes(p.id)).sort((a, b) => score(b) - score(a)).slice(0, Math.max(0, Math.min(20 - R.board.length, want - active()))).forEach(p => R.board.push(p.id));
+    Object.values(R.pool).filter(p => p.commit == null && !p.dropped && !R.board.includes(p.id)).sort((a, b) => score(b) - score(a)).slice(0, Math.max(0, Math.min(20 - R.board.length, want - active()))).forEach(p => R.board.push(p.id));
     const cand = R.board.map(id => R.pool[id]).filter(p => p && p.commit == null);
     let hrs = SD.HOURS(), coach = 3;
     cand.forEach(p => { p.acts = {}; p.offer = true; });
@@ -133,7 +154,7 @@
     const home = SD.userGames().filter(x => x.h === ut.id && !x.neutral && !x.res && x.d > g.date);
     if (home.length) ranked.filter(p => !p.visit && (p.rec.stars >= 4 || leads(p))).slice(0, 8).forEach((p, i) => { SD.setVisit(p.id, home[i % home.length].d); });
     // the final period: settle the class with the best prospects still open that this board has been working
-    if (SD.period().n >= 5 && room > 0) ranked.filter(p => p.commit == null).sort((a, b) => (mine(b) + b.rec.c * 40) - (mine(a) + a.rec.c * 40)).slice(0, room).forEach(p => { p.commit = ut.id; p.cwk = 99; p.cper = 5; });
+    if (SD.period().n >= 5 && room > 0) ranked.filter(p => p.commit == null && !p.dropped).sort((a, b) => (mine(b) + b.rec.c * 40) - (mine(a) + a.rec.c * 40)).slice(0, room).forEach(p => { p.commit = ut.id; p.cwk = 99; p.cper = 5; });
   }
   function rankClasses() {
     const g = G(), R = g.recruit, pts = {}, cs = {};

@@ -12,11 +12,16 @@
   const last = p => p ? p.n.split(' ').slice(-1)[0].replace(/^(Jr\.|II|III|IV)$/, '') || p.n : '';
   H.last = p => p ? (p.n.split(' ').filter(w => !/^(Jr\.?|Sr\.?|II|III|IV)$/.test(w)).slice(-1)[0] || p.n) : '';
 
+  // Home court: the edge scales with the building and its fanbase (prestige), like football. Real college hoops is about 3.5 points on average,
+  // roughly 2 for a quiet gym and 6 for the loudest arenas. HC_K is the shot-percentage swing for an average home team.
+  H.HC_K = 0.0235;
+  H.homeEdge = t => (0.6 + 0.9 * Math.max(0, Math.min(1.1, ((t && t.prestige || 55) - 30) / 65))) * H.HC_K;
   H.newGame = (th, ta, o) => {
     o = o || {}; const sp = SD.SP(), women = sp.he === 'she';
     const GM = { kind: 'hoops', T: { h: th, a: ta }, score: { h: 0, a: 0 }, per: 1, nper: sp.periods, perLen: sp.perLen, clock: sp.perLen, shot: sp.shot, poss: chance(0.5) ? 'h' : 'a',
       ps: {}, on: { h: [], a: [] }, en: {}, min: {}, tf: { h: 0, a: 0 }, to: { h: women ? 4 : 4, a: women ? 4 : 4 }, coach: { h: Object.assign({ pace: 'normal', focus: 'bal', def: 'man', depth: 9, star: 1 }, th.coach || {}), a: Object.assign({ pace: 'normal', focus: 'bal', def: 'man', depth: 9, star: 1 }, ta.coach || {}) },
       plays: [], lineScore: { h: [], a: [] }, user: o.user || null, mode: o.mode || 'coach', over: false, neutral: !!o.neutral, live: !!o.live, women, run: { s: null, n: 0 }, trans: null, lastEvent: null, ot: 0, half: 1, mom: 0, title: o.title || null, crowd: o.neutral ? 0.3 : 0.9 };
+    GM.hc = o.neutral ? 0 : H.homeEdge(th); GM.restAdj = o.rest || { h: 0, a: 0 };
     GM.diff = o.diff || 0; GM.uid = o.uid;
     for (const s of ['h', 'a']) {
       GM.L = GM.L || {}; GM.L[s] = SD.lineup(GM.T[s]);
@@ -177,7 +182,7 @@
     // make probability
     const w = sp.he === 'she';
     const clutchB = endGame && GM.clock < 120 && Math.abs(diff) <= 6 ? (shooter.tr.clutch - 82) / 900 : 0;
-    const home = GM.neutral ? 0 : (s === 'h' ? 0.012 : -0.008);
+    const home = (GM.neutral ? 0 : (s === 'h' ? 0.6 : -0.4) * GM.hc) + (GM.restAdj ? GM.restAdj[s] : 0);
     const mom = (GM.run.s === s ? Math.min(4, GM.run.n / 3) * 0.004 : 0);
     let pm;
     if (type === 'rim') pm = (w ? 0.56 : 0.6) + sq(R(GM, shooter, 'ins') - R(GM, help || dfn, 'idf')) / 170 + sq(R(GM, shooter, 'ath') - R(GM, dfn, 'ath')) / 320 + (play === 'trans' ? 0.1 : play === 'cut' ? 0.05 : 0) - (zone ? 0.03 : 0);

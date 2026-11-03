@@ -158,12 +158,32 @@
     // year one: the real class is locked in (with NIL promises sized to each player's market value)
     const locked = !!withReal && !g.hx && year === (g.startSeason || 2026) + 1 && g.user === DY.UT_ID;
     g.recruit = { year, pool, board: [], hours: DY.HOURS(), log: [], classRank: null, signed: false, locked, _need: _needs };
+    // real Tennessee commits do not hand themselves over: you still have to pursue them (board + offer), and if you do they always commit
+    if (!locked && g.user === DY.UT_ID) list.forEach(p => { if (p.real && p.commit === DY.UT_ID) { p.realUT = true; p.commit = null; p.firm = false; p.offer = false; p.interest[DY.UT_ID] = 40; } });
     const ut = DY.userT();
     list.filter(p => p.commit === g.user).forEach(p => { g.recruit.board.push(p.id); if (DY.nilOn()) { p.nilOffer = DY.recruitNil(p); p.nilLocked = true; } });
     DY.rankClasses();
   };
   DY.boardAdd = id => { const R = G().recruit; if (R.locked) return 'Recruiting is locked in year one: the real 2027 class.'; if (R.board.includes(id)) return null; if (R.board.length >= DY.BOARD_MAX) return 'Your board is full (30). Remove someone first.'; R.board.push(id); const p = DY.RP(id); if (p.interest[G().user] == null) p.interest[G().user] = 0; return null; };
   DY.boardRemove = id => { const R = G().recruit; R.board = R.board.filter(x => x !== id); };
+  // Remove a commit (the CPU assistant took someone you do not want, or you changed your mind). He is released, off your board and stays away from your class
+  // until you re-add him; a re-add puts him straight back as a commit as long as nobody else has landed him and you have a spot.
+  DY.releaseCommit = id => {
+    const g = G(), R = g.recruit, p = DY.RP(id); if (!p || p.commit !== g.user) return 'He is not one of your commits.';
+    if (R.locked) return 'Recruiting is locked in year one: the real 2027 class.'; if (R.signed) return 'Signing day has passed.';
+    p.commit = null; p.firm = false; p.dropped = true; p.acts = {}; p.interest[g.user] = 0; p.offer = false;
+    R.board = R.board.filter(x => x !== id); R.removed = (R.removed || []).filter(x => x !== id).concat(id);
+    R.log = [`You removed ${p.n} from your class.`].concat(R.log || []); return `${p.n} removed from your class.`;
+  };
+  DY.readdCommit = id => {
+    const g = G(), R = g.recruit, p = DY.RP(id); if (!p || !p.dropped) return null;
+    if (p.commit != null) return `${p.n} has already committed to ${DY.T(p.commit).name}.`;
+    if (R.signed) return 'Signing day has passed.';
+    if (DY.myCommits().length >= DY.CAP.hs) return 'Your class is full.';
+    p.commit = g.user; p.firm = !!p.realUT; p.dropped = false; p.offer = true; p.interest[g.user] = Math.max(200, p.interest[g.user] || 0);
+    R.removed = (R.removed || []).filter(x => x !== id); if (!R.board.includes(id)) R.board.push(id);
+    R.log = [`COMMIT: ${p.n} is back in your class.`].concat(R.log || []); return `${p.n} is a commit again.`;
+  };
   DY.hoursUsed = () => { const R = G().recruit; let h = 0; R.board.forEach(id => { const p = DY.RP(id); for (const a in p.acts) h += DY.ACTIONS[a].hrs; }); return h; };
   DY.setAct = (id, act, on) => {
     const p = DY.RP(id); if (!p) return 'Not found.';
@@ -223,6 +243,8 @@
       const eff = mode === 'auto' ? DY.AUTO_EFF : 1;
       if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * eff * (0.45 + DY.fitScore(ut, p)) * (p.offer ? 1 : 0.55) * crowd * DY.pull(ut, p);
     });
+    // real Tennessee commits: put in the effort (on the board with an offer, or the assistant is running it) and they always commit
+    if (ut.id === DY.UT_ID && !R.locked) Object.values(R.pool).forEach(p => { if (p.realUT && p.commit == null && !p.dropped && R.board.includes(p.id) && p.offer && DY.myCommits().length < DY.CAP.hs) { p.commit = ut.id; p.firm = true; logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos} from ${p.home}, commits to ${DY.UN()}!`); DY.news('commit', `${p.rec.stars}-star ${DY.POS_NAME[p.pos].toLowerCase()} ${p.n} commits to ${DY.UN()}`, 'A real Tennessee commit, landed.'); } });
     // everyone else
     cpuState(R);
     Object.values(R.pool).forEach(p => {
@@ -253,7 +275,7 @@
       const need = (140 + p.rec.stars * 15 + (w <= 4 ? 40 : 0)) * (1 - Math.min(w, 14) / 24);
       // four- and five-stars want to see campus (an official visit) before they commit to you
       const visitOk = p.rec.stars < 4 || p.visited || w >= (p.rec.stars >= 5 ? 12 : 8);
-      if (!p.commit && lv >= need * (g.teams[lead].user && p.rec.stars >= 5 ? 1 + 0.12 * Math.max(0, DY.myCommits().filter(x => x.rec.stars >= 5).length - 3) : 1) && lv >= second * (g.teams[lead].user ? (w >= 10 ? 1.08 : 1.15) : (w >= 10 ? 1.08 : 1.2)) && (!g.teams[lead].user || (p.offer && !full && visitOk && starRoom(p)))) {
+      if (!p.commit && !(p.realUT && w < 9 && !g.teams[lead].user) && lv >= need * (g.teams[lead].user && p.rec.stars >= 5 ? 1 + 0.12 * Math.max(0, DY.myCommits().filter(x => x.rec.stars >= 5).length - 3) : 1) && lv >= second * (g.teams[lead].user ? (w >= 10 ? 1.08 : 1.15) : (w >= 10 ? 1.08 : 1.2)) && (!g.teams[lead].user || (p.offer && !full && visitOk && starRoom(p)))) {
         p.commit = +lead; if (!g.teams[lead].user) addCommit(R, +lead, p);
         if (g.teams[lead].user) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos} from ${p.home}, commits to ${DY.UN()}!`); DY.news('commit', `${p.rec.stars}-star ${DY.POS_NAME[p.pos].toLowerCase()} ${p.n} commits to ${DY.UN()}`, `No. ${p.rec.nat} nationally (${p.rec.c.toFixed(4)} composite). ${p.home}, ${p.hs}.`, { rid: p.id }); }
         else if (p.rec.nat <= 50 && R.board.includes(p.id)) logs.push(`${p.n} (No. ${p.rec.nat}) commits to ${g.teams[lead].name}.`);
@@ -328,7 +350,7 @@
     const needs = DY.teamNeeds(ut), SPEC = ['K', 'P', 'LS'];
     const commits = DY.myCommits(), inPlay = p => p && (p.commit == null || p.commit === ut.id);
     // real Tennessee commits are always on the board (a Tennessee dynasty)
-    if (ut.id === DY.UT_ID) Object.values(R.pool).filter(p => p.real && p.commit === ut.id && !R.board.includes(p.id)).forEach(p => R.board.push(p.id));
+    if (ut.id === DY.UT_ID) Object.values(R.pool).filter(p => p.real && (p.commit === ut.id || (p.realUT && p.commit == null && !p.dropped)) && !R.board.includes(p.id)).forEach(p => { R.board.push(p.id); if (!p.offer) DY.offer(p.id); });
     commits.forEach(p => { if (!R.board.includes(p.id)) R.board.push(p.id); });
     // how many of the class slots each position already has (commits plus prospects still in play on the board)
     const planned = {}; R.board.map(DY.RP).filter(inPlay).forEach(p => { planned[p.pos] = (planned[p.pos] || 0) + 1; });
@@ -352,7 +374,7 @@
     while (active() < tgt && R.board.length < DY.BOARD_MAX && guard++ < 40) {
       // Tennessee: auto never chases more than two five-stars (the real Tennessee five-star commits do not count against that)
       const five5 = R.board.map(DY.RP).filter(q => q && inPlay(q) && !q.real && q.rec.stars >= 5).length, capFive = ut.id === DY.UT_ID && five5 >= DY.AUTO_FIVE_MAX;
-      const pick = Object.values(R.pool).filter(p => !R.board.includes(p.id) && inPlay(p) && !p.real && !(capFive && p.rec.stars >= 5)).map(p => [p, score(p)]).sort((a, b) => b[1] - a[1])[0];
+      const pick = Object.values(R.pool).filter(p => !R.board.includes(p.id) && inPlay(p) && !p.real && !p.dropped && !(capFive && p.rec.stars >= 5)).map(p => [p, score(p)]).sort((a, b) => b[1] - a[1])[0];
       if (!pick || pick[1] < -500) break;
       R.board.push(pick[0].id); planned[pick[0].pos] = (planned[pick[0].pos] || 0) + 1; if (pick[0].interest[ut.id] == null) pick[0].interest[ut.id] = 0;
     }

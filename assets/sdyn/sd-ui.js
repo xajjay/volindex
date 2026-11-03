@@ -160,7 +160,7 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-tab],[data-job],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-rotauto],[data-ord],[data-gid],[data-lpos],[data-lmore],[data-srecs],[data-tctab]'); if (!el) return;
+    const el = e.target.closest('[data-tab],[data-job],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-rradd],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-rotauto],[data-ord],[data-gid],[data-lpos],[data-lmore],[data-srecs],[data-tctab]'); if (!el) return;
     const d = el.dataset, g = G();
     if (el.tagName === 'A') e.preventDefault();
     if (d.tab) { V.tab = d.tab; V.msg = null; return hub(); }
@@ -213,7 +213,8 @@
     if (d.tctab) { V.tcTab = d.tctab; return teamCard(+d.tcid); }
     if (d.rfind) { const [k, v] = d.rfind.split('|'); V.rfind[k] = k === 'stars' ? +v : k === 'int' ? v === '1' : v; return keep(); }
     if (d.radd) { V.msg = SD.boardAdd(+d.radd); return keep(); }
-    if (d.rrm) { SD.boardRemove(+d.rrm); return keep(); }
+    if (d.rrm) { const q = g.recruit.pool[+d.rrm]; if (q && q.commit === g.user) V.msg = SD.releaseCommit(+d.rrm); else SD.boardRemove(+d.rrm); return keep(); }
+    if (d.rradd) { V.msg = SD.readdCommit(+d.rradd); return keep(); }
     if (d.ract) { const [id, a] = d.ract.split('|'); const p = g.recruit.pool[id]; V.msg = SD.setAct(+id, a, !p.acts[a]); return keep(); }
     if (d.roffer) { V.msg = SD.offer(+d.roffer); return keep(); }
     if (d.nilans) { const [id, v] = d.nilans.split('|'); const a = g.off.nilAsk.find(x => x.id === +id); if (a) a.ans = v === '1'; return keep(); }
@@ -653,7 +654,8 @@
         return `<div class="dy-needs"><div class="glabel">Recruiting needs</div><p class="small"><b>${open}</b> open roster spots next season · <b>${left}</b> spots left in this class. The class rank moves as every school keeps signing.</p>${list.length ? `<div class="dy-needchips">${list.map(([pos, v]) => `<span class="dy-need ${v >= 3 ? 'hi' : v >= 2 ? 'md' : ''}">${pos} <b>${v}</b></span>`).join('')}</div>` : '<p class="small dim">Every position is stocked for next season.</p>'}</div>`; })()}
       ${perBar}${topCls ? `<div class="glabel">Top classes <small class="dim">5★ · 4★ · 3★ and total</small></div><ol class="dy-poll dy-cls">${topCls}</ol>` : ''}
       ${g.settings.recruiting === 'auto' ? '<p><span class="chip">Auto</span> Your staff runs the board.</p>' : '<p class="small dim">Each week (Mondays) your calls, visits and NIL promises add interest. Four- and five-stars want an official visit to a home game before they commit. Other programs are recruiting the same kids.</p>'}
-      ${commits.length ? `<ul class="dy-mini">${commits.map(p => `<li><span class="dy-stars">${stars(p.rec.stars)}</span> ${esc(p.n)} <small>${p.pos} · No. ${p.rec.natl}${p.real ? ' · real commitment' : ''}</small></li>`).join('')}</ul>` : ''}</div>
+      ${commits.length ? `<ul class="dy-mini">${commits.map(p => `<li><span class="dy-stars">${stars(p.rec.stars)}</span> ${esc(p.n)} <small>${p.pos} · No. ${p.rec.natl}${p.real ? ' · real commitment' : ''}</small>${R.signed ? '' : ` <button class="glink" data-rrm="${p.id}" title="Release this commit">Remove</button>`}</li>`).join('')}</ul>` : ''}
+      ${(R.removed || []).length ? `<div class="glabel">Removed commits</div><ul class="dy-mini">${R.removed.map(id => R.pool[id]).filter(Boolean).map(p => `<li>${esc(p.n)} <small>${p.pos}</small> ${p.commit != null ? `<small class="dim">Committed: ${esc(T(p.commit).name)}</small>` : R.signed ? '' : `<button class="glink" data-rradd="${p.id}">Re-add</button>`}</li>`).join('')}</ul>` : ''}</div>
       <div class="box"><div class="glabel">Your board</div><div class="dy-scroll"><table class="dyt"><tbody>${board.map(card).join('') || '<tr><td class="dim">Add prospects from the list below.</td></tr>'}</tbody></table></div></div>
       <div class="box"><div class="glabel">Prospects</div><div class="gchips dy-chips"><button data-rfind="int|${F.int ? 0 : 1}" aria-pressed="${!!F.int}" title="Prospects with interest in ${esc(SD.UN())}">Interested in ${esc(SD.UN())}</button> ${['ALL'].concat(SD.POS[SD.kind()]).map(x => `<button data-rfind="pos|${x}" aria-pressed="${F.pos === x}">${x === 'ALL' ? 'All' : x}</button>`).join('')} ${[0, 5, 4, 3, 2].map(s => `<button data-rfind="stars|${s}" aria-pressed="${F.stars === s}">${s ? s + '★' : 'Any'}</button>`).join('')}</div>
         <input id="sdRq" class="dy-in" placeholder="Search by name" value="${esc(F.q)}">

@@ -313,6 +313,11 @@
     const g = G(), H = T(x.h), A = T(x.a), k = SD.kind();
     SD.uniqueNums(H); SD.uniqueNums(A);
     const o = { neutral: x.neutral, title: x.title, live: !!user, user: user ? (x.h === g.user ? 'h' : 'a') : null, diff: (x.h === g.user || x.a === g.user) ? SD.diff() : 0, uid: g.user };
+    if (k === 'hoops') {   // short turnarounds cost a little, a long layoff gives rest (and a little rust)
+      const days = tid => { let b = null; for (const y of g.sched) if (y.res && y.d < x.d && (y.h === tid || y.a === tid) && (!b || y.d > b)) b = y.d; return b ? Math.round((Date.parse(x.d) - Date.parse(b)) / 864e5) : 4; };
+      const ra = d => d <= 1 ? -0.006 : d === 2 ? -0.002 : d >= 7 ? 0.003 : 0;
+      o.rest = { h: ra(days(x.h)), a: ra(days(x.a)) };
+    }
     if (k === 'diamond') { o.noMercy = x.kind === 'ncaa'; o.starter = { h: SD.pickStarter(H, x), a: SD.pickStarter(A, x) }; }
     return k === 'hoops' ? SD.H.newGame(H, A, o) : SD.B.newGame(H, A, o);
   };
