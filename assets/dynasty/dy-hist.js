@@ -20,7 +20,7 @@
   }
   DY.loadHist = year => year >= 2026 ? Promise.all([script('data/hist/fb-2026.js').catch(() => null), script('data/hist/fb-classes.js').catch(() => null)]) : Promise.all([script('data/hist/fb-sched.js'), script('data/hist/fb-classes.js'), script('data/hist/fb-tnclasses.js').catch(() => null), year ? script('data/hist/fb-' + year + '.js') : null]);
   // a saved historical dynasty: the schedules and classes must be loaded before it runs
-  DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); return g; }) : Promise.resolve(g);
+  DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); try { if (g.sched && g.sched.length && g.sched.every(x => !x.res && !x.real)) DY.balanceHome(g.sched); } catch (e) { } return g; }) : Promise.resolve(g);   // (a saved generated slate that has not started gets the home/away fix too)
 
   /* ---------- the era: conferences, title games, the playoff ---------- */
   const NO_CCG = y => {
@@ -129,6 +129,17 @@
       }
     });
   }
+  // home and away: nobody plays 9 of 11 on the road. Flip games (never the FCS ones) until every team is within a game of even
+  DY.balanceHome = balanceHome;
+  function balanceHome(games) {
+    const d = {}, ok = x => x.h < 1000 && x.a < 1000 && !x.neutral;
+    games.forEach(x => { if (x.h < 1000) d[x.h] = (d[x.h] || 0) + 1; if (x.a < 1000) d[x.a] = (d[x.a] || 0) - 1; });
+    for (let pass = 0; pass < 60; pass++) {
+      let moved = 0;
+      for (const x of games) { if (!ok(x)) continue; if ((d[x.h] || 0) - (d[x.a] || 0) > 2) { const t = x.h; x.h = x.a; x.a = t; d[x.a] -= 2; d[x.h] += 2; moved++; } }
+      if (!moved) break;
+    }
+  }
   // seasons before 2001: a generated slate in that year's conferences (rivalries kept), eleven games
   function genSchedule(season) {
     const g = G(), games = [], busy = {}, rnd = DY.r, cnt = {};
@@ -179,6 +190,7 @@
     order.filter(e => special(e) != null).forEach(e => place(e[0], e[1], e[2], special(e)));
     order.filter(e => special(e) == null).forEach(e => place(e[0], e[1], e[2]));
     fillFcs(season, games, busy);
+    balanceHome(games);
     games.sort((x, y) => x.wk - y.wk);
     g.sched = games;
     return games;
