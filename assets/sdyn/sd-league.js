@@ -309,6 +309,14 @@
     const p = want.find(rested) || rot.concat(D.pen).filter(rested).sort((a, b) => b.ovr - a.ovr)[0] || rot[0] || D.pen[0];
     return p ? p.id : null;
   };
+  // basketball rivalries (weight 1 = the historic ones). A rivalry pulls a favorite's edge in a little (about 8%, roughly a point on a ten-point favorite).
+  SD.RIVALS = { 'Duke|North Carolina': 1, 'Kentucky|Louisville': 1, 'Kansas|Missouri': 1, 'Indiana|Purdue': 1, 'Michigan|Michigan State': 1, 'Michigan|Ohio State': 1, 'Syracuse|Georgetown': 1,
+    'Kentucky|Tennessee': 1, 'Florida|Tennessee': 0.8, 'Tennessee|Vanderbilt': 0.8, 'Alabama|Auburn': 0.8, 'Arkansas|Tennessee': 0.6, 'Alabama|Tennessee': 0.6, 'Auburn|Tennessee': 0.6,
+    'Arizona|Arizona State': 1, 'UCLA|USC': 0.8, 'Oregon|Oregon State': 0.8, 'Cincinnati|Xavier': 1, 'Kansas|Kansas State': 0.8, 'Texas|Texas A&M': 0.8, 'Illinois|Missouri': 0.8,
+    'Utah|BYU': 0.8, 'Duke|Virginia': 0.5, 'North Carolina|NC State': 0.8, 'Duke|NC State': 0.8, 'Villanova|Georgetown': 0.8, 'Gonzaga|Saint Mary\'s': 0.8, 'Ole Miss|Mississippi State': 0.8,
+    'Iowa|Iowa State': 0.8, 'Wisconsin|Minnesota': 0.8, 'Indiana|Kentucky': 0.8, 'Memphis|Tennessee': 0.6, 'Georgia|Florida': 0.5, 'Baylor|Texas': 0.5, 'Oklahoma|Oklahoma State': 0.8, 'Pitt|West Virginia': 0.8 };
+  SD.rivalW = (a, b) => SD.RIVALS[[a.name, b.name].sort().join('|')] || 0;
+  SD.RIVAL_K = 0.08;
   SD.startGame = (x, user) => {
     const g = G(), H = T(x.h), A = T(x.a), k = SD.kind();
     SD.uniqueNums(H); SD.uniqueNums(A);
@@ -317,6 +325,8 @@
       const days = tid => { let b = null; for (const y of g.sched) if (y.res && y.d < x.d && (y.h === tid || y.a === tid) && (!b || y.d > b)) b = y.d; return b ? Math.round((Date.parse(x.d) - Date.parse(b)) / 864e5) : 4; };
       const ra = d => d <= 1 ? -0.006 : d === 2 ? -0.002 : d >= 7 ? 0.003 : 0;
       o.rest = { h: ra(days(x.h)), a: ra(days(x.a)) };
+      const rw = x.kind === 'ncaa' || x.kind === 'ct' ? 0 : SD.rivalW(H, A);
+      if (rw) { const gap = ((H.elo || 1500) - (A.elo || 1500)) / 28, sh = Math.max(-0.006, Math.min(0.006, gap * SD.RIVAL_K * rw / 128)) / 2; o.rest.h -= sh; o.rest.a += sh; }
     }
     if (k === 'diamond') { o.noMercy = x.kind === 'ncaa'; o.starter = { h: SD.pickStarter(H, x), a: SD.pickStarter(A, x) }; }
     return k === 'hoops' ? SD.H.newGame(H, A, o) : SD.B.newGame(H, A, o);

@@ -8,6 +8,7 @@
 .dy-l { color: var(--loss); }
 .dy-win { font-weight: 700; }
 .dy .chip { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--fg); margin: 0 4px 4px 0; }
+.dy .chip.ut { background: var(--orange); color: #fff; font-size: 11px; padding: 1px 7px; margin: 0 0 0 4px; }
 .dy-t { white-space: nowrap; font-weight: 600; }
 .dy-t::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: var(--tc); margin-right: 6px; vertical-align: 1px; }
 .dy-t small { color: var(--muted); font-weight: 700; }

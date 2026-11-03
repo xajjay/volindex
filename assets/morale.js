@@ -111,7 +111,7 @@
     if (pr.type === 'focal') return r.usage != null && r.usage <= 2 && r.gp > 0;
     if (pr.type === 'captain') return r.gp > 0 && (r.start || r.rot);
     if (pr.type === 'nil') return A.nil(p) >= (pr.amt || 0) * 0.98;
-    if (pr.type === 'redshirt') return r.gp <= (A.redshirtGames || 4);
+    if (pr.type === 'redshirt') return (r.share || 0) <= 0.15;
     return true;
   };
   // is an open promise on track right now? (for the alert and the room list)
@@ -203,6 +203,16 @@
   M.leaveMult = (g, p) => { if (!M.on(g)) return 1; return clamp(1 + (55 - mor(p)) / 60 - (rel(p) - 50) / 110 - (M.state(g).trust - 60) / 300, 0.45, 2.4); };
   M.nilMult = (g, p) => { if (!M.on(g)) return 1; return clamp(1 + (55 - mor(p)) / 90 - (rel(p) - 50) / 200, 0.5, 1.8); };
   M.nilSlack = (g, p) => (M.on(g) ? clamp((rel(p) - 50) / 200, -0.2, 0.25) : 0);   // loyal, trusting players accept a lower number before they ask
-  M.recruitMult = (g, type) => { if (!M.on(g) || !type) return 1; const t = M.state(g).trust; return 1 + (M.TYPES[type].boost / 100) * (0.5 + t / 100); };
-  M.signed = (g, p, type) => { if (!M.on(g)) return; p.mor = 74; p.rel = 55 + (type ? 8 : 0); if (type) p.pr = { type, amt: 0, st: 'open', yr: g.season + 1, recruit: true }; };
+  // recruiting promises: a prospect weighs what you offer him more when your word is good, and big prospects care most
+  M.RP_TYPES = ['start', 'rot', 'focal', 'redshirt'];
+  M.recruitMult = (g, type, stars) => { if (!M.on(g) || !type) return 1; const t = M.state(g).trust; return 1 + (M.TYPES[type].boost / 100) * (0.5 + t / 100) * (0.7 + 0.15 * (stars || 3)); };
+  M.setRP = (g, pool, p, type, canFocal) => {
+    if (!M.on(g)) return 'The locker room is switched off in Settings.';
+    if (!type) { p.rpromise = null; return 'Promise withdrawn.'; }
+    if (type === 'focal' && canFocal === false) return 'That is not a focal-point position.';
+    const n = Object.values(pool).filter(q => q.rpromise && q.id !== p.id && q.commit !== -1 && !q.dropped).length;
+    if (n >= 3) return 'You already have three recruiting promises out. Withdraw one first. They are binding once he signs.';
+    p.rpromise = type; return `Promised ${p.n}: ${M.TYPES[type].name.toLowerCase()}. It counts if he signs, and he will hold you to it.`;
+  };
+  M.signed = (g, p, type) => { if (!M.on(g)) return; p.mor = 74; p.rel = 55 + (type ? 8 : 0); if (type) p.pr = { type, amt: 0, st: 'open', yr: g.season + 1, recruit: true }; p.rpromise = null; };
 })(typeof window !== 'undefined' ? window : globalThis);

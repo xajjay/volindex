@@ -104,7 +104,7 @@
       // an official visit this week
       if (p.visit && p.visit <= g.date && !p.visited) { const x = SD.userGames().find(y => y.d === p.visit); const won = x && x.res && ((x.h === ut.id) === (x.res.h > x.res.a)); pts += won ? 50 : 18; p.visited = true; logs.push(`${p.n} (${p.rec.stars}★ ${p.pos}) took an official visit${won ? ' and saw a win' : ''}.`); }
       pts = 70 * (1 - Math.exp(-pts / 70));
-      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + fitScore(ut, p) * 0.9) * (p.offer ? 1 : 0.5) * SD.recruitMult() * (mode === 'auto' ? SD.autoEff() : 1);
+      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + fitScore(ut, p) * 0.9) * (p.offer ? 1 : 0.5) * SD.recruitMult() * (mode === 'auto' ? SD.autoEff() : 1) * (window.MORALE ? MORALE.recruitMult(g, p.rpromise, p.rec.stars) : 1);
     });
     Object.values(R.pool).forEach(p => {
       if (p.commit != null && p.commit !== ut.id && p.acts) p.acts = {};
@@ -231,7 +231,7 @@
   SD.persuade = (id, raise) => {
     const g = G(), o = g.off, p = SD.P(id), ut = SD.userT();
     if (o.pitched[id] != null) return 'You already made your pitch.';
-    if (SD.payroll(ut) + raise > ut.budget * 1.03) return 'That raise is over your NIL budget.';
+    if (SD.payroll(ut) + (p.nil || 0) + raise > ut.budget * 1.03) return 'That raise is over your NIL budget.';
     const ok = chance(SD.persuadeChance(p, raise)); o.pitched[id] = ok;
     if (ok) { p.leave = null; p.retYear = g.season; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); SD.news('nil', `${p.n} is coming back`, ''); }
     return ok ? `${p.n} is coming back!` : `${p.n} is turning pro.`;
@@ -450,6 +450,7 @@
     const room = {}; g.teams.forEach(t => { room[t.id] = t.id === g.user ? SD.MAXC() : Math.max(0, lim - t.roster.length - (SD.kind() === 'hoops' ? 0 : 1)); });
     const sign = (p, t) => {
       delete p.pros; delete p.interest; delete p.acts; p.t = t.id; p.yr = 1; p.el = SD.kind() === 'hoops' ? 5 : 4; p.car = {}; p.firstY = g.season + 1; p.nil = SD.nilValue(p, t) * 0.6 | 0;
+      if (t.id === g.user && window.MORALE) MORALE.signed(g, p, p.rpromise); else p.rpromise = null;
       t.roster.push(p.id); g.P[p.id] = p; room[t.id]--;
     };
     const list = Object.values(R.pool).sort((a, b) => b.rec.c - a.rec.c);

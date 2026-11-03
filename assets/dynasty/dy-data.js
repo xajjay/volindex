@@ -225,6 +225,11 @@ Sacramento State|SAC|42|#043927|#C4B581|CA`;
     'Georgia|Tennessee': 'Rivals', 'Kentucky|Tennessee': 'Battle for the Barrel', 'Alabama|Auburn': 'Iron Bowl', 'Mississippi State|Ole Miss': 'Egg Bowl',
     'Michigan|Ohio State': 'The Game', 'Texas|Texas A&M': 'Lone Star Showdown', 'Oklahoma|Texas': 'Red River Rivalry' };
 
+  // more rivalries that are real but have no trophy name (2 = the big historic ones, used by the game engine for a small closer-game effect)
+  DY.RIVAL_MORE = ['Georgia|Florida', 'Auburn|Georgia', 'Alabama|LSU', 'Florida|Florida State', 'Clemson|South Carolina', 'Oklahoma|Oklahoma State', 'Notre Dame|USC',
+    'Michigan|Michigan State', 'Michigan|Notre Dame', 'Ohio State|Penn State', 'Oregon|Washington', 'Army|Navy', 'Miami|Florida State', 'Texas|Oklahoma', 'Arkansas|LSU',
+    'Auburn|Alabama', 'Iowa|Iowa State', 'Pitt|West Virginia', 'North Carolina|Duke', 'Virginia|Virginia Tech', 'Cal|Stanford', 'Utah|BYU', 'Stanford|Notre Dame', 'LSU|Tennessee', 'Arkansas|Tennessee', 'Auburn|Tennessee', 'Missouri|Tennessee'];
+
   // state centroids (lat, lon) for recruiting distance
   DY.STATE_LL = { AL: [32.8, -86.8], AK: [61, -150], AZ: [34.2, -111.7], AR: [34.9, -92.4], CA: [36.8, -119.4], CO: [39, -105.5], CT: [41.6, -72.7], DE: [39, -75.5],
     FL: [28.6, -82.4], GA: [32.7, -83.4], HI: [20.8, -156.3], ID: [44.4, -114.6], IL: [40, -89.2], IN: [39.9, -86.3], IA: [42, -93.5], KS: [38.5, -98.4],

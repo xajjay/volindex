@@ -75,7 +75,8 @@
     const k = target / sum;
     ps.forEach(p => { p.nil = Math.round(clamp(p.nilV * k * rr(0.85, 1.15), 5000, 7e6) / 5000) * 5000; });
   };
-  DY.payroll = t => t.roster.reduce((s, id) => s + (DY.P(id).nil || 0), 0);
+  // players who declared for the draft, graduated or are leaving do not count against next season's NIL budget
+  DY.payroll = t => t.roster.reduce((s, id) => { const p = DY.P(id); return s + (p.leave ? 0 : (p.nil || 0)); }, 0);
 
   /* ---------- schedules ---------- */
   const confTeams = conf => G().teams.filter(t => t.conf === conf);
@@ -244,6 +245,9 @@
 
   /* ---------- playing a game and banking the results ---------- */
   const rivalOf = (a, b) => DY.RIVAL_NAME[[tname(a), tname(b)].sort().join('|')] || null;
+  // rivalry weight: 1 for the named historic games, 0.7 for rivalry-week pairs and other real rivalries. Used for a small 'closer than the numbers say' effect.
+  DY.rivalW = (a, b) => { const k = [tname(a), tname(b)].sort().join('|'); if (DY.RIVAL_NAME[k]) return 1; const has = l => l.some(p => p.slice().sort().join('|') === k); if (has(DY.RIVALRY_WEEK || [])) return 0.7; if ((DY.RIVAL_MORE || []).some(s => s.split('|').sort().join('|') === k)) return 0.7; return 0; };
+  DY.RIVAL_K = 0.10;   // share of the favorite's edge that the rivalry takes away (about a point on a ten-point favorite)
   DY.REST_BYE = 0.25;   // engine rating units: about 1.2 points of margin
   DY.gameOpts = x => {
     const A = DY.T(x.h), B = DY.T(x.a);
@@ -255,7 +259,10 @@
       let streak = 0; for (let w = x.wk - 1; w >= 1 && has(w); w--) streak++;
       const bye = x.wk > 2 && !has(x.wk - 1) && has(x.wk - 2);
       return (bye ? DY.REST_BYE : 0) - (streak >= 8 ? Math.min(0.3, 0.1 * (streak - 7)) : 0); };
-    return { id: x.id, wk: x.wk, rest: { h: restOf(x.h), a: restOf(x.a) }, neutral: x.neutral, big, rival: rivalOf(x.h, x.a) || x.tag, title: x.title || null, ranks: { h: ra, a: rb }, noInj: !G().settings.injuries };
+    const rest = { h: restOf(x.h), a: restOf(x.a) };
+    const rw = x.post ? 0 : DY.rivalW(x.h, x.a);
+    if (rw) { const o = t => { const v = DY.teamOvr(t); return typeof v === 'number' ? v : v.ovr; }, gap = o(A) - o(B), sh = Math.max(-0.25, Math.min(0.25, gap * 2.14 * DY.RIVAL_K * rw / 4.8)) / 2; rest.h -= sh; rest.a += sh; }
+    return { id: x.id, wk: x.wk, rest, neutral: x.neutral, big, rival: rivalOf(x.h, x.a) || x.tag, title: x.title || null, ranks: { h: ra, a: rb }, noInj: !G().settings.injuries };
   };
   DY.startGame = (x, user) => {
     const g = G();

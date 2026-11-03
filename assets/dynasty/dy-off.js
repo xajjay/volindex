@@ -241,7 +241,7 @@
       pts = 140 * (1 - Math.exp(-pts / 140));
       // auto recruiting is a decent assistant, not a great recruiter: it lands a class near where the program's standing says it should
       const eff = mode === 'auto' ? DY.autoEff() : 1;
-      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * eff * (0.45 + DY.fitScore(ut, p)) * (p.offer ? 1 : 0.55) * crowd * DY.pull(ut, p);
+      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * eff * (0.45 + DY.fitScore(ut, p)) * (p.offer ? 1 : 0.55) * crowd * DY.pull(ut, p) * (window.MORALE ? MORALE.recruitMult(g, p.rpromise, p.rec.stars) : 1);
     });
     // real Tennessee commits: put in the effort (on the board with an offer, or the assistant is running it) and they always commit
     if (ut.id === DY.UT_ID && !R.locked) Object.values(R.pool).forEach(p => { if (p.realUT && p.commit == null && !p.dropped && R.board.includes(p.id) && p.offer && DY.myCommits().length < DY.CAP.hs) { p.commit = ut.id; p.firm = true; logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos} from ${p.home}, commits to ${DY.UN()}!`); DY.news('commit', `${p.rec.stars}-star ${DY.POS_NAME[p.pos].toLowerCase()} ${p.n} commits to ${DY.UN()}`, 'A real Tennessee commit, landed.'); } });
@@ -592,7 +592,7 @@
   DY.persuade = (id, raise) => {
     const g = G(), o = g.off, p = DY.P(id), ut = DY.userT();
     if (o.pitched[id] != null) return 'You already made your pitch.';
-    if (DY.payroll(ut) + raise > ut.budget * 1.02) return `That raise would put you over your NIL budget (${DY.money(ut.budget - DY.payroll(ut))} open).`;
+    if (DY.payroll(ut) + (p.nil || 0) + raise > ut.budget * 1.02) return `That raise would put you over your NIL budget (${DY.money(ut.budget - DY.payroll(ut) - (p.nil || 0))} open once he is back on the books).`;
     const dg = p.dg || DY.draftGrade(p);
     const ch = clamp(0.55 - (dg - 82) * 0.06 + (p.tr.loyal - 72) / 140 + raise / Math.max(100000, p.nilV || DY.nilValue(p, ut)) * 0.3, 0.02, 0.85);
     const ok = chance(ch);
@@ -857,6 +857,7 @@
     const sign = (p, t) => {
       delete p.pros; delete p.interest; delete p.acts; p.t = t.id; p.yr = 1; p.el = 5; p.car = {}; p.aw = []; p.log = []; p.firstY = g.season + 1;
       p.nil = t.user ? Math.round((p.nilOffer || DY.recruitNil(p) * 0.8) / 5000) * 5000 : 0;
+      if (t.user && window.MORALE) MORALE.signed(g, p, p.rpromise); else p.rpromise = null;
       G().P[p.id] = p; t.roster.push(p.id); counts[t.id]++;
       DY.addLog(p, `Signed with ${t.name} (${p.rec.stars}★, No. ${p.rec.nat} nationally).`);
     };

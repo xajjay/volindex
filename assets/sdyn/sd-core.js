@@ -181,7 +181,7 @@
     return Math.round(clamp(v, 5000, k === 'hoops' ? 5e6 : 1.2e6) / 5000) * 5000;
   };
   SD.budgetFor = t => { const k = SD.kind(), w = SD.SP().he === 'she'; const b = (k === 'hoops' ? (w ? 2.2e6 : 8e6) : (w ? 0.8e6 : 2.5e6)) * Math.pow(1.035, t.prestige - 70); return Math.round(b / 50000) * 50000; };
-  SD.payroll = t => t.roster.reduce((s, id) => s + (SD.P(id).nil || 0), 0);
+  SD.payroll = t => t.roster.reduce((s, id) => { const p = SD.P(id); return s + (p.leave ? 0 : (p.nil || 0)); }, 0);   // leavers (draft, graduating) are off the books
   SD.money = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(v >= 1e7 ? 1 : 2).replace(/\.?0+$/, '') + 'M' : '$' + Math.round(v / 1000) + 'K';
 
   /* ---------- the real Tennessee rosters ---------- */
