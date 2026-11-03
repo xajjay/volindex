@@ -122,7 +122,7 @@
     let type = 'rot', why = e.why;
     if (r.share < M.shareFor(A, e.tier) - 0.1) type = e.tier === 'start' ? 'start' : 'rot';
     else if (v > 0 && A.nil(p) < v * 0.8 && m.money >= 55) type = 'nil';
-    else if (e.st > 0.6 && r.start && (r.usage || 9) > 2) type = 'focal';
+    else if (e.st > 0.6 && r.start && (r.usage || 9) > 2 && (!A.canFocal || A.canFocal(p))) type = 'focal';
     const amt = type === 'nil' ? Math.round(Math.max(A.nil(p) * 1.25, v) / 5000) * 5000 : 0;
     p.ask = { type, amt, open: true, yr: g.season, why }; p.askY = g.season; out.push(p);
     const S = M.state(g); S.asks++; S.unread++;
@@ -134,7 +134,7 @@
     if (S.y !== g.season) { S.y = g.season; S.n = 0; }
     const cap = Math.max(1, A.cap - (S.trust >= 75 ? 1 : 0) + (S.trust < 40 ? 1 : 0));
     if (S.n >= cap) return out;
-    const c = me.filter(p => mor(p) < 46 && p.askY !== g.season && p.askY !== g.season - 1 && !(p.ask && p.ask.open) && A.ovr(p) >= 62 && M.status(A, p) >= 0.18 && (!opts || !opts.onlyOne || true))
+    const c = me.filter(p => mor(p) < (A.line || 46) && p.askY !== g.season && !(p.ask && p.ask.open) && A.ovr(p) >= 62 && M.status(A, p) >= 0.18 && (!opts || !opts.onlyOne || true))
       .map(p => [p, (50 - mor(p)) * 1.3 + M.status(A, p) * 40 + (((p.tr && p.tr.ego) || 60) - 50) * 0.3 - (rel(p) - 50) * 0.25]).sort((a, b) => b[1] - a[1]);
     if (c.length) { concern(A, c[0][0], out); S.n++; }
     return out;
@@ -176,10 +176,12 @@
     if (p.pr && p.pr.st === 'open') return 'You already made him a promise.';
     if (n >= 4) return 'You have four open promises. Keep a few before you make more.';
     if (type === 'nil' && !(A.nilValue(p) > 0)) return 'NIL is off.';
+    if (type === 'focal' && A.canFocal && !A.canFocal(p)) return 'That is not a focal-point position.';
     return null;
   };
   M.promise = (A, p, type, amt) => {
     const g = A.g(), why = M.canPromise(A, p, type); if (why) return why;
+    if (type === 'nil' && A.raise) { const amt0 = Math.round((amt || (p.ask && p.ask.amt) || A.nil(p) * 1.2) / 5000) * 5000, err = A.raise(p, amt0); if (err) return err; }
     p.pr = { type, amt: type === 'nil' ? Math.round((amt || (p.ask && p.ask.amt) || A.nil(p) * 1.2) / 5000) * 5000 : 0, st: 'open', yr: g.season };
     p.mor = clamp(mor(p) + 12, 5, 99); p.rel = clamp(rel(p) + 3, 0, 100); if (p.ask) p.ask.open = false;
     log(g, `Promised ${A.name(p)}: ${M.TYPES[type].short}.`);

@@ -346,12 +346,15 @@
   // program has slipped below its starting rank and eases off when it has climbed above it.
   DY.AUTO_HOLD = 0.9;
   DY.prestigeRank = t => 1 + G().teams.filter(x => x.fbs && x.prestige > t.prestige).length;
+  // team-strength rank (cached per season: the roster is what auto recruiting is steering)
+  DY.ovrRank = t => { const g = G(), k = g.season + ':' + g.phase; if (!g._ovrRk || g._ovrRk.k !== k) { const o = x => { const v = DY.teamOvr(x); return typeof v === 'number' ? v : v.ovr; }; g._ovrRk = { k, m: {} }; g.teams.filter(x => x.fbs && x.roster && x.roster.length).map(x => [x.id, o(x)]).sort((a, b) => b[1] - a[1]).forEach((x, i) => { g._ovrRk.m[x[0]] = i + 1; }); } return g._ovrRk.m[t.id] || 60; };
   DY.autoEff = () => {
-    const g = G(), ut = DY.userT(); if (!g || !ut) return DY.AUTO_EFF;
-    if (g.autoRank == null) g.autoRank = DY.prestigeRank(ut);
-    const rel = Math.log(DY.prestigeRank(ut) / g.autoRank);
-    return DY.AUTO_EFF * clamp(1 + DY.AUTO_HOLD * rel, 0.35, 1.8);
+    const g = G(), ut = DY.userT(); if (!g || !ut) return 1;
+    const now = Math.sqrt(DY.prestigeRank(ut) * DY.ovrRank(ut));       // a blend of reputation and the roster itself, so a team that is already over-performing eases off
+    if (g.autoRank == null) g.autoRank = now;
+    return DY.AUTO_EFF * clamp(1 + DY.AUTO_HOLD * Math.log(now / g.autoRank), 0.35, 1.5);
   };
+
   DY.AUTO_TARGETS = 20;
   DY.AUTO_EFF = 1;
   DY.AUTO_FIVE_MAX = 2;

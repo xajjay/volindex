@@ -82,9 +82,16 @@
   SD.setVisit = (id, d) => { const g = G(), p = g.recruit.pool[id]; const x = SD.userGames().find(y => y.d === d && y.h === g.user && !y.res); if (!x) return 'Official visits are for home games.'; if (Object.values(g.recruit.pool).filter(q => q.visit === d).length >= 4) return 'Four visitors a game is the limit.'; p.visit = d; return null; };
   // On full auto the program holds the standing it started with: the assistant works harder when the program has slipped below its starting rank and eases off
   // when it has climbed above it, so results still drift with how the simulation goes.
-  SD.AUTO_HOLD = 0.6;
+  SD.AUTO_HOLD = 0.8;
   SD.prestigeRank = t => 1 + G().teams.filter(x => !x.dorm && x.prestige > t.prestige).length;
-  SD.autoEff = () => { const g = G(), ut = SD.userT(); if (!g || !ut) return 1; if (g.autoRank == null) g.autoRank = SD.prestigeRank(ut); return clamp(1 + SD.AUTO_HOLD * Math.log(SD.prestigeRank(ut) / g.autoRank), 0.35, 1.8); };
+  // roster-strength rank, cached per season and smoothed (prestige does not move in these sports, so the roster is the signal)
+  SD.ovrRank = t => { const g = G(), k = g.season + ':' + g.phase; if (!g._ovrRk || g._ovrRk.k !== k) { const m = {}; g.teams.filter(x => !x.dorm && x.roster && x.roster.length).map(x => [x.id, SD.teamRating(x)]).sort((a, b) => b[1] - a[1]).forEach((x, i) => { m[x[0]] = i + 1; }); g._ovrRk = { k, m }; } return g._ovrRk.m[t.id] || 150; };
+  SD.autoEff = () => {
+    const g = G(), ut = SD.userT(); if (!g || !ut) return 1;
+    const now = SD.ovrRank(ut); if (g.autoRank == null) { g.autoRank = now; g.autoSm = now; }
+    if (g.autoSmK !== g.season) { g.autoSmK = g.season; g.autoSm = Math.exp(0.5 * Math.log(g.autoSm) + 0.5 * Math.log(now)); }
+    return clamp(1 + SD.AUTO_HOLD * Math.log(g.autoSm / g.autoRank), 0.3, 1.5);
+  };
   SD.recruitWeek = () => {
     const g = G(), R = g.recruit; if (!R || R.signed) return;
     const ut = SD.userT(), mode = g.settings.recruiting, full = SD.myCommits().length >= SD.MAXC();
@@ -421,7 +428,7 @@
   SD.tRange = p => { const h = (p.id * 2654435761 >>> 0) % 1000 / 1000, w = 5 + Math.round(h * 3), lo = Math.round(p.ovr - 1 - h * (w - 2)); return [Math.max(50, lo), Math.min(99, lo + w)]; };
   function resolvePortal() {
     const g = G(), P = g.off.portal, ut = SD.userT(); if (!P) return; P.resolved = true;
-    if (g.settings.portal === 'auto') { const need = SD.LIMIT[g.sport] - ut.roster.length; SD.portalPlayers().filter(p => p.portal.from !== g.user).sort((a, b) => b.ovr - a.ovr).slice(0, Math.max(0, Math.min(3, need))).forEach(p => SD.portalOffer(p.id, SD.nilValue(p, ut))); }
+    if (g.settings.portal === 'auto') { const need = SD.LIMIT[g.sport] - ut.roster.length; SD.portalPlayers().filter(p => p.portal.from !== g.user).sort((a, b) => b.ovr - a.ovr).slice(0, Math.max(0, Math.min(Math.max(1, Math.round(3 * Math.min(1, SD.autoEff()))), need))).forEach(p => SD.portalOffer(p.id, SD.nilValue(p, ut))); }
     SD.portalPlayers().forEach(p => {
       g.teams.forEach(t => { if (t.user || t.id === g.user || t.id === p.portal.from) return; if (chance(0.03 * Math.pow(t.prestige / 70, 2) * (p.ovr >= 78 ? 3 : 1))) p.portal.offers[t.id] = Math.round(SD.nilValue(p, t) * rr(0.6, 1.25) / 5000) * 5000; });
       if (p.portal.pushed && !Object.keys(p.portal.offers).length) { const t2 = pick(g.teams.filter(t => t.id !== p.portal.from && t.prestige < T(p.portal.from).prestige)); if (t2) p.portal.offers[t2.id] = Math.round(SD.nilValue(p, t2) * 0.8 / 5000) * 5000; }

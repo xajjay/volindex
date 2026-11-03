@@ -22,6 +22,7 @@
       if (!hoops()) { const share = (s.pa || s.bf || 0) / 150; return { start: share > 0.6, rot: share > 0.25, share, usage: 5, gp: g0 }; }
       return { start: (s.gs || 0) / g0 > 0.5 || mpg >= 24, rot: mpg >= 12, share: mpg / 40, usage: T.indexOf(p) + 1, gp: g0 };
     },
+    raise: (p, amt) => SD.adjustNil(p.id, amt),
     news: (k, h, b) => SD.news(k, h, b),
   });
   SD.moraleTick = () => { const g = G(); if (!M || !M.on(g)) return; const t = SD.userT(), n = t.w + t.l, every = hoops() ? 7 : 10; if (n && n % every === 0 && g.mor_last !== n) { g.mor_last = n; M.tick(SD.moraleAdapter()); } };

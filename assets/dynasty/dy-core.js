@@ -487,6 +487,7 @@
         team.depth[pos] = keep;
       } else team.depth[pos] = have.sort((a, b) => b.ovr - a.ovr).map(p => p.id);
     }
+    if (team.user && DY.moralePush) DY.moralePush(team);   // promised starters stay in the lineup
   };
   // the 11 + specialists for a game
   DY.lineup = team => {
