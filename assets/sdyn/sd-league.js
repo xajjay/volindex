@@ -815,6 +815,7 @@
     const g = G();
     SD.gamesOn(x.d).filter(y => !y.res).forEach(y => SD.simGame(y));
     SD.endDay(x.d); g.date = SD.addDays(x.d, 1);
+    if (SD.moraleTick && g.phase === 'season') SD.moraleTick();
     if (g.phase === 'season' && SD.regularOver()) { SD.updatePoll(); SD.setupCT(); }
     else if (g.phase === 'ct' || g.phase === 'ncaa') { if (!g.sched.some(y => !y.res && y.d <= x.d)) SD.postAfterDay(); }
   };

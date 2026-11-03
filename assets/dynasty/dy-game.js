@@ -234,10 +234,12 @@
   function simUntil(cond, label) {
     const GM = S.GM; clearTimeout(S.timer);
     const coach = GM.coach; GM.coach = 'watch';
+    // Simming ahead uses the same fast model as simming the week, so the finished game is a normal result, not the physics engine on autopilot
+    const wasLive = GM.live; GM.live = false;
     let n = 0, r = null;
     const start = { poss: GM.poss, q: GM.q, drives: GM.drives.length };
     while (!GM.over && n++ < 700) { r = DY.step(GM, {}); if (r) { S.lastRes = r; if (r.anim) delete r.anim.trk; if (r.r && r.r.anim) delete r.r.anim.trk; } if (cond(GM, r, start)) break; }
-    GM.coach = coach;
+    GM.coach = coach; GM.live = wasLive;
     if (r) showCaption(Object.assign({}, r, { tag: r.tag || label }));
     renderBoard(); renderTab(); barsMode(); if (!isBars()) drawStatic();
     if (GM.over) return finish();

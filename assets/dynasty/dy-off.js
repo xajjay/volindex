@@ -240,7 +240,7 @@
       const crowd = atPos >= room ? (p.pref.top.includes('pt') ? 0.65 : 0.88) : 1;
       pts = 140 * (1 - Math.exp(-pts / 140));
       // auto recruiting is a decent assistant, not a great recruiter: it lands a class near where the program's standing says it should
-      const eff = mode === 'auto' ? DY.AUTO_EFF : 1;
+      const eff = mode === 'auto' ? DY.autoEff() : 1;
       if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * eff * (0.45 + DY.fitScore(ut, p)) * (p.offer ? 1 : 0.55) * crowd * DY.pull(ut, p);
     });
     // real Tennessee commits: put in the effort (on the board with an offer, or the assistant is running it) and they always commit
@@ -341,6 +341,17 @@
      one; if you have fewer than 20 prospects still in play it tops the board up to 20, your own picks first. New targets are chosen to
      build a whole class: talent, then the positions the roster is actually short at (never a pile of quarterbacks or corners), then who
      is interested and likely to say yes. In a Tennessee dynasty the real Tennessee commits are on the board from day one. */
+  // On full auto the program should hold the standing it started with (a top-10 Tennessee stays about a top-10 program, a 1990s power stays a power, an early-2010s
+  // 35th-ranked Tennessee stays mid-pack), drifting up or down with how the simulation actually goes. The assistant recruits and shops the portal harder when the
+  // program has slipped below its starting rank and eases off when it has climbed above it.
+  DY.AUTO_HOLD = 0.9;
+  DY.prestigeRank = t => 1 + G().teams.filter(x => x.fbs && x.prestige > t.prestige).length;
+  DY.autoEff = () => {
+    const g = G(), ut = DY.userT(); if (!g || !ut) return DY.AUTO_EFF;
+    if (g.autoRank == null) g.autoRank = DY.prestigeRank(ut);
+    const rel = Math.log(DY.prestigeRank(ut) / g.autoRank);
+    return DY.AUTO_EFF * clamp(1 + DY.AUTO_HOLD * rel, 0.35, 1.8);
+  };
   DY.AUTO_TARGETS = 20;
   DY.AUTO_EFF = 1;
   DY.AUTO_FIVE_MAX = 2;
@@ -432,6 +443,7 @@
   DY.startOffseason = () => {
     const g = G();
     g.off = { stage: 'recap', leaving: [], portal: null, draft: null, prog: [], nilAsk: [], season: g.season };
+    if (DY.moraleSeasonEnd) DY.moraleSeasonEnd();
     // bank the season, burn eligibility, decide who leaves
     g.teams.forEach(t => {
       t.roster.forEach(id => {
@@ -444,7 +456,7 @@
         else if (p.yr >= 3) {
           const dg = DY.draftGrade(p);
           const pr = dg >= 91 ? 0.85 : dg >= 87 ? 0.55 : dg >= 84 ? 0.2 : dg >= 81 ? 0.05 : 0;
-          if (chance(pr * (p.tr.ego > 75 ? 1.15 : 1) * (p.tr.loyal > 96 ? 0.7 : 1))) { p.leave = 'nfl'; p.dg = dg; }
+          if (chance(pr * (window.MORALE && t.user ? MORALE.leaveMult(g, p) : 1) * (p.tr.ego > 75 ? 1.15 : 1) * (p.tr.loyal > 96 ? 0.7 : 1))) { p.leave = 'nfl'; p.dg = dg; }
         }
       });
       // never more than 15 early entries from one school
@@ -659,7 +671,7 @@
     ut.roster.map(DY.P).forEach(p => {
       p.nilV = DY.nilValue(p, ut);
       const want = p.nilV * (1 + (p.tr.ego - 60) / 300);
-      if ((want > p.nil * 1.15 && want - p.nil >= 15000) || (p.tr.ego >= 80 && p.ovr >= 80 && chance(0.5))) g.off.nilAsk.push({ id: p.id, ask: Math.round(Math.max(want, p.nil * 1.15) / 5000) * 5000, ans: null });
+      if ((want > p.nil * (1.15 + (window.MORALE ? MORALE.nilSlack(g, p) : 0)) && want - p.nil >= 15000 && (!window.MORALE || !MORALE.on(g) || MORALE.status(DY.moraleAdapter(), p) >= 0.15 || p.ovr >= 78)) || (p.tr.ego >= 80 && p.ovr >= 80 && chance(0.5))) g.off.nilAsk.push({ id: p.id, ask: Math.round(Math.max(want, p.nil * 1.15) / 5000) * 5000, ans: null });
     });
     g.off.nilAsk.sort((a, b) => b.ask - a.ask);
   };
@@ -704,6 +716,7 @@
     if ((p.lastGp || 0) < 4 && p.yr >= 2) c += 0.1;
     if (p.unhappy) c += 0.22;
     if (t.w < t.l) c += 0.05;
+    if (t.user && window.MORALE && MORALE.on(DY.G)) c = c * MORALE.leaveMult(DY.G, p) + (MORALE.moraleOf(p) < 35 ? 0.05 : 0);
     c += (p.tr.ego - 55) / 400 - (p.tr.loyal - 67) / 260;
     if (p.el <= 1) c *= 0.7;
     return clamp(c, 0.005, 0.6);
@@ -820,7 +833,7 @@
     P.pool.map(DY.P).filter(p => p.portal && p.portal.from !== ut.id).sort((a, b) => b.ovr - a.ovr).forEach(p => {
       const L = DY.lineup(ut), st = (L[p.pos] || []).slice(0, DY.STARTERS[p.pos] || 1), worst = st[st.length - 1];
       const short = DY.rosterRoom() > 10;
-      if (DY.rosterRoom() <= 0 || n >= (short ? 12 : 6) || DY.newcomers() >= DY.CAP.newcomers) return;
+      if (DY.rosterRoom() <= 0 || n >= Math.max(2, Math.round((short ? 12 : 6) * Math.min(1, DY.autoEff()))) || DY.newcomers() >= DY.CAP.newcomers) return;
       if ((needs[p.pos] > (short ? 0 : 1) && p.ovr >= (short ? 70 : 74)) || (worst && p.ovr >= worst.ovr + 2)) { n++; const amt = Math.round(DY.nilValue(p, ut) * 1.05 / 5000) * 5000; if (amt < room * 0.4) { P.mine[p.id] = amt; room -= amt; } }
     });
   }

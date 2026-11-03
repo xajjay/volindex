@@ -114,6 +114,7 @@
   DY.makeTraits = () => { const t = {}; for (const k in DY.TRAITS) t[k] = k === 'ego' ? Math.round(clamp(52 + gauss() * 14, 20, 95)) : Math.round(clamp(82 + gauss() * 8.5, 65, 99)); return t; };
   DY.persLabel = p => {
     const t = p.tr;
+    if (window.MORALE && !(t.ego >= 80 && t.disc <= 58) && t.work < 90) return MORALE.persona(p);
     if (t.ego >= 80 && t.disc <= 58) return ['Hot Head', 'Plays with an edge that can boil over: personal fouls and taunting flags follow him.'];
     if (t.clutch >= 88) return ['Ice Water', 'Gets better when the lights are brightest: late, close, third down.'];
     if (t.lead >= 88 && (p.pos === 'QB' || p.pos === 'LB')) return ['Field General', 'Runs the huddle; his calm keeps the offense on time in hostile stadiums.'];

@@ -114,7 +114,7 @@
   }
 
   /* ---------- hub ---------- */
-  const TABS = [['home', 'Home'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['depth', 'Depth chart'], ['recruit', 'Recruiting'], ['polls', 'Rankings'], ['standings', 'Standings'], ['stats', 'Stats'], ['nil', 'NIL'], ['history', 'History'], ['settings', 'Settings']];
+  const TABS = [['home', 'Home'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['depth', 'Depth chart'], ['recruit', 'Recruiting'], ['polls', 'Rankings'], ['standings', 'Standings'], ['stats', 'Stats'], ['nil', 'NIL'], ['room', 'Locker Room'], ['history', 'History'], ['settings', 'Settings']];
   function hub() {
     const g = G(); if (!g) return landing();
     const ut = DY.userT(), rk = DY.apRank(ut.id);
@@ -129,7 +129,7 @@
             ${canSimAhead ? `<div class="dy-menu"><button class="btn" data-act="simmenu" aria-haspopup="true">Sim ahead ▾</button><div class="dy-menu-in" hidden><p class="small dim" style="margin:2px 8px 6px">Your games get simmed too.</p>${g.phase === 'season' && g.week < 7 || g.phase === 'preseason' ? '<button data-ahead="mid">To midseason (week 7)</button>' : ''}${g.phase === 'season' || g.phase === 'preseason' ? '<button data-ahead="reg">To end of the regular season</button>' : ''}<button data-ahead="end">To the end of the season</button></div></div>` : ''}
             <button class="btn" data-act="save" title="Save to slot ${g.slot || 1}">Save</button></div>
         </div>
-        <nav class="wrap dyh-tabs" role="tablist">${(g.post && g.post.seeds && g.post.seen !== false ? [['playoff', 'Playoff']] : []).concat(TABS.filter(([k]) => k !== 'nil' || DY.nilOn())).map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="${V.tab === k}">${l}${k === 'recruit' && g.phase !== 'offseason' && g.recruit && !g.recruit.signed && !g.recruit.locked && g.settings.recruiting === 'manual' ? ` <small>${DY.HOURS() - DY.hoursUsed()}h</small>` : ''}</button>`).join('')}</nav>
+        <nav class="wrap dyh-tabs" role="tablist">${(g.post && g.post.seeds && g.post.seen !== false ? [['playoff', 'Playoff']] : []).concat(TABS.filter(([k]) => (k !== 'nil' || DY.nilOn()) && (k !== 'room' || (window.MORALE && MORALE.on(g)))).map(([k, l]) => [k, k === 'room' && MORALE.state(g).unread ? l + ' •' : l])).map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="${V.tab === k}">${l}${k === 'recruit' && g.phase !== 'offseason' && g.recruit && !g.recruit.signed && !g.recruit.locked && g.settings.recruiting === 'manual' ? ` <small>${DY.HOURS() - DY.hoursUsed()}h</small>` : ''}</button>`).join('')}</nav>
       </div>
       ${V.msg ? `<div class="wrap"><div class="gnote dy-msg">${esc(V.msg)} <button class="glink" data-act="msgx">Dismiss</button></div></div>` : ''}
       <div class="wrap dy-body" id="dyBody"></div>
@@ -137,7 +137,8 @@
     </div>`;
     const body = APP.querySelector('#dyBody');
     if (V.tab === 'playoff' && !(g.post && g.post.seeds && g.post.seen !== false)) V.tab = 'home';
-    ({ home, schedule, roster, depth, recruit, polls, standings, stats, nil, history, settings, playoff })[V.tab](body);
+    if (V.tab === 'room' && !(window.MORALE && MORALE.on(g))) V.tab = 'home';
+    ({ home, schedule, roster, depth, recruit, polls, standings, stats, nil, room, history, settings, playoff })[V.tab](body);
     APP.firstElementChild.onclick = onClick; APP.firstElementChild.onchange = onChange;
     const cq = APP.querySelector('#dyCampQ');
     if (cq) {
@@ -241,7 +242,7 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-tid],[data-vteam],[data-tab],[data-act],[data-pid],[data-pedit],[data-psave],[data-push],[data-job],[data-rid],[data-box],[data-sort],[data-rpos],[data-dmove],[data-ract],[data-roffer],[data-radd],[data-rrm],[data-rradd],[data-nilans],[data-retain],[data-poffer],[data-conf],[data-ppos],[data-prpos],[data-statk],[data-stab],[data-more],[data-slot],[data-set],[data-rfind],[data-goto],[data-recs],[data-hview],[data-lpos],[data-ahead],[data-dview],[data-nilstep],[data-persuade],[data-cut],[data-camp],[data-nilf],[data-dunit],[data-dproj],[data-gside]');
+    const el = e.target.closest('[data-mor],[data-tid],[data-vteam],[data-tab],[data-act],[data-pid],[data-pedit],[data-psave],[data-push],[data-job],[data-rid],[data-box],[data-sort],[data-rpos],[data-dmove],[data-ract],[data-roffer],[data-radd],[data-rrm],[data-rradd],[data-nilans],[data-retain],[data-poffer],[data-conf],[data-ppos],[data-prpos],[data-statk],[data-stab],[data-more],[data-slot],[data-set],[data-rfind],[data-goto],[data-recs],[data-hview],[data-lpos],[data-ahead],[data-dview],[data-nilstep],[data-persuade],[data-cut],[data-camp],[data-nilf],[data-dunit],[data-dproj],[data-gside]');
     if (!el) { const m = APP.querySelector('.dy-menu-in'); if (m && !m.hidden && !e.target.closest('.dy-menu')) m.hidden = true; return; }
     const g = G(), d = el.dataset;
     if (el.tagName === 'A') e.preventDefault();
@@ -275,6 +276,7 @@
     if (d.push) { V.msg = DY.encourage(+d.push); closeModal(); return keep(); }
     if (d.pedit) return editCard(+d.pedit);
     if (d.psave) { V.msg = saveEdit(+d.psave); closeModal(); return keep(); }
+    if (d.mor) { const [a, id, ty] = d.mor.split('|'), p = DY.P(+id), A = DY.moraleAdapter(); V.msg = a === 'p' ? MORALE.promise(A, p, ty) : a === 't' ? MORALE.talk(A, p) : a === 'i' ? MORALE.ignore(A, p) : ''; autosave(); return keep(); }
     if (d.pid) return playerCard(+d.pid);
     if (d.rid) return prospectCard(+d.rid);
     if (d.box) return boxModal(d.box);
@@ -1018,6 +1020,19 @@
       </div></div>${playerSearch()}`;
   }
 
+  /* ---------- locker room ---------- */
+  function room(b) {
+    const g = G(), A = DY.moraleAdapter(), S = MORALE.state(g), me = DY.userT().roster.map(DY.P).sort((a, b) => b.ovr - a.ovr);
+    S.unread = 0;
+    const asks = me.filter(p => p.ask && p.ask.open), proms = me.filter(p => p.pr && p.pr.st === 'open');
+    const opt = p => Object.keys(MORALE.TYPES).filter(k => k !== 'redshirt' && (k !== 'nil' || DY.nilValue(p, DY.userT()) > 0)).map(k => `<button class="btn sm" data-mor="p|${p.id}|${k}">${esc(MORALE.TYPES[k].short)}</button>`).join(' ');
+    const mood = p => { const m = MORALE.mood(p); return `<span class="dy-risk ${m.v < 40 ? 'high' : m.v < 55 ? 'medium' : 'low'}">${esc(m.label)}</span>`; };
+    b.innerHTML = `<div class="box"><div class="glabel">Locker room</div><p class="small">${esc(MORALE.trustLabel(S.trust))} · ${S.kept} promises kept, ${S.broke} broken. Concerns show up as a quiet marker on this tab, a few a season at most. Ignore them if you like: it costs a little, nothing more.</p></div>
+      ${asks.length ? `<div class="box"><div class="glabel">Wants to talk (${asks.length})</div>${asks.map(p => `<div class="dy-row"><div>${plink(p)} <small>${p.pos} · ${p.ovr} · ${esc(MORALE.persona(p)[0])}</small><div class="small dim">${esc(MORALE.TYPES[p.ask.type].name)}${p.ask.type === 'nil' ? ' of ' + DY.money(p.ask.amt) : ''}${p.ask.why ? ' · ' + esc(p.ask.why) : ''}</div></div><div class="grow"><button class="btn primary sm" data-mor="p|${p.id}|${p.ask.type}">Promise it</button><button class="btn sm" data-mor="t|${p.id}">Talk</button><button class="btn sm" data-mor="i|${p.id}">Not now</button></div></div>`).join('')}</div>` : ''}
+      ${proms.length ? `<div class="box"><div class="glabel">Your promises (${proms.length}/4)</div>${proms.map(p => { const ok = MORALE.onTrack(A, p); return `<div class="dy-row">${plink(p)} <small>${esc(MORALE.TYPES[p.pr.type].name)}${p.pr.amt ? ' ' + DY.money(p.pr.amt) : ''}</small> <span class="dy-risk ${ok ? 'low' : 'high'}">${ok ? 'On track' : 'At risk'}</span></div>`; }).join('')}</div>` : ''}
+      <div class="box"><div class="glabel">The room</div><div class="dy-scroll"><table class="dyt dy-tight"><thead><tr><th>Player</th><th>Personality</th><th>Mood</th><th>With you</th><th class="hide-s">Expects</th><th>Promise</th></tr></thead><tbody>${me.map(p => { const e = MORALE.expect(A, p), pr = p.pr && p.pr.st === 'open'; return `<tr><td>${plink(p)} <small>${p.pos} · ${p.ovr}</small></td><td><small title="${esc(MORALE.persona(p)[1])}">${esc(MORALE.persona(p)[0])}</small></td><td>${mood(p)}</td><td><small>${esc(MORALE.relLabel(MORALE.relOf(p)))}</small></td><td class="hide-s"><small>${e.tier === 'start' ? 'Starting job' : e.tier === 'rot' ? 'A role' : 'Fine on the bench'}${e.patient ? ' (will wait)' : ''}</small></td><td>${pr ? '<small>' + esc(MORALE.TYPES[p.pr.type].short) + '</small>' : '<details><summary class="small">Promise…</summary>' + opt(p) + ' <button class="btn sm" data-mor="t|' + p.id + '">Talk</button></details>'}</td></tr>`; }).join('')}</tbody></table></div></div>
+      ${S.log.length ? `<div class="box"><div class="glabel">History</div><ul class="small dim">${S.log.slice(0, 12).map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}`;
+  }
   /* ---------- settings ---------- */
   function settings(b) {
     const g = G(), s = g.settings, m = DY.readMeta(), ut = DY.userT();
@@ -1032,6 +1047,7 @@
       <div class="gfield"><div class="glabel">Recruiting</div>${seg('recruiting', [['manual', 'Manual'], ['auto', 'Auto'], ['off', 'Off']])}</div>
       <div class="gfield"><div class="glabel">Transfer portal</div>${seg('portal', [['manual', 'Manual'], ['auto', 'Auto'], ['off', 'Off']])}</div>
       <div class="gfield"><div class="glabel">NIL raises</div>${seg('nil', [['manual', 'I decide'], ['auto', 'Auto'], ['off', 'Off (no NIL)']])}</div>
+      <div class="gfield"><div class="glabel">Locker room (morale and promises)</div>${seg('morale', [['off', 'Off'], ['on', 'On']])}<p class="dim small">Players have moods, personalities and a relationship with you. Stars expect roles and money that fit them; make promises any time and keep them to earn loyalty. A few quiet alerts a season, nothing forced.</p></div>
       <div class="gfield"><div class="glabel">Playoff (from the next selection day)</div>${seg('cfp', [['real', 'Real format'], [2, '2'], [4, '4'], [8, '8'], [12, '12'], [24, '24']])}</div>
       <div class="gfield"><div class="glabel">G6 + independents 24-team playoff</div>${seg('g6po', [['off', 'Off'], ['on', 'On (from 2027)'], ['always', 'On every season']])}<p class="dim small">A separate bracket for Group of 6 teams and independents. A G6 champion that also earns a CFP spot can pick one.</p>${seg('g6pref', [['cfp', 'My G6 champ plays the CFP'], ['g6', 'My G6 champ plays the G6 playoff']])}</div>
       <div class="gfield"><div class="glabel">Difficulty</div>${seg('difficulty', [['freshman', 'Freshman'], ['varsity', 'Varsity (default)'], ['heisman', 'Heisman (hard)']])}</div>

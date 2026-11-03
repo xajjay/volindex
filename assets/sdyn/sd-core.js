@@ -122,6 +122,7 @@
   SD.makeTraits = () => { const t = {}; for (const k in SD.TRAITS) t[k] = k === 'ego' ? Math.round(clamp(52 + gauss() * 14, 20, 95)) : Math.round(clamp(82 + gauss() * 8.5, 65, 99)); return t; };
   SD.persLabel = p => {
     const t = p.tr;
+    if (window.MORALE && t.work < 90) return MORALE.persona(p);
     if (t.clutch >= 88) return ['Ice Water', 'Wants the ball with the game on the line.'];
     if (t.lead >= 88) return ['Floor General', 'The voice in the huddle; steadies the team on the road.'];
     if (t.work >= 90) return ['Gym Rat', 'First one in, last one out. Develops faster than his peers.'];
@@ -137,7 +138,13 @@
   SD.GRADES = [['A+', 97], ['A', 92], ['A-', 88], ['B+', 84], ['B', 80], ['B-', 76], ['C+', 72], ['C', 68], ['C-', 64], ['D', 0]];
   SD.gradeOfCeil = c => (SD.GRADES.find(g => c >= g[1]) || SD.GRADES[SD.GRADES.length - 1])[0];
   SD.CEIL_YR = 3.8; SD.CEIL_CAPYRS = 3;   // growth per remaining year toward the ceiling, and the most years of growth a player can bank (basketball: a four-year career, not five)
-  SD.setCeil = (p, grade) => { const yrsLeft = Math.min(SD.kind() === 'hoops' ? SD.CEIL_CAPYRS : 9, Math.max(0, (p.el || 1) - 1)); p.ceil = Math.round(clamp(p.ovr + yrsLeft * Math.max(1.2, (SD.kind() === 'hoops' ? SD.CEIL_YR : 4.2) + (grade - 85) * 0.15) + gauss() * 2.5, p.ovr, 99)); p.potG = SD.gradeOfCeil(p.ceil); };
+  // Basketball development: not everyone has a big ceiling, and not everyone grows on the same schedule. Potential is scaled by a per-player factor (most players
+  // are near what they are; a few have real upside), and each player is an early, steady or late bloomer (the Dalton Knecht type shows up in years four and five).
+  SD.POT_F = [[0.35, 0.4], [0.35, 0.8], [0.2, 1.15], [0.1, 1.6]];
+  SD.setCeil = (p, grade) => {
+    const hoops = SD.kind() === 'hoops', yrsLeft = Math.min(hoops ? SD.CEIL_CAPYRS : 9, Math.max(0, (p.el || 1) - 1));
+    let f = 1; if (hoops) { let r = rnd(), a = 0; f = 1.6; for (const [w, v] of SD.POT_F) { a += w; if (r < a) { f = v; break; } } const b = rnd(); p.bloom = b < 0.22 ? 'early' : b < 0.7 ? 'steady' : 'late'; }
+    p.ceil = Math.round(clamp(p.ovr + f * yrsLeft * Math.max(1.2, (hoops ? SD.CEIL_YR : 4.2) + (grade - 85) * 0.15) + gauss() * 2.5, p.ovr, 99)); p.potG = SD.gradeOfCeil(p.ceil); };
   SD.starsOf = c => c >= 0.9834 ? 5 : c >= 0.89 ? 4 : c >= 0.797 ? 3 : 2;
 
   /* ---------- players ---------- */
@@ -291,29 +298,31 @@
   };
 
   /* ---------- the lineup: starters and rotation ---------- */
+  // a coach's promise (start / rotation / focal point) is honored by the lineup: a small push so the player actually gets the job
+  SD.pushOf = p => (window.MORALE && p.pr && p.pr.st === 'open' && SD.G && MORALE.on(SD.G) ? ({ start: 7, focal: 7, rot: 4 }[p.pr.type] || 0) : 0);
   SD.lineup = t => {
     const ps = t.roster.map(SD.P).filter(p => p && !(p.inj && p.inj.g > 0));
     if (SD.kind() === 'hoops') {
       // the five starters fill the five slots (PG, SG, SF, PF, C): the coach's picks where they are healthy, the best fit for any
       // empty slot (primary position first, then secondary, then the closest position), and the bench in the coach's order
       const slots = t.slots || {}, used = new Set(), five = [], SL = SD.SLOTS;
-      const sig = ps.map(p => p.id + ':' + p.ovr).join(',') + '|' + SL.map(k => slots[k] || 0).join(',');
+      const sig = ps.map(p => p.id + ':' + p.ovr + ':' + SD.pushOf(p)).join(',') + '|' + SL.map(k => slots[k] || 0).join(',');
       if (t._lsig === sig && t._lcache) return t._lcache.map(SD.P);
       SL.forEach(pos => { const p = slots[pos] != null && ps.find(q => q.id === slots[pos]); if (p && !used.has(p)) { used.add(p); five[SL.indexOf(pos)] = p; } });
       const open = SL.filter((pos, i) => !five[i]);
       if (open.length) {
-        const pool = ps.filter(p => !used.has(p)).sort((a, b) => b.ovr - a.ovr).slice(0, open.length + 5);
+        const pool = ps.filter(p => !used.has(p)).sort((a, b) => (b.ovr + SD.pushOf(b)) - (a.ovr + SD.pushOf(a))).slice(0, open.length + 5);
         let best = null, bs = -1e9;
         const rec = (k, taken, sum) => {
           if (k === open.length) { if (sum > bs) { bs = sum; best = taken.slice(); } return; }
-          for (const p of pool) { if (taken.includes(p)) continue; taken.push(p); rec(k + 1, taken, sum + p.ovr - SD.slotCost(p, open[k]) * 1.6); taken.pop(); }
+          for (const p of pool) { if (taken.includes(p)) continue; taken.push(p); rec(k + 1, taken, sum + p.ovr + SD.pushOf(p) - SD.slotCost(p, open[k]) * 1.6); taken.pop(); }
         };
         rec(0, [], 0);
         if (best) open.forEach((pos, k) => { five[SL.indexOf(pos)] = best[k]; used.add(best[k]); });
       }
       const starters = five.filter(Boolean);
       const keep = (t.bench || []).map(SD.P).filter(p => p && ps.includes(p) && !starters.includes(p));
-      const rest = ps.filter(p => !starters.includes(p) && !keep.includes(p)).sort((a, b) => b.ovr - a.ovr);
+      const rest = ps.filter(p => !starters.includes(p) && !keep.includes(p)).sort((a, b) => (b.ovr + SD.pushOf(b)) - (a.ovr + SD.pushOf(a)));
       const out = starters.concat(keep, rest);
       t._lsig = sig; t._lcache = out.map(p => p.id);
       return out;

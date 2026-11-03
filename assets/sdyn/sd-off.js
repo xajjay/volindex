@@ -80,6 +80,11 @@
   };
   SD.offer = id => { const p = G().recruit.pool[id]; const n = Object.values(G().recruit.pool).filter(x => x.offer).length; if (n >= SD.CLASS[G().sport] * 4) return 'That is enough offers out.'; p.offer = true; return null; };
   SD.setVisit = (id, d) => { const g = G(), p = g.recruit.pool[id]; const x = SD.userGames().find(y => y.d === d && y.h === g.user && !y.res); if (!x) return 'Official visits are for home games.'; if (Object.values(g.recruit.pool).filter(q => q.visit === d).length >= 4) return 'Four visitors a game is the limit.'; p.visit = d; return null; };
+  // On full auto the program holds the standing it started with: the assistant works harder when the program has slipped below its starting rank and eases off
+  // when it has climbed above it, so results still drift with how the simulation goes.
+  SD.AUTO_HOLD = 0.6;
+  SD.prestigeRank = t => 1 + G().teams.filter(x => !x.dorm && x.prestige > t.prestige).length;
+  SD.autoEff = () => { const g = G(), ut = SD.userT(); if (!g || !ut) return 1; if (g.autoRank == null) g.autoRank = SD.prestigeRank(ut); return clamp(1 + SD.AUTO_HOLD * Math.log(SD.prestigeRank(ut) / g.autoRank), 0.35, 1.8); };
   SD.recruitWeek = () => {
     const g = G(), R = g.recruit; if (!R || R.signed) return;
     const ut = SD.userT(), mode = g.settings.recruiting, full = SD.myCommits().length >= SD.MAXC();
@@ -92,7 +97,7 @@
       // an official visit this week
       if (p.visit && p.visit <= g.date && !p.visited) { const x = SD.userGames().find(y => y.d === p.visit); const won = x && x.res && ((x.h === ut.id) === (x.res.h > x.res.a)); pts += won ? 50 : 18; p.visited = true; logs.push(`${p.n} (${p.rec.stars}★ ${p.pos}) took an official visit${won ? ' and saw a win' : ''}.`); }
       pts = 70 * (1 - Math.exp(-pts / 70));
-      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + fitScore(ut, p) * 0.9) * (p.offer ? 1 : 0.5) * SD.recruitMult() * 1;
+      if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + fitScore(ut, p) * 0.9) * (p.offer ? 1 : 0.5) * SD.recruitMult() * (mode === 'auto' ? SD.autoEff() : 1);
     });
     Object.values(R.pool).forEach(p => {
       if (p.commit != null && p.commit !== ut.id && p.acts) p.acts = {};
@@ -178,14 +183,44 @@
       // a senior with a year left: most good players use the fifth year; role players and bench seniors often move on
       if (hoops && p.yr >= 4 && p.el >= 1 && chance(p.ovr < 68 ? 0.62 : p.ovr < 76 ? 0.38 : p.ovr < 83 ? 0.2 : 0.1) && !(p.tr.loyal > 96 && chance(0.6))) { p.leave = 'grad'; return; }
       const dg = p.ovr + (hoops ? 0 : (SD.isPit(p) ? 2 : 0));
-      if (hoops) { if (p.ovr >= 84 && chance(clamp((p.ovr - 82) * 0.12 * (p.tr.ego > 75 ? 1.2 : 1) * (p.tr.loyal > 96 ? 0.6 : 1) * (p.retYear === g.season - 1 ? 0.6 : 1), 0, 0.9))) { p.leave = 'pro'; p.dg = dg; } }
+      if (hoops) { /* decided after the loop by the NBA draft model */ }
       else if (g.sport === 'baseball' && p.yr >= 3 && p.ovr >= 80 && chance(clamp((p.ovr - 78) * 0.13, 0, 0.92))) { p.leave = 'pro'; p.dg = dg; }
     }));
+    if (SD.moraleSeasonEnd) SD.moraleSeasonEnd();
+    if (hoops) SD.nbaDeclare();
     g.off.leaving = ut.roster.filter(id => SD.P(id).leave).map(id => ({ id, why: SD.P(id).leave }));
     g.off.leaving.filter(x => x.why === 'pro').forEach(x => SD.news('nil', `${SD.P(x.id).n} declares for the draft`, 'You can make a pitch to bring him back on the recap screen.'));
     SD.jobReview();
   };
-  SD.persuadeChance = (p, raise) => clamp(0.5 - (p.dg - 84) * 0.06 + (p.tr.loyal - 82) / 100 + (raise || 0) / Math.max(50000, SD.nilValue(p, SD.userT())) * 0.3, 0.03, 0.85);
+  /* ---------- the NBA draft: who goes pro is decided by how NBA teams see a player, not by his overall ---------- */
+  // Prospect value on an overall-like scale: talent now, potential, youth, NBA size for his position, versatility, shooting, athleticism, a little production.
+  // So a one-and-done wing with length ranks above an older college star who is undersized or a back-to-the-basket player.
+  SD.nbaScore = p => {
+    const yr = Math.min(5, p.yr || 1), at = p.at;
+    let v = p.ovr * 0.7 + (p.ceil || p.ovr) * 0.3;
+    v += [3, 1.5, 0, -2.5, -5][yr - 1];
+    const ref = { PG: 75, SG: 77, SF: 79, PF: 81, C: 83 }[p.pos] || 78, d = (p.ht || ref) - ref;
+    v += d >= 0 ? Math.min(4, d * 0.9) : Math.max(-8, d * (p.pos === 'C' || p.pos === 'PF' ? 1.6 : 1.1));
+    const n = ['thr', 'hnd', 'pas', 'pdf', 'idf', 'reb', 'ath', 'blk', 'stl'].filter(k => at[k] >= 78).length; v += clamp((n - 3) * 0.9, -1.5, 3.5);
+    v += (at.ath - 75) * 0.12;
+    v += at.thr >= 78 ? (p.pos === 'C' || p.pos === 'PF' ? 2.5 : 1.5) : (at.thr < 60 && p.pos !== 'C' && p.pos !== 'PF' ? -2 : 0);
+    const s = p.lastS; if (s && s.gp) v += clamp((((s.pts || 0) + (s.reb != null ? s.reb : (s.orb || 0) + (s.drb || 0)) + (s.ast || 0)) / s.gp - 14) * 0.12, -1.5, 2) || 0;
+    return v;
+  };
+  // Rank every player; the best ~58 are draft picks and ~22 more go pro as free agents. Most of them leave, the borderline ones sometimes stay for NIL and a bigger role.
+  SD.nbaDeclare = () => {
+    const g = G(), she = SD.SP().he === 'she', K = she ? 36 : 58, U = she ? 10 : 22, all = [];
+    g.teams.forEach(t => t.roster.forEach(id => { const p = SD.P(id); p.nba = SD.nbaScore(p); all.push(p); }));
+    all.sort((a, b) => b.nba - a.nba);
+    all.forEach((p, i) => {
+      p.nbaRank = i + 1; if (i >= K + U) return;
+      if (p.leave === 'pro') return;
+      const r = (i + 1) / K, base = r <= 0.26 ? 0.97 : r <= 0.52 ? 0.92 : r <= 1 ? 0.8 : 0.45;
+      if (p.leave === 'grad' || chance(clamp(base * (window.MORALE && p.t === g.user ? MORALE.leaveMult(g, p) : 1) * (p.tr.ego > 75 ? 1.1 : 1) * (p.tr.loyal > 96 ? 0.6 : 1) * (p.retYear === g.season - 1 ? 0.6 : 1), 0, 0.99))) { if (p.leave !== 'grad') p.leave = 'pro'; }
+      p.dg = 90 - (i + 1) * 0.22 * (58 / K);
+    });
+  };
+  SD.persuadeChance = (p, raise) => clamp(0.5 - (p.dg - 84) * 0.06 + (p.tr.loyal - 82) / 100 + (raise || 0) / Math.max(50000, SD.nilValue(p, SD.userT())) * 0.3 - (window.MORALE && MORALE.on(G()) ? (MORALE.leaveMult(G(), p) - 1) * 0.15 : 0), 0.03, 0.85);
   SD.persuade = (id, raise) => {
     const g = G(), o = g.off, p = SD.P(id), ut = SD.userT();
     if (o.pitched[id] != null) return 'You already made your pitch.';
@@ -323,7 +358,7 @@
   }
   function nilReview() {
     const g = G(), ut = SD.userT();
-    g.off.nilAsk = ut.roster.map(SD.P).filter(p => SD.nilValue(p, ut) > (p.nil || 0) * 1.3 && p.el >= 1 && chance(0.6 + (p.tr.ego - 60) / 100)).map(p => ({ id: p.id, ask: Math.round(SD.nilValue(p, ut) * rr(0.85, 1.1) / 5000) * 5000, ans: null }));
+    g.off.nilAsk = ut.roster.map(SD.P).filter(p => SD.nilValue(p, ut) > (p.nil || 0) * (1.3 + (window.MORALE ? MORALE.nilSlack(g, p) : 0)) && (!window.MORALE || !MORALE.on(g) || MORALE.status(SD.moraleAdapter(), p) >= 0.15 || p.ovr >= 78) && p.el >= 1 && chance((0.6 + (p.tr.ego - 60) / 100) * (window.MORALE ? MORALE.nilMult(g, p) : 1))).map(p => ({ id: p.id, ask: Math.round(SD.nilValue(p, ut) * rr(0.85, 1.1) / 5000) * 5000, ans: null }));
   }
   SD.nilRisk = (p, amt) => { const v = SD.nilValue(p, SD.userT()), r = amt / Math.max(1000, v); let k = r >= 1 ? 0.03 : r >= 0.85 ? 0.12 : r >= 0.65 ? 0.3 : 0.55; k *= 1 + (p.tr.ego - 60) / 120; k *= 1 - (p.tr.loyal - 82) / 120; return clamp(k, 0.01, 0.9); };
   SD.riskLabel = r => r < 0.05 ? 'None' : r < 0.12 ? 'Low' : r < 0.3 ? 'Medium' : 'High';
@@ -337,7 +372,7 @@
     g.teams.forEach(t => {
       t.roster.map(SD.P).forEach(p => {
         let c = 0.03; const better = t.roster.map(SD.P).filter(x => x.pos === p.pos && x.ovr > p.ovr).length;
-        if (better >= (SD.kind() === 'hoops' ? 1 : 2) && p.ovr >= 70) c += 0.12; if (p.unhappy) c += 0.25; c += (p.tr.ego - 60) / 400 - (p.tr.loyal - 82) / 250;
+        if (better >= (SD.kind() === 'hoops' ? 1 : 2) && p.ovr >= 70) c += 0.12; if (p.unhappy) c += 0.25; if (t.id === g.user && window.MORALE && MORALE.on(g)) c = c * MORALE.leaveMult(g, p) + (MORALE.moraleOf(p) < 35 ? 0.06 : 0); c += (p.tr.ego - 60) / 400 - (p.tr.loyal - 82) / 250;
         if (p.pushOut || (chance(clamp(c, 0.005, 0.5)) && pool.filter(id => SD.P(id).portal.from === t.id).length < (SD.kind() === 'hoops' ? 4 : 8))) { p.portal = { from: t.id, offers: {}, pushed: !!p.pushOut }; pool.push(p.id); }
       });
     });
@@ -424,8 +459,11 @@
     R.signed = true; R.finalRank = R.classRank;
   }
   function runDraft() {
-    const g = G(), out = Object.values(g.P).filter(p => p.gone === g.season && (p.leave === 'pro' || p.leave === 'grad') && p.ovr >= (SD.kind() === 'hoops' ? 80 : 76)).sort((a, b) => b.ovr - a.ovr);
-    const n = SD.kind() === 'hoops' ? (SD.SP().he === 'she' ? 36 : 58) : 120;
+    const g = G(), hoops = SD.kind() === 'hoops', she = SD.SP().he === 'she';
+    const all = Object.values(g.P).filter(p => p.gone === g.season && (p.leave === 'pro' || p.leave === 'grad') && (hoops ? p.nba != null && p.nbaRank <= (she ? 46 : 80) : p.ovr >= 76));
+    const out = hoops ? all.map(p => [p, p.nba + gauss() * 2.5]).sort((a, b) => b[1] - a[1]).map(x => x[0]) : all.sort((a, b) => b.ovr - a.ovr);
+    const n = hoops ? (she ? 36 : 58) : 120;
+    out.slice(n).forEach(p => { p.udfa = true; });
     g.off.draft = out.slice(0, n).map((p, i) => ({ id: p.id, pk: i + 1, t: p.t0 }));
     g.off.draft.forEach(x => { const p = SD.P(x.id); p.draft = { pk: x.pk, y: g.season }; });
     const mine = g.off.draft.filter(x => x.t === g.user);
@@ -434,10 +472,17 @@
   function develop(p) {
     const work = (p.tr.work - 82) / 40, room = Math.max(0, p.ceil - p.ovr);
     const mins = p.lastS ? (SD.kind() === 'hoops' ? (p.lastS.min || 0) / Math.max(1, p.lastS.gp) / 30 : (p.lastS.pa || p.lastS.bf || 0) / 150) : 0;
-    let gain = clamp(room * (0.36 + work * 0.12 + Math.min(0.15, mins * 0.1)) + gauss() * 1.2, -2, 9);
-    if (p.yr >= 4) gain = Math.min(gain, 3);
+    const hoops = SD.kind() === 'hoops', bl = p.bloom || 'steady', yi = Math.min(5, p.yr) - 1;
+    const tm = hoops ? ({ early: [1.4, 1.1, 0.65, 0.35, 0.25], steady: [1, 1, 1, 1, 0.8], late: [0.45, 0.6, 1, 1.3, 1.1] }[bl] || [1, 1, 1, 1, 1])[yi] : 1;
+    let gain = clamp(room * (0.36 + work * 0.12 + Math.min(0.15, mins * 0.1)) * tm + gauss() * 1.2, -2, 9);
+    // basketball: players without a big ceiling grow (or stall) with what they actually do on the floor, and a late bloomer who is playing can break out in year three, four or five
+    if (hoops) {
+      const perf = clamp((mins - 0.55) * 2.2, -1, 1); if (room < 9) gain += perf * 0.9;
+      if (bl === 'late' && p.yr >= 3 && mins >= 0.45 && chance(0.22)) { gain += rr(3, 6); p.burst = true; }
+    }
+    if (p.yr >= 4) gain = Math.min(gain, hoops && bl === 'late' ? 6 : 3);
     // the last few points are the hardest: slow growth near the top (diamond more, it piled up 90s)
-    if (p.ovr >= 85 && gain > 0) gain *= SD.kind() === 'hoops' ? 0.8 : 0.5;
+    if (p.ovr >= 85 && gain > 0) gain *= SD.kind() === 'hoops' ? (p.ovr >= 90 ? 0.3 : p.ovr >= 87 ? 0.5 : 0.7) : 0.5;
     const before = p.ovr;
     for (const k in p.at) p.at[k] = Math.round(clamp(p.at[k] + gain * rr(0.6, 1.3), 50, 99));
     SD.setOvr(p); p.yr++; p.lastDelta = p.ovr - before;

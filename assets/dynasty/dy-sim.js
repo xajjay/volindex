@@ -16,7 +16,7 @@
   const SIM = DY.SIM = {};
   // The 22-man simulation turns small rating gaps into big on-field gaps (blocks, separation, pressure). This pulls the ratings it sees back toward the average
   // so a game played on the field has the same talent leverage as a simmed one (calibrated against DY.simGame).
-  DY.SIM_RK = 0.45; DY.SIM_RK2 = 0.55;   // ratings the sim reads through E(), and the raw physical ones (speed, acceleration, agility)
+  DY.SIM_RK = 0.5; DY.SIM_RK2 = 0.6;   // ratings the sim reads through E(), and the raw physical ones (speed, acceleration, agility)
   // physical ratings are pulled toward what a starter at that position typically has, so a team's edge in speed stays an edge but a smaller one
   const PHYS_MU = { QB: { spd: 67, acc: 70, agi: 77 }, RB: { spd: 82, acc: 78, agi: 78 }, WR: { spd: 81, acc: 76, agi: 75 }, TE: { spd: 70, acc: 69, agi: 67 }, OT: { spd: 52, acc: 60, agi: 77 }, IOL: { spd: 52, acc: 60, agi: 79 }, EDGE: { spd: 75, acc: 73, agi: 72 }, DT: { spd: 60, acc: 60, agi: 66 }, LB: { spd: 75, acc: 73, agi: 72 }, CB: { spd: 82, acc: 76, agi: 76 }, S: { spd: 78, acc: 75, agi: 72 } };
   const cp = (v, p, k) => { const mu = (PHYS_MU[p && p.pos] || {})[k]; const c = mu != null ? mu : 78; return c + (v - c) * DY.SIM_RK2; };

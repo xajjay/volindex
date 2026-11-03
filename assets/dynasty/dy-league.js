@@ -446,6 +446,8 @@
     DY.healWeek();
     if (DY.recruitWeek) DY.recruitWeek(w);
     g.teams.forEach(t => DY.refreshDepth(t));
+    if (DY.moralePush) DY.moralePush(DY.userT());
+    if (DY.moraleTick) DY.moraleTick();
     DY.updatePolls(w);
     DY.weekNews(w);
     g.week++;

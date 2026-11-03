@@ -106,7 +106,7 @@
   const hoops0 = () => SD.SPORTS[SPORT].kind === 'hoops';
 
   /* ---------- hub ---------- */
-  const TABS = () => (G() && G().post && G().post.seen !== false ? [['tourney', 'NCAA Tournament']] : []).concat([['home', 'Home'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['lineup', hoops() ? 'Rotation' : 'Lineup'], ['recruit', 'Recruiting'], ['polls', 'Rankings'], ['standings', 'Standings'], ['stats', 'Stats'], ['nil', 'NIL'], ['history', 'History'], ['settings', 'Settings']]);
+  const TABS = () => (G() && G().post && G().post.seen !== false ? [['tourney', 'NCAA Tournament']] : []).concat([['home', 'Home'], ['schedule', 'Schedule'], ['roster', 'Roster'], ['lineup', hoops() ? 'Rotation' : 'Lineup'], ['recruit', 'Recruiting'], ['polls', 'Rankings'], ['standings', 'Standings'], ['stats', 'Stats'], ['nil', 'NIL'], ...(window.MORALE && MORALE.on(G()) ? [['room', 'Locker Room' + (MORALE.state(G()).unread ? ' •' : '')]] : []), ['history', 'History'], ['settings', 'Settings']]);
   function hub() {
     const g = G(); if (!g) return landing();
     const ut = SD.userT(), rk = SD.apRank(ut.id), sp = SD.SP();
@@ -128,7 +128,8 @@
     </div>`;
     const body = APP.querySelector('#dyBody');
     if (V.tab === 'tourney' && !(g.post && g.post.seen !== false)) V.tab = 'home';
-    ({ home, schedule, roster, lineup, recruit, polls, standings, stats, nil, history, settings, tourney })[V.tab](body);
+    if (V.tab === 'room' && !(window.MORALE && MORALE.on(g))) V.tab = 'home';
+    ({ home, schedule, roster, lineup, recruit, polls, standings, stats, nil, room, history, settings, tourney })[V.tab](body);
     APP.firstElementChild.onclick = onClick; APP.firstElementChild.onchange = onChange;
     const at = APP.querySelector('.dyh-tabs [aria-selected="true"]'); if (at && at.scrollIntoView && root.innerWidth < 900) at.scrollIntoView({ block: 'nearest', inline: 'center' });
   }
@@ -160,9 +161,10 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-tab],[data-job],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-rradd],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-rotauto],[data-ord],[data-gid],[data-lpos],[data-lmore],[data-srecs],[data-tctab]'); if (!el) return;
+    const el = e.target.closest('[data-mor],[data-tab],[data-job],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-rradd],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-rotauto],[data-ord],[data-gid],[data-lpos],[data-lmore],[data-srecs],[data-tctab]'); if (!el) return;
     const d = el.dataset, g = G();
     if (el.tagName === 'A') e.preventDefault();
+    if (d.mor) { const [a, id, ty] = d.mor.split('|'), p = SD.P(+id), A = SD.moraleAdapter(); V.msg = a === 'p' ? MORALE.promise(A, p, ty) : a === 't' ? MORALE.talk(A, p) : a === 'i' ? MORALE.ignore(A, p) : ''; autosave(); return keep(); }
     if (d.tab) { V.tab = d.tab; V.msg = null; return hub(); }
     if (d.pedit) return editCard(+d.pedit);
     if (d.psave) { V.msg = saveEdit(+d.psave); closeModal(); return keep(); }
@@ -742,6 +744,19 @@
     const bpBox = `<div class="box"><div class="glabel">Best programs in this dynasty</div>${bp.map(c => `<p class="small" style="margin:6px 0 2px"><b>${esc(c.label)}</b></p>${c.top.length ? `<ol class="dy-mini">${c.top.map(r => `<li>${tlink(r.t, false)} <small>${r.v}</small></li>`).join('')}</ol>` : '<p class="dim small">None yet.</p>'}`).join('')}</div>`;
     b.innerHTML = `<div class="dy-grid"><div class="dy-col wide"><div class="box"><div class="glabel">Coach ${esc(g.coach.name)} · ${g.coach.w}-${g.coach.l}</div><div class="dy-scroll"><table class="dyt"><thead><tr><th>Season</th><th>Record</th><th>Conf</th><th>Rank</th><th>Finish</th><th class="hide-s">Champion</th></tr></thead><tbody>${g.hist.slice().reverse().map(h => `<tr><td>${SD.SP().label(h.y)}</td><td>${h.w}-${h.l}</td><td>${h.cw}-${h.cl}${h.secReg ? ' 🏆' : ''}${h.secT ? ' (T)' : ''}</td><td>${h.ap || '—'}</td><td>${esc(h.finish)}</td><td class="hide-s small">${esc(h.champ || '')}</td></tr>`).join('') || '<tr><td class="dim">Your first season is under way.</td></tr>'}</tbody></table></div></div>${legBox}${srBox}${natBox}</div><div class="dy-col">${teamBox}${bpBox}</div></div>`;
   }
+  /* ---------- locker room ---------- */
+  function room(b) {
+    const g = G(), A = SD.moraleAdapter(), S = MORALE.state(g), me = SD.userT().roster.map(SD.P).sort((a, b) => b.ovr - a.ovr);
+    S.unread = 0;
+    const asks = me.filter(p => p.ask && p.ask.open), proms = me.filter(p => p.pr && p.pr.st === 'open');
+    const opt = p => Object.keys(MORALE.TYPES).filter(k => k !== 'redshirt' && (k !== 'nil' || SD.nilValue(p, SD.userT()) > 0)).map(k => `<button class="btn sm" data-mor="p|${p.id}|${k}">${esc(MORALE.TYPES[k].short)}</button>`).join(' ');
+    const mood = p => { const m = MORALE.mood(p); return `<span class="dy-risk ${m.v < 40 ? 'high' : m.v < 55 ? 'medium' : 'low'}">${esc(m.label)}</span>`; };
+    b.innerHTML = `<div class="box"><div class="glabel">Locker room</div><p class="small">${esc(MORALE.trustLabel(S.trust))} · ${S.kept} promises kept, ${S.broke} broken. Concerns show up as a quiet marker on this tab, a few a season at most. Ignore them if you like: it costs a little, nothing more.</p></div>
+      ${asks.length ? `<div class="box"><div class="glabel">Wants to talk (${asks.length})</div>${asks.map(p => `<div class="dy-row"><div>${plink(p)} <small>${p.pos} · ${p.ovr} · ${esc(MORALE.persona(p)[0])}</small><div class="small dim">${esc(MORALE.TYPES[p.ask.type].name)}${p.ask.type === 'nil' ? ' of ' + SD.money(p.ask.amt) : ''}${p.ask.why ? ' · ' + esc(p.ask.why) : ''}</div></div><div class="grow"><button class="btn primary sm" data-mor="p|${p.id}|${p.ask.type}">Promise it</button><button class="btn sm" data-mor="t|${p.id}">Talk</button><button class="btn sm" data-mor="i|${p.id}">Not now</button></div></div>`).join('')}</div>` : ''}
+      ${proms.length ? `<div class="box"><div class="glabel">Your promises (${proms.length}/4)</div>${proms.map(p => { const ok = MORALE.onTrack(A, p); return `<div class="dy-row">${plink(p)} <small>${esc(MORALE.TYPES[p.pr.type].name)}${p.pr.amt ? ' ' + SD.money(p.pr.amt) : ''}</small> <span class="dy-risk ${ok ? 'low' : 'high'}">${ok ? 'On track' : 'At risk'}</span></div>`; }).join('')}</div>` : ''}
+      <div class="box"><div class="glabel">The room</div><div class="dy-scroll"><table class="dyt dy-tight"><thead><tr><th>Player</th><th>Personality</th><th>Mood</th><th>With you</th><th class="hide-s">Expects</th><th>Promise</th></tr></thead><tbody>${me.map(p => { const e = MORALE.expect(A, p), pr = p.pr && p.pr.st === 'open'; return `<tr><td>${plink(p)} <small>${p.pos} · ${p.ovr}</small></td><td><small title="${esc(MORALE.persona(p)[1])}">${esc(MORALE.persona(p)[0])}</small></td><td>${mood(p)}</td><td><small>${esc(MORALE.relLabel(MORALE.relOf(p)))}</small></td><td class="hide-s"><small>${e.tier === 'start' ? 'Starting job' : e.tier === 'rot' ? 'A role' : 'Fine on the bench'}${e.patient ? ' (will wait)' : ''}</small></td><td>${pr ? '<small>' + esc(MORALE.TYPES[p.pr.type].short) + '</small>' : '<details><summary class="small">Promise…</summary>' + opt(p) + ' <button class="btn sm" data-mor="t|' + p.id + '">Talk</button></details>'}</td></tr>`; }).join('')}</tbody></table></div></div>
+      ${S.log.length ? `<div class="box"><div class="glabel">History</div><ul class="small dim">${S.log.slice(0, 12).map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}`;
+  }
   function settings(b) {
     const g = G(), s = g.settings;
     const seg = (k, opts) => `<div class="gseg">${opts.map(([v, l]) => `<button data-set="${k}|${v}" aria-pressed="${String(s[k]) === String(v)}">${esc(l)}</button>`).join('')}</div>`;
@@ -752,7 +767,7 @@
       ${hoops() ? '' : `<div class="gfield"><div class="glabel">Bullpen</div>${seg('autoPen', [[true, 'Staff makes pitching changes'], [false, 'I make them']])}</div>`}
       <div class="gfield"><div class="glabel">Recruiting</div>${seg('recruiting', [['manual', 'I recruit'], ['auto', 'Auto'], ['off', 'Off']])}</div>
       <div class="gfield"><div class="glabel">Transfer portal</div>${seg('portal', [['manual', 'I manage it'], ['auto', 'Auto']])}</div>
-      <div class="gfield"><div class="glabel">NIL raises</div>${seg('nil', [['manual', 'I decide'], ['auto', 'Auto']])}</div>
+      <div class="gfield"><div class="glabel">Locker room (morale and promises)</div>${seg('morale', [['off', 'Off'], ['on', 'On']])}<p class="dim small">Players have moods, personalities and a relationship with you. Stars expect roles and money that fit them; you can make promises any time and keep them to earn loyalty. A few quiet alerts a season, nothing forced.</p></div>
       <div class="grow"><button class="btn" data-act="export">Export save file</button><button class="btn" data-act="quit">Quit to menu</button></div></div>`;
   }
 
