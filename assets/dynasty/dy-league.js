@@ -244,11 +244,18 @@
 
   /* ---------- playing a game and banking the results ---------- */
   const rivalOf = (a, b) => DY.RIVAL_NAME[[tname(a), tname(b)].sort().join('|')] || null;
+  DY.REST_BYE = 0.25;   // engine rating units: about 1.2 points of margin
   DY.gameOpts = x => {
     const A = DY.T(x.h), B = DY.T(x.a);
     const ra = DY.apRank(x.h), rb = DY.apRank(x.a);
     const big = !!(rivalOf(x.h, x.a) || (ra && ra <= 25 && rb && rb <= 25) || (rb && rb <= 15) || (ra && ra <= 10 && x.post) || x.post || x.tag === 'Rivalry Week');
-    return { id: x.id, wk: x.wk, neutral: x.neutral, big, rival: rivalOf(x.h, x.a) || x.tag, title: x.title || null, ranks: { h: ra, a: rb }, noInj: !G().settings.injuries };
+    // schedule dynamics: a team coming off a bye is fresher; the long stretch without one (8th straight game) wears a roster down
+    const restOf = tid => { const gs = G().sched; if (x.post || !x.wk || x.wk <= 1) return 0;
+      const has = w => gs.some(y => y.wk === w && (y.h === tid || y.a === tid && true) && y.res);
+      let streak = 0; for (let w = x.wk - 1; w >= 1 && has(w); w--) streak++;
+      const bye = x.wk > 2 && !has(x.wk - 1) && has(x.wk - 2);
+      return (bye ? DY.REST_BYE : 0) - (streak >= 8 ? Math.min(0.3, 0.1 * (streak - 7)) : 0); };
+    return { id: x.id, wk: x.wk, rest: { h: restOf(x.h), a: restOf(x.a) }, neutral: x.neutral, big, rival: rivalOf(x.h, x.a) || x.tag, title: x.title || null, ranks: { h: ra, a: rb }, noInj: !G().settings.injuries };
   };
   DY.startGame = (x, user) => {
     const g = G();

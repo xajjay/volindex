@@ -236,7 +236,14 @@
         // a recruit's own taste (a dream school, a coach he clicked with) is fixed for the cycle; a class already heavy in stars is a harder sell (playing time, one more star at a spot is less appealing)
         p.aff = p.aff || {}; if (p.aff[tid] == null) p.aff[tid] = Math.exp(gauss() * (p.rec.stars >= 4 ? 0.42 : 0.25));
         const scT = R._sc[t.id] || { 5: 0, 4: 0 }, crowdS = p.rec.stars >= 5 ? 1 / (1 + 0.10 * Math.max(0, scT[5] - 4)) : p.rec.stars === 4 ? 1 / (1 + 0.035 * Math.max(0, scT[4] + scT[5] - 11)) : 1;
-        p.interest[tid] += (6 + t.prestige / 11) * (0.45 + DY.fitScore(t, p)) * rr(0.35, 1.5) * heat * nm * p.aff[tid] * crowdS;
+        // a real recruit's real school is his default first option (about 85% of the time it stays that way); it stops being one when the room at his position is already full or the school never really pushes
+        let rs = 1;
+        if (p.realSchool != null) {
+          if (p.stick == null) p.stick = chance(DY.REAL_STICK);
+          if (+tid === p.realSchool) rs = p.stick ? (have > nd + 1 ? 1.25 : DY.REAL_PULL) : 1;
+          else rs = p.stick ? 0.7 : 1;
+        }
+        p.interest[tid] += (6 + t.prestige / 11) * (0.45 + DY.fitScore(t, p)) * rr(0.35, 1.5) * heat * nm * p.aff[tid] * crowdS * rs;
       }
       // commits: only schools that can use him (a spot at his position, room in the class) are considered
       const order = Object.entries(p.interest).filter(([tid]) => { const t = g.teams[tid]; return t.user || p.commit === +tid || DY.cpuOk(t, p); }).sort((a, b) => b[1] - a[1]);
@@ -396,6 +403,7 @@
   // limits per offseason (AJ): 30 newcomers (20 high school, 20 transfers), 30 departures, 15 transfers out, 15 NFL entries
   DY.CAP = { newcomers: 30, hs: 20, tin: 20, out: 30, tout: 15, nfl: 15 };
   DY.ROSTER_MAX = 85;
+  DY.REAL_STICK = 0.88; DY.REAL_PULL = 4.5;   // real recruits: the chance he sticks to his real school, and how hard that school's pull is
   DY.CPU_ROSTER = 85;
   DY.CPU_PUSH = 1.12;      // how hard CPU programs chase recruits (1 = old behaviour)
   DY.rosterMax = () => DY.ROSTER_MAX;

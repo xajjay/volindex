@@ -19,6 +19,8 @@
     const G = DY.G;
     const crowdBase = o.neutral ? 0 : clamp(home.cap / 100, 0.15, 1.05);
     const big = !!o.big;
+    // venue: a loud 100,000-seat house that wins is worth about 4+ points, a small quiet stadium about 2 (engine units, ~4.7 points each)
+    const envHfa = o.neutral ? 0 : DY.HFA_K * clamp(0.45 + home.cap / 100 * 0.55 + Math.max(0, home.prestige - 60) / 110, 0.5, 1.9);
     const GM = {
       id: o.id || ('g' + Math.floor(rnd() * 1e9)), wk: o.wk, season: G ? G.season : 2026, T: { h: home, a: away }, neutral: !!o.neutral, big, rival: o.rival || null,
       crowd: clamp(crowdBase * (big ? 1 : 0.72) * (0.75 + home.prestige / 400), 0, 1.1), title: o.title || null, ranks: o.ranks || {},
@@ -26,7 +28,7 @@
       q: 1, clock: 900, poss: 'h', ball: 25, down: 1, togo: 10, score: { h: 0, a: 0 }, to: { h: 3, a: 3 }, running: false, lineScore: { h: [0, 0, 0, 0], a: [0, 0, 0, 0] },
       next: 'kick', kicker: null, opening: null, ps: {}, ts: { h: DY.teamLine(), a: DY.teamLine() }, plays: [], drives: [], drive: null, mom: 0, form: {}, hot: {},
       tend: { h: DY.newTend(), a: DY.newTend() }, dtend: { h: {}, a: {} }, snap: {}, user: o.user || null, coach: o.coach || 'offense', over: false, ot: null,
-      lastCall: { h: [], a: [] }, ovr: { h: DY.teamOvr(home), a: DY.teamOvr(away) }, injuries: [], noInj: !!o.noInj, hurry: { h: false, a: false }, chew: { h: false, a: false },
+      hfaU: envHfa, rest: o.rest || { h: 0, a: 0 }, lastCall: { h: [], a: [] }, ovr: { h: DY.teamOvr(home), a: DY.teamOvr(away) }, injuries: [], noInj: !!o.noInj, hurry: { h: false, a: false }, chew: { h: false, a: false },
     };
     // coin toss: the winner defers; the other team receives
     const toss = chance(0.5) ? 'h' : 'a';
@@ -113,6 +115,9 @@
     let v = p.at[k] != null ? p.at[k] : p.ovr - 12;
     v = 78 + (v - 78) * DY.SENS;
     v += (GM.form[p.id] || 0) + (GM.hot[p.id] || 0);
+    if (DY.DAYSD) { if (!GM.day) GM.day = { h: DY.gauss() * DY.DAYSD, a: DY.gauss() * DY.DAYSD }; v += GM.day[side]; }
+    if (GM.rest) v += GM.rest[side];
+    if (side === 'h' && GM.hfaU) v += GM.hfaU;   // a team's whole-day swing: the 'everything clicked' / 'nothing worked' Saturdays that produce real-life blowouts and upsets
     const m = side === 'h' ? GM.mom : -GM.mom; v += m * 1.6;
     if (side === 'a' && GM.crowd > 0 && GM.poss === 'a') v -= GM.crowd * 1.8 * (1 - (GM.L.a.QB[0] ? (GM.L.a.QB[0].tr.lead - 62) / 120 : 0)) * (1 - (GM.cap ? GM.cap.a * 0.25 : 0));
     if (bigMoment(GM) || (GM.down >= 3 && GM.q >= 3 && Math.abs(GM.score.h - GM.score.a) <= 8)) v += (p.tr.clutch - 67) / 9 + (GM.cap ? GM.cap[side] || 0 : 0);
@@ -120,7 +125,9 @@
     return v;
   }
   const avg = a => a.reduce((s, x) => s + x, 0) / Math.max(1, a.length);
-  DY.SENS = 0.54;
+  DY.SENS = 0.40;
+  DY.DAYSD = 1.75;
+  DY.HFA_K = 0.3;
   DY._E = E; DY._pers = (GM, s) => pers(GM, s);
 
   /* ---------- the CPU coordinators ---------- */

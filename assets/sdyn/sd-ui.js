@@ -160,7 +160,7 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-tab],[data-job],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-rotauto],[data-ord],[data-gid]'); if (!el) return;
+    const el = e.target.closest('[data-tab],[data-job],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-rotauto],[data-ord],[data-gid],[data-lpos],[data-lmore],[data-srecs],[data-tctab]'); if (!el) return;
     const d = el.dataset, g = G();
     if (el.tagName === 'A') e.preventDefault();
     if (d.tab) { V.tab = d.tab; V.msg = null; return hub(); }

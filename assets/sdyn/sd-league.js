@@ -402,7 +402,10 @@
   SD.initPoll = () => {
     const g = G(), A = root.SITE_AUTO && root.SITE_AUTO[g.sport], P = A && A.poll;
     let order = g.teams.slice().sort((a, b) => SD.powerKey(b) - SD.powerKey(a));
-    if (P && P.top && !(P.date && P.date < g.season + '-09-01') && SD.kind() === 'hoops') { const real = P.top.map(([, n]) => byName(n)).filter(Boolean); order = real.concat(order.filter(t => !real.includes(t))); }
+    // a historical start: that season's real AP preseason poll (never the current one)
+    const HP = g.hx && root.BB_HIST && root.BB_HIST[g.season + 1] && root.BB_HIST[g.season + 1].poll;
+    if (g.hx) { if (HP) { const real = HP.map(byName).filter(Boolean); order = real.concat(order.filter(t => !real.includes(t))); real.forEach((t, i) => { t.realRank = i + 1; }); } }
+    else if (P && P.top && !(P.date && P.date < g.season + '-09-01') && SD.kind() === 'hoops') { const real = P.top.map(([, n]) => byName(n)).filter(Boolean); order = real.concat(order.filter(t => !real.includes(t))); }
     setPoll(order, 'pre');
   };
   function setPoll(order, wk) { const g = G(), prev = {}; g.polls.ap.forEach((x, i) => { prev[x.t] = i + 1; }); g.polls.ap = order.slice(0, 25).map((t, i) => ({ t: t.id, prev: prev[t.id] || null, rec: t.w + '-' + t.l })); g.teams.forEach(t => { t.ap = null; }); g.polls.ap.forEach((x, i) => { T(x.t).ap = i + 1; }); g.polls.hist[g.season + '-' + wk] = g.polls.ap.map(x => x.t); }
