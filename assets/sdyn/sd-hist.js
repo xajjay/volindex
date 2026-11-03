@@ -62,6 +62,19 @@
 
   // earlier seasons for the real players: per-game lines from the prior years' data and honors the stats earned (conference and national player of the year,
   // all-conference, all-America, SEC freshman of the year). Called once after the starting rosters exist.
+  // Tennessee's real honors (SEC and national), by season end year: [code, player]. Sources: SEC/UT Athletics season summaries and the All-SEC lists.
+  // Other teams keep stat-derived honors since no award data is bundled for them.
+  const TN_AW = { 2010: [['SEC1', 'Wayne Chism']], 2011: [['SEC1', 'Scotty Hopson'], ['SEC2', 'Tobias Harris']], 2012: [['SEC2', 'Jeronne Maymon'], ['SECAF', 'Jarnell Stokes']],
+    2013: [['SEC1', 'Jordan McRae'], ['SEC2', 'Jarnell Stokes']], 2014: [['SEC1', 'Jordan McRae'], ['SEC1', 'Jarnell Stokes'], ['SECDEF', 'Josh Richardson']],
+    2015: [['SEC1', 'Josh Richardson'], ['SECDEF', 'Josh Richardson']], 2016: [['SEC2', 'Kevin Punter']], 2017: [['SEC2', 'Robert Hubbs'], ['SECAF', 'Grant Williams']],
+    2018: [['SECPOY', 'Grant Williams'], ['SEC1', 'Grant Williams'], ['SEC2', 'Admiral Schofield'], ['SEC6', 'Lamonte Turner']],
+    2019: [['AA1', 'Grant Williams'], ['SECPOY', 'Grant Williams'], ['SEC1', 'Grant Williams'], ['SEC1', 'Admiral Schofield'], ['SEC2', 'Jordan Bone']],
+    2020: [['SEC2', 'John Fulkerson'], ['SECDPOY', 'Yves Pons']], 2021: [['SECDEF', 'Yves Pons'], ['SECAF', 'Jaden Springer'], ['SECAF', 'Keon Johnson']],
+    2022: [['SEC1', 'Santiago Vescovi'], ['SEC2', 'Kennedy Chandler']], 2023: [['SEC1', 'Santiago Vescovi'], ['SEC2', 'Zakai Zeigler'], ['SECDEF', 'Zakai Zeigler'], ['SECAF', 'Julian Phillips']],
+    2024: [['AA1', 'Dalton Knecht'], ['SECPOY', 'Dalton Knecht'], ['SEC1', 'Dalton Knecht'], ['SEC1', 'Zakai Zeigler'], ['SEC2', 'Jonas Aidoo'], ['SECDPOY', 'Zakai Zeigler']],
+    2025: [['SEC1', 'Zakai Zeigler'], ['SEC2', 'Chaz Lanier'], ['AA3', 'Zakai Zeigler'], ['AA3', 'Chaz Lanier'], ['SECDPOY', 'Zakai Zeigler']],
+    2026: [['SEC1', "Ja'Kobi Gillespie"], ['SEC2', 'Nate Ament'], ['SECNEW', "Ja'Kobi Gillespie"], ['SECDEF', 'Felix Okpara']] };
+  const nk = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
   SD.histPast = g => {
     const Y = g.season + 1; if (!root.BB_HIST[Y]) return;
     // team strength follows the real season (SRS): a 25-SRS power is a title contender, a 5-SRS mid-major is not, whatever its leading scorer's line says
@@ -76,12 +89,13 @@
         T.pl.forEach(r => { if (!r[0] || !(r[7] > 0)) return; all.push({ r, tm, conf: T.conf, sc: prod(r) * Math.min(1, r[7] / 24) + (T.srs || 0) * 0.15 }); });
       }
       all.sort((a, b) => b.sc - a.sc);
-      const give = (rec, k) => { const ps = byName[rec.r[0]]; if (!ps) return; ps.forEach(p => { p.aw = p.aw || []; if (!p.aw.some(x => x.y === y - 1 && x.a === k)) p.aw.push({ y: y - 1, a: k }); }); };
+      const give = (rec, k) => { if (rec.tm.name === 'Tennessee') return; const ps = byName[rec.r[0]]; if (!ps) return; ps.forEach(p => { p.aw = p.aw || []; if (!p.aw.some(x => x.y === y - 1 && x.a === k)) p.aw.push({ y: y - 1, a: k }); }); };
       all.slice(0, 1).forEach(x => give(x, 'POY'));
       const per = {}; all.filter(x => (per[x.tm.name] = (per[x.tm.name] || 0) + 1) <= 2).slice(0, 5).forEach(x => give(x, 'AA1'));
       const sec = all.filter(x => /^SEC/.test(x.conf || '')); if (sec[0]) give(sec[0], 'SECPOY');
       sec.slice(0, 5).forEach(x => give(x, 'SEC1')); sec.slice(5, 10).forEach(x => give(x, 'SEC2'));
       const fr = sec.filter(x => x.r[1] === 'FR'); if (fr[0]) give(fr[0], 'SECFR');
+      (TN_AW[y] || []).forEach(([k, nm]) => { const key = nk(nm); Object.keys(byName).forEach(n => { if (nk(n) !== key) return; byName[n].forEach(p => { p.aw = p.aw || []; if (!p.aw.some(x => x.y === y - 1 && x.a === k)) p.aw.push({ y: y - 1, a: k }); }); }); });
       all.forEach(x => { const ps = byName[x.r[0]]; if (!ps) return; const [, , , , , , , gm, mp, pts, trb, ast, stl, blk] = x.r;
         ps.forEach(p => { if (p.car[y - 1]) return; p.car[y - 1] = { t: x.tm.abbr, real: true, gp: gm, pts: Math.round(pts * gm), reb: Math.round(trb * gm), ast: Math.round(ast * gm), stl: Math.round(stl * gm), blk: Math.round(blk * gm), min: Math.round(mp * gm) }; }); });
     }

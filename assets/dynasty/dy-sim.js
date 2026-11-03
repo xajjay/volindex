@@ -14,6 +14,15 @@
   const rnd = () => DY.r();
   const chance = p => rnd() < p;
   const SIM = DY.SIM = {};
+  // The 22-man simulation turns small rating gaps into big on-field gaps (blocks, separation, pressure). This pulls the ratings it sees back toward the average
+  // so a game played on the field has the same talent leverage as a simmed one (calibrated against DY.simGame).
+  DY.SIM_RK = 0.45; DY.SIM_RK2 = 0.55;   // ratings the sim reads through E(), and the raw physical ones (speed, acceleration, agility)
+  // physical ratings are pulled toward what a starter at that position typically has, so a team's edge in speed stays an edge but a smaller one
+  const PHYS_MU = { QB: { spd: 67, acc: 70, agi: 77 }, RB: { spd: 82, acc: 78, agi: 78 }, WR: { spd: 81, acc: 76, agi: 75 }, TE: { spd: 70, acc: 69, agi: 67 }, OT: { spd: 52, acc: 60, agi: 77 }, IOL: { spd: 52, acc: 60, agi: 79 }, EDGE: { spd: 75, acc: 73, agi: 72 }, DT: { spd: 60, acc: 60, agi: 66 }, LB: { spd: 75, acc: 73, agi: 72 }, CB: { spd: 82, acc: 76, agi: 76 }, S: { spd: 78, acc: 75, agi: 72 } };
+  const cp = (v, p, k) => { const mu = (PHYS_MU[p && p.pos] || {})[k]; const c = mu != null ? mu : 78; return c + (v - c) * DY.SIM_RK2; };
+  // compress talent but not the game environment (home crowd, game-day swing, rest), which the sim should feel at full strength
+  const envOf = (GM, side) => (GM.day ? GM.day[side] : 0) + (GM.rest ? GM.rest[side] || 0 : 0) + (side === 'h' && GM.hfaU ? GM.hfaU : 0);
+  const simR = (GM, p, k, side) => { const e = envOf(GM, side); return 78 + (DY._E(GM, p, k, side) - e - 78) * DY.SIM_RK + e; };
   // tuning (calibrated against FBS averages: see the notes at the bottom of the file)
   const tkOf = W => W.tackle ? { t: W.tackle.t, i: W.ag.indexOf(W.tackle.by), a: W.tackle.ast && typeof W.tackle.ast === 'object' ? W.ag.indexOf(W.tackle.ast) : -1 } : null;
   const K = SIM.K = { tk0: 0.84, tkD: 95, tkHead: 0.06, tkBack: 0.1, tkHelp: 0.08, tkEng: 0.16, runShed: 0.6, runShedD: 46, nearShed: 0.06, passShed: 0.37, passShedD: 44,
@@ -119,10 +128,10 @@
 
   /* ---------- agents ---------- */
   const topSpd = v => 5.0 + (clamp(v || 60, 30, 99) - 50) * 0.094;
-  const accOf = p => { const a = p.at.acc != null ? p.at.acc : p.at.agi != null ? p.at.agi : p.ovr - 6; return 4.4 + (clamp(a, 30, 99) - 50) * 0.085; };
+  const accOf = p => { const a = cp(p.at.acc != null ? p.at.acc : p.at.agi != null ? p.at.agi : p.ovr - 6, p, p.at.acc != null ? 'acc' : 'agi'); return 4.4 + (clamp(a, 30, 99) - 50) * 0.085; };
   function agent(W, p, side, role, f, l) {
     const a = {
-      p, side, role, x: f, y: l, vx: 0, vy: 0, top: topSpd(p ? p.at.spd : 60), acc: p ? accOf(p) : 5, agi: p ? (p.at.agi || p.ovr - 6) : 60,
+      p, side, role, x: f, y: l, vx: 0, vy: 0, top: topSpd(p ? cp(p.at.spd, p, 'spd') : 60), acc: p ? accOf(p) : 5, agi: p ? cp(p.at.agi || p.ovr - 6, p, 'agi') : 60,
       eng: null, stun: 0, down: 0, slow: 0, hist: [], tries: {}, path: null, pi: 0, task: null, i: W.ag.length, x0: f, y0: l,
     };
     W.ag.push(a); W.by[role] = a; return a;
@@ -176,7 +185,7 @@
     const lmin = Math.min(-by * d, (W53 - by) * d), lmax = Math.max(-by * d, (W53 - by) * d);
     const W = { GM, s, ds: s === 'h' ? 'a' : 'h', t: 0, ag: [], by: {}, pairs: [], ev: [], frames: [], flags: [], lmin, lmax, ballOn: GM.ball, toGoal: 100 - GM.ball, own: -GM.ball,
       ball: { x: -0.2, y: 0, z: 0.3, holder: null, fl: null }, carrier: null, phase: 'pre', done: null, opt: opt || {}, boost: { run: 0, pro: 0, rush: 0, box: 0, sep: 0, read: 0 }, tackles: [], dir: d };
-    W.R = (p, k) => DY._E(GM, p, k, GM.T.h.roster.includes(p.id) ? 'h' : 'a');
+    W.R = (p, k) => simR(GM, p, k, GM.T.h.roster.includes(p.id) ? 'h' : 'a');
     W_ = W;
     return W;
   }
@@ -498,7 +507,7 @@
         const r = d.man;
         if (run && knows && c) { pursue(W, d, c); continue; }
         const mcv = W.R(d.p, 'mcv'), rr = r.p ? W.R(r.p, r.route && /go|fade|seam|post|corner|wheel|sluggo/.test(r.route) ? 'drr' : 'srr') : 70;
-        let lag = clamp(0.26 + (rr - mcv) / 95 + (topSpd(r.p.at.spd) - d.top) * 0.05 + (d.beat || 0) - W.boost.sep * 0.08, 0.05, 0.8);
+        let lag = clamp(0.26 + (rr - mcv) / 95 + (topSpd(cp(r.p.at.spd, r.p, 'spd')) - d.top) * 0.05 + (d.beat || 0) - W.boost.sep * 0.08, 0.05, 0.8);
         if (r.route === 'block' || (r.task === 'block' && r.eng)) lag = 0.2;
         const pp = past(r, lag), pv = past(r, lag + 0.1);
         const vx = (pp.x - pv.x) / 0.1, vy = (pp.y - pv.y) / 0.1;
@@ -1166,7 +1175,7 @@
     const ks = rs === 'h' ? 'a' : 'h';
     const d = rs === 'h' ? 1 : -1;
     const W = { GM, s: rs, ds: ks, t: 0, ag: [], by: {}, pairs: [], ev: [], frames: [], lmin: -26.67, lmax: 26.67, toGoal: 100, own: 0, ball: { x: 0, y: 0, z: 0, holder: null, fl: null }, carrier: null, phase: 'kick', boost: { run: 0, pro: 0, rush: 0, box: 0, sep: 0, read: 0 }, dir: d, ret: true };
-    W.R = (p, key) => DY._E(GM, p, key, rs);
+    W.R = (p, key) => simR(GM, p, key, rs);
     const L = GM.L[ks], R = GM.L[rs];
     const kicker = k.kind === 'punt' ? (L.P[0] || L.K[0]) : L.K[0];
     const cover = [kicker, ...L.LB.slice(0, 3), ...L.S.slice(0, 2), ...L.CB.slice(0, 2), ...L.WR.slice(0, 2), L.RB[1] || L.RB[0], L.TE[0], L.EDGE[0]].filter(Boolean).filter((p, i, a) => a.indexOf(p) === i).slice(0, 11);

@@ -136,7 +136,8 @@
   /* ---------- potential ---------- */
   SD.GRADES = [['A+', 97], ['A', 92], ['A-', 88], ['B+', 84], ['B', 80], ['B-', 76], ['C+', 72], ['C', 68], ['C-', 64], ['D', 0]];
   SD.gradeOfCeil = c => (SD.GRADES.find(g => c >= g[1]) || SD.GRADES[SD.GRADES.length - 1])[0];
-  SD.setCeil = (p, grade) => { const yrsLeft = Math.max(0, (p.el || 1) - 1); p.ceil = Math.round(clamp(p.ovr + yrsLeft * Math.max(1.2, 4.2 + (grade - 85) * 0.15) + gauss() * 2.5, p.ovr, 99)); p.potG = SD.gradeOfCeil(p.ceil); };
+  SD.CEIL_YR = 3.8; SD.CEIL_CAPYRS = 3;   // growth per remaining year toward the ceiling, and the most years of growth a player can bank (basketball: a four-year career, not five)
+  SD.setCeil = (p, grade) => { const yrsLeft = Math.min(SD.kind() === 'hoops' ? SD.CEIL_CAPYRS : 9, Math.max(0, (p.el || 1) - 1)); p.ceil = Math.round(clamp(p.ovr + yrsLeft * Math.max(1.2, (SD.kind() === 'hoops' ? SD.CEIL_YR : 4.2) + (grade - 85) * 0.15) + gauss() * 2.5, p.ovr, 99)); p.potG = SD.gradeOfCeil(p.ceil); };
   SD.starsOf = c => c >= 0.9834 ? 5 : c >= 0.89 ? 4 : c >= 0.797 ? 3 : 2;
 
   /* ---------- players ---------- */
