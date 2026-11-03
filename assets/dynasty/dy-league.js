@@ -51,6 +51,7 @@
       if (t.id === DY.UT_ID) { DY.importTennessee(t); t.depthEdited = t.user; } else { DY.genRoster(t); if (t.user) DY.fillRoster(t, 84); }
     });
     if (opts.year) DY.histBuild(g, opts.year); else { if (DY.resetEra) DY.resetEra(); if (DY.modern2026) DY.modern2026(g); }
+    g.teams.forEach(t => { if (!t.user && t.fbs && !t.dorm && t.roster.length < DY.CPU_ROSTER) DY.fillRoster(t, DY.CPU_ROSTER); });     // CPU programs carry a full 85, like yours
     g.teams.forEach(DY.fixNums);
     const ut = DY.userT();
     ut.style = g.settings.offStyle || 'power'; DY.pickCaptains(ut);

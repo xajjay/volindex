@@ -230,12 +230,12 @@
       for (const tid in p.interest) {
         const t = g.teams[tid]; if (t.user) continue;
         // blue-bloods go a little harder after the elite kids, but not by much: fit, home and a spot to play decide most of it
-        const heat = p.rec.stars >= 5 ? 1.04 + Math.max(0, t.prestige - 82) / 170 : p.rec.stars === 4 ? 1.0 + Math.max(0, t.prestige - 82) / 280 : 0.95;
+        const heat = (p.rec.stars >= 5 ? 1.14 + Math.max(0, t.prestige - 80) / 125 : p.rec.stars === 4 ? 1.06 + Math.max(0, t.prestige - 80) / 190 : 1.0) * DY.CPU_PUSH;
         const ok = DY.cpuOk(t, p), nd = (R._need[t.id] || {})[p.pos] || 0, have = (R._pc[t.id] || {})[p.pos] || 0;
         const nm = !ok && p.commit !== +tid ? 0.3 : 1 + Math.min(0.4, Math.max(0, nd - have) * 0.1);
         // a recruit's own taste (a dream school, a coach he clicked with) is fixed for the cycle; a class already heavy in stars is a harder sell (playing time, one more star at a spot is less appealing)
         p.aff = p.aff || {}; if (p.aff[tid] == null) p.aff[tid] = Math.exp(gauss() * (p.rec.stars >= 4 ? 0.42 : 0.25));
-        const scT = R._sc[t.id] || { 5: 0, 4: 0 }, crowdS = p.rec.stars >= 5 ? 1 / (1 + 0.16 * Math.max(0, scT[5] - 3)) : p.rec.stars === 4 ? 1 / (1 + 0.05 * Math.max(0, scT[4] + scT[5] - 9)) : 1;
+        const scT = R._sc[t.id] || { 5: 0, 4: 0 }, crowdS = p.rec.stars >= 5 ? 1 / (1 + 0.10 * Math.max(0, scT[5] - 4)) : p.rec.stars === 4 ? 1 / (1 + 0.035 * Math.max(0, scT[4] + scT[5] - 11)) : 1;
         p.interest[tid] += (6 + t.prestige / 11) * (0.45 + DY.fitScore(t, p)) * rr(0.35, 1.5) * heat * nm * p.aff[tid] * crowdS;
       }
       // commits: only schools that can use him (a spot at his position, room in the class) are considered
@@ -396,6 +396,8 @@
   // limits per offseason (AJ): 30 newcomers (20 high school, 20 transfers), 30 departures, 15 transfers out, 15 NFL entries
   DY.CAP = { newcomers: 30, hs: 20, tin: 20, out: 30, tout: 15, nfl: 15 };
   DY.ROSTER_MAX = 85;
+  DY.CPU_ROSTER = 85;
+  DY.CPU_PUSH = 1.12;      // how hard CPU programs chase recruits (1 = old behaviour)
   DY.rosterMax = () => DY.ROSTER_MAX;
   DY.startOffseason = () => {
     const g = G();
@@ -805,7 +807,7 @@
     const g = G(), R = g.recruit, ut = DY.userT();
     const userOff = g.settings.recruiting === 'off';
     const counts = {}; g.teams.forEach(t => counts[t.id] = 0);
-    const cap = t => t.user ? Math.max(0, Math.min(DY.CAP.hs, DY.CAP.newcomers - DY.transfersIn(), DY.rosterMax() + 6 - t.roster.length)) : Math.max(0, 54 - t.roster.length);
+    const cap = t => t.user ? Math.max(0, Math.min(DY.CAP.hs, DY.CAP.newcomers - DY.transfersIn(), DY.rosterMax() + 6 - t.roster.length)) : Math.max(0, DY.CPU_ROSTER - t.roster.length);
     const sign = (p, t) => {
       delete p.pros; delete p.interest; delete p.acts; p.t = t.id; p.yr = 1; p.el = 5; p.car = {}; p.aw = []; p.log = []; p.firstY = g.season + 1;
       p.nil = t.user ? Math.round((p.nilOffer || DY.recruitNil(p) * 0.8) / 5000) * 5000 : 0;
@@ -861,8 +863,8 @@
   DY.autoCuts = final => {
     const g = G(), ut = DY.userT(), o = g.off;
     o.cut = o.cut || [];
-    // CPU teams stay at 54-60
-    if (final) g.teams.forEach(t => { if (t.user) return; DY.ensureRoster(t, { trim: true }); const extra = t.roster.length - 60; if (extra > 0) { const out = t.roster.map(DY.P).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)).slice(0, extra); out.forEach(p => { p.t = null; p.gone = g.season; p.leave = 'cut'; }); t.roster = t.roster.filter(id => DY.P(id).t === t.id); } DY.ensureRoster(t); });
+    // CPU teams stay at 85 or fewer
+    if (final) g.teams.forEach(t => { if (t.user) return; DY.ensureRoster(t, { trim: true }); const extra = t.roster.length - DY.CPU_ROSTER; if (extra > 0) { const out = t.roster.map(DY.P).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)).slice(0, extra); out.forEach(p => { p.t = null; p.gone = g.season; p.leave = 'cut'; }); t.roster = t.roster.filter(id => DY.P(id).t === t.id); } DY.ensureRoster(t); if (t.fbs && !t.dorm && t.roster.length < DY.CPU_ROSTER - 3) { DY.fillRoster(t, DY.CPU_ROSTER); DY.refreshDepth(t); } });
     if (!final) return;
     let need = DY.cutsNeeded() - o.cut.length;
     if (need > 0) { const order = ut.roster.map(DY.P).filter(p => !o.cut.includes(p.id) && p.tin !== g.season).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)); order.slice(0, need).forEach(p => o.cut.push(p.id)); }

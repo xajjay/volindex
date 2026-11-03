@@ -120,7 +120,7 @@
     return v;
   }
   const avg = a => a.reduce((s, x) => s + x, 0) / Math.max(1, a.length);
-  DY.SENS = 0.6;
+  DY.SENS = 0.54;
   DY._E = E; DY._pers = (GM, s) => pers(GM, s);
 
   /* ---------- the CPU coordinators ---------- */
