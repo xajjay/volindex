@@ -15,11 +15,14 @@
   SD.MAXC = () => ({ mbb: 7, wbb: 7, baseball: 15, softball: 10 })[G().sport] || 7;   // the most commits a class can hold
   SD.ACTIONS = { dm: { name: 'Social media', hrs: 1, pts: 4 }, call: { name: 'Phone call', hrs: 3, pts: 12 }, coach: { name: 'Head coach visit', hrs: 7, pts: 30 } };
   const posPool = () => SD.kind() === 'hoops' ? ['PG', 'SG', 'SF', 'PF', 'C'] : G().sport === 'softball' ? ['C', '1B', '2B', 'SS', '3B', 'LF', 'CF', 'RF', 'SP', 'SP', 'RP'] : ['C', '1B', '2B', 'SS', '3B', 'LF', 'CF', 'RF', 'SP', 'SP', 'SP', 'RP', 'RP', 'RP'];
-  SD.PROS_BASE = 66;   // freshman rating at a .80 composite (tuned so league talent holds steady season to season)
+  SD.CPU_PUSH = 1.1; SD.REAL_STICK = 0.88; SD.REAL_PULL = 3;   // CPU recruiting drive, and how strongly a real recruit's real school pulls
+  SD.PROS_BASE = 64;   // freshman rating at a .80 composite (tuned so league talent holds steady season to season)
   function prospect(year, rank, n) {
     // national rank -> composite: No. 1 about .9999, No. 25 about .985 (five-stars), No. 150 about .93
     // past the top n prospects the composite keeps sliding gently (2-stars and walk-on level), never below .66
-    const c = rank <= n ? clamp(1 - Math.pow(rank / n, 0.75) * 0.3 - rr(0, 0.004), 0.7, 0.9999) : clamp(0.7 - (rank - n) / n * 0.03 - rr(0, 0.004), 0.66, 0.7), g = c * 100;
+    // 247-style shape: about 25 five-stars (.984+), the 4-star band through roughly No. 190, three-stars below that
+    const curve = r => r <= 25 ? 0.9999 - (r - 1) * 0.00066 : r <= 150 ? 0.9835 - (r - 25) / 125 * 0.083 : 0.9005 - (r - 150) / Math.max(1, n - 150) * 0.10;
+    const c = rank <= n ? clamp(curve(rank) - rr(0, 0.003), 0.7, 0.9999) : clamp(0.7 - (rank - n) / n * 0.03 - rr(0, 0.004), 0.66, 0.7), g = c * 100;
     const pos = pick(posPool());
     const ovr = Math.round(clamp(SD.PROS_BASE + (g - 80) * 0.7 + Math.max(0, g - 95) * 1.2 + gauss() * 2.5, 50, 84));
     const p = SD.makePlayer(pos, ovr, { t: null, yr: 1, el: SD.kind() === 'hoops' ? 5 : 4, grade: g, rec: { c, stars: SD.starsOf(c), g, natl: rank, cls: year } });
@@ -36,6 +39,7 @@
     const n = Math.max(n0, Math.round(g.teams.length * per));
     const pool = {};
     for (let i = 1; i <= n; i++) { const p = prospect(year, i, n0); pool[p.id] = p; }
+    if (g.hx && SD.histClass) SD.histClass(year, pool);
     g.recruit = { year, pool, board: [], log: [], signed: false, classRank: null };
     // the real commitments for next year's class
     const R = root.RECRUITING && root.RECRUITING[g.sport];
@@ -76,7 +80,10 @@
     Object.values(R.pool).forEach(p => {
       if (p.commit != null && p.commit !== ut.id && p.acts) p.acts = {};
       if (p.commit != null && p.firm) return;
-      for (const tid in p.interest) { const t = g.teams[tid]; if (!t || t.user || +tid === g.user) continue; const heat = p.rec.stars >= 4 ? 1 + Math.max(0, t.prestige - 75) / 50 : 1; p.interest[tid] += (3 + t.prestige / 10) * (0.5 + fitScore(t, p)) * rr(0.3, 1.4) * heat; }
+      for (const tid in p.interest) { const t = g.teams[tid]; if (!t || t.user || +tid === g.user) continue; const heat = (p.rec.stars >= 4 ? 1 + Math.max(0, t.prestige - 75) / 50 : 1) * SD.CPU_PUSH;
+        // a real recruit's real school is his default first option (he sticks about 88% of the time), unless the school never pushes him
+        let rs = 1; if (p.realSchool != null) { if (p.stick == null) p.stick = chance(SD.REAL_STICK); rs = +tid === p.realSchool ? (p.stick ? SD.REAL_PULL : 1) : (p.stick ? 0.7 : 1); }
+        p.interest[tid] += (3 + t.prestige / 10) * (0.5 + fitScore(t, p)) * rr(0.3, 1.4) * heat * rs; }
       const order = Object.entries(p.interest).sort((a, b) => b[1] - a[1]); if (!order.length) return;
       const [lead, lv] = order[0], second = order[1] ? order[1][1] : 0, isMe = +lead === g.user;
       const need = (130 + p.rec.stars * 15) * (1 - Math.min(20, weekNo()) / 34);

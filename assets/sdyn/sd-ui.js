@@ -844,7 +844,7 @@
       ${p.note ? `<p class="small dim">${esc(p.note)}</p>` : ''}
       ${g.phase === 'offseason' && p.t === g.user && g.off && ['recap', 'nil', 'portal'].includes(g.off.stage) && p.tin !== g.season ? `<p><button class="btn" data-push="${p.id}">${p.pushOut ? 'Undo: keep him' : 'Encourage to transfer'}</button> <small class="dim">He enters the portal and frees his roster spot and NIL money.</small></p>` : ''}
       ${!p.real ? `<p><button class="btn" data-pedit="${p.id}">Edit player</button> <small class="dim">Name, number and bio. Ratings stay as they are.</small></p>` : ''}
-      ${p.aw && p.aw.length ? `<p class="small"><b>Honors:</b> ${p.aw.map(a => a.y + ' ' + ({ POY: 'National Player of the Year', AA1: 'All-American', SEC1: 'All-SEC', SECPOY: 'SEC Player of the Year', SECFR: 'SEC Freshman of the Year' }[a.a] || a.a)).join(' · ')}</p>` : ''}
+      ${p.aw && p.aw.length ? `<p class="small"><b>Honors:</b> ${p.aw.map(a => a.y + ' ' + ({ POY: 'National Player of the Year', AA1: 'All-American', SEC1: 'All-SEC first team', SEC2: 'All-SEC second team', SECPOY: 'SEC Player of the Year', SECFR: 'SEC Freshman of the Year' }[a.a] || a.a)).join(' · ')}</p>` : ''}
       <div class="dy-pc-cols"><div><div class="glabel">Ratings</div>${hideT ? '<p class="small dim">In the portal: a star rating and a range until he signs.</p>' : keys.map(k => bar(names[k], p.at[k])).join('')}</div>
       <div><div class="glabel">Personality</div>${Object.keys(SD.TRAITS).map(k => bar(SD.TRAITS[k], p.tr[k])).join('')}</div></div>
       ${rows ? `<div class="glabel">Stats</div><div class="dy-scroll"><table class="dyt"><thead><tr><th>Year</th>${cols.map(c => `<th>${c[0]}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>` : ''}</div>`);
