@@ -314,6 +314,7 @@
      is interested and likely to say yes. In a Tennessee dynasty the real Tennessee commits are on the board from day one. */
   DY.AUTO_TARGETS = 20;
   DY.AUTO_EFF = 1;
+  DY.AUTO_FIVE_MAX = 2;
   DY.autoRecruit = () => {
     const g = G(), R = g.recruit, ut = DY.userT();
     if (R.locked) return;
@@ -342,7 +343,9 @@
     // aim at a full class: the number of live targets scales with the spots still open and how late it is (late, a winnable three-star beats a longshot five-star)
     const wkNow = g.week || 0, spots = Math.max(0, DY.CAP.hs - commits.length), tgt = Math.min(DY.BOARD_MAX, Math.max(DY.AUTO_TARGETS, Math.round(spots * (1.3 + wkNow / 8))));
     while (active() < tgt && R.board.length < DY.BOARD_MAX && guard++ < 40) {
-      const pick = Object.values(R.pool).filter(p => !R.board.includes(p.id) && inPlay(p) && !p.real).map(p => [p, score(p)]).sort((a, b) => b[1] - a[1])[0];
+      // Tennessee: auto never chases more than two five-stars (the real Tennessee five-star commits do not count against that)
+      const five5 = R.board.map(DY.RP).filter(q => q && inPlay(q) && !q.real && q.rec.stars >= 5).length, capFive = ut.id === DY.UT_ID && five5 >= DY.AUTO_FIVE_MAX;
+      const pick = Object.values(R.pool).filter(p => !R.board.includes(p.id) && inPlay(p) && !p.real && !(capFive && p.rec.stars >= 5)).map(p => [p, score(p)]).sort((a, b) => b[1] - a[1])[0];
       if (!pick || pick[1] < -500) break;
       R.board.push(pick[0].id); planned[pick[0].pos] = (planned[pick[0].pos] || 0) + 1; if (pick[0].interest[ut.id] == null) pick[0].interest[ut.id] = 0;
     }

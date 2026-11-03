@@ -306,7 +306,10 @@
   DY.clockStr = clockStr;
   function tempoSecs(GM, s, call) {
     const base = GM.style[s].tempo + gauss() * 2.5;
-    const tempo = (call && call.tempo) || (GM.hurry[s] ? 'hurry' : GM.chew[s] ? 'chew' : null);
+    let tempo = (call && call.tempo) || (GM.hurry[s] ? 'hurry' : GM.chew[s] ? 'chew' : null);
+    // a blowout does not get run up: in the second half the leader's clock keeps running (whoever is calling the plays)
+    const lead = GM.score[s] - GM.score[other(s)];
+    if ((GM.q >= 3 && lead >= 35) || (GM.q === 4 && lead >= 24)) tempo = 'chew';
     if (tempo === 'hurry') return rr(11, 16);
     if (tempo === 'chew') return rr(36, 40);
     return clamp(base, 12, 40);
