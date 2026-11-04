@@ -182,8 +182,8 @@
     if (d.push) { V.msg = SD.encourage(+d.push); V.more.push = true; return keep(); }
     if (d.ncadd) { const y = g.season + 1, ut = SD.userT(), o = g.teams.filter(t => t.conf !== ut.conf).sort((a, b) => b.prestige - a.prestige)[g.ncPick[y].length * 3]; g.ncPick[y].push({ o: o.id, site: 'H' }); return keep(); }
     if (d.ncrm != null && d.ncrm !== '') { g.ncPick[g.season + 1].splice(+d.ncrm, 1); return keep(); }
-    if (d.campf) { SD.campState().focus = d.campf; return keep(); }
-    if (d.campp) { const C = SD.campState(), id = +d.campp, i = C.picks.indexOf(id); if (i >= 0) C.picks.splice(i, 1); else if (C.picks.length < 3) C.picks.push(id); else V.msg = 'Three players max: tap one to take him out.'; return keep(); }
+    if (d.campf) return;
+    if (d.campp) { const C = SD.campState(), id = +d.campp, i = C.picks.indexOf(id); if (i >= 0) { C.picks.splice(i, 1); delete C.pf[id]; } else if (C.picks.length < SD.CAMP_MAX) { const o = SD.campOptions(SD.P(id)); SD.campPick(id, o.length ? o[0][0] : ''); } else V.msg = SD.CAMP_MAX + ' players max: tap one to take him out.'; return keep(); }
     if (d.act === 'camp') { SD.runCamp(false); autosave(); return keep(); }
     if (d.act === 'main' || d.act === 'sim') V.recap = null;
     if (d.act === 'simall') { const a = primaryAction(); if (a && a.altMain) a.altMain(); return; }
@@ -236,6 +236,7 @@
   }
   function onChange(e) {
     const el = e.target, g = G(), t = SD.userT();
+    if (el.dataset.campf) { SD.campSet(+el.dataset.campf, el.value); return keep(); }
     if (el.dataset.ncp) { const [i, k] = el.dataset.ncp.split('|'); const a = g.ncPick[g.season + 1][+i]; a[k] = k === 'o' ? +el.value : el.value; return keep(); }
     if (el.dataset.rprom) { const q = g.recruit.pool[el.dataset.rprom]; V.msg = MORALE.setRP(g, g.recruit.pool, q, el.value); return keep(); }
     if (el.dataset.rnil) { const p = g.recruit.pool[el.dataset.rnil]; p.nilOffer = +el.value; return keep(); }
@@ -512,12 +513,12 @@
   }
   function campCard() {
     const g = G(), C = SD.campState(), ut = SD.userT(), F = SD.CAMP[SD.kind()];
-    if (C.done) return `<div class="box"><div class="glabel">Preseason camp: ${esc(F[C.focus][0])}</div><ul class="dy-mini">${(C.res || []).slice(0, 8).map(x => `<li>${plink(SD.P(x.id))} <small>${x.before} → <b>${x.after}</b>${x.extra ? ' · extra reps' : ''}</small></li>`).join('')}</ul></div>`;
+    if (C.done) return `<div class="box"><div class="glabel">Preseason camp</div><ul class="dy-mini">${(C.res || []).slice(0, 8).map(x => `<li>${plink(SD.P(x.id))} <small>${x.before} → <b>${x.after}</b>${x.foc ? ' · ' + esc(x.foc) : ''}</small></li>`).join('')}</ul></div>`;
     const ps = ut.roster.map(SD.P).sort((a, b) => b.ovr - a.ovr);
-    return `<div class="box"><div class="glabel">Preseason camp</div><p class="small dim">Pick a team focus and up to three players for extra reps (young players with a high ceiling gain the most). Work ethic matters. If you skip it, your staff runs camp when the season starts.</p>
-      <div class="gchips dy-chips">${Object.entries(F).map(([k, v]) => `<button data-campf="${k}" aria-pressed="${C.focus === k}">${esc(v[0])}</button>`).join('')}</div>
-      <div class="dy-scroll" style="max-height:260px"><table class="dyt dy-tight"><tbody>${ps.map(p => `<tr class="${C.picks.includes(p.id) ? 'me' : ''}"><td><button class="dy-ra ${C.picks.includes(p.id) ? 'on' : ''}" data-campp="${p.id}">${C.picks.includes(p.id) ? 'Extra reps ✓' : 'Extra reps'}</button></td><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${ovrB(p.ovr)}</td><td><span class="dy-pot">${p.potG}</span></td><td class="small">Work ${p.tr.work}</td></tr>`).join('')}</tbody></table></div>
-      <div class="grow"><button class="btn primary" data-act="camp">Run camp</button><span class="small dim">${C.picks.length}/3 picked</span></div></div>`;
+    const row = p => { const on = C.picks.includes(p.id), o = SD.campOptions(p); return `<tr class="${on ? 'me' : ''}"><td><button class="dy-ra ${on ? 'on' : ''}" data-campp="${p.id}">${on ? 'In camp ✓' : 'Pick'}</button></td><td>${plink(p)} <small>${p.pos} · ${yrLabel(p)}</small></td><td>${ovrB(p.ovr)}</td><td><span class="dy-pot">${p.potG}</span></td><td class="small">${on ? `<select data-campf="${p.id}">${o.map(([k, v]) => `<option value="${k}" ${C.pf[p.id] === k ? 'selected' : ''}>${esc(v[0])}</option>`).join('')}</select>` : 'Work ' + p.tr.work}</td></tr>`; };
+    return `<div class="box"><div class="glabel">Preseason camp</div><p class="small dim">Pick up to ${SD.CAMP_MAX} players and choose the skill each one works on (young players with a high ceiling gain the most). Everyone else gets a light all-round camp. Work ethic matters. If you skip it, your staff runs camp when the season starts.</p>
+      <div class="dy-scroll" style="max-height:300px"><table class="dyt dy-tight"><tbody>${ps.map(row).join('')}</tbody></table></div>
+      <div class="grow"><button class="btn primary" data-act="camp">Run camp</button><span class="small dim">${C.picks.length}/${SD.CAMP_MAX} picked</span></div></div>`;
   }
   function depthPreview() {
     const ut = SD.userT(), o = SD.teamOvr(ut);
