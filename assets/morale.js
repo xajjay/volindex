@@ -117,12 +117,20 @@
   // is an open promise on track right now? (for the alert and the room list)
   M.onTrack = (A, p) => { const r = A.role(p); if (!p.pr || p.pr.st !== 'open') return null; if (!r.gp) return true; return M.kept(A, p); };
 
-  const concern = (A, p, out) => {
-    const g = A.g(), r = A.role(p), e = M.expect(A, p), v = A.nilValue(p), m = M.motives(p);
-    let type = 'rot', why = e.why;
-    if (r.share < M.shareFor(A, e.tier) - 0.1) type = e.tier === 'start' ? 'start' : 'rot';
+  // what he would ask for, or null when nothing he could ask for makes sense (a player who already starts never asks for a starting job)
+  const wantType = (A, p) => {
+    const r = A.role(p), e = M.expect(A, p), v = A.nilValue(p), m = M.motives(p);
+    let type = 'rot';
+    if (r.share < M.shareFor(A, e.tier) - 0.1 && !(r.start && e.tier !== 'start')) type = e.tier === 'start' ? 'start' : 'rot';
     else if (v > 0 && A.nil(p) < v * 0.8 && m.money >= 55) type = 'nil';
     else if (e.st > 0.6 && r.start && (r.usage || 9) > 2 && (!A.canFocal || A.canFocal(p))) type = 'focal';
+    if (r.start && (type === 'start' || type === 'rot')) return null;
+    if (!r.start && r.rot && type === 'rot' && e.tier !== 'start' && r.share >= M.shareFor(A, 'rot') - 0.1) return null;
+    return type;
+  };
+  const concern = (A, p, out) => {
+    const g = A.g(), r = A.role(p), e = M.expect(A, p), v = A.nilValue(p), m = M.motives(p);
+    let type = wantType(A, p) || 'rot', why = e.why;
     const amt = type === 'nil' ? Math.round(Math.max(A.nil(p) * 1.25, v) / 5000) * 5000 : 0;
     p.ask = { type, amt, open: true, yr: g.season, why }; p.askY = g.season; out.push(p);
     const S = M.state(g); S.asks++; S.unread++;
@@ -134,12 +142,15 @@
     if (S.y !== g.season) { S.y = g.season; S.n = 0; }
     const cap = Math.max(1, A.cap - (S.trust >= 75 ? 1 : 0) + (S.trust < 40 ? 1 : 0));
     if (S.n >= cap) return out;
-    const c = me.filter(p => mor(p) < (A.line || 46) && p.askY !== g.season && !(p.ask && p.ask.open) && A.ovr(p) >= 62 && M.status(A, p) >= 0.18 && (!opts || !opts.onlyOne || true))
+    const c = me.filter(p => mor(p) < (A.line || 46) && p.askY !== g.season && !(p.ask && p.ask.open) && A.ovr(p) >= 62 && M.status(A, p) >= 0.18 && wantType(A, p) != null)
       .map(p => [p, (50 - mor(p)) * 1.3 + M.status(A, p) * 40 + (((p.tr && p.tr.ego) || 60) - 50) * 0.3 - (rel(p) - 50) * 0.25]).sort((a, b) => b[1] - a[1]);
     if (c.length) { concern(A, c[0][0], out); S.n++; }
     return out;
   };
-  M.tick = A => { const g = A.g(); if (!M.on(g)) return []; M.update(A, 0.35); return M.concerns(A); };
+  M.tick = A => { const g = A.g(); if (!M.on(g)) return []; M.update(A, 0.35);
+    // a request for a job he has since won is moot
+    A.roster().forEach(p => { if (p.ask && p.ask.open && (p.ask.type === 'start' || p.ask.type === 'rot') && A.role(p).start) { p.ask.open = false; p.ask.moot = true; } });
+    return M.concerns(A); };
 
   M.seasonEnd = A => {
     const g = A.g(); if (!M.on(g)) return { asks: [], kept: [], broke: [] };
