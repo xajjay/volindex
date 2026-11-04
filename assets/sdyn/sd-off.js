@@ -116,6 +116,10 @@
       pts = 70 * (1 - Math.exp(-pts / 70));
       if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + fitScore(ut, p) * 0.9) * (p.offer ? 1 : 0.5) * SD.recruitMult() * (mode === 'auto' ? SD.autoEff() : 1) * (window.MORALE ? MORALE.recruitMult(g, p.rpromise, p.rec.stars) : 1);
     });
+    // a CPU program only has so many scholarships: a class tops out at the same size as yours, and no school stacks the top of the board
+    const cnt = {}, hi = {}, CAP = SD.MAXC(), CAP4 = Math.max(2, Math.round(CAP * 0.55));
+    Object.values(R.pool).forEach(q => { if (q.commit != null) { cnt[q.commit] = (cnt[q.commit] || 0) + 1; if (q.rec.stars >= 4) hi[q.commit] = (hi[q.commit] || 0) + 1; } });
+    const open = (tid, p) => +tid === g.user || ((cnt[tid] || 0) < CAP && (p.rec.stars < 4 || (hi[tid] || 0) < CAP4) && (p.rec.stars < 5 || (hi[tid] || 0) < CAP4));
     Object.values(R.pool).forEach(p => {
       if (p.commit != null && p.commit !== ut.id && p.acts) p.acts = {}; else if (p.acts) delete p.acts.scout;   // a scouting report is one-time
       if (p.commit != null && p.firm) return;
@@ -126,15 +130,15 @@
       if (p.realUT && p.commit == null && !p.dropped && ut.id === g.user && R.board.includes(p.id) && p.offer && !full) {
         p.commit = g.user; p.cwk = weekNo(); p.cper = SD.period().n; p.firm = true; logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos}, commits to ${SD.UN()}!`); SD.news('commit', `${p.rec.stars}-star ${p.pos} ${p.n} commits to ${SD.UN()}`, 'A real Tennessee commit, landed.'); return;
       }
-      const order = Object.entries(p.interest).sort((a, b) => b[1] - a[1]); if (!order.length) return;
+      const order = Object.entries(p.interest).sort((a, b) => b[1] - a[1]).filter(([tid]) => open(tid, p) || +tid === p.commit); if (!order.length) return;
       const [lead, lv] = order[0], second = order[1] ? order[1][1] : 0, isMe = +lead === g.user;
       const need = (130 + p.rec.stars * 15) * (1 - Math.min(20, weekNo()) / 34);
       const per = SD.period().n, early = per === 1 ? 99 : per === 2 ? 1.25 : 1;
       if (p.commit == null && !(p.realUT && SD.period().n < 3 && !isMe) && lv >= need * early && lv >= second * (per === 2 ? 1.35 : 1.15) && (!isMe || (p.offer && !full && (p.rec.stars < 4 || p.visited || weekNo() >= 14)))) {
-        p.commit = +lead; p.cwk = weekNo(); p.cper = per; if (per <= 2) p.early = true;
+        p.commit = +lead; p.cwk = weekNo(); p.cper = per; if (per <= 2) p.early = true; cnt[+lead] = (cnt[+lead] || 0) + 1; if (p.rec.stars >= 4) hi[+lead] = (hi[+lead] || 0) + 1;
         if (isMe) { logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos}, commits to ${SD.UN()}!`); SD.news('commit', `${p.rec.stars}-star ${p.pos} ${p.n} commits to ${SD.UN()}`, `No. ${p.rec.natl} nationally.`); }
       } else if (p.commit != null && !p.firm && weekNo() - (p.cwk || 0) < 5 && !(p.commit === g.user && p.visited) && +lead !== p.commit && lv >= (p.interest[p.commit] || 0) * 1.35 && (!isMe || p.offer)) {
-        const was = p.commit; p.commit = +lead;
+        const was = p.commit; p.commit = +lead; cnt[was]--; if (p.rec.stars >= 4) hi[was]--; cnt[+lead] = (cnt[+lead] || 0) + 1; if (p.rec.stars >= 4) hi[+lead] = (hi[+lead] || 0) + 1;
         if (isMe) logs.push(`FLIP: ${p.n} flips to ${SD.UN()}!`); else if (was === g.user) logs.push(`DECOMMIT: ${p.n} flips to ${T(+lead).name}.`);
       }
     });
