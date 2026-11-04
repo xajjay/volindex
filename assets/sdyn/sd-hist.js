@@ -114,7 +114,7 @@
       const p = gen[i]; if (!p) return; const [name, pos0, hts, wt, home, school] = x.r, ht = htIn(hts) || 77;
       let pos = String(pos0 || 'G').toUpperCase();
       pos = pos.startsWith('C') ? 'C' : pos.startsWith('F') ? (ht >= 81 ? 'C' : ht >= 79 ? 'PF' : 'SF') : pos === 'G/F' ? 'SF' : (ht <= 74 ? 'PG' : 'SG');
-      p.n = name; p.pos = pos; p.home = home || p.home; p.ht = ht; if (wt) p.wt = +wt; p.realName = true;
+      p.n = name; SD.reposition(p, pos, ht); p.home = home || p.home; if (wt) p.wt = +wt; p.realName = true;
       const sch = g.teams.find(t => t.name === school);
       if (sch) { p.realSchool = sch.id; p.interest[sch.id] = Math.max(p.interest[sch.id] || 0, 45);
         if (school === 'Tennessee' && g.user === sch.id) { p.commit = sch.id; p.firm = true; p.real = true; p.offer = true; p.interest[sch.id] = 200; } }

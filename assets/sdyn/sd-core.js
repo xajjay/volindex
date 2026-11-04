@@ -95,7 +95,9 @@
     else if (p.pos === 'SF') { if (shoot >= 70 && h <= 79) out.push('SG'); if (big >= 68 || h >= 79) out.push('PF'); if (a.pas >= 76 && a.hnd >= 74) out.push('PG'); }
     else if (p.pos === 'PF') { if (a.thr >= 68 || a.ath >= 78) out.push('SF'); if (a.idf >= 72 || a.blk >= 70 || h >= 82) out.push('C'); }
     else if (p.pos === 'C') { if (a.thr >= 62 || a.ath >= 74 || a.mid >= 66) out.push('PF'); }
-    return out.length ? out : null;
+    const fit = out.filter(q => { const d = Math.abs(SD.SLOTS.indexOf(q) - SD.SLOTS.indexOf(p.pos)); return d <= 1 || (d === 2 && (p.pos === 'PG' ? h >= 78 : p.pos === 'C' ? true : h >= 76)); });
+    fit.sort((x, y) => Math.abs(SD.SLOTS.indexOf(x) - SD.SLOTS.indexOf(p.pos)) - Math.abs(SD.SLOTS.indexOf(y) - SD.SLOTS.indexOf(p.pos)));
+    return fit.length ? fit.slice(0, 2) : null;
   };
   // how well a player fits a lineup slot: 0 at his main position, a small cost at a secondary one, more the farther he is from it
   SD.SLOTS = ['PG', 'SG', 'SF', 'PF', 'C'];
@@ -170,6 +172,16 @@
     if (kind === 'hoops') { const base = { PG: 74, SG: 76, SF: 78, PF: 80, C: 82 }[pos] - (w ? 5 : 0); return Math.round(base + gauss() * 1.6); }
     return Math.round((w ? 66 : 72) + gauss() * 2);
   }
+  // give a player a new main position (and height): rebuild his ratings, style and secondary positions around it so a 5'11 guard is never a rim protector
+  SD.reposition = (p, pos, ht) => {
+    if (SD.kind() !== 'hoops') { p.pos = pos; if (ht) p.ht = ht; return p; }
+    const ovr = p.ovr, g = p.rec && p.rec.g, was = p.ceil;
+    p.pos = pos; p.ht = ht || htFor(pos, 'hoops'); p.pos2 = null;
+    p.at = fillAttrs(pos, ovr, 'hoops', pick(SD.ARCH_BY_POS[pos] || [null]));
+    SD.setOvr(p); p.pos2 = SD.derivePos2(p); p.arch = SD.archOf(p);
+    if (g) SD.setCeil(p, g);
+    return p;
+  };
   SD.htStr = h => h ? Math.floor(h / 12) + "'" + (h % 12) + '"' : '';
   const htIn = s => { const m = /(\d+)'\s*(\d+)/.exec(s || ''); return m ? +m[1] * 12 + +m[2] : null; };
   SD.YR = ['', 'Fr.', 'So.', 'Jr.', 'Sr.', '5th', '6th'];

@@ -46,7 +46,7 @@
     if (first && R && R.commits) R.commits.forEach(c => {
       const pos = SD.kind() === 'hoops' ? (/wing|SF|forward/i.test(c.pos) ? 'SF' : /PG|point/i.test(c.pos) ? 'PG' : /C|center|post/i.test(c.pos) ? 'C' : 'SG') : /RHP|LHP|P\b/.test(c.pos) ? 'SP' : /C\b/.test(c.pos) ? 'C' : /OF/.test(c.pos) ? 'CF' : 'SS';
       const st = /5-star/.test(c.rank) ? 5 : /4-star|No\. [1-9]\d?\b/.test(c.rank) ? 4 : 3, comp = st === 5 ? 0.99 : st === 4 ? 0.95 : 0.89;
-      const p = prospect(year, Math.round((1 - comp) * 1000), n); p.n = c.name; p.pos = pos; p.rec.c = comp; p.rec.stars = st; p.commit = SD.tnT().id; p.firm = true; p.real = true; p.home = c.from || p.home;
+      const p = prospect(year, Math.round((1 - comp) * 1000), n); p.n = c.name; SD.reposition(p, pos); p.rec.c = comp; p.rec.stars = st; p.commit = SD.tnT().id; p.firm = true; p.real = true; p.home = c.from || p.home;
       SD.setOvr(p); pool[p.id] = p;
     });
     // real Tennessee commits do not hand themselves over: pursue them (board + offer, or let the assistant run it) and they always commit
