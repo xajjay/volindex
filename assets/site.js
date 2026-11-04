@@ -4,11 +4,11 @@
   const SPORTS = [
     { key: 'football', name: 'Football', ready: true },
     { key: 'volleyball', name: 'Volleyball', ready: true },
-    { key: 'soccer', name: 'Soccer', ready: true },
     { key: 'mbb', name: "Men's Basketball", ready: false },
     { key: 'wbb', name: "Women's Basketball", ready: false },
     { key: 'baseball', name: 'Baseball', ready: false },
     { key: 'softball', name: 'Softball', ready: false },
+    { key: 'soccer', name: 'Soccer', ready: true },   // season over: last on the Home screen
   ];
   const TABS = [
     ['overview', 'Overview'], ['schedule', 'Schedule & Standings'], ['roster', 'Roster'], ['depth', 'Depth Chart'],
@@ -163,6 +163,7 @@
         <div class="eyebrow">${s.key === 'football' ? '2026 season' : window.SITE && window.SITE[s.key] ? window.SITE[s.key].season + ' season' : 'Coming soon'}</div>
         <h2>${esc(s.name)} ${rankBlock(pollFor(s.key, F))}</h2></div>
         ${pollLine(pollFor(s.key, F))}
+        ${(d => d && d.concluded ? `<div class="concl" style="margin:6px 0 2px;font-weight:700;color:var(--smokey,#4B4B4B)">${esc(d.concludedNote || 'Season concluded')}</div>` : '')(window.SITE && window.SITE[s.key])}
         ${(d => d ? `<div class="upd">Updated ${fmtDate(d, { month: 'short', day: 'numeric' })}</div>` : '')(lastUpdated(s.key))}
         ${(r => r ? `<div class="bigrec"><b>${esc(r.rec)}</b>${r.sec ? `<span>${esc(r.sec)} <em>SEC</em></span>` : ''}<small>${esc(r.season)} record</small></div>` : '')(s.key === 'football' && F ? (F.schedule.some(g => g.result) ? { season: F.season, rec: F.team.record, sec: F.team.sec } : null) : window.sportRecord && window.sportRecord(s.key))}
         <div class="status">${(s.key === 'football' && F && F.schedule.some(g => g.result)) || (window.sportRecord && window.sportRecord(s.key)) ? '' : s.key === 'football' && F ? `${F.season}: ${F.team.record} (${F.team.sec} SEC)` : window.sportStatus && window.sportStatus(s.key) ? esc(window.sportStatus(s.key).split(' · Next')[0]) : 'Page in progress.'}</div>

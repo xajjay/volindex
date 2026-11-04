@@ -15,29 +15,41 @@
   };
   const SHORT = { 'Mississippi State': 'MS State' };
   const badge = r => { const s = SCHOOL[r.team] || ['#4B4B4B', (r.abbr || r.team || '?').slice(0, 4).toUpperCase()]; return `<span class="tbadge" style="background:${s[0]};color:${s[2] || '#fff'}" aria-hidden="true">${esc(s[1])}</span>`; };
+  // true once any team has played a conference game; before that, "place" by conference record is meaningless (everyone is 0-0)
+  const confStarted = rows => rows.some(r => wl(r.conf).g > 0);
   function placed(rows) {
+    if (!confStarted(rows)) {   // pre-conference play: order by overall record, no places or ties
+      return rows.slice().sort((a, b) => wl(b.overall).pct - wl(a.overall).pct || wl(b.overall).w - wl(a.overall).w || String(a.team).localeCompare(String(b.team)))
+        .map(r => Object.assign({ place: null, tie: false }, r));
+    }
     // place by conference win %, ties share a place
     let last = null, place = 0;
     return rows.map((r, i) => { const p = wl(r.conf).pct; if (last === null || p !== last) { place = i + 1; last = p; } return Object.assign({ place }, r); })
       .map((r, i, a) => Object.assign(r, { tie: a.filter(x => x.place === r.place).length > 1 }));
   }
+  // Tennessee's own row comes from the site's schedule results (updated the moment a game ends), so it is never a game behind ESPN's feed
+  function withOwnRecord(k, S) {
+    if (!S || S.final || k === 'football' || !window.sportRecord) return S.rows;
+    const r = window.sportRecord(k); if (!r || !r.rec) return S.rows;
+    return S.rows.map(x => isUT(x) ? Object.assign({}, x, { overall: r.rec, conf: r.sec || x.conf }) : x);
+  }
   function data(k) { return ((window.SITE_AUTO || {}).standings || {})[k]; }
   window.secPlace = function (k) {
     const S = data(k); if (!S) return null;
-    const rows = placed(S.rows), me = rows.find(isUT); if (!me) return null;
+    const rows = placed(withOwnRecord(k, S)), me = rows.find(isUT); if (!me || me.place == null) return null;
     return { text: (me.tie ? 'T-' : '') + ord(me.place), of: rows.length, season: S.season, final: S.final, conf: me.conf };
   };
   window.standingsHtml = function (k) {
     const S = data(k);
     if (!S || !S.rows || !S.rows.length) return `<div class="section" id="standings"><h3>SEC standings</h3><p class="dim">Standings load with the next automatic update.</p></div>`;
-    const rows = placed(S.rows), me = rows.find(isUT);
+    const own = withOwnRecord(k, S), rows = placed(own), me = rows.find(isUT), early = !confStarted(own);
     const has = f => rows.some(r => r[f]);
     const src = S.source ? `<a href="${esc(S.source.replace(/\/apis\/.*$/, '').replace('site.api.espn.com', 'www.espn.com'))}" target="_blank" rel="noopener">${esc(S.sourceName || 'ESPN')}</a>` : esc(S.sourceName || 'ESPN');
     return `<div class="section" id="standings" style="margin-top:0">
-      ${me ? `<div class="standhead"><span class="tbadge big" style="background:#FF8200">TENN</span><div><b>Tennessee is ${me.tie ? 'T-' : ''}${ord(me.place)} in the SEC</b><span>${esc(me.conf)} SEC · ${esc(me.overall)} overall${S.final ? ` · ${esc(S.season)} final standings (this season hasn't started yet)` : ` · ${esc(S.season)} · updated ${new Date(S.updated + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}</span></div></div>` : ''}
+      ${me ? `<div class="standhead"><span class="tbadge big" style="background:#FF8200">TENN</span><div><b>${early ? `Tennessee is ${esc(me.overall)} overall` : `Tennessee is ${me.tie ? 'T-' : ''}${ord(me.place)} in the SEC`}</b><span>${early ? 'SEC play hasn\'t started' : esc(me.conf) + ' SEC · ' + esc(me.overall) + ' overall'}${S.final ? ` · ${esc(S.season)} final standings (this season hasn't started yet)` : ` · ${esc(S.season)} · updated ${new Date(S.updated + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}</span></div></div>` : ''}
       <div class="tablewrap standings"><table><thead><tr><th>Team</th><th class="n">Conf</th><th class="n">Overall</th>${has('home') ? '<th class="n hide-sm">Home</th>' : ''}${has('away') ? '<th class="n hide-sm">Away</th>' : ''}${has('streak') ? '<th class="n">Strk</th>' : ''}</tr></thead>
-      <tbody>${rows.map(r => `<tr class="${isUT(r) ? 'me' : ''}"><td><span class="tcell" title="${r.tie ? 'T-' : ''}${ord(r.place)} in the SEC">${badge(r)}<b>${esc(SHORT[r.team] || r.team)}</b></span></td><td class="n num"><b>${esc(r.conf || '—')}</b></td><td class="n num">${esc(r.overall || '—')}</td>${has('home') ? `<td class="n num hide-sm">${esc(r.home || '—')}</td>` : ''}${has('away') ? `<td class="n num hide-sm">${esc(r.away || '—')}</td>` : ''}${has('streak') ? `<td class="n num">${esc(r.streak || '')}</td>` : ''}</tr>`).join('')}</tbody></table></div>
-      <p class="dim small">Sorted by SEC winning percentage; ties share a place (official tiebreakers aren't applied). Source: ${src}.</p></div>`;
+      <tbody>${rows.map(r => `<tr class="${isUT(r) ? 'me' : ''}"><td><span class="tcell" title="${r.place == null ? '' : (r.tie ? 'T-' : '') + ord(r.place) + ' in the SEC'}">${badge(r)}<b>${esc(SHORT[r.team] || r.team)}</b></span></td><td class="n num"><b>${esc(r.conf || '—')}</b></td><td class="n num">${esc(r.overall || '—')}</td>${has('home') ? `<td class="n num hide-sm">${esc(r.home || '—')}</td>` : ''}${has('away') ? `<td class="n num hide-sm">${esc(r.away || '—')}</td>` : ''}${has('streak') ? `<td class="n num">${esc(r.streak || '')}</td>` : ''}</tr>`).join('')}</tbody></table></div>
+      <p class="dim small">${early ? "SEC play hasn't started, so teams are listed by overall record (no conference places yet)." : "Sorted by SEC winning percentage; ties share a place (official tiebreakers aren't applied)."} Tennessee's row comes from this site's own results. Source: ${src}.</p></div>`;
   };
   // "Schedule | SEC Standings" switch at the top of each Schedule & Standings tab
   let view = 'schedule';

@@ -42,13 +42,28 @@
   const resStr = g => g.result ? `<span class="${g.result}">${g.result}</span>${g.us != null ? ' ' + g.us + '–' + g.them : ''}` : '';
   // header record (and the overview's record sentence) from the schedule
   function setRecord(D) {
-    const real = D.schedule.filter(g => g.result && g.kind !== 'exh');
+    const played = D.schedule.filter(g => g.result);
+    const real = played.filter(g => g.kind !== 'exh');
     const rec = arr => { const w = arr.filter(g => g.result === 'W').length, l = arr.filter(g => g.result === 'L').length, t = arr.filter(g => g.result === 'T').length; return `${w}-${l}${t ? '-' + t : ''}`; };
-    if (!real.length) return;
-    D.header = D.header.map(h => /record/i.test(h[1]) && (!/^\d{4}/.test(h[1]) || h[1].startsWith(D.season)) ? [rec(real), h[1]] : h[1] === 'SEC' ? [rec(real.filter(g => g.kind === 'conf')), 'SEC'] : h);
-    D.inSeason = true;
+    const bb = D.key === 'mbb' || D.key === 'wbb';
+    if (!real.length && !(bb && played.length)) return;   // basketball shows 0-0 once the exhibitions are done
     const sec = rec(real.filter(g => g.kind === 'conf'));
-    if (D.quick && D.quick[0]) D.quick = [D.quick[0].replace(/<b>\d+-\d+(?:-\d+)?<\/b>( \(\d+-\d+(?:-\d+)? SEC\))?/, `<b>${rec(real)}</b> (${sec} SEC)`)].concat(D.quick.slice(1));
+    let hasRec = false;
+    D.header = D.header.map(h => { if (/record/i.test(h[1]) && (!/^\d{4}/.test(h[1]) || h[1].startsWith(D.season))) { hasRec = true; return [rec(real), h[1]]; } return h[1] === 'SEC' ? [sec, 'SEC'] : h; });
+    if (bb && !hasRec) {   // basketball headers carry last season's record, not this season's: put the live record in its place
+      const i = D.header.findIndex(h => /^\d{4}-\d{2}$/.test(h[1]));
+      const tile = [rec(real), D.season + ' record'];
+      if (i >= 0) D.header.splice(i, 1, tile, [sec, 'SEC']); else D.header.push(tile, [sec, 'SEC']);
+    }
+    D.inSeason = true;
+    if (D.quick && D.quick[0] && /^Tennessee (is|finished) <b>/.test(D.quick[0])) D.quick = [D.quick[0].replace(/<b>\d+-\d+(?:-\d+)?<\/b>( \(\d+-\d+(?:-\d+)? SEC\))?/, `<b>${rec(real)}</b> (${sec} SEC)`)].concat(D.quick.slice(1));
+    if (bb && D.quick) {   // generated lead bullet so the quick read never goes stale between hand edits
+      const last = played[played.length - 1], nx = nextGame(D);
+      const lead = `<span data-auto="1"></span>Tennessee is <b>${rec(real)}</b> (${sec} SEC) this season.` +
+        (last ? ` Last game: <b>${last.result} ${last.us}-${last.them}</b> ${last.site === 'A' ? 'at' : 'vs.'} ${esc(last.opp.replace(/ \(No\. \d+\)/, ''))}${last.kind === 'exh' ? ' (exhibition)' : ''}, ${fmtDate(last.date, { month: 'short', day: 'numeric' })}.` : '') +
+        (nx ? ` Next: ${nx.site === 'A' ? 'at' : 'vs.'} ${esc(nx.opp.replace(/ \(No\. \d+\)/, ''))}, ${fmtDate(nx.date, { month: 'short', day: 'numeric' })}.` : '');
+      D.quick = [lead].concat(D.quick.filter(q => !/data-auto="1"/.test(q)));
+    }
   }
   // a final from the live scoreboard (assets/live.js): show the result and new record right away,
   // before the data update lands. Returns true when something changed.
@@ -91,9 +106,9 @@
         D.pollAuto = A.poll;
         const yr = parseInt(D.season, 10), start = /baseball|softball/.test(D.key) ? `${yr}-01-01` : `${yr}-08-01`;
         if (A.poll.date && A.poll.date >= start) {
-          const i = D.header.findIndex(h => /AVCA|Soccer Coaches|AP Top|poll/i.test(h[1]));
+          const i = D.header.findIndex(h => /AVCA|Soccer Coaches|AP Top|AP preseason|poll/i.test(h[1]));
           const label = `${A.poll.poll} (${fmtDate(A.poll.date, { month: 'short', day: 'numeric' })})`;
-          const val = typeof A.poll.rank === 'number' ? 'No. ' + A.poll.rank : 'NR';
+          const val = typeof A.poll.rank === 'number' ? 'No. ' + A.poll.rank : A.poll.votes ? 'RV' : 'NR';
           if (i >= 0) D.header[i] = [val, label]; else D.header.unshift([val, label]);
         }
       }
@@ -232,7 +247,30 @@
     const T = B.teams;
     const per = B.periods && B.periods.length ? `<div class="tablewrap"><table class="mini box-line"><thead><tr><th>Team</th>${B.periods.map(p => `<th class="n">${esc(p)}</th>`).join('')}<th class="n">${D.key === 'volleyball' ? 'Sets' : 'F'}</th></tr></thead>
       <tbody>${[['away', B.periodsAway], ['home', B.periodsHome]].map(([side, sc], i) => { const t = T.find(x => x.home === (side === 'home')) || {}; return `<tr class="${/Tennessee/.test(t.name || '') ? 'me' : ''}"><td><b>${esc(t.name || '')}</b></td>${(sc || []).map(v => `<td class="n">${esc(v)}</td>`).join('')}<td class="n"><b>${esc(t.score ?? '')}</b></td></tr>`; }).join('')}</tbody></table></div>` : '';
-    const ptable = t => { const cols = boxCols(D, t.players || []); return `<div class="tablewrap"><table class="mini"><thead><tr><th>${esc(t.name)}</th>${cols.map(([l]) => `<th class="n">${esc(l)}</th>`).join('')}</tr></thead>
+    // basketball: utsports' stat keys are statsXxx (older seasons used plain names); show a real box (starters first, FG/3P/FT as made-attempted, totals row)
+    const BB = {
+      min: ['statsMinutesPlayed', 'minutesPlayed'], pts: ['statsTotalPointsScored', 'points'], fgm: ['statsTotalFieldGoalsMade', 'fieldGoals'], fga: ['statsTotalFieldGoalsAttempted', 'fieldGoalsAttempted'],
+      tpm: ['statsThreePointFieldGoalsMade', 'threePointFieldGoals'], tpa: ['statsThreePointFieldGoalsAttempted', 'threePointFieldGoalsAttempted'], ftm: ['statsFreeThrowsMade', 'freeThrows'], fta: ['statsFreeThrowsAttempted', 'freeThrowsAttempted'],
+      oreb: ['statsOffensiveRebounds', 'offensiveRebounds'], reb: ['statsTotalRebounds', 'rebounds'], ast: ['statsAssists', 'assists'], stl: ['statsSteals', 'steals'], blk: ['statsBlockedShots', 'blocks'], to: ['statsTurnovers', 'turnovers'], pf: ['statsPersonalFouls', 'personalFouls'],
+    };
+    const bv = (s, k) => { for (const f of BB[k]) if (s && s[f] != null && s[f] !== '' && !/^-?NaN$/.test(String(s[f]))) return numv(s[f]); return null; };
+    const isBB = (D.key === 'mbb' || D.key === 'wbb') && T.some(t => (t.players || []).some(p => bv(p.s, 'pts') != null || bv(p.s, 'min') != null));
+    const bbTable = t => {
+      const ps = (t.players || []).filter(p => !/^(TM|TEAM)$/i.test(p.num || '') && !/^team$/i.test(p.name || ''));
+      const played = ps.filter(p => (bv(p.s, 'min') || 0) > 0 || (bv(p.s, 'pts') || 0) > 0 || (bv(p.s, 'fga') || 0) > 0 || (bv(p.s, 'reb') || 0) > 0);
+      const dnp = ps.filter(p => !played.includes(p));
+      const started = p => String((p.s || {}).gameStarted) === '1';
+      played.sort((a, b) => (started(b) - started(a)) || ((bv(b.s, 'min') || 0) - (bv(a.s, 'min') || 0)) || ((bv(b.s, 'pts') || 0) - (bv(a.s, 'pts') || 0)));
+      const v = (s, k) => { const x = bv(s, k); return x == null ? '' : x; };
+      const ma = (s, m, a) => { const x = bv(s, m), y = bv(s, a); return x == null && y == null ? '' : (x ?? 0) + '-' + (y ?? 0); };
+      const row = p => `<tr><td>${p.num ? '<span class="dim small">' + esc(p.num) + '</span> ' : ''}${esc(String(p.name).replace(/\s+/g, ' '))}${started(p) ? ' <span class="dim small" title="Starter">*</span>' : ''}</td><td class="n">${v(p.s, 'min')}</td><td class="n"><b>${v(p.s, 'pts')}</b></td><td class="n">${ma(p.s, 'fgm', 'fga')}</td><td class="n">${ma(p.s, 'tpm', 'tpa')}</td><td class="n">${ma(p.s, 'ftm', 'fta')}</td><td class="n">${v(p.s, 'reb')}</td><td class="n">${v(p.s, 'ast')}</td><td class="n">${v(p.s, 'stl')}</td><td class="n">${v(p.s, 'blk')}</td><td class="n">${v(p.s, 'to')}</td><td class="n">${v(p.s, 'pf')}</td></tr>`;
+      const tot = t.totals || {};
+      const tr = bv(tot, 'pts') != null ? `<tr class="me"><td><b>Totals</b></td><td class="n">${bv(tot, 'min') != null ? Math.round(bv(tot, 'min')) : ''}</td><td class="n"><b>${v(tot, 'pts')}</b></td><td class="n">${ma(tot, 'fgm', 'fga')}</td><td class="n">${ma(tot, 'tpm', 'tpa')}</td><td class="n">${ma(tot, 'ftm', 'fta')}</td><td class="n">${v(tot, 'reb')}</td><td class="n">${v(tot, 'ast')}</td><td class="n">${v(tot, 'stl')}</td><td class="n">${v(tot, 'blk')}</td><td class="n">${v(tot, 'to')}</td><td class="n">${v(tot, 'pf')}</td></tr>` : '';
+      return `<div class="tablewrap"><table class="mini"><thead><tr><th>${esc(t.name)}</th>${['MIN', 'PTS', 'FG', '3P', 'FT', 'REB', 'AST', 'STL', 'BLK', 'TO', 'PF'].map(l => `<th class="n">${l}</th>`).join('')}</tr></thead>
+        <tbody>${played.map(row).join('')}${tr}</tbody></table></div>
+        <p class="dim small">* started${dnp.length ? ' · Did not play: ' + dnp.map(p => esc(String(p.name).replace(/\s+/g, ' '))).join(', ') : ''}</p>`;
+    };
+    const ptable = t => { if (isBB) return bbTable(t); const cols = boxCols(D, t.players || []); return `<div class="tablewrap"><table class="mini"><thead><tr><th>${esc(t.name)}</th>${cols.map(([l]) => `<th class="n">${esc(l)}</th>`).join('')}</tr></thead>
       <tbody>${(t.players || []).map(p => `<tr><td>${p.num ? '<span class="dim small">' + esc(p.num) + '</span> ' : ''}${esc(p.name)}</td>${cols.map(([, f]) => `<td class="n">${esc(/^-?NaN$/.test(String(p.s[f])) ? '' : (p.s[f] ?? ''))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; };
     const ut = T.find(t => /Tennessee/.test(t.name || '')) || T[1], op = T.find(t => t !== ut) || T[0];
     window.showDialog(head, `<p class="dim small">${esc([B.stadium, B.location].filter(Boolean).join(', '))}${B.attendance ? ' · Attendance ' + Number(B.attendance).toLocaleString() : ''}</p>${per}
@@ -652,7 +690,7 @@ ${rows}
     const R = D.ratings; const E = X(D);
     let rows = (E.ratings || R.rows).map(r => r.slice());
     [D.pollCur, D.rpiAuto].filter(Boolean).forEach(a => {
-      const val = typeof a.rank === 'number' ? 'No. ' + a.rank : 'NR';
+      const val = typeof a.rank === 'number' ? 'No. ' + a.rank : a.votes ? 'RV' : 'NR';
       const note = `Automatic · ${a.date ? 'through ' + fmtDate(a.date, { month: 'short', day: 'numeric' }) : ''}${a.record ? ' · record ' + a.record : ''}${a.prev ? ' · previous: ' + a.prev : ''}`;
       const word = a.poll.split(' ')[0] === 'NCAA' ? a.poll : a.poll.split(' ')[0];
       const i = rows.findIndex(r => r[0].toLowerCase().startsWith(word.toLowerCase()) && !/preseason/i.test(r[0]));
