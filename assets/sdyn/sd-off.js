@@ -13,7 +13,7 @@
   SD.CLASS = { mbb: 4, wbb: 4, baseball: 13, softball: 8 };
   SD.HOURS = () => 40;
   SD.MAXC = () => ({ mbb: 7, wbb: 7, baseball: 15, softball: 10 })[G().sport] || 7;   // the most commits a class can hold
-  SD.ACTIONS = { dm: { name: 'Social media', hrs: 1, pts: 4 }, call: { name: 'Phone call', hrs: 3, pts: 12 }, coach: { name: 'Head coach visit', hrs: 7, pts: 30 } };
+  SD.ACTIONS = { dm: { name: 'Social media', hrs: 1, pts: 4 }, call: { name: 'Phone call', hrs: 3, pts: 12 }, coach: { name: 'Head coach visit', hrs: 7, pts: 30 }, scout: { name: 'Scout', hrs: 1, pts: 0 } };
   const posPool = () => SD.kind() === 'hoops' ? ['PG', 'SG', 'SF', 'PF', 'C'] : G().sport === 'softball' ? ['C', '1B', '2B', 'SS', '3B', 'LF', 'CF', 'RF', 'SP', 'SP', 'RP'] : ['C', '1B', '2B', 'SS', '3B', 'LF', 'CF', 'RF', 'SP', 'SP', 'SP', 'RP', 'RP', 'RP'];
   SD.CPU_PUSH = 1.1; SD.REAL_STICK = 0.88; SD.REAL_PULL = 3;   // CPU recruiting drive, and how strongly a real recruit's real school pulls
   SD.PROS_BASE = 64;   // freshman rating at a .80 composite (tuned so league talent holds steady season to season)
@@ -27,7 +27,7 @@
     const ovr = Math.round(clamp(SD.PROS_BASE + (g - 80) * 0.7 + Math.max(0, g - 95) * 1.2 + gauss() * 2.5, 50, 84));
     const p = SD.makePlayer(pos, ovr, { t: null, yr: 1, el: SD.kind() === 'hoops' ? 5 : 4, grade: g, rec: { c, stars: SD.starsOf(c), g, natl: rank, cls: year } });
     p.pros = true; p.interest = {}; p.commit = null; p.offer = false; p.acts = {}; p.visit = null; p.visited = false; p.nilOffer = 0; p.scout = 0;
-    p.pref = SD.shuffle(['pt', 'nil', 'champ', 'prox', 'brand', 'dev']).slice(0, 3);
+    p.pref = SD.shuffle(['pt', 'champ', 'prox', 'brand', 'dev'].concat(SD.nilOn() ? ['nil'] : [])).slice(0, 3);
     // a few programs start interested
     const g0 = G(); for (let i = 0; i < 10; i++) { const t = SD.wpick(g0.teams, t => Math.pow(t.prestige / 60, 2.5 + p.rec.stars * 0.6)); p.interest[t.id] = rr(0, 30) * (t.prestige / 80); }
     return p;
@@ -83,6 +83,7 @@
   SD.setAct = (id, act, on) => {
     const p = G().recruit.pool[id]; if (!p) return 'Not found.';
     if (p.firm && p.commit !== G().user) return `${p.n} is locked in with ${T(p.commit).name}.`;
+    if (on && act === 'scout' && (p.scout || 0) >= 3) return 'Fully scouted.';
     if (on) { if (act === 'coach' && Object.values(G().recruit.pool).filter(x => x.acts.coach).length >= 3) return 'Three head coach visits a week.'; if (SD.hoursUsed() + SD.ACTIONS[act].hrs > SD.HOURS()) return 'Not enough hours left this week.'; p.acts[act] = 1; }
     else delete p.acts[act];
     return null;
@@ -108,7 +109,7 @@
     const logs = [];
     if (mode !== 'off') R.board.forEach(id => {
       const p = R.pool[id]; if (!p) return;
-      let pts = 0; for (const a in p.acts) pts += SD.ACTIONS[a].pts; if (p.offer) pts += 3;
+      let pts = 0; for (const a in p.acts) { if (a === 'scout') { p.scout = Math.min(3, (p.scout || 0) + 1); continue; } pts += SD.ACTIONS[a].pts; } if (p.offer) pts += 3;
       if (p.nilOffer) pts += Math.min(22, p.nilOffer / Math.max(15000, SD.nilValue(p, ut)) * 9) * (p.pref.includes('nil') ? 1.5 : 0.8);
       // an official visit this week
       if (p.visit && p.visit <= g.date && !p.visited) { const x = SD.userGames().find(y => y.d === p.visit); const won = x && x.res && ((x.h === ut.id) === (x.res.h > x.res.a)); pts += won ? 50 : 18; p.visited = true; logs.push(`${p.n} (${p.rec.stars}★ ${p.pos}) took an official visit${won ? ' and saw a win' : ''}.`); }
@@ -116,7 +117,7 @@
       if (pts > 0) p.interest[ut.id] = (p.interest[ut.id] || 0) + pts * (0.45 + fitScore(ut, p) * 0.9) * (p.offer ? 1 : 0.5) * SD.recruitMult() * (mode === 'auto' ? SD.autoEff() : 1) * (window.MORALE ? MORALE.recruitMult(g, p.rpromise, p.rec.stars) : 1);
     });
     Object.values(R.pool).forEach(p => {
-      if (p.commit != null && p.commit !== ut.id && p.acts) p.acts = {};
+      if (p.commit != null && p.commit !== ut.id && p.acts) p.acts = {}; else if (p.acts) delete p.acts.scout;   // a scouting report is one-time
       if (p.commit != null && p.firm) return;
       for (const tid in p.interest) { const t = g.teams[tid]; if (!t || t.user || +tid === g.user) continue; const heat = (p.rec.stars >= 4 ? 1 + Math.max(0, t.prestige - 75) / 50 : 1) * SD.CPU_PUSH;
         // a real recruit's real school is his default first option (he sticks about 88% of the time), unless the school never pushes him
@@ -186,7 +187,11 @@
   }
 
   /* ---------- the offseason ---------- */
-  SD.OFF_ORDER = ['recap', 'nil', 'portal', 'signing', 'draft', 'progress', 'cuts', 'schedule'];
+  const OFF_ALL = ['recap', 'nil', 'portal', 'signing', 'draft', 'progress', 'cuts', 'schedule'];
+  // the transfer portal opened in October 2018 and NIL began in July 2021: a historical dynasty has neither before then
+  SD.portalOn = () => { const g = G(); return !(g && g.hx && g.season < 2018); };
+  SD.nilOn = () => { const g = G(); return !(g && g.hx && g.season < 2021); };
+  Object.defineProperty(SD, 'OFF_ORDER', { get: () => OFF_ALL.filter(x => (x !== 'nil' || SD.nilOn()) && (x !== 'portal' || SD.portalOn())) });
   SD.OFF_LABEL = { recap: 'Season recap', nil: 'NIL & budget', portal: 'Transfer portal', signing: 'Signing day', draft: 'Pro draft', progress: 'Player development', cuts: 'Roster limit', schedule: 'Next season' };
   SD.LIMIT = { mbb: 15, wbb: 15, baseball: 34, softball: 25 };
   SD.startOffseason = () => {
@@ -240,6 +245,7 @@
   SD.persuade = (id, raise) => {
     const g = G(), o = g.off, p = SD.P(id), ut = SD.userT();
     if (o.pitched[id] != null) return 'You already made your pitch.';
+    if (!SD.nilOn()) raise = 0;
     if (SD.payroll(ut) + (p.nil || 0) + raise > ut.budget * 1.03) return 'That raise is over your NIL budget.';
     const ok = chance(SD.persuadeChance(p, raise)); o.pitched[id] = ok;
     if (ok) { p.leave = null; p.retYear = g.season; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); SD.news('nil', `${p.n} is coming back`, ''); }
@@ -355,8 +361,8 @@
   };
   SD.offNext = () => {
     const g = G(), o = g.off, st = o.stage;
-    if (st === 'recap') { removeLeavers(); nilReview(); }
-    else if (st === 'nil') { resolveNil(); openPortal(); }
+    if (st === 'recap') { removeLeavers(); if (SD.nilOn()) nilReview(); else { o.nilAsk = []; if (SD.portalOn()) openPortal(); } }
+    else if (st === 'nil') { resolveNil(); if (SD.portalOn()) openPortal(); }
     else if (st === 'portal') { resolvePortal(true); }
     else if (st === 'signing') { signingDay(); }
     else if (st === 'draft') { /* the draft already happened with the departures */ }

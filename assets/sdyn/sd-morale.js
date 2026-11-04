@@ -9,7 +9,7 @@
     g: G, cap: hoops() ? 2 : 3, redshirtGames: 0,
     roster: () => SD.userT().roster.map(SD.P),
     name: p => p.n, ovr: p => p.ovr,
-    nil: p => p.nil || 0, nilValue: p => (G().settings.nil === 'off' ? 0 : SD.nilValue(p, SD.userT())),
+    nil: p => p.nil || 0, nilValue: p => (G().settings.nil === 'off' || !SD.nilOn() ? 0 : SD.nilValue(p, SD.userT())),
     winPct: () => { const t = SD.userT(), n = t.w + t.l; return n ? t.w / n : 0.5; },
     expWin: () => { const ts = G().teams.filter(t => !t.dorm && t.roster && t.roster.length), avg = ts.reduce((a, t) => a + SD.teamRating(t), 0) / ts.length; return Math.max(0.15, Math.min(0.9, 0.5 + (SD.teamRating(SD.userT()) - avg) * 0.02)); },
     yr: p => p.yr, stars: p => (p.rec && p.rec.stars) || 0,
