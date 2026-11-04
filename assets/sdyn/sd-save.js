@@ -39,7 +39,13 @@
       Object.values(g.P || {}).forEach(p => p && f(p.tr)); if (g.recruit && g.recruit.pool) Object.values(g.recruit.pool).forEach(p => p && f(p.tr)); (g.guests ? Object.values(g.guests) : []).forEach(() => 0);
       g.fx.tr2 = 1;
     }
-    SD.G = g; SD.seed(g.rs || g.seed); return g; };
+    SD.G = g; SD.seed(g.rs || g.seed);
+    if (!g.fx.pos2 && SD.SP().kind === 'hoops') {   // older saves: re-read every player's style from his ratings and keep one sensible secondary position
+      const fix = p => { if (!p || !p.at || p.at.ins == null) return; p.arch = SD.archOf(p); p.pos2 = SD.derivePos2(p); };
+      Object.values(g.P || {}).forEach(fix); if (g.recruit && g.recruit.pool) Object.values(g.recruit.pool).forEach(fix);
+      g.fx.pos2 = 1;
+    }
+    return g; };
   SD.fromBytes = bytes => gunzip(bytes).then(SD.fromText);
   SD.deleteSlot = (sport, n) => { del(sport + '-slot' + n); try { root.localStorage.removeItem('vi-sdyn-' + sport + n); } catch (e) { /* ignore */ } const m = SD.readMeta(sport); delete m[n]; writeMeta(sport, m); };
   SD.exportBlob = () => { const g = SD.G; g.rs = SD.rstate(); return gzip(SD.pack(g)).then(b => new root.Blob([b], { type: 'application/gzip' })); };

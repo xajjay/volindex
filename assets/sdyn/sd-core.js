@@ -60,7 +60,7 @@
     PG: ['Playmaker', 'Combo guard', 'Scoring guard', 'Lockdown defender', '3 and D', 'Shooter'],
     SG: ['Shooter', '3 and D', 'Scoring guard', 'Combo guard', 'Slasher', 'Lockdown defender'],
     SF: ['3 and D', 'Slasher', 'Scoring wing', 'Point forward', 'Two-way wing', 'Lockdown defender', 'Shooter'],
-    PF: ['Stretch big', 'Glass cleaner', 'Post scorer', 'Rim runner', 'Two-way big', 'Point forward'],
+    PF: ['Stretch big', 'Glass cleaner', 'Post scorer', 'Rim runner', 'Two-way big'],
     C: ['Rim protector', 'Glass cleaner', 'Post scorer', 'Stretch big', 'Rim runner', 'Playmaking big']
   };
   SD.ARCH = {
@@ -97,7 +97,7 @@
     else if (p.pos === 'C') { if (a.thr >= 62 || a.ath >= 74 || a.mid >= 66) out.push('PF'); }
     const fit = out.filter(q => { const d = Math.abs(SD.SLOTS.indexOf(q) - SD.SLOTS.indexOf(p.pos)); return d <= 1 || (d === 2 && (p.pos === 'PG' ? h >= 78 : p.pos === 'C' ? true : h >= 76)); });
     fit.sort((x, y) => Math.abs(SD.SLOTS.indexOf(x) - SD.SLOTS.indexOf(p.pos)) - Math.abs(SD.SLOTS.indexOf(y) - SD.SLOTS.indexOf(p.pos)));
-    return fit.length ? fit.slice(0, 2) : null;
+    return fit.length ? fit.slice(0, 1) : null;   // one clear secondary spot (PG/SG, SG/SF ...) is plenty
   };
   // how well a player fits a lineup slot: 0 at his main position, a small cost at a secondary one, more the farther he is from it
   SD.SLOTS = ['PG', 'SG', 'SF', 'PF', 'C'];
@@ -110,7 +110,7 @@
     const at = {};
     const keys = kind === 'hoops' ? Object.keys(SD.ATTR.hoops) : SD.isPit({ pos }) ? Object.keys(SD.ATTR.pit).concat(['con', 'pow', 'eye', 'spd', 'fld', 'arm']) : Object.keys(SD.ATTR.bat);
     const w = SD.W[pos === 'C' && kind === 'diamond' ? 'C_' : pos];
-    keys.forEach(k => { const inW = w[k] != null; at[k] = Math.round(clamp(target + (inW ? 0 : -8) + gauss() * (inW ? 6 : 8), 50, 99)); });
+    keys.forEach(k => { const inW = w[k] != null; at[k] = Math.round(clamp(target + (inW ? 0 : -8) + gauss() * (arch ? (inW ? 3.5 : 5) : (inW ? 6 : 8)), 50, 99)); });
     if (kind === 'diamond' && SD.isPit({ pos })) ['con', 'pow', 'eye'].forEach(k => { at[k] = Math.round(clamp(45 + gauss() * 5, 50, 70)); });
     if (kind === 'hoops' && arch && SD.ARCH[arch]) { const d = SD.ARCH[arch]; for (const k in d) at[k] = Math.round(clamp(at[k] + d[k] + gauss() * 1.5, 40, 99)); }
     // pull the weighted overall onto the target
@@ -226,7 +226,7 @@
     if (L) (L.chart['Starting five'] || []).forEach(([, list]) => starters.add(list[0]));
     const ids = [];
     (S ? S.roster : []).forEach(rp => {
-      const ht = htIn(rp.ht), pos = hoopsPos(rp, ht), pos2 = hoopsPos2(rp), yr = CLS[rp.cls] || 2;
+      const ht = htIn(rp.ht), pos = hoopsPos(rp, ht), pos2 = ((hoopsPos2(rp) || []).filter(q => Math.abs(SD.SLOTS.indexOf(q) - SD.SLOTS.indexOf(pos)) === 1).slice(0, 1)), yr = CLS[rp.cls] || 2;
       const r = R[rp.name] || {}, rating = r.tr ? r.tr.rating : r.hs ? (r.hs.own || r.hs.grade || 85) : (yr === 1 ? 84 : 82);
       const st = stats[rp.name], ppgNote = /([\d.]+)\s*(career\s*)?ppg/.exec(rp.note || '');
       const ppg = st ? num(st.pointsPerGame) : ppgNote ? +ppgNote[1] : 0, mpg = st ? num(st.minutesPerGame) : ppg ? 26 : 0;
