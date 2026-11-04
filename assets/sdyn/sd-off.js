@@ -52,6 +52,15 @@
     // real Tennessee commits do not hand themselves over: pursue them (board + offer, or let the assistant run it) and they always commit
     if (SD.tnT && g.user === SD.tnT().id) Object.values(pool).forEach(p => { if (p.real && p.commit === g.user) { p.realUT = true; p.commit = null; p.firm = false; p.offer = false; p.interest[g.user] = 40; } });
   };
+  // "interested in us": we are among his top schools and he is actually warm on us (or we have him on the board with an offer)
+  SD.interested = p => { const g = G(), me = p.interest[g.user] || 0; if (p.commit != null) return p.commit === g.user; if (p.realUT || p.offer) return true; if (me < 10) return false; const above = Object.values(p.interest).filter(v => v > me).length; return above < 5; };
+  SD.rankClasses = () => rankClasses();
+  // before anyone commits (period 1), a projection: each uncommitted prospect counts for the school he currently leans toward
+  SD.projectedClasses = () => {
+    const R = G().recruit, pts = {}, n = {};
+    Object.values(R.pool).forEach(p => { let t = p.commit; if (t == null) { const e = Object.entries(p.interest).sort((a, b) => b[1] - a[1])[0]; if (!e || e[1] < 8) return; t = +e[0]; } pts[t] = (pts[t] || 0) + Math.pow(p.rec.c * 100 - 70, 2); n[t] = (n[t] || 0) + 1; });
+    return Object.entries(pts).sort((a, b) => b[1] - a[1]).map(([t, v]) => ({ t: +t, v, n: n[t] }));
+  };
   SD.myCommits = () => Object.values(G().recruit.pool).filter(p => p.commit === G().user);
   SD.boardAdd = id => { const R = G().recruit; if (R.board.includes(id)) return null; if (R.board.length >= 20) return 'Your board is full (20).'; R.board.push(id); const p = R.pool[id]; if (p.interest[G().user] == null) p.interest[G().user] = 0; return null; };
   SD.boardRemove = id => { const R = G().recruit; R.board = R.board.filter(x => x !== id); };

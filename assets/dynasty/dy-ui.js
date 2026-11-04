@@ -60,7 +60,7 @@
   }
   function setup() {
     const s = V.setup;
-    const def = { year: 2026, team: 'Tennessee', start: 'pre', coach: '', arch: 'motivator', diff: 'varsity', cfp: 'real', g6po: 'off', g6pref: 'cfp', coachMode: 'offense', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, speed: 'slow', shake: true, offStyle: 'power', watchSeason: false };
+    const def = { year: 2026, team: 'Tennessee', start: 'pre', coach: '', arch: 'motivator', diff: 'varsity', cfp: 'real', g6po: 'off', g6pref: 'cfp', coachMode: 'offense', morale: 'off', recruiting: 'manual', portal: 'manual', nil: 'manual', injuries: true, speed: 'slow', shake: true, offStyle: 'power', watchSeason: false };
     for (const k in def) if (s[k] == null) s[k] = def[k];
     const hy = s.year < 2026 && DY.histYears ? s.year : null;
     if (hy && !(root.DY_HSCHED && root.DY_HCLASS)) { APP.innerHTML = '<div class="wrap games dy"><div class="box"><p>Loading the history books…</p></div></div>'; DY.loadHist(null).then(setup).catch(() => { s.year = 2026; setup(); }); return; }
@@ -86,6 +86,7 @@
         <div class="gfield"><div class="glabel">Recruiting</div>${seg('recruiting', [['manual', 'I recruit'], ['auto', 'Auto'], ['off', 'Off']])}${hy ? '<p class="dim small">Each class is made of real players: ranked by what their careers became through the 2024 class, by their composite recruiting rank for 2025 through 2028; classes after that are generated.</p>' : s.team === 'Tennessee' ? '<p class="dim small">Year one is the real 2027 class, locked in.</p>' : ''}</div>
         <div class="gfield"><div class="glabel">Transfer portal</div>${seg('portal', [['manual', 'I manage it'], ['auto', 'Auto'], ['off', 'Off']])}${hy && hy < 2018 ? '<p class="dim small">The portal opened in October 2018: it starts off for earlier seasons.</p>' : ''}</div>
         <div class="gfield"><div class="glabel">NIL</div>${seg('nil', [['manual', 'I approve raises'], ['auto', 'Auto'], ['off', 'Off (no NIL)']])}${hy && hy < 2021 ? '<p class="dim small">NIL arrived in July 2021: it starts off for earlier seasons.</p>' : ''}</div>
+        <div class="gfield"><div class="glabel">Locker room (morale, personalities, promises)</div>${seg('morale', [['off', 'Off'], ['on', 'On']])}<p class="dim small">Players have moods and a relationship with you; make promises to players and recruits. A few quiet alerts a season. Change it any time in Settings.</p></div>
         <div class="gfield"><div class="glabel">Game speed</div>${seg('speed', [['slow', 'Slow'], ['fast', 'Fast']])}</div>
         <div class="gfield"><div class="glabel">Injuries</div>${seg('injuries', [[true, 'On'], [false, 'Off']])}</div>
         <div class="gfield"><div class="glabel">Third-down screen shake in big home games</div>${seg('shake', [[true, 'On'], [false, 'Off']])}</div>
@@ -104,7 +105,7 @@
       if (b.id === 'dyStart' || b.dataset.start2) {
         s.coach = APP.querySelector('#dyCoach').value.trim() || 'Coach';
         const go = () => busy(hy ? `Building the ${hy} season: every team's real roster…` : 'Building the 2026 season: 136 teams, 7,400 players…', () => {
-          DY.newDynasty({ year: hy || undefined, team: s.team, coach: s.coach, arch: s.arch, settings: { cfp: s.cfp, g6po: s.g6po, g6pref: s.g6pref, coachMode: s.coachMode, recruiting: s.recruiting, portal: s.portal, nil: s.nil, injuries: s.injuries, speed: s.speed, shake: s.shake, difficulty: s.diff, offStyle: s.offStyle, watchSeason: s.watchSeason } });
+          DY.newDynasty({ year: hy || undefined, team: s.team, coach: s.coach, arch: s.arch, settings: { cfp: s.cfp, g6po: s.g6po, g6pref: s.g6pref, coachMode: s.coachMode, recruiting: s.recruiting, portal: s.portal, nil: s.nil, injuries: s.injuries, speed: s.speed, shake: s.shake, difficulty: s.diff, offStyle: s.offStyle, watchSeason: s.watchSeason, morale: s.morale } });
           G().slot = s.slot; V.tab = 'home';
           if (!hy && s.start === 'today' && DY.canStartToday()) { const err = DY.startToday(); if (err) V.msg = err; }
         });
