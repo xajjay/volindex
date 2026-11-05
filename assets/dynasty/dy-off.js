@@ -659,7 +659,7 @@
     if (st === 'draft') DY.runDraft();
     if (st === 'progress') DY.progressAll();
     if (st === 'cuts') DY.autoCuts(false);
-    if (st === 'schedule') { g.nonconfPick = g.nonconfPick || {}; if (!g.nonconfPick[g.season + 1]) g.nonconfPick[g.season + 1] = DY.UT_NONCONF_REAL[g.season + 1] ? DY.UT_NONCONF_REAL[g.season + 1].map(x => ({ o: DY.byName(x[0]).id, home: x[1] === 'H', wk: DY.weekOfDate(g.season + 1, x[2]) })) : DY.autoNonconf(g.season + 1); }
+    if (st === 'schedule') { g.nonconfPick = g.nonconfPick || {}; if (!g.nonconfPick[g.season + 1]) g.nonconfPick[g.season + 1] = (g.hx && DY.histUtNonconf && DY.histUtNonconf(g.season + 1)) || (DY.UT_NONCONF_REAL[g.season + 1] ? DY.UT_NONCONF_REAL[g.season + 1].map(x => ({ o: DY.byName(x[0]).id, home: x[1] === 'H', wk: DY.weekOfDate(g.season + 1, x[2]) })) : DY.autoNonconf(g.season + 1)); }
   }
 
   /* NIL: market values move with performance; players who outgrew their deal ask for a raise */

@@ -270,7 +270,7 @@
     if (d.act === 'export') return DY.exportBlob(null).then(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `vol-dynasty-${g.season}.vdyn`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); });
     if (d.act === 'autodepth') { const t = DY.userT(); t.depthEdited = false; DY.refreshDepth(t); return keep(); }
     if (d.act === 'portalround') return busy('Players are making their decisions…', () => DY.resolvePortal(false));
-    if (d.act === 'ncauto') { g.nonconfPick[g.season + 1] = DY.autoNonconf(g.season + 1); return keep(); }
+    if (d.act === 'ncauto') { g.nonconfPick[g.season + 1] = DY.autoNonconf(g.season + 1); (g.ncTouched = g.ncTouched || {})[g.season + 1] = 1; return keep(); }
     if (d.act === 'autocuts') { g.off.cut = []; const need = DY.cutsNeeded(); DY.userT().roster.map(DY.P).sort((a, b) => DY.cutScore(a) - DY.cutScore(b)).slice(0, need).forEach(p => g.off.cut.push(p.id)); return keep(); }
     if (d.job) { const err = DY.takeJob(+d.job); V.msg = err || `Welcome to ${DY.UN()}.`; return keep(); }
     if (d.act === 'cfpdone') { if (g.post) g.post.seen = true; V.tab = 'playoff'; return hub(); }
@@ -322,7 +322,7 @@
     if (el.dataset.rprom) { const q = DY.RP(+el.dataset.rprom); V.msg = MORALE.setRP(g, g.recruit.pool, q, el.value, ['QB', 'RB', 'WR', 'TE'].includes(q.pos)); return keep(); }
     if (el.dataset.rnil) { V.msg = DY.setNil(+el.dataset.rnil, +el.value); return keep(); }
     if (el.dataset.rvisit) { V.msg = DY.setVisit(+el.dataset.rvisit, +el.value) || 'Official visit scheduled.'; return keep(); }
-    if (el.dataset.nc) { const [i, k] = el.dataset.nc.split('|'); const arr = g.nonconfPick[g.season + 1]; arr[+i][k] = k === 'home' ? el.value === '1' : +el.value; return keep(); }
+    if (el.dataset.nc) { const [i, k] = el.dataset.nc.split('|'); const arr = g.nonconfPick[g.season + 1]; arr[+i][k] = k === 'home' ? el.value === '1' : +el.value; (g.ncTouched = g.ncTouched || {})[g.season + 1] = 1; return keep(); }
     if (el.dataset.mvpos) { const p = DY.P(+el.dataset.mvpos); if (el.value) { DY.changePos(p, el.value); const t = DY.userT(); t.depthEdited = true; DY.refreshDepth(t); V.msg = `${p.n} moved to ${el.value}${p.pos0 && DY.posFit(p, el.value) === 'poor' ? ' (out of position: big ratings hit)' : ''}. Overall at ${el.value}: ${p.ovr}.`; } return keep(); }
     if (el.id === 'dyRfq') { V.rfind.q = el.value; return keep(); }
     if (el.dataset.vsel != null) { V.viewTeam = +el.value === g.user ? null : +el.value; return keep(); }

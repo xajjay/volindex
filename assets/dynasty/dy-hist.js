@@ -86,6 +86,16 @@
     const n = name.slice(2), f = DY.FCS.find(x => x.name === n);
     return (f || DY.FCS[hash(n) % DY.FCS.length]).id;
   }
+  // Tennessee's real non-conference slate for a historical season, as editable picks (weeks counted from the opener)
+  DY.histUtNonconf = season => {
+    const g = G(); if (!g.hx || !DY.isHistSeason(g, season)) return null;
+    const S = root.DY_HSCHED[season]; if (!S || !S.g || !S.g.length) return null;
+    const rows = S.g.filter(r => !r[3] && !r[4] && (r[1] === 'Tennessee' || r[2] === 'Tennessee')).sort((x, y) => x[0] < y[0] ? -1 : 1);
+    const mon = DY.firstSat(season).getTime() - 4 * 864e5, out = [];
+    rows.forEach(r => { const o = DY.byName(r[1] === 'Tennessee' ? r[2] : r[1]); if (!o) return;
+      out.push({ o: o.id, home: r[1] === 'Tennessee', wk: clamp(Math.floor((Date.parse(season + '-' + r[0] + 'T12:00:00Z') - mon) / (7 * 864e5)) + 1, 1, 5) }); });
+    return out.length ? out : null;
+  };
   DY.histSchedule = season => {
     const g = G(); if (!DY.isHistSeason(g, season)) return null;
     const S = root.DY_HSCHED[season], games = [], busy = {};
@@ -109,6 +119,18 @@
       const tag = (tn(r.h) === 'Tennessee' || tn(r.a) === 'Tennessee') && (tn(r.h) === 'Alabama' || tn(r.a) === 'Alabama') ? 'Third Saturday in October' : null;
       games.push({ id: season + '-' + games.length, wk: w, h: r.h, a: r.a, conf: r.c, neutral: r.n, tag, res: null, real: true });
     });
+    // the coach's own non-conference picks replace the real slate's non-conference games (only once he has touched them)
+    const picks = g.nonconfPick && g.nonconfPick[season];
+    if (picks && g.ncTouched && g.ncTouched[season]) {
+      const UT = DY.UT_ID;
+      for (let i = games.length - 1; i >= 0; i--) { const x = games[i]; if ((x.h === UT || x.a === UT) && !x.conf && !x.neutral) { if (x.h < 1000) delete busy[x.h + '|' + x.wk]; if (x.a < 1000) delete busy[x.a + '|' + x.wk]; games.splice(i, 1); } }
+      const off = (g.hx.wk && g.hx.wk[season] && g.hx.wk[season].off) || 0;
+      picks.forEach(pk => { if (pk.o == null || pk.o === UT) return;
+        const ok = w => w >= 0 && w <= DY.LAST_WK && !busy[UT + '|' + w] && (pk.o >= 1000 || !busy[pk.o + '|' + w]);
+        let w = clamp((pk.wk || 1) + off, 0, DY.LAST_WK); if (!ok(w)) { let k = 1; while (k < 15 && !ok(w + k) && !ok(w - k)) k++; w = ok(w + k) ? w + k : ok(w - k) ? w - k : -1; }
+        if (w < 0) return; busy[UT + '|' + w] = 1; if (pk.o < 1000) busy[pk.o + '|' + w] = 1;
+        games.push({ id: season + '-' + games.length + 'p', wk: w, h: pk.home ? UT : pk.o, a: pk.home ? pk.o : UT, conf: false, neutral: false, tag: null, res: null, real: false, pick: true }); });
+    }
     fillFcs(season, games, busy);
     games.sort((x, y) => x.wk - y.wk);
     g.sched = games;
@@ -132,7 +154,7 @@
   // home and away: nobody plays 9 of 11 on the road. Flip games (never the FCS ones) until every team is within a game of even
   DY.balanceHome = balanceHome;
   function balanceHome(games) {
-    const d = {}, ok = x => x.h < 1000 && x.a < 1000 && !x.neutral;
+    const d = {}, ok = x => x.h < 1000 && x.a < 1000 && !x.neutral && !x.pick;
     games.forEach(x => { if (x.h < 1000) d[x.h] = (d[x.h] || 0) + 1; if (x.a < 1000) d[x.a] = (d[x.a] || 0) - 1; });
     for (let pass = 0; pass < 60; pass++) {
       let moved = 0;
@@ -163,6 +185,10 @@
       }
     }
     edges.forEach(([a, b]) => { cnt[a] = (cnt[a] || 0) + 1; cnt[b] = (cnt[b] || 0) + 1; });
+    // the coach's own non-conference picks go in first (opponent, home or away, preferred week)
+    const pickMap = {}, picks = (g.nonconfPick && g.nonconfPick[season]) || [], UTID = DY.UT_ID;
+    picks.forEach(pk => { const o = pk.o != null && DY.T(pk.o); if (!o || o.dorm || pk.o === UTID || have.has(key(UTID, pk.o))) return;
+      addE(UTID, pk.o, false); cnt[UTID] = (cnt[UTID] || 0) + 1; cnt[pk.o] = (cnt[pk.o] || 0) + 1; pickMap[key(UTID, pk.o)] = pk; });
     // non-conference: fill to eleven against other I-A teams, then I-AA
     const ids = live.map(t => t.id);
     for (let pass = 0; pass < 3; pass++) for (const a of DY.shuffle(ids)) {
@@ -180,15 +206,15 @@
       for (let w = 1; w <= 13; w++) tries.push(w);
       for (const w of tries) if (!busy[a + '|' + w] && !busy[b + '|' + w]) {
         busy[a + '|' + w] = busy[b + '|' + w] = 1;
-        const hm = (season + a * 7 + b * 3) % 2 === 0, A = DY.T(a), B = DY.T(b);
+        const pm = pickMap[key(a, b)], hm = pm ? (pm.home ? a === UTID : b === UTID) : (season + a * 7 + b * 3) % 2 === 0, A = DY.T(a), B = DY.T(b);
         const tag = (A.name === 'Tennessee' || B.name === 'Tennessee') && (A.name === 'Alabama' || B.name === 'Alabama') ? 'Third Saturday in October' : null;
-        games.push({ id: season + '-' + games.length, wk: w, h: hm ? a : b, a: hm ? b : a, conf: !!conf, neutral: false, tag, res: null }); return true;
+        games.push({ id: season + '-' + games.length, wk: w, h: hm ? a : b, a: hm ? b : a, conf: !!conf, neutral: false, tag, res: null, pick: !!pm }); return true;
       }
       return false;
     };
     const special = e => { const n = [DY.T(e[0]).name, DY.T(e[1]).name].sort().join('|'); return n === 'Alabama|Tennessee' ? third : n === 'Tennessee|Vanderbilt' ? 13 : n === 'Auburn|Alabama' || n === 'Alabama|Auburn' ? 13 : n === 'Michigan|Ohio State' ? 13 : null; };
     order.filter(e => special(e) != null).forEach(e => place(e[0], e[1], e[2], special(e)));
-    order.filter(e => special(e) == null).forEach(e => place(e[0], e[1], e[2]));
+    order.filter(e => special(e) == null).forEach(e => { const pm = pickMap[key(e[0], e[1])]; place(e[0], e[1], e[2], pm ? clamp(pm.wk || 1, 1, 13) : undefined); });
     fillFcs(season, games, busy);
     balanceHome(games);
     games.sort((x, y) => x.wk - y.wk);
