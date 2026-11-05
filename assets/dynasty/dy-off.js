@@ -147,7 +147,7 @@
     if (!R._pc || !R._pc[t]) return; R._pc[t][p.pos] = Math.max(0, (R._pc[t][p.pos] || 0) - 1); R._tot[t] = Math.max(0, (R._tot[t] || 0) - 1);
     const sc = R._sc[t]; if (sc) { if (p.rec.stars >= 5) sc[5]--; else if (p.rec.stars === 4) sc[4]--; }
   };
-  DY.classPoints = (ids) => ids.map(DY.RP).filter(Boolean).sort((a, b) => b.rec.c - a.rec.c).reduce((s, p, i) => s + p.rec.c * 100 * Math.exp(-(i * i) / (2 * 100)), 0);
+  DY.classPoints = (ids) => ids.map(DY.RP).filter(Boolean).sort((a, b) => b.rec.c - a.rec.c).reduce((s, p, i) => s + 40 * Math.exp((p.rec.c - 0.87) * 13) * Math.exp(-(i * i) / (2 * 100)), 0);     // convex like the real composite: a five-star is worth about two four-stars of a class's points
 
   /* ---------- the recruiting season ---------- */
   DY.RP = id => G().recruit && G().recruit.pool[id];
@@ -252,12 +252,12 @@
       for (const tid in p.interest) {
         const t = g.teams[tid]; if (t.user) continue;
         // blue-bloods go a little harder after the elite kids, but not by much: fit, home and a spot to play decide most of it
-        const heat = (p.rec.stars >= 5 ? 1.14 + Math.max(0, t.prestige - 80) / 125 : p.rec.stars === 4 ? 1.06 + Math.max(0, t.prestige - 80) / 190 : 1.0) * DY.CPU_PUSH;
+        const heat = (p.rec.stars >= 5 ? 1.14 + Math.max(0, t.prestige - 72) / 55 : p.rec.stars === 4 ? 1.06 + Math.max(0, t.prestige - 72) / 85 : 1.0) * DY.CPU_PUSH;
         const ok = DY.cpuOk(t, p), nd = (R._need[t.id] || {})[p.pos] || 0, have = (R._pc[t.id] || {})[p.pos] || 0;
         const nm = !ok && p.commit !== +tid ? 0.3 : 1 + Math.min(0.4, Math.max(0, nd - have) * 0.1);
         // a recruit's own taste (a dream school, a coach he clicked with) is fixed for the cycle; a class already heavy in stars is a harder sell (playing time, one more star at a spot is less appealing)
         p.aff = p.aff || {}; if (p.aff[tid] == null) p.aff[tid] = Math.exp(gauss() * (p.rec.stars >= 4 ? 0.42 : 0.25));
-        const scT = R._sc[t.id] || { 5: 0, 4: 0 }, crowdS = p.rec.stars >= 5 ? 1 / (1 + 0.10 * Math.max(0, scT[5] - 4)) : p.rec.stars === 4 ? 1 / (1 + 0.035 * Math.max(0, scT[4] + scT[5] - 11)) : 1;
+        const scT = R._sc[t.id] || { 5: 0, 4: 0 }, crowdS = p.rec.stars >= 5 ? 1 / (1 + 0.10 * Math.max(0, scT[5] - 6)) : p.rec.stars === 4 ? 1 / (1 + 0.035 * Math.max(0, scT[4] + scT[5] - 15)) : 1;
         // a real recruit's real school is his default first option (about 85% of the time it stays that way); it stops being one when the room at his position is already full or the school never really pushes
         let rs = 1;
         if (p.realSchool != null) {
