@@ -509,6 +509,7 @@
       ${(rows => rows.length ? `<div class="section"><h3>Polls & rankings <small>Media polls, preseason rankings and other ratings</small></h3><div class="tablewrap"><table><thead><tr><th>Source</th><th class="n">Tennessee</th><th>Notes</th></tr></thead>
         <tbody>${rows.map(r => `<tr><td><a href="${esc(r[3])}" target="_blank" rel="noopener"><b>${esc(r[0])}</b></a></td><td class="n"><b>${esc(r[1])}</b></td><td class="dim">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div></div>` : '')(ratingRows(D).filter(r => !A.teams.some(t => r[0].toLowerCase().split(' ')[0] === t.src.toLowerCase().split(' ')[0] && !/poll|projected/i.test(r[0]))))}
       ${D.key === 'mbb' ? cbbdSection() : ''}
+      ${D.key === 'wbb' ? wbbBoxSection() : ''}
       ${A.glossary ? `<details class="box gloss"><summary>What do these numbers mean?</summary><dl>${A.glossary.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></details>` : ''}`;
   }
 
@@ -540,6 +541,44 @@
       ${games.length ? `<div class="section"><h3>Game-by-game efficiency</h3><div class="tablewrap"><table class="mini"><thead><tr><th>Date</th><th>Opponent</th><th class="n">Score</th><th class="n">Pace</th><th class="n">ORtg</th><th class="n">DRtg</th><th class="n">eFG%</th><th class="n">Opp eFG%</th><th class="n">TO%</th><th class="n">OREB%</th><th class="n">FT rate</th></tr></thead>
         <tbody>${games.map(g => `<tr><td class="num">${fmtDate(g.date, { month: 'short', day: 'numeric' })}</td><td><b>${g.home ? '' : g.neutral ? 'vs. ' : 'at '}${esc(g.opp)}</b></td><td class="n">${g.pts}-${g.oppPts}</td><td class="n">${f(g.pace, 0)}</td><td class="n">${f(g.ortg)}</td><td class="n">${f(g.drtg)}</td><td class="n">${f(g.efg)}</td><td class="n">${f(g.oppEfg)}</td><td class="n">${f(g.tov)}</td><td class="n">${f(g.orb)}</td><td class="n">${f(g.ftr)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}
       <p class="dim small">Advanced stats: <a href="https://collegebasketballdata.com" target="_blank" rel="noopener">Data provided by CollegeBasketballData.com</a>${C.updated ? ' · updated ' + fmtDate(C.updated, { month: 'short', day: 'numeric' }) : ''}. Regular-season games only.</p></div>`;
+  }
+
+  /* ---------- women's basketball box-score analytics (data/wbb-box.js, built from SportsDataverse/wehoop box scores) ---------- */
+  function wbbBoxSection() {
+    const C = window.SITE_WBBBOX; if (!C || !C.players || !C.players.length) return '';
+    const f = (v, d = 1) => v == null ? '—' : (+v).toFixed(d);
+    const T = C.team || {}, us = T.us || {}, op = T.opp || {};
+    const ff = [['Effective FG%', 'efg', 1], ['Turnover %', 'tov', 1], ['Offensive rebound %', 'orb', 1], ['Free throw rate', 'ftr', 1], ['True shooting %', 'ts', 1],
+      ['Points per 100 possessions', 'rating', 1], ['FG%', 'fg', 1], ['3PT%', 'tp', 1], ['FT%', 'ft', 1], ['Rebounds', 'reb', 0], ['Assists', 'ast', 0], ['Steals', 'stl', 0], ['Blocks', 'blk', 0], ['Turnovers', 'tov_n', 0]];
+    const players = C.players.slice().sort((a, b) => (b.min || 0) - (a.min || 0));
+    const cols = [['G', 'g', 0], ['MPG', 'mpg', 1], ['PPG', 'ppg', 1], ['RPG', 'rpg', 1], ['APG', 'apg', 1], ['eFG%', 'efg', 1], ['TS%', 'ts', 1], ['A/TO', 'ato', 2], ['Usage%', 'usg', 1], ['AST%', 'astp', 1], ['TRB%', 'trbp', 1], ['Pts/40', 'p40', 1]];
+    const games = (C.games || []).slice().reverse();
+    const names = Object.keys(C.logs || {}).sort((a, b) => ((players.find(p => p.name === b) || {}).min || 0) - ((players.find(p => p.name === a) || {}).min || 0));
+    const logTable = n => {
+      const L = (C.logs || {})[n] || [];
+      return `<div class="tablewrap"><table class="mini"><thead><tr><th>Date</th><th>Opponent</th><th class="n">Min</th><th class="n">Pts</th><th class="n">Reb</th><th class="n">Ast</th><th class="n">Stl</th><th class="n">Blk</th><th class="n">TO</th><th class="n">FG</th><th class="n">3PT</th><th class="n">FT</th></tr></thead>
+        <tbody>${L.map(g => `<tr><td class="num">${fmtDate(g.date, { month: 'short', day: 'numeric' })}</td><td><b>${g.site === 'A' ? 'at ' : g.site === 'N' ? 'vs. ' : ''}${esc(g.opp)}</b>${g.start ? ' <span class="dim small">(S)</span>' : ''}</td><td class="n">${g.min}</td><td class="n"><b>${g.pts}</b></td><td class="n">${g.reb}</td><td class="n">${g.ast}</td><td class="n">${g.stl}</td><td class="n">${g.blk}</td><td class="n">${g.tov}</td><td class="n">${esc(g.fg)}</td><td class="n">${esc(g.tp)}</td><td class="n">${esc(g.ft)}</td></tr>`).join('')}</tbody></table></div>`;
+    };
+    window.vicWbbLog = sel => { const box = document.getElementById('wbbLog'); if (box) box.innerHTML = logTable(sel.value); };
+    return `<div class="section"><h3>Team four factors <small>${esc(C.season)} · through ${T.games || 0} game${T.games === 1 ? '' : 's'}${T.pace ? ' · pace ' + f(T.pace) + ' possessions per 40 min' : ''}</small></h3>
+        <p class="dim small">The four factors (shooting, turnovers, rebounding and free throws) explain most of what wins basketball games. Possessions are estimated from the box score, and early-season numbers move a lot from game to game.</p>
+        <div class="tablewrap"><table class="mini"><thead><tr><th>Stat</th><th class="n">Tennessee</th><th class="n">Opponents</th></tr></thead>
+        <tbody>${ff.map(([l, k, d]) => `<tr><td>${esc(l)}</td><td class="n"><b>${f(us[k], d)}</b></td><td class="n">${f(op[k], d)}</td></tr>`).join('')}</tbody></table></div></div>
+      <div class="section"><h3>Player advanced stats <small>${esc(C.season)} · sorted by minutes</small></h3>
+        <div class="tablewrap"><table class="mini"><thead><tr><th>Player</th><th>Pos</th>${cols.map(c => `<th class="n">${esc(c[0])}</th>`).join('')}</tr></thead>
+        <tbody>${players.map(p => `<tr><td><a href="#" data-sp="${esc(p.name)}"><b>${esc(p.name)}</b></a></td><td>${esc(p.pos || '')}</td>${cols.map(([, k, d]) => `<td class="n">${f(p[k], d)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+        <details class="box gloss"><summary>What do these numbers mean?</summary><dl>
+          <dt>eFG% / TS%</dt><dd>Shooting efficiency. eFG% credits threes as worth 1.5 twos; TS% also counts free throws.</dd>
+          <dt>A/TO</dt><dd>Assists per turnover.</dd>
+          <dt>Usage%</dt><dd>The share of the team's possessions a player ends (shot, turnover or free throws) while on the floor.</dd>
+          <dt>AST% / TRB%</dt><dd>The share of teammates' baskets a player assisted, and the share of all available rebounds a player grabbed, while on the floor.</dd>
+          <dt>Pts/40</dt><dd>Points scored per 40 minutes, which puts starters and bench players on the same scale.</dd></dl></details></div>
+      ${names.length ? `<div class="section"><h3>Player game logs <small>Every game this season</small></h3>
+        <div class="controls" style="margin-bottom:10px"><select aria-label="Choose a player" onchange="window.vicWbbLog(this)">${names.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('')}</select></div>
+        <div id="wbbLog">${logTable(names[0])}</div></div>` : ''}
+      ${games.length ? `<div class="section"><h3>Game-by-game efficiency</h3><div class="tablewrap"><table class="mini"><thead><tr><th>Date</th><th>Opponent</th><th class="n">Score</th><th class="n">Pace</th><th class="n">ORtg</th><th class="n">DRtg</th><th class="n">eFG%</th><th class="n">Opp eFG%</th><th class="n">TO%</th><th class="n">OREB%</th><th class="n">FT rate</th></tr></thead>
+        <tbody>${games.map(g => `<tr><td class="num">${fmtDate(g.date, { month: 'short', day: 'numeric' })}</td><td><b>${g.site === 'A' ? 'at ' : g.site === 'N' ? 'vs. ' : ''}${esc(g.opp)}</b></td><td class="n">${g.pts}-${g.oppPts}</td><td class="n">${f(g.pace, 0)}</td><td class="n">${f(g.ortg)}</td><td class="n">${f(g.drtg)}</td><td class="n">${f(g.efg)}</td><td class="n">${f(g.oppEfg)}</td><td class="n">${f(g.tov)}</td><td class="n">${f(g.orb)}</td><td class="n">${f(g.ftr)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}
+      <p class="dim small">Box scores: <a href="https://wehoop.sportsdataverse.org/" target="_blank" rel="noopener">SportsDataverse (wehoop)</a>, ESPN data${C.through ? ' through ' + fmtDate(C.through, { month: 'short', day: 'numeric' }) : ''}. Advanced numbers are calculated by The Vol Index from the box scores.</p>`;
   }
 
   /* ---------- recruiting ---------- */

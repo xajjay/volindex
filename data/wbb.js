@@ -1234,6 +1234,11 @@ window.SITE.wbb = {
  },
  "sources": [
   [
+   "Box-score advanced stats and game logs",
+   "SportsDataverse (wehoop)",
+   "https://wehoop.sportsdataverse.org/"
+  ],
+  [
    "Roster, schedule",
    "utsports.com",
    "https://utsports.com/sports/womens-basketball/roster"

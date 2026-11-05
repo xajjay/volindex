@@ -146,6 +146,26 @@ def check_cbbd(t, findings):
         findings.append(("warn", "mbb", f"CBBD has a newer AP poll ({ap[-1]['date']}, #{ap[-1].get('rank')}) than the site shows ({site['date']})."))
 
 
+def check_wbb(t, findings):
+    """Women's basketball box-score analytics (SportsDataverse): refreshed daily in season, and not lagging the site's results."""
+    if not in_window(t, SEASON_WINDOW["wbb"]): return
+    try:
+        x = open(os.path.join(DATA, "wbb-box.js"), encoding="utf-8").read()
+        c = json.loads(x.split("window.SITE_WBBBOX = ", 1)[1].rsplit(";", 1)[0])
+    except Exception:
+        c = None
+    if not c:
+        findings.append(("note", "wbb", "No women's box-score analytics yet (the source may not have this season's games, or the step was skipped).")); return
+    d = parse_date(c.get("updated"))
+    if d and (t - d).days > IN_SEASON_MAX_AGE:
+        findings.append(("warn", "wbb", f"Women's box-score analytics last refreshed {(t - d).days} days ago (the source may have stopped updating)."))
+    through = parse_date(c.get("through"))
+    played = [parse_date(g.get("date")) for g in (load_auto("wbb").get("schedule") or []) if g.get("result") and not g.get("exh")]
+    played = [p for p in played if p]
+    if through and played and (max(played) - through).days >= 3:
+        findings.append(("warn", "wbb", f"Women's box scores run through {through}, but the site has a result from {max(played)}. The source is behind."))
+
+
 def run():
     t = today()
     prev = last_counts()
@@ -190,6 +210,7 @@ def run():
                      "poll": poll.get("poll"), "pollDate": str(pdate) if pdate else None})
 
     check_cbbd(t, findings)
+    check_wbb(t, findings)
 
     # manual files
     manual_rows = []
