@@ -54,7 +54,7 @@
       if (b.dataset.del) { if (b.dataset.sure) { SD.deleteSlot(SPORT, +b.dataset.del); if (root.VI_CLOUD) root.VI_CLOUD.remove(SPORT, +b.dataset.del); landing(); } else { b.dataset.sure = 1; b.textContent = 'Tap again to delete'; } }
     };
     const imp = APP.querySelector('#sdImport');
-    imp.onchange = () => { const f = imp.files[0]; if (!f) return; SD.importFile(f).then(g => { if (g.sport !== SPORT) { V.msg = 'That save is for another sport.'; return landing(); } g.slot = g.slot || 1; SD.saveSlot(g.slot); hub(); }).catch(err => { V.msg = 'Could not import: ' + err.message; landing(); }); };
+    imp.onchange = () => { const f = imp.files[0]; if (!f) return; SD.importFile(f).then(g => { if (g.sport !== SPORT) { SD.G = null; V.msg = 'That is a ' + ({ mbb: "men's basketball", wbb: "women's basketball", baseball: 'baseball', softball: 'softball' }[g.sport] || 'different sport') + ' save. Import it on that sport\'s dynasty page.'; return landing(); } g.slot = g.slot || 1; SD.saveSlot(g.slot); hub(); }).catch(err => { V.msg = 'Could not import: ' + err.message; landing(); }); };
   }
   function blurb(sp) {
     return sp.kind === 'hoops' ? `Take over ${sp.he === 'she' ? 'the Lady Vols' : 'Tennessee'} with the real ${sp.label(sp.season)} roster and schedule. Coach the games possession by possession on a live court (pace, defense, focus, timeouts, your rotation), recruit, work the portal and NIL, and chase the SEC title and March Madness.`

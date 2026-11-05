@@ -33,7 +33,7 @@
     if (!bytes) { const b64 = root.localStorage.getItem('vi-sdyn-' + sport + n); if (!b64) return null; const s = root.atob(b64), a = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) a[i] = s.charCodeAt(i); bytes = a; }
     return gunzip(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)).then(txt => SD.fromText(txt));
   });
-  SD.fromText = txt => { const g = JSON.parse(txt); if (!g || g.v !== SD.VERSION || !g.teams) throw new Error('Not a save from this version.'); g.fx = g.fx || {};
+  SD.fromText = txt => { const g = JSON.parse(txt); if (g && !g.sport && g.startSeason) throw new Error('That is a football dynasty save. Import it on the Football dynasty page.'); if (!g || g.v !== SD.VERSION || !g.teams) throw new Error('Not a save from this version.'); g.fx = g.fx || {};
     if (!g.fx.tr2) {   // personalities were too low: stretch every player to 65-99 around a low-80s average (ego is left alone)
       const f = tr => { if (!tr) return; for (const k in tr) if (k !== 'ego') tr[k] = Math.max(65, Math.min(99, Math.round(82 + (tr[k] - 70) * 0.9))); };
       Object.values(g.P || {}).forEach(p => p && f(p.tr)); if (g.recruit && g.recruit.pool) Object.values(g.recruit.pool).forEach(p => p && f(p.tr)); (g.guests ? Object.values(g.guests) : []).forEach(() => 0);

@@ -93,6 +93,7 @@
   };
   DY.fromText = txt => {
     const g = JSON.parse(txt);
+    if (g && g.sport) throw new Error('That is a ' + ({ mbb: "men's basketball", wbb: "women's basketball", baseball: 'baseball', softball: 'softball' }[g.sport] || g.sport) + ' dynasty save. Import it on that sport\'s dynasty page.');
     if (!g || g.v !== DY.VERSION || !g.teams) throw new Error('Not a dynasty save from this version.');
     DY.G = g; DY.seed(g.rs || g.seed);
     if (DY.seedPast) DY.seedPast(g);
