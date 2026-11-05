@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-03. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-05. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-03",
+ "updated": "2026-11-05",
  "team": {
   "record": "6-2",
   "sec": "3-2",
@@ -143,7 +143,7 @@ window.SITE_AUTO.football = {
    ],
    "oRushYpg": [
     122.9,
-    36,
+    37,
     9
    ],
    "oPassYpg": [
@@ -1167,7 +1167,7 @@ window.SITE_AUTO.football = {
    "Amare Campbell": [
     {
      "stat": "Tackles for loss",
-     "rank": 48
+     "rank": 49
     }
    ],
    "Tyree Weathersby": [
@@ -1193,19 +1193,19 @@ window.SITE_AUTO.football = {
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 34
+     "rank": 37
     }
    ],
    "Ty Redmond": [
     {
      "stat": "Passes defended",
-     "rank": 3
+     "rank": 4
     }
    ],
    "Dejuan Lane": [
     {
      "stat": "Interceptions",
-     "rank": 16
+     "rank": 17
     }
    ],
    "Kayin Lee": [
@@ -1217,7 +1217,7 @@ window.SITE_AUTO.football = {
    "Mike Matthews": [
     {
      "stat": "Receiving yards",
-     "rank": 61
+     "rank": 64
     }
    ],
    "DeSean Bishop": [
@@ -1473,8 +1473,8 @@ window.SITE_AUTO.football = {
    "kick": "2026-11-07T23:15Z",
    "line": "TENN -6.5",
    "ou": 50.5,
-   "ml": "-245",
-   "book": "DraftKings",
+   "ml": "-238",
+   "book": "Draft Kings",
    "win": 66.8
   },
   "Texas A&M": {
@@ -1556,7 +1556,7 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     9.0,
-    108,
+    110,
     14,
     false
    ],
@@ -1565,7 +1565,7 @@ window.SITE_AUTO.football = {
     "Interceptions thrown",
     "Passing",
     4.0,
-    32,
+    31,
     3,
     true
    ],
@@ -1574,7 +1574,7 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     20.0,
-    107,
+    105,
     11,
     true
    ],
@@ -1628,7 +1628,7 @@ window.SITE_AUTO.football = {
     "First downs per game",
     "Downs",
     22.4,
-    32,
+    31,
     5,
     false
    ],
@@ -1655,7 +1655,7 @@ window.SITE_AUTO.football = {
     "Penalty yards per game",
     "Downs",
     62.1,
-    93,
+    92,
     8,
     true
    ],
@@ -1664,7 +1664,7 @@ window.SITE_AUTO.football = {
     "Time of possession per game (min)",
     "Downs",
     31.3,
-    39,
+    38,
     5,
     false
    ],
@@ -1673,7 +1673,7 @@ window.SITE_AUTO.football = {
     "Turnovers lost",
     "Downs",
     11.0,
-    73,
+    71,
     4,
     true
    ],
@@ -1700,7 +1700,7 @@ window.SITE_AUTO.football = {
     "Yards per play allowed",
     "Yards allowed",
     4.69,
-    19,
+    20,
     4,
     true
    ],
@@ -1727,7 +1727,7 @@ window.SITE_AUTO.football = {
     "Opponent completion %",
     "Pass defense",
     62.3,
-    78,
+    80,
     8,
     true
    ],
@@ -1754,7 +1754,7 @@ window.SITE_AUTO.football = {
     "Rushing yards allowed per game",
     "Run defense",
     122.9,
-    36,
+    37,
     9,
     true
    ],
@@ -1781,7 +1781,7 @@ window.SITE_AUTO.football = {
     "Takeaways",
     "Run defense",
     14.0,
-    13,
+    14,
     4,
     false
    ],
@@ -1790,7 +1790,7 @@ window.SITE_AUTO.football = {
     "Turnover margin",
     "Run defense",
     3.0,
-    35,
+    36,
     5,
     false
    ],
