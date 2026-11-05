@@ -9,7 +9,7 @@ window.SITE.mbb = {
  "name": "Men's Basketball",
  "short": "Men's Hoops",
  "season": "2026-27",
- "updated": "2026-11-04",
+ "updated": "2026-11-05",
  "venue": "Food City Center",
  "prevLabel": "2025-26",
  "header": [
@@ -34,8 +34,8 @@ window.SITE.mbb = {
   "Coming off a <b>25-12</b> season and a third straight <b>Elite Eight</b> (lost to Michigan).",
   "Preseason polls: <b>No. 8</b> in the AP Top 25 (third-highest preseason AP spot in program history) and <b>No. 9</b> in the coaches poll. Seven SEC teams are ranked, led by No. 1 Florida.",
   "A near-total reload: Rick Barnes added <b>seven double-digit scorers</b> from the portal, led by Wake Forest's <b>Juke Harris</b> (21.4 ppg), the only newcomer on the preseason First Team All-SEC.",
-  "Exhibitions went badly: an <b>86-70</b> home loss to Xavier and a <b>103-64</b> loss at No. 2 Duke. <b>Terrence Hill Jr.</b> hurt his ankle early at Duke; <b>Jalen Washington</b> is still awaiting eligibility and <b>Tyler Lundblade</b> hasn't played yet (back).",
-  "The opener was <b>Nov. 3 vs. Wofford</b> (SEC Network); Michigan State visits Nov. 17."
+  "Exhibitions went badly: an <b>86-70</b> home loss to Xavier and a <b>103-64</b> loss at No. 2 Duke. <b>Terrence Hill Jr.</b> hurt his ankle early at Duke; <b>Jalen Washington</b> is still awaiting eligibility.",
+  "Opener: a <b>90-59 win over Wofford</b> (Nov. 3, 18,389 at Food City Center). <b>DeWayne Brown II</b> had 17 points and 17 rebounds, <b>Terrence Hill Jr.</b> 17 points off the bench, and <b>Tyler Lundblade</b>, who missed the exhibitions, started and scored 12. Radford visits Nov. 9; Michigan State Nov. 17."
  ],
  "staff": [
   [

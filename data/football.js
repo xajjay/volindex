@@ -3,7 +3,7 @@ window.SITE = window.SITE || {};
 window.SITE.football = {
  "sport": "football",
  "season": 2026,
- "updated": "2026-10-12",
+ "updated": "2026-11-05",
  "team": {
   "record": "5-1",
   "sec": "2-1",
@@ -701,7 +701,7 @@ window.SITE.football = {
    "natRanks": [],
    "draft": {
     "level": "Watch",
-    "note": "Consensus No. 863 (10 mocks); team leader in tackles"
+    "note": "Consensus No. 258 (NFL Mock Draft Database, 11 mocks); team leader in tackles"
    },
    "leaving": false,
    "on3Dropped": "Dropped out of the On3 Top 300 in the Oct. 12 update (was No. 258)"
@@ -769,7 +769,7 @@ window.SITE.football = {
    "natRanks": [],
    "draft": {
     "level": "Watch",
-    "note": "Consensus No. 306; senior with a 5th year available"
+    "note": "Consensus No. 371 (NFL Mock Draft Database, 2 mocks); senior with a 5th year available"
    },
    "leaving": false
   },
@@ -970,12 +970,12 @@ window.SITE.football = {
     }
    },
    "rating": {
-    "src": "on3",
-    "rank": 23,
-    "grade": 98,
-    "stars": 5,
-    "prevRank": 35,
-    "label": "On3 Top 300 · No. 23 (up 12 from No. 35, Oct. 12 update)"
+       "src": "on3",
+       "rank": 12,
+       "grade": 98,
+       "stars": 5,
+       "prevRank": 23,
+       "label": "On3 Top 300 · No. 12 (up 11 from No. 23, Nov. 5 update)"
    },
    "elig": "RS SO/TR",
    "career": {
@@ -1005,7 +1005,7 @@ window.SITE.football = {
    ],
    "draft": {
     "level": "High",
-    "note": "Consensus big board No. 54, projected Round 2 (NFL Mock Draft Database); No. 6 nationally in TFL"
+    "note": "Consensus No. 19, projected Round 1 (NFL Mock Draft Database, 54 mocks); No. 6 on Mel Kiper's big board (Nov. 4); No. 7 overall to the Saints in The Athletic's Oct. 30 mock; No. 53 on NFL Draft Buzz"
    },
    "leaving": false
   },
@@ -1162,10 +1162,11 @@ window.SITE.football = {
     ]
    },
    "rating": {
-    "src": "247",
-    "grade": 97,
-    "stars": 4,
-    "label": "247 Composite (HS)"
+       "src": "on3",
+       "rank": 278,
+       "grade": 91,
+       "stars": 4,
+       "label": "On3 Top 300 · No. 278 (new to the Top 300, Nov. 5 update)"
    },
    "elig": "JR",
    "career": {
@@ -1209,7 +1210,7 @@ window.SITE.football = {
    ],
    "draft": {
     "level": "Medium",
-    "note": "Consensus No. 131, projected Round 4; in 9 mock drafts"
+    "note": "Consensus No. 126, projected Round 4 (NFL Mock Draft Database, 15 mocks)"
    },
    "leaving": false
   },
@@ -1243,12 +1244,12 @@ window.SITE.football = {
     }
    },
    "rating": {
-    "src": "on3",
-    "rank": 187,
-    "grade": 92,
-    "stars": 4,
-    "prevRank": 177,
-    "label": "On3 Top 300 · No. 187 (down 10 from No. 177, Oct. 12 update)"
+       "src": "on3",
+       "rank": 233,
+       "grade": 91,
+       "stars": 4,
+       "prevRank": 187,
+       "label": "On3 Top 300 · No. 233 (down 46 from No. 187, Nov. 5 update)"
    },
    "elig": "SO",
    "career": {
@@ -1274,7 +1275,7 @@ window.SITE.football = {
    "natRanks": [],
    "future": {
     "year": 2028,
-    "rank": 16
+    "rank": 17
    },
    "leaving": false
   },
@@ -1353,7 +1354,7 @@ window.SITE.football = {
    "natRanks": [],
    "draft": {
     "level": "Watch",
-    "note": "Consensus No. 772; senior with a 5th year available"
+    "note": "Consensus No. 771 (NFL Mock Draft Database, 1 mock); senior with a 5th year available"
    },
    "leaving": false
   },
@@ -1397,7 +1398,7 @@ window.SITE.football = {
    "natRanks": [],
    "future": {
     "year": 2029,
-    "rank": 6
+    "rank": 4
    },
    "leaving": false
   },
@@ -1587,7 +1588,7 @@ window.SITE.football = {
    "natRanks": [],
    "draft": {
     "level": "Watch",
-    "note": "Consensus No. 218, projected Round 6; senior with a 5th year available"
+    "note": "Consensus No. 209, projected Round 6 (NFL Mock Draft Database, 10 mocks); senior with a 5th year available"
    },
    "leaving": false
   },
@@ -1869,7 +1870,7 @@ window.SITE.football = {
    "natRanks": [],
    "draft": {
     "level": "Watch",
-    "note": "Big year: Walter Camp National Defensive Player of the Week"
+    "note": "Consensus No. 140, projected Round 5 (NFL Mock Draft Database, 1 mock); Walter Camp National Defensive Player of the Week"
    },
    "leaving": false
   },
@@ -1930,6 +1931,10 @@ window.SITE.football = {
     }
    },
    "natRanks": [],
+   "future": {
+    "year": 2029,
+    "rank": 1
+   },
    "leaving": false
   },
   {
@@ -2265,7 +2270,7 @@ window.SITE.football = {
    "natRanks": [],
    "draft": {
     "level": "Watch",
-    "note": "Consensus No. 198, projected Round 6; NFL Draft Buzz No. 109"
+    "note": "Consensus No. 354 (NFL Mock Draft Database, 6 mocks); NFL Draft Buzz No. 109 (earlier this season)"
    },
    "leaving": false
   },
@@ -2319,7 +2324,7 @@ window.SITE.football = {
    "natRanks": [],
    "draft": {
     "level": "Medium",
-    "note": "Consensus No. 153, projected Round 5; No. 75 on CBS top 100"
+    "note": "Consensus No. 130, projected Round 4 (NFL Mock Draft Database, 18 mocks); No. 75 on CBS Sports' preseason top 100"
    },
    "leaving": false
   },
@@ -2536,12 +2541,12 @@ window.SITE.football = {
     ]
    },
    "rating": {
-    "src": "on3",
-    "rank": 103,
-    "grade": 94,
-    "stars": 4,
-    "prevRank": 102,
-    "label": "On3 Top 300 · No. 103 (down 1 from No. 102, Oct. 12 update)"
+       "src": "on3",
+       "rank": 28,
+       "grade": 98,
+       "stars": 5,
+       "prevRank": 103,
+       "label": "On3 Top 300 · No. 28 (up 75 from No. 103, Nov. 5 update)"
    },
    "elig": "RS JR",
    "career": {
@@ -2593,8 +2598,8 @@ window.SITE.football = {
     }
    ],
    "draft": {
-    "level": "Watch",
-    "note": "Consensus No. 319; among the national leaders in rushing yards"
+    "level": "Medium",
+    "note": "Consensus No. 155, projected Round 5 (NFL Mock Draft Database, 6 mocks); among the national leaders in rushing yards"
    },
    "leaving": false
   },
@@ -2628,12 +2633,12 @@ window.SITE.football = {
     }
    },
    "rating": {
-    "src": "on3",
-    "rank": 154,
-    "grade": 92,
-    "stars": 4,
-    "prevRank": 134,
-    "label": "On3 Top 300 · No. 154 (down 20 from No. 134, Oct. 12 update)"
+       "src": "on3",
+       "rank": 221,
+       "grade": 91,
+       "stars": 4,
+       "prevRank": 154,
+       "label": "On3 Top 300 · No. 221 (down 67 from No. 154, Nov. 5 update)"
    },
    "elig": "RS JR",
    "career": {
@@ -2673,7 +2678,7 @@ window.SITE.football = {
    ],
    "draft": {
     "level": "Watch",
-    "note": "Big year: 5.5 TFL, 4.5 sacks; On3 No. 134"
+    "note": "Big year: 5.5 TFL, 4.5 sacks; No. 221 in the On3 Top 300 (Nov. 5)"
    },
    "leaving": false
   },
@@ -3618,6 +3623,10 @@ window.SITE.football = {
     }
    },
    "natRanks": [],
+   "draft": {
+    "level": "Watch",
+    "note": "Consensus No. 290 (NFL Mock Draft Database, 1 mock)"
+   },
    "leaving": false
   },
   {
@@ -4747,14 +4756,7 @@ window.SITE.football = {
     "Preseason Coaches All-SEC 3rd team"
    ],
    "stats": {},
-   "rating": {
-    "src": "on3",
-    "rank": 265,
-    "grade": 91,
-    "stars": 4,
-    "prevRank": 244,
-    "label": "On3 Top 300 · No. 265 (down 21 from No. 244, Oct. 12 update)"
-   },
+   "rating": null,
    "elig": "SO",
    "career": {
     "2025": {
@@ -4770,9 +4772,10 @@ window.SITE.football = {
    "natRanks": [],
    "future": {
     "year": 2028,
-    "rank": 6
+    "rank": 9
    },
-   "leaving": false
+   "leaving": false,
+   "on3Dropped": "Dropped out of the On3 Top 300 in the Nov. 5 update (was No. 265)"
   },
   {
    "id": "ed-baker",
@@ -4824,7 +4827,7 @@ window.SITE.football = {
    "natRanks": [],
    "draft": {
     "level": "Medium",
-    "note": "No. 49 on CBS Sports top 100; consensus No. 254"
+    "note": "Consensus No. 163, projected Round 5 (NFL Mock Draft Database, 5 mocks); No. 49 on CBS Sports' preseason top 100"
    },
    "leaving": false
   },
@@ -7171,7 +7174,7 @@ window.SITE.football = {
   ],
   [
    "College player ratings",
-   "On3 Top 300, updated 10/12/2026",
+   "On3 Top 300, updated 11/05/2026",
    "https://www.on3.com/college/rankings/player/football/2026/"
   ],
   [

@@ -18,7 +18,7 @@ window.EXTRAS = {
     ratings: [
       ['SEC media preseason poll', 'No. 4', 'Predicted order, released Oct. 12, 2026. Florida 1st, Texas 2nd, Arkansas 3rd.', 'https://utsports.com/news/2026/10/12/mens-basketball-vols-voted-fourth-in-sec-by-media-harris-named-first-team-all-sec'],
       ['KenPom preseason', 'No. 18', 'Net rating +24.47 · offense No. 16 · defense No. 19 · tempo No. 297', 'https://kenpom.com/'],
-      ['Bart Torvik T-Rank projection', 'No. 15', 'Projected 21-9 (11-7 SEC) · adj. offense No. 8 · adj. defense No. 22', 'https://barttorvik.com/team.php?team=Tennessee&year=2027'],
+      ['Bart Torvik T-Rank', 'No. 17', 'Nov. 5, after 1 game (1-0) · Barthag .9197 · adj. offense 118.9 (No. 9) · adj. defense 96.2 (No. 22). Early-season numbers lean on preseason projections.', 'https://barttorvik.com/team.php?team=Tennessee&year=2027'],
       ['EvanMiya preseason', 'No. 18', 'No. 13 excluding players with pending eligibility · offense No. 30 · defense No. 14 · roster rank No. 31', 'https://evanmiya.com/?team_ratings'],
       ['Blue Ribbon Yearbook preseason top 25', 'No. 6', 'Preseason magazine ranking', 'https://www.rockytopinsider.com/'],
       ['CBS Sports Preseason Top 25 And 1', 'No. 15', 'Gary Parrish', 'https://www.cbssports.com/college-basketball/'],
@@ -32,7 +32,7 @@ window.EXTRAS = {
       intro: 'Preseason computer ratings from the three most-used college basketball models, plus EvanMiya player ratings and T-Rank player projections. These switch to in-season numbers once games start.',
       teams: [
         { src: 'KenPom', url: 'https://kenpom.com/', rank: 18, rating: '+24.47', off: ['119.8', 16], def: ['95.3', 19], extra: 'Adj. tempo 70.0 (No. 297)', date: 'Preseason' },
-        { src: 'Bart Torvik (T-Rank)', url: 'https://barttorvik.com/team.php?team=Tennessee&year=2027', rank: 15, rating: '.9197 Barthag', off: ['119.8', 8], def: ['96.9', 22], extra: 'Projected 21-9, 11-7 SEC · adj. tempo 69.0', date: 'Preseason' },
+        { src: 'Bart Torvik (T-Rank)', url: 'https://barttorvik.com/team.php?team=Tennessee&year=2027', rank: 17, rating: '.9197 Barthag', off: ['118.9', 9], def: ['96.2', 22], extra: 'In-season, after 1 game (1-0); still weighted toward preseason projections', date: 'Nov. 5' },
         { src: 'EvanMiya', url: 'https://evanmiya.com/?team_ratings', rank: 18, rating: '+20.1', off: ['+10.6', 30], def: ['+9.5', 14], extra: 'Roster rank No. 31 · No. 13 if pending-eligibility players are excluded', date: 'Preseason (May 29)' },
       ],
       confTitle: 'SEC by KenPom preseason rating',

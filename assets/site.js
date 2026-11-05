@@ -857,7 +857,7 @@ ${part('next')}
       <div class="section"><h3>NFL draft outlook <small>2027 consensus big board, mock drafts and big seasons</small></h3>
         <div class="box"><ul class="list">${prospects.map(p => `<li data-player="${esc(p.name)}" class="click-li"><b class="namecol">${esc(p.name)}</b><span class="grow dim">${p.pos} · ${clsLabel(p)} · ${esc(p.draft.note)}</span><span class="chip risk-${p.draft.level}">${p.draft.level}</span></li>`).join('')}</ul></div>
         ${future.length ? `<p class="dim small" style="margin-top:10px">Future first-round buzz: ${future.map(p => `<b>${esc(p.name)}</b> (No. ${p.future.rank} on the ${p.future.year} consensus board)`).join(', ')}.</p>` : ''}</div>
-      <div class="section"><h3>On3 Top 300 college players <small>Tennessee players ranked among the nation's best (updated Oct. 12; arrows show movement since Oct. 5)</small></h3>
+      <div class="section"><h3>On3 Top 300 college players <small>Tennessee players ranked among the nation's best (updated Nov. 5; arrows show movement since Oct. 12)</small></h3>
         <div class="grid g3">${P.filter(p => p.rating && p.rating.src === 'on3').sort((a, b) => a.rating.rank - b.rating.rank).map(p => pcard(p)).join('')}</div></div>`;
   }
 
