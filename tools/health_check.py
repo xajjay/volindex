@@ -123,6 +123,29 @@ def parse_date(s):
     except Exception: return None
 
 
+def load_cbbd():
+    try:
+        t = open(os.path.join(DATA, "mbb-cbbd.js"), encoding="utf-8").read()
+        return json.loads(t.split("window.SITE_CBBD = ", 1)[1].rsplit(";", 1)[0])
+    except Exception:
+        return None
+
+def check_cbbd(t, findings):
+    """Men's basketball advanced stats (CBBD): should refresh daily in season; its AP poll should match the site's."""
+    c = load_cbbd()
+    if not in_window(t, SEASON_WINDOW["mbb"]): return
+    if not c:
+        findings.append(("note", "mbb", "No CBBD advanced stats yet (add the CBBD_API_KEY secret, or the API had no data).")); return
+    d = parse_date(c.get("updated"))
+    if d and (t - d).days > IN_SEASON_MAX_AGE:
+        findings.append(("warn", "mbb", f"CBBD advanced stats last refreshed {(t - d).days} days ago."))
+    site = (load_auto("mbb").get("poll") or {})
+    ap = [p for p in c.get("polls", []) if p.get("poll") == "AP Top 25"]
+    if ap and site.get("rank") not in (None, "NR") and parse_date(ap[-1].get("date")) and parse_date(site.get("date")) \
+            and parse_date(ap[-1]["date"]) > parse_date(site["date"]) and POLL_WINDOW.get("mbb") and in_window(t, POLL_WINDOW["mbb"]):
+        findings.append(("warn", "mbb", f"CBBD has a newer AP poll ({ap[-1]['date']}, #{ap[-1].get('rank')}) than the site shows ({site['date']})."))
+
+
 def run():
     t = today()
     prev = last_counts()
@@ -165,6 +188,8 @@ def run():
                 findings.append(("warn", s, f"{poll.get('poll', 'Poll')} on the site is dated {pdate} ({(t - pdate).days} days old). A newer poll should be out."))
         rows.append({"key": s, "updated": str(upd) if upd else None, "ageDays": age, "games": n,
                      "poll": poll.get("poll"), "pollDate": str(pdate) if pdate else None})
+
+    check_cbbd(t, findings)
 
     # manual files
     manual_rows = []

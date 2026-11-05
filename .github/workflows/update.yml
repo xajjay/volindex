@@ -41,6 +41,11 @@ jobs:
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
         run: python tools/update_data.py --auto ${{ (inputs.force || github.event_name == 'push') && '--force' || '' }} ${{ github.event.schedule == '7,22,37,52 16-23,0-7 * * *' && '--gameday' || '' }}
+      - name: Update men's basketball advanced stats (CBBD)
+        continue-on-error: true      # optional extra data: never block the rest of the update
+        env:
+          CBBD_API_KEY: ${{ secrets.CBBD_API_KEY }}
+        run: python tools/update_cbbd.py ${{ github.event.schedule == '7,22,37,52 16-23,0-7 * * *' && '--gameday' || '' }}
       - name: Check that the data is actually fresh
         # Only on the morning run, a manual run or an updater change; not on every 15-minute game-night run.
         if: github.event.schedule != '7,22,37,52 16-23,0-7 * * *'

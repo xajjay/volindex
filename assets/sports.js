@@ -508,7 +508,38 @@
         <tbody>${A.pearGames.map(g => `<tr><td class="num">${fmtDate(g[0], { month: 'short', day: 'numeric' })}</td><td><b>${esc(g[1])}</b></td><td class="n">${g[2]}</td><td><span class="winbar"><i style="width:${g[3]}%"></i></span> <b class="num">${g[3].toFixed(1)}%</b></td></tr>`).join('')}</tbody></table></div></div>` : ''}
       ${(rows => rows.length ? `<div class="section"><h3>Polls & rankings <small>Media polls, preseason rankings and other ratings</small></h3><div class="tablewrap"><table><thead><tr><th>Source</th><th class="n">Tennessee</th><th>Notes</th></tr></thead>
         <tbody>${rows.map(r => `<tr><td><a href="${esc(r[3])}" target="_blank" rel="noopener"><b>${esc(r[0])}</b></a></td><td class="n"><b>${esc(r[1])}</b></td><td class="dim">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div></div>` : '')(ratingRows(D).filter(r => !A.teams.some(t => r[0].toLowerCase().split(' ')[0] === t.src.toLowerCase().split(' ')[0] && !/poll|projected/i.test(r[0]))))}
+      ${D.key === 'mbb' ? cbbdSection() : ''}
       ${A.glossary ? `<details class="box gloss"><summary>What do these numbers mean?</summary><dl>${A.glossary.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></details>` : ''}`;
+  }
+
+  /* ---------- men's basketball advanced stats (data/mbb-cbbd.js, from CollegeBasketballData.com) ---------- */
+  function cbbdSection() {
+    const C = window.SITE_CBBD; if (!C || !C.players || !C.players.length) return '';
+    const f = (v, d = 1) => v == null ? '—' : (+v).toFixed(d);
+    const T = C.team || {}, us = T.us || {}, op = T.opp || {};
+    const ff = [['Effective FG%', 'efg', 1, true], ['Turnover %', 'tov', 1, false], ['Offensive rebound %', 'orb', 1, true], ['Free throw rate', 'ftr', 1, true],
+      ['True shooting %', 'ts', 1, true], ['Points per 100 possessions', 'rating', 1, true], ['FG%', 'fg', 1, true], ['3PT%', 'tp', 1, true], ['FT%', 'ft', 1, true],
+      ['Points in the paint', 'paint', 0, true], ['Fast-break points', 'fast', 0, true], ['Points off turnovers', 'offTov', 0, true]];
+    const players = C.players.slice().sort((a, b) => (b.min || 0) - (a.min || 0));
+    const cols = [['G', 'g', 0], ['MPG', 'mpg', 1], ['PPG', 'ppg', 1], ['ORtg', 'ortg', 1], ['DRtg', 'drtg', 1], ['Net', 'net', 1], ['Usage%', 'usg', 1], ['eFG%', 'efg', 1], ['TS%', 'ts', 1], ['A/TO', 'ato', 2], ['PORPAG', 'porpag', 1], ['Win shares', 'ws', 1]];
+    const games = (C.games || []).slice().reverse();
+    return `<div class="section"><h3>Team four factors <small>${esc(C.season)} · through ${T.games || 0} game${T.games === 1 ? '' : 's'}${T.pace ? ' · pace ' + f(T.pace) + ' possessions' : ''}</small></h3>
+        <p class="dim small">The four factors (shooting, turnovers, rebounding and free throws) explain most of what wins basketball games. Early-season numbers move a lot from one game to the next.</p>
+        <div class="tablewrap"><table class="mini"><thead><tr><th>Stat</th><th class="n">Tennessee</th><th class="n">Opponents</th></tr></thead>
+        <tbody>${ff.map(([l, k, d]) => `<tr><td>${esc(l)}</td><td class="n"><b>${f(us[k], d)}</b></td><td class="n">${f(op[k], d)}</td></tr>`).join('')}</tbody></table></div></div>
+      <div class="section"><h3>Player advanced stats <small>${esc(C.season)} · sorted by minutes</small></h3>
+        <div class="tablewrap"><table class="mini"><thead><tr><th>Player</th><th>Pos</th>${cols.map(c => `<th class="n">${esc(c[0])}</th>`).join('')}</tr></thead>
+        <tbody>${players.map(p => `<tr><td><a href="#" data-sp="${esc(p.name)}"><b>${esc(p.name)}</b></a></td><td>${esc(p.pos || '')}</td>${cols.map(([, k, d]) => `<td class="n">${f(p[k], d)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+        <details class="box gloss"><summary>What do these numbers mean?</summary><dl>
+          <dt>ORtg / DRtg / Net</dt><dd>Points the team scores and allows per 100 possessions while the player is on the floor, and the difference. Ratings from a few minutes are not meaningful.</dd>
+          <dt>Usage%</dt><dd>The share of the team's possessions a player ends (shot, turnover or free throws) while on the floor.</dd>
+          <dt>eFG% / TS%</dt><dd>Shooting efficiency. eFG% credits threes as worth 1.5 twos; TS% also counts free throws.</dd>
+          <dt>A/TO</dt><dd>Assists per turnover.</dd>
+          <dt>PORPAG</dt><dd>Points over replacement per adjusted game, a catch-all value stat.</dd>
+          <dt>Win shares</dt><dd>An estimate of how many wins a player has produced.</dd></dl></details></div>
+      ${games.length ? `<div class="section"><h3>Game-by-game efficiency</h3><div class="tablewrap"><table class="mini"><thead><tr><th>Date</th><th>Opponent</th><th class="n">Score</th><th class="n">Pace</th><th class="n">ORtg</th><th class="n">DRtg</th><th class="n">eFG%</th><th class="n">Opp eFG%</th><th class="n">TO%</th><th class="n">OREB%</th><th class="n">FT rate</th></tr></thead>
+        <tbody>${games.map(g => `<tr><td class="num">${fmtDate(g.date, { month: 'short', day: 'numeric' })}</td><td><b>${g.home ? '' : g.neutral ? 'vs. ' : 'at '}${esc(g.opp)}</b></td><td class="n">${g.pts}-${g.oppPts}</td><td class="n">${f(g.pace, 0)}</td><td class="n">${f(g.ortg)}</td><td class="n">${f(g.drtg)}</td><td class="n">${f(g.efg)}</td><td class="n">${f(g.oppEfg)}</td><td class="n">${f(g.tov)}</td><td class="n">${f(g.orb)}</td><td class="n">${f(g.ftr)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}
+      <p class="dim small">Advanced stats: <a href="https://collegebasketballdata.com" target="_blank" rel="noopener">Data provided by CollegeBasketballData.com</a>${C.updated ? ' · updated ' + fmtDate(C.updated, { month: 'short', day: 'numeric' }) : ''}. Regular-season games only.</p></div>`;
   }
 
   /* ---------- recruiting ---------- */
