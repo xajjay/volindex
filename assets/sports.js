@@ -93,6 +93,8 @@
             gid: g.id, hasBox: !!((A.box && A.box[String(g.id)]) || (A.boxIds && A.boxIds.includes(String(g.id)))), watch: g.watch, live: g.live, event: g.tournament, note: g.note,
           });
         });
+        // Basketball: once the real season has started (a regular-season game has a result), the exhibitions drop off the schedule.
+        if ((D.key === 'mbb' || D.key === 'wbb') && D.schedule.some(g => g.result && g.kind !== 'exh')) D.schedule = D.schedule.filter(g => g.kind !== 'exh');
         setRecord(D);
       }
       if (A.stats) D.statsAuto = A.stats;
