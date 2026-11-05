@@ -148,6 +148,8 @@
     return out;
   };
   M.tick = A => { const g = A.g(); if (!M.on(g)) return []; M.update(A, 0.35);
+    // older saves: a redshirt promise no longer exists
+    A.roster().forEach(p => { if (p.pr && p.pr.type === 'redshirt') p.pr = null; if (p.rpromise === 'redshirt') p.rpromise = null; });
     // a request for a job he has since won is moot
     A.roster().forEach(p => { if (p.ask && p.ask.open && (p.ask.type === 'start' || p.ask.type === 'rot') && A.role(p).start) { p.ask.open = false; p.ask.moot = true; } });
     return M.concerns(A); };
@@ -215,8 +217,8 @@
   M.nilMult = (g, p) => { if (!M.on(g)) return 1; return clamp(1 + (55 - mor(p)) / 90 - (rel(p) - 50) / 200, 0.5, 1.8); };
   M.nilSlack = (g, p) => (M.on(g) ? clamp((rel(p) - 50) / 200, -0.2, 0.25) : 0);   // loyal, trusting players accept a lower number before they ask
   // recruiting promises: a prospect weighs what you offer him more when your word is good, and big prospects care most
-  M.RP_TYPES = ['start', 'rot', 'focal', 'redshirt'];
-  M.recruitMult = (g, type, stars) => { if (!M.on(g) || !type) return 1; const t = M.state(g).trust; return 1 + (M.TYPES[type].boost / 100) * (0.5 + t / 100) * (0.7 + 0.15 * (stars || 3)); };
+  M.RP_TYPES = ['start', 'rot', 'focal'];   // no redshirt promise: there are no redshirt years
+  M.recruitMult = (g, type, stars) => { if (!M.on(g) || !type || type === 'redshirt') return 1; const t = M.state(g).trust; return 1 + (M.TYPES[type].boost / 100) * (0.5 + t / 100) * (0.7 + 0.15 * (stars || 3)); };
   M.setRP = (g, pool, p, type, canFocal) => {
     if (!M.on(g)) return 'The locker room is switched off in Settings.';
     if (!type) { p.rpromise = null; return 'Promise withdrawn.'; }
@@ -225,5 +227,5 @@
     if (n >= 3) return 'You already have three recruiting promises out. Withdraw one first. They are binding once he signs.';
     p.rpromise = type; return `Promised ${p.n}: ${M.TYPES[type].name.toLowerCase()}. It counts if he signs, and he will hold you to it.`;
   };
-  M.signed = (g, p, type) => { if (!M.on(g)) return; p.mor = 74; p.rel = 55 + (type ? 8 : 0); if (type) p.pr = { type, amt: 0, st: 'open', yr: g.season + 1, recruit: true }; p.rpromise = null; };
+  M.signed = (g, p, type) => { if (!M.on(g)) return; if (type === 'redshirt') type = null; p.mor = 74; p.rel = 55 + (type ? 8 : 0); if (type) p.pr = { type, amt: 0, st: 'open', yr: g.season + 1, recruit: true }; p.rpromise = null; };
 })(typeof window !== 'undefined' ? window : globalThis);
