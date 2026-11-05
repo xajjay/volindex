@@ -1472,7 +1472,7 @@ window.SITE_AUTO.football = {
    "tv": "ESPN",
    "kick": "2026-11-07T23:15Z",
    "line": "TENN -6.5",
-   "ou": 50.5,
+   "ou": 49.5,
    "ml": "-238",
    "book": "DraftKings",
    "win": 66.8
