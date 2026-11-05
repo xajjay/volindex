@@ -25,7 +25,7 @@ GAME_DESC = {"run": "Draft Vols from every era at their best season, then play a
 html = open(os.path.join(site, "index.html"), encoding="utf-8").read()
 if "<base " not in html:
     html = html.replace("<head>", '<head>\n<base href="/">', 1)
-DEFAULT_IMG = ORIGIN + "/assets/og-image.png"
+DEFAULT_IMG = ORIGIN + "/assets/og-image-v2.png"
 GAMES_IMG = ORIGIN + "/assets/og-games.png"
 pages = []   # (path, priority) for sitemap
 
@@ -54,7 +54,7 @@ def page(rel, title, desc, img=DEFAULT_IMG, ld=None, priority="0.6", body=None):
 ORG = {"@context": "https://schema.org", "@type": "WebSite", "name": "The Vol Index", "url": ORIGIN + "/",
        "description": "Tennessee athletics in one place: schedules, rosters, depth charts, stats, recruiting, history and daily games."}
 page("", "The Vol Index · Tennessee athletics, all in one place",
-     "Every Vols sport in one free hub: schedules, scores, rosters, depth charts, stats, recruiting, history and daily Vol games.", ld=ORG, priority="1.0")
+     "Every major Vols team sport in one free hub: schedules, scores, rosters, depth charts, stats, recruiting, history and daily Vol games.", ld=ORG, priority="1.0")
 for slug, name in SPORTS.items():
     page(slug, f"Tennessee {name} · The Vol Index", f"Tennessee {name.lower()}: schedule, scores, roster, stats, rankings and history, updated after every game.", priority="0.9")
     for t, tl in TABS.items():
