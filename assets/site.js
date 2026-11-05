@@ -194,7 +194,21 @@
         <div class="box" style="padding:16px 18px"><h3>Home page rankings</h3>${list(POLL_SOURCES)}</div>
         <div class="box" style="padding:16px 18px"><h3>Football</h3>${list(F.sources.concat((F.records && F.records.source) || []))}</div>
         ${sports.map(s => `<div class="box" style="padding:16px 18px"><h3>${esc(s.name)}</h3>${list(window.SITE[s.key].sources.map(x => Array.isArray(x) ? x : [x.label || x.name || '', x.site || x.name || x.url, x.url]))}</div>`).join('')}
-      </div>`;
+      </div>
+      ${healthBox()}`;
+  }
+  // "Is the data fresh?" table, from data/health.js (written by tools/health_check.py each morning)
+  function healthBox() {
+    const H = window.SITE_HEALTH;
+    if (!H || !H.sports) return '';
+    const names = {}; SPORTS.forEach(s => { names[s.key] = s.name; });
+    const rows = H.sports.map(r => {
+      const bad = (H.findings || []).some(f => f.level === 'warn' && f.area === r.key);
+      return `<tr><td>${esc(names[r.key] || r.key)}</td><td>${r.updated ? fmtDate(r.updated, { month: 'short', day: 'numeric' }) : 'n/a'}</td><td>${r.poll && r.pollDate ? esc(r.poll) + ', ' + fmtDate(r.pollDate, { month: 'short', day: 'numeric' }) : 'n/a'}</td><td>${bad ? 'Check pending' : 'Fresh'}</td></tr>`;
+    }).join('');
+    return `<div class="wrap"><div class="box" style="padding:16px 18px;margin-top:16px"><h3>Data freshness</h3>
+      <p class="dim small">An automatic check runs every morning and flags any sport whose data or poll has gone stale. Last check: ${fmtDate(H.checked, { month: 'short', day: 'numeric', year: 'numeric' })}.</p>
+      <div class="tablewrap"><table><thead><tr><th>Sport</th><th>Last refreshed</th><th>Latest poll</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div></div></div>`;
   }
   function renderComing(key) {
     const s = SPORTS.find(x => x.key === key);

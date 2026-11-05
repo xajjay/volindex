@@ -20,6 +20,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: update-data
@@ -31,6 +32,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # full history so health_check.py can see when hand-edited files last changed
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -38,6 +41,11 @@ jobs:
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
         run: python tools/update_data.py --auto ${{ (inputs.force || github.event_name == 'push') && '--force' || '' }} ${{ github.event.schedule == '7,22,37,52 16-23,0-7 * * *' && '--gameday' || '' }}
+      - name: Check that the data is actually fresh
+        # Only on the morning run, a manual run or an updater change; not on every 15-minute game-night run.
+        if: github.event.schedule != '7,22,37,52 16-23,0-7 * * *'
+        id: health
+        run: python tools/health_check.py --write --issue-body health-issue.md
       - name: Save changes
         run: |
           git config user.name "vol-index-bot"
@@ -48,3 +56,17 @@ jobs:
           # someone may have pushed while this ran: rebase onto it and retry instead of failing
           for i in 1 2 3 4; do git push && exit 0; sleep $((i * 5)); git pull --rebase -X theirs origin main || { git rebase --abort; git pull --no-rebase -X ours origin main; }; done
           exit 1
+      - name: Open, update or close the data-health issue
+        if: always() && steps.health.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create data-health --color D93F0B --description "Automatic data freshness warning" 2>/dev/null || true
+          num=$(gh issue list --label data-health --state open --json number --jq '.[0].number // empty')
+          if [ "${{ steps.health.outputs.ok }}" = "true" ]; then
+            if [ -n "$num" ]; then gh issue close "$num" --comment "All data checks are passing again."; fi
+          elif [ -n "$num" ]; then
+            gh issue edit "$num" --body-file health-issue.md
+          else
+            gh issue create --title "Vol Index data check: something looks stale" --label data-health --body-file health-issue.md
+          fi
