@@ -196,6 +196,8 @@
   SD.portalOn = () => { const g = G(); return !(g && g.hx && g.season < 2018); };
   SD.nilOn = () => { const g = G(); return !(g && g.hx && g.season < 2021); };
   Object.defineProperty(SD, 'OFF_ORDER', { get: () => OFF_ALL.filter(x => (x !== 'nil' || SD.nilOn()) && (x !== 'portal' || SD.portalOn())) });
+  // never drop a player who played for your school, won an award or was drafted: the legacy board, records and search all need him
+  SD.keepPlayer = p => { const ut = SD.userT(); return p.t0 === ut.id || (p.aw && p.aw.length > 0) || !!p.draft || Object.values(p.car || {}).some(x => x && (x.t === ut.abbr || (x.t === 'TENN' && ut.name === 'Tennessee') && +x.y !== 0)); };
   SD.OFF_LABEL = { recap: 'Season recap', nil: 'NIL & budget', portal: 'Transfer portal', signing: 'Signing day', draft: 'Pro draft', progress: 'Player development', cuts: 'Roster limit', schedule: 'Next season' };
   SD.LIMIT = { mbb: 15, wbb: 15, baseball: 34, softball: 25 };
   SD.startOffseason = () => {
@@ -550,7 +552,7 @@
     g.season++; g.phase = 'preseason'; g.off = null; g.post = null; g.ct = null;
     g.teams.forEach(t => { t.w = 0; t.l = 0; t.cw = 0; t.cl = 0; t.pf = 0; t.pa = 0; t.elo = t.elo * 0.6 + (1500 + (SD.teamRating(t) - 75) * 22) * 0.4; t.preElo = t.elo; t.roster.forEach(id => { const p = SD.P(id); p.unhappy = false; p.rest = 0; p.inj = null; }); });
     // old players and prospects nobody signed leave the table
-    for (const id in g.P) { const p = g.P[id]; if (p.t == null && !p.pros && p.gone != null && p.gone < g.season - 2) delete g.P[id]; }
+    for (const id in g.P) { const p = g.P[id]; if (p.t == null && !p.pros && p.gone != null && p.gone < g.season - 2 && !SD.keepPlayer(p)) delete g.P[id]; }
     SD.buildSchedule();
     SD.updatePoll();
     SD.initRecruiting(false);

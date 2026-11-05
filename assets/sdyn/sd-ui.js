@@ -131,7 +131,7 @@
     if (V.tab === 'tourney' && !(g.post && g.post.seen !== false)) V.tab = 'home';
     if (V.tab === 'room' && !(window.MORALE && MORALE.on(g))) V.tab = 'home';
     ({ home, schedule, roster, lineup, recruit, polls, standings, stats, nil, room, history, settings, tourney })[V.tab](body);
-    APP.firstElementChild.onclick = onClick; APP.firstElementChild.onchange = onChange;
+    APP.firstElementChild.onclick = onClick; APP.firstElementChild.onchange = onChange; APP.firstElementChild.oninput = e => { if (e.target && e.target.id === 'sdPs') onChange(e); };
     const at = APP.querySelector('.dyh-tabs [aria-selected="true"]'); if (at && at.scrollIntoView && root.innerWidth < 900) at.scrollIntoView({ block: 'nearest', inline: 'center' });
   }
   function primaryAction() {
@@ -162,7 +162,7 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-rid],[data-mor],[data-tab],[data-job],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-rradd],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-rotauto],[data-ord],[data-gid],[data-lpos],[data-lmore],[data-srecs],[data-tctab]'); if (!el) return;
+    const el = e.target.closest('[data-hview],[data-rid],[data-mor],[data-tab],[data-job],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-rradd],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-rotauto],[data-ord],[data-gid],[data-lpos],[data-lmore],[data-srecs],[data-tctab]'); if (!el) return;
     const d = el.dataset, g = G();
     if (el.tagName === 'A') e.preventDefault();
     if (d.mor) { const [a, id, ty] = d.mor.split('|'), p = SD.P(+id), A = SD.moraleAdapter(); V.msg = a === 'p' ? MORALE.promise(A, p, ty) : a === 't' ? MORALE.talk(A, p) : a === 'i' ? MORALE.ignore(A, p) : ''; autosave(); return keep(); }
@@ -211,6 +211,7 @@
     if (d.conf) { V.conf = d.conf; return keep(); }
     if (d.nilf) { V.nilf = d.nilf; return keep(); }
     if (d.ppos) { V.ppos = d.ppos; return keep(); }
+    if (d.hview) { V.hview = d.hview === 'main' ? null : d.hview; root.scrollTo(0, 0); return keep(); }
     if (d.lpos) { V.lpos = d.lpos; return keep(); }
     if (d.lmore) { V.lmore = !V.lmore; return keep(); }
     if (d.srecs) { V.srecs = d.srecs; return keep(); }
@@ -248,9 +249,10 @@
     if (el.dataset.mins) { const c = typeof t.coach === 'object' && t.coach ? t.coach : (t.coach = {}); c.mins = Object.assign({}, c.mins || {}); if (el.value === '') delete c.mins[el.dataset.mins]; else c.mins[el.dataset.mins] = +el.value; return keep(); }
     if (el.dataset.optn) { const c = typeof t.coach === 'object' && t.coach ? t.coach : (t.coach = {}); const o = (c.opts || []).slice(); o[+el.dataset.optn] = el.value === '' ? null : +el.value; const seen = new Set(); c.opts = o.map(x => x != null && !seen.has(x) && seen.add(x) ? x : null); while (c.opts.length && c.opts[c.opts.length - 1] == null) c.opts.pop(); return keep(); }
     if (el.dataset.coach) { t.coach = Object.assign({}, t.coach || {}, { [el.dataset.coach]: el.value }); return keep(); }
+    if (el.id === 'sdPs') { V.psearch = el.value; return keep(true); }
     if (el.id === 'sdRq') { V.rfind.q = el.value; return keep(true); }
   }
-  function keep(focus) { const y = root.scrollY; hub(); root.scrollTo(0, y); if (focus) { const q = APP.querySelector('#sdRq'); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } } }
+  function keep(focus) { const y = root.scrollY; hub(); root.scrollTo(0, y); if (focus) { const q = APP.querySelector('#sdPs') || APP.querySelector('#sdRq'); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } } }
   function modal(html) { const m = APP.querySelector('#dyModal'); APP.querySelector('#dyModalBody').innerHTML = html; m.hidden = false; }
   function closeModal() { const m = APP.querySelector('#dyModal'); if (m) m.hidden = true; }
   UI.modal = html => modal(html);
@@ -752,8 +754,26 @@
   }
 
   /* ---------- history, settings ---------- */
+  function playerFind() {
+    const g = G(), q = (V.psearch || '').trim().toLowerCase(); let res = [];
+    if (q.length >= 2) res = Object.values(g.P).filter(p => p && p.n && !p.pros && p.n.toLowerCase().includes(q)).sort((a, b) => (b.t === g.user) - (a.t === g.user) || (b.t != null) - (a.t != null) || b.ovr - a.ovr).slice(0, 40);
+    return `<div class="box"><div class="glabel">Find a player</div><input id="sdPs" class="dy-in" placeholder="Search any player by name" value="${esc(V.psearch || '')}" autocomplete="off">
+      ${q.length >= 2 ? (res.length ? `<div class="dy-scroll"><table class="dyt dy-tight"><thead><tr><th>Player</th><th>Pos</th><th>Team</th><th>OVR</th></tr></thead><tbody>${res.map(p => `<tr><td>${plink(p)}</td><td>${p.pos}</td><td>${p.t != null && T(p.t) ? tlink(p.t, false) : p.draft ? 'Drafted ' + (p.draft.y || '') : p.t0 != null && T(p.t0) ? '<span class="dim">Former: ' + esc(T(p.t0).name) + '</span>' : '<span class="dim">Gone</span>'}</td><td>${ovrB(p.ovr)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim small">No player by that name.</p>') : '<p class="dim small">Type at least two letters. Finds current players, former players and anyone drafted.</p>'}</div>`;
+  }
+  function seasonPage(b, y) {
+    const g = G(), h = g.hist.find(z => z.y === y); if (!h) { V.hview = null; return history(b); }
+    const aw = g.awards && g.awards[y] || {}, poy = aw.poy && SD.P(aw.poy);
+    b.innerHTML = `<div class="box"><button class="btn" data-hview="main">‹ Back to history</button><div class="glabel" style="margin-top:10px">${esc(SD.SP().label(y))} season · ${esc(h.team || SD.UN())}</div>
+      <div class="dy-stats4"><div><b>${h.w}-${h.l}</b><small>Record</small></div><div><b>${h.cw}-${h.cl}${h.secReg ? ' 🏆' : ''}</b><small>Conference</small></div><div><b>${h.ap || '—'}</b><small>Final ranking</small></div><div><b>${h.ovr || '—'}</b><small>Team OVR</small></div></div>
+      <p class="small">${esc(h.finish)}${h.seed ? ' · No. ' + h.seed + ' seed' : ''}${h.secT ? ' · Won the conference tournament' : ''} · National champion: ${esc(h.champ || '—')}${h.poy ? ' · Player of the Year: ' + esc(h.poy) : ''}${h.recRank ? ' · Recruiting class No. ' + h.recRank : ''}</p>
+      ${h.aa && h.aa.length ? `<p class="small"><b>All-Americans:</b> ${h.aa.map(esc).join(', ')}</p>` : ''}</div>
+      <div class="dy-grid"><div class="dy-col wide"><div class="box"><div class="glabel">Schedule and results</div><table class="dyt dy-tight"><tbody>${(h.games || []).map(x => `<tr><td class="small">${esc(SD.dateStr(x.d))}</td><td>${x.n ? 'vs' : x.h ? 'vs' : '@'} ${esc(x.on)}${x.t ? ` <small class="dim">${esc(x.t)}</small>` : ''}</td><td class="${x.us > x.th ? 'dy-w' : 'dy-l'}"><b>${x.us > x.th ? 'W' : 'L'} ${x.us}-${x.th}</b></td></tr>`).join('') || '<tr><td class="dim">Game-by-game results are saved for seasons played from now on.</td></tr>'}</tbody></table></div></div>
+      <div class="dy-col"><div class="box"><div class="glabel">Top of the roster and stats</div>${(h.top || []).length ? `<table class="dyt dy-tight"><tbody>${h.top.map(p => `<tr><td>${SD.P(p.id) ? plink(SD.P(p.id), p.n) : esc(p.n)} <small class="dim">${p.pos}</small></td><td>${p.ovr}</td><td class="small">${esc(p.line || '')}</td></tr>`).join('')}</tbody></table>` : '<p class="dim small">Roster snapshots are saved for seasons played from now on.</p>'}</div>
+      ${poy ? `<div class="box"><div class="glabel">National Player of the Year</div><p>${plink(poy)} <small class="dim">${poy.pos}${poy.t != null && T(poy.t) ? ' · ' + esc(T(poy.t).name) : ''}</small></p></div>` : ''}</div></div>`;
+  }
   function history(b) {
     const g = G(), H = hoops();
+    if (V.hview && V.hview.indexOf('season:') === 0) return seasonPage(b, +V.hview.slice(7));
     const nb = H ? SD.natBook() : null;
     const natBox = nb ? `<div class="box"><div class="glabel">National records <small class="dim">real-life ${g.sport === 'wbb' ? "women's" : "men's"} Division I marks, updated when broken</small></div><div class="dy-scroll"><table class="dyt"><thead><tr><th></th>${['game', 'season', 'career'].map(sc => `<th>${sc[0].toUpperCase() + sc.slice(1)}</th>`).join('')}</tr></thead><tbody>${Object.keys(SD.NATLAB).map(k => `<tr><td>${SD.NATLAB[k]}</td>${['game', 'season', 'career'].map(sc => { const r = nb[sc][k]; return `<td class="${r.brk ? 'dy-w' : ''}"><b>${r.v}</b> <small>${esc(r.n)}, ${esc(r.t)} ${r.y}${r.brk ? ' (new)' : ''}</small></td>`; }).join('')}</tr>`).join('')}</tbody></table></div>${(g.natBroken || []).length ? `<p class="small">Recent breaks: ${g.natBroken.slice(0, 4).map(x => `${esc(x.n)} (${x.scope} ${SD.NATLAB[x.k].toLowerCase()}, ${x.v})`).join(' · ')}</p>` : ''}</div>` : '';
     const pos = V.lpos || 'ALL', set = pos === 'ALL' ? null : [pos], nShow = V.lmore ? 25 : 10;
@@ -771,7 +791,7 @@
     const teamBox = hh.length ? `<div class="box"><div class="glabel">${esc(SD.UN())} under Coach ${esc(g.coach.name)}</div><div class="dy-stats4"><div><b>${best ? best.w + '-' + best.l : '—'}</b><small>Best season</small></div><div><b>${hh.filter(x => x.seed).length}</b><small>NCAA trips</small></div><div><b>${hh.filter(x => x.finish === 'National champions').length}</b><small>National titles</small></div><div><b>${sum('secT') + sum('secReg')}</b><small>Conf. titles</small></div></div></div>` : '';
     const bp = SD.schoolBests();
     const bpBox = `<div class="box"><div class="glabel">Best programs in this dynasty</div>${bp.map(c => `<p class="small" style="margin:6px 0 2px"><b>${esc(c.label)}</b></p>${c.top.length ? `<ol class="dy-mini">${c.top.map(r => `<li>${tlink(r.t, false)} <small>${r.v}</small></li>`).join('')}</ol>` : '<p class="dim small">None yet.</p>'}`).join('')}</div>`;
-    b.innerHTML = `<div class="dy-grid"><div class="dy-col wide"><div class="box"><div class="glabel">Coach ${esc(g.coach.name)} · ${g.coach.w}-${g.coach.l}</div><div class="dy-scroll"><table class="dyt"><thead><tr><th>Season</th><th>Record</th><th>Conf</th><th>Rank</th><th>Finish</th><th class="hide-s">Champion</th></tr></thead><tbody>${g.hist.slice().reverse().map(h => `<tr><td>${SD.SP().label(h.y)}</td><td>${h.w}-${h.l}</td><td>${h.cw}-${h.cl}${h.secReg ? ' 🏆' : ''}${h.secT ? ' (T)' : ''}</td><td>${h.ap || '—'}</td><td>${esc(h.finish)}</td><td class="hide-s small">${esc(h.champ || '')}</td></tr>`).join('') || '<tr><td class="dim">Your first season is under way.</td></tr>'}</tbody></table></div></div>${legBox}${srBox}${natBox}</div><div class="dy-col">${teamBox}${bpBox}</div></div>`;
+    b.innerHTML = `<div class="dy-grid"><div class="dy-col wide"><div class="box"><div class="glabel">Coach ${esc(g.coach.name)} · ${g.coach.w}-${g.coach.l}</div><div class="dy-scroll"><table class="dyt"><thead><tr><th>Season</th><th>Record</th><th>Conf</th><th>Rank</th><th>Finish</th><th class="hide-s">Champion</th></tr></thead><tbody>${g.hist.slice().reverse().map(h => `<tr class="dy-click" data-hview="season:${h.y}" style="cursor:pointer"><td><u>${SD.SP().label(h.y)}</u></td><td>${h.w}-${h.l}</td><td>${h.cw}-${h.cl}${h.secReg ? ' 🏆' : ''}${h.secT ? ' (T)' : ''}</td><td>${h.ap || '—'}</td><td>${esc(h.finish)}</td><td class="hide-s small">${esc(h.champ || '')}</td></tr>`).join('') || '<tr><td class="dim">Your first season is under way.</td></tr>'}</tbody></table></div></div>${legBox}${srBox}${natBox}</div><div class="dy-col">${playerFind()}${teamBox}${bpBox}</div></div>`;
   }
   /* ---------- locker room ---------- */
   function room(b) {

@@ -788,6 +788,13 @@
     }
     const secC = g.ct && g.ct[ut.conf] && g.ct[ut.conf].champ === g.user;
     const entry = { y: g.season, w: ut.w, l: ut.l, cw: ut.cw, cl: ut.cl, ap: SD.apRank(ut.id), seed: P && P.seedOf ? P.seedOf[g.user] || null : null, finish, secReg: SD.standings(ut.conf)[0] && SD.standings(ut.conf)[0].id === g.user, secT: secC, champ: P && P.champ != null ? T(P.champ).name : null, poy: A.poy ? SD.P(A.poy).n : null };
+    // the season's detail page: results, the top of the roster, honors (kept with the season, so it survives players leaving)
+    entry.team = SD.UN(); entry.ovr = Math.round(SD.teamRating(ut)); entry.recRank = g.recruit && g.recruit.classRank || null;
+    entry.games = SD.userGames().filter(x => x.res).sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : 0).map(x => { const home = x.h === g.user; return { d: x.d, on: T(home ? x.a : x.h).name, h: home ? 1 : 0, n: x.neutral ? 1 : 0, us: home ? x.res.h : x.res.a, th: home ? x.res.a : x.res.h, t: x.title || (x.kind === 'ct' ? 'Conference tournament' : '') }; });
+    entry.top = ut.roster.map(SD.P).sort((a, b) => b.ovr - a.ovr).slice(0, 8).map(p => { const s = p.s || {}, n = s.gp || 0, f1 = (v, d) => (d ? (v / d).toFixed(1) : '0.0');
+      const line = !n ? '' : SD.kind() === 'hoops' ? `${f1(s.pts || 0, n)} ppg · ${f1((s.orb || 0) + (s.drb || 0), n)} rpg · ${f1(s.ast || 0, n)} apg` : SD.isPit(p) ? `${s.ipo ? (s.er * (SD.kind() === 'diamond' && g.sport === 'softball' ? 7 : 9) / (s.ipo / 3)).toFixed(2) : '—'} ERA · ${s.k || 0} K` : `${s.ab ? (s.h / s.ab).toFixed(3).replace(/^0/, '') : '.000'} AVG · ${s.hr || 0} HR · ${s.rbi || 0} RBI`;
+      return { id: p.id, n: p.n, pos: p.pos, ovr: p.ovr, line }; });
+    entry.aa = (A.aa1 || []).map(id => { const q = SD.P(id); return q ? q.n + (q.t != null && T(q.t) ? ' (' + T(q.t).abbr + ')' : '') : null; }).filter(Boolean);
     g.hist.push(entry);
     { const inF = new Set((P && P.field) || []), ffs = new Set(); ((P && P.rounds) || []).forEach(rd => (rd || []).forEach(x => { if (x.res && /Final Four/.test(x.title || '')) { ffs.add(x.h); ffs.add(x.a); } }));
       g.teams.forEach(t => { const st = t.dorm ? [] : SD.standings(t.conf), ctn = g.ct && g.ct[t.conf] && g.ct[t.conf].champ === t.id;

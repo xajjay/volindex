@@ -1117,7 +1117,7 @@
   };
   // keep the save small: players who left CPU teams are dropped unless they won something
   function trimPlayers() {
-    const g = G();
-    for (const id in g.P) { const p = g.P[id]; if (p.t == null && p.gone && p.gone < g.season - 1 && p.t0 !== g.user && !p.aw.some(a => /AA1|HEIS/.test(a.a))) delete g.P[id]; }
+    const g = G(), ut = DY.userT();   // anyone who ever played for you stays on the legacy board, however long ago
+    for (const id in g.P) { const p = g.P[id]; if (p.t == null && p.gone && p.gone < g.season - 1 && p.t0 !== g.user && !g.legacy[id] && !(p.car && Object.values(p.car).some(c => c.t === ut.abbr)) && !p.aw.some(a => /AA1|HEIS/.test(a.a))) delete g.P[id]; }
   }
 })(typeof window !== 'undefined' ? window : globalThis);
