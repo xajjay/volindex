@@ -516,13 +516,33 @@
     const g6 = DY.P4.includes(t.conf) || t.abbr === 'ND' ? 0 : -48;
     return pre * wPre + (t.elo + lp.win - lp.pen) * (1 - wPre) + g6 - lp.pen * 0.35 * wPre;
   };
+  // resume numbers the committee weighs. Reference teams are fixed from the current ratings: a "typical top-12 team" for strength of record,
+  // the 30th and 50th best teams for quality wins and bad losses
+  let refCache = { k: '', v: null };
+  function refs() {
+    const g = G(); let k = g.season + ':'; let n = 0; g.teams.forEach(t => { n += t.w + t.l; }); k += n;
+    if (refCache.k === k) return refCache.v;
+    const e = g.teams.filter(t => !t.dorm && t.fbs).map(t => t.elo).sort((a, b) => b - a);
+    refCache = { k, v: { ref: e[11] || 1650, q30: e[29] || 1560, b50: e[49] || 1520 } }; return refCache.v;
+  }
+  DY.cfpMetrics = t => {
+    const R = refs(); const m = { w: 0, l: 0, ew: 0, rw: 0, rl: 0, qw: 0, bl: 0 };
+    DY.teamGames(t.id).forEach(x => { if (!x.res) return; const me = x.h === t.id, o = DY.T(me ? x.a : x.h), w = me ? x.res.h > x.res.a : x.res.a > x.res.h, oe = o.fbs ? o.elo : 1250;
+      m.ew += 1 / (1 + Math.pow(10, (oe - R.ref) / 400)); if (w) m.w++; else m.l++;
+      const r = DY.apRank(o.id); if (r && r <= 25) { if (w) m.rw++; else m.rl++; }
+      if (w && o.fbs && o.elo >= R.q30) m.qw++;
+      if (!w && (!o.fbs || o.elo < R.b50)) m.bl++; });
+    m.sor = m.w - m.ew; m.sos = avgOppElo(t); return m;
+  };
   DY.cfpKey = (t, final) => {
     const lp = lossPen(t), g = G();
     let top = 0;
     DY.teamGames(t.id).forEach(x => { if (!x.res) return; const me = x.h === t.id, o = me ? x.a : x.h, w = me ? x.res.h > x.res.a : x.res.a > x.res.h; const r = DY.apRank(o); if (w && r && r <= 25) top += r <= 10 ? 26 : 16; });
     const sos = avgOppElo(t);
     const g6 = DY.P4.includes(t.conf) || t.abbr === 'ND' ? 0 : -70;
-    return t.elo * 0.55 + lp.win * 0.9 - lp.pen * 1.15 + top + (sos - 1500) * 0.35 + g6 + (final && t.champ === g.season ? 34 : 0);
+    const mm = DY.cfpMetrics(t);
+    // strength of record (wins above what a typical top-12 team would win against this schedule) and bad losses sit on top of the game-by-game credit
+    return t.elo * 0.5 + lp.win * 0.8 - lp.pen * 1.05 + top + (sos - 1500) * 0.3 + mm.sor * 9 + mm.qw * 4 - mm.bl * 18 + g6 + (final && t.champ === g.season ? 34 : 0);
   };
   function avgOppElo(t) { const os = DY.teamGames(t.id).filter(x => x.res).map(x => DY.T(DY.oppOf(x, t.id))).map(o => o.fbs ? o.elo : 1250); return os.length ? os.reduce((a, b) => a + b, 0) / os.length : 1500; }
   DY.sos = avgOppElo;
@@ -544,7 +564,9 @@
     setPoll(g.teams.filter(t => !t.dorm).sort((a, b) => DY.apKey(b) - DY.apKey(a)), wk);
     if (DY.CFP_WEEKS.includes(wk) || wk === 14) {
       const prev = {}; (g.polls.cfp || []).forEach((x, i) => prev[x.t] = i + 1);
-      g.polls.cfp = g.teams.filter(t => !t.dorm).sort((a, b) => DY.cfpKey(b, wk === 14) - DY.cfpKey(a, wk === 14)).slice(0, 25).map(t => ({ t: t.id, prev: prev[t.id] || null, rec: t.w + '-' + t.l }));
+      const fb = g.teams.filter(t => !t.dorm), M = {}; fb.forEach(t => { M[t.id] = DY.cfpMetrics(t); });
+      const rk = k => { const o = fb.filter(t => t.fbs).sort((a, b) => M[b.id][k] - M[a.id][k]); const r = {}; o.forEach((t, i) => { r[t.id] = i + 1; }); return r; }, sosR = rk('sos'), sorR = rk('sor');
+      g.polls.cfp = fb.sort((a, b) => DY.cfpKey(b, wk === 14) - DY.cfpKey(a, wk === 14)).slice(0, 25).map(t => { const m = M[t.id]; return { t: t.id, prev: prev[t.id] || null, rec: t.w + '-' + t.l, sos: sosR[t.id] || null, sor: sorR[t.id] || null, rw: m.rw, rl: m.rl, qw: m.qw, bl: m.bl }; });
       g.polls.cfpWeek = wk;
       if (wk === DY.CFP_WEEKS[0]) DY.news('poll', `First College Football Playoff rankings are out`, `${g.polls.cfp.slice(0, 4).map((x, i) => (i + 1) + '. ' + tname(x.t)).join(', ')}. ${DY.UN()} is ${DY.cfpRank(g.user) ? 'No. ' + DY.cfpRank(g.user) : 'outside the top 25'}.`);
     }
