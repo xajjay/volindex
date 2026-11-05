@@ -21,15 +21,21 @@ except ImportError:
     sys.exit("Run: pip install pandas pyarrow requests")
 
 season = int(sys.argv[sys.argv.index("--season") + 1]) if "--season" in sys.argv else 2027
-API = "https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases?per_page=100"
+API = "https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases"
+PREFIX = "espn_womens_college_basketball_"
+# The release names follow one pattern; try the likely table names directly instead of paging through every release.
+GUESSES = ["schedules", "schedule", "team_boxscores", "team_box", "player_boxscores", "player_box", "rosters", "player_stats", "team_stats", "pbp"]
 
-rels = requests.get(API, timeout=30).json()
-if not isinstance(rels, list):
-    sys.exit(f"GitHub said: {rels}")
-wbb = [r for r in rels if "womens_college_basketball" in r["tag_name"]]
+wbb = []
+for g in GUESSES:
+    r = requests.get(f"{API}/tags/{PREFIX}{g}", timeout=30)
+    if r.status_code == 200:
+        wbb.append(r.json())
+    elif r.status_code == 403:
+        sys.exit("GitHub is rate-limiting anonymous requests. Wait about an hour and run again.")
 print("Women's college basketball releases found:")
-for r in wbb: print("  ", r["tag_name"], f"({len(r['assets'])} files)")
-if not wbb: sys.exit("No matching releases on page 1; check https://github.com/sportsdataverse/sportsdataverse-data/releases")
+for r in wbb: print("  ", r["tag_name"], f"({len(r['assets'])} files)", ", ".join(a["name"] for a in r["assets"][:3]) + (" ..." if len(r["assets"]) > 3 else ""))
+if not wbb: sys.exit("None of the guessed names exist. Open https://github.com/sportsdataverse/wehoop-wbb-data and copy a release name from the table links, then paste it to Claude.")
 
 def asset_for(tag_part, max_mb):
     for r in wbb:
