@@ -67,8 +67,8 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 1,
-   "edited": "2026-11-04",
+   "ageDays": 0,
+   "edited": "2026-11-05",
    "file": "data/wbb-lineup.js",
    "label": "Women's basketball lineup",
    "maxDays": 21
@@ -109,60 +109,60 @@ window.SITE_HEALTH = {
  "ok": false,
  "sports": [
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 12,
    "key": "football",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-05"
+   "updated": "2026-11-06"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 34,
    "key": "mbb",
    "poll": "AP Top 25",
    "pollDate": "2026-10-19",
-   "updated": "2026-11-05"
+   "updated": "2026-11-06"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 33,
    "key": "wbb",
    "poll": "AP Top 25",
    "pollDate": "2026-10-20",
-   "updated": "2026-11-05"
+   "updated": "2026-11-06"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 57,
    "key": "baseball",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-05"
+   "updated": "2026-11-06"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 33,
    "key": "softball",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-05"
+   "updated": "2026-11-06"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 27,
    "key": "volleyball",
    "poll": "AVCA Coaches Poll",
    "pollDate": "2026-11-01",
-   "updated": "2026-11-05"
+   "updated": "2026-11-06"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 18,
    "key": "soccer",
    "poll": "United Soccer Coaches",
    "pollDate": "2026-11-03",
-   "updated": "2026-11-05"
+   "updated": "2026-11-06"
   }
  ],
  "warnings": 4

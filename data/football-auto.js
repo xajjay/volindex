@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-05. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-06. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-05",
+ "updated": "2026-11-06",
  "team": {
   "record": "6-2",
   "sec": "3-2",
@@ -1474,7 +1474,7 @@ window.SITE_AUTO.football = {
    "line": "TENN -6.5",
    "ou": 49.5,
    "ml": "-238",
-   "book": "Draft Kings",
+   "book": "DraftKings",
    "win": 66.8
   },
   "Texas A&M": {
