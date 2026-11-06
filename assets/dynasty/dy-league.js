@@ -793,7 +793,7 @@
   const AA_SLOTS = [['QB', 1], ['RB', 2], ['WR', 3], ['TE', 1], ['OT', 2], ['IOL', 3], ['EDGE', 2], ['DT', 2], ['LB', 3], ['CB', 2], ['S', 2], ['K', 1], ['P', 1]];
   DY.AWARD_NAME = { HEIS: 'Heisman Trophy', HEISF: 'Heisman finalist', AA1: 'All-American 1st team', AA2: 'All-American 2nd team', FRAA: 'Freshman All-American', SEC1: 'All-SEC 1st team', SEC2: 'All-SEC 2nd team',
     SECO: 'SEC Offensive Player of the Year', SECD: 'SEC Defensive Player of the Year', SECF: 'SEC Freshman of the Year', OBRIEN: 'Davey O\'Brien Award', WALKER: 'Doak Walker Award',
-    BILET: 'Biletnikoff Award', MACKEY: 'Mackey Award', OUTLAND: 'Outland Trophy', BEDNARIK: 'Bednarik Award', BUTKUS: 'Butkus Award', THORPE: 'Thorpe Award', GROZA: 'Lou Groza Award', GUY: 'Ray Guy Award' };
+    BILET: 'Biletnikoff Award', MACKEY: 'Mackey Award', OUTLAND: 'Outland Trophy', BEDNARIK: 'Bednarik Award', BUTKUS: 'Butkus Award', THORPE: 'Thorpe Award', GROZA: 'Lou Groza Award', GUY: 'Ray Guy Award', JET: 'Jet Award (Returner of the Year)' };
   DY.awards = () => {
     const g = G(), y = g.season, A = g.awards[y] = { aa1: [], aa2: [], fraa: [], sec1: [], sec2: [] };
     const all = [];
@@ -814,6 +814,10 @@
     best(x => x.p.pos === 'QB', 'OBRIEN', 'obrien'); best(x => x.p.pos === 'RB', 'WALKER', 'walker'); best(x => x.p.pos === 'WR', 'BILET', 'bilet');
     best(x => x.p.pos === 'TE', 'MACKEY', 'mackey'); best(x => x.p.pos === 'OT' || x.p.pos === 'IOL' || x.p.pos === 'DT', 'OUTLAND', 'outland');
     best(x => DY.SIDE(x.p.pos) === 'D', 'BEDNARIK', 'bednarik'); best(x => x.p.pos === 'LB', 'BUTKUS', 'butkus'); best(x => x.p.pos === 'CB' || x.p.pos === 'S', 'THORPE', 'thorpe');
+    // Jet Award: best returner in the country, on return touchdowns first, then yards and volume
+    const rsc = p => { const s = p.s || {}; return (s.kr || 0) + (s.pr || 0) >= 6 ? (s.rttd || 0) * 60 + ((s.kry || 0) + (s.pry || 0)) / 8 + ((s.kr || 0) + (s.pr || 0)) * 0.5 : 0; };
+    const jet = all.map(x => ({ x, r: rsc(x.p) })).filter(z => z.r > 0).sort((a, b) => b.r - a.r)[0];
+    if (jet) { A.jet = jet.x.p.id; give(jet.x.p, 'JET'); }
     best(x => x.p.pos === 'K', 'GROZA', 'groza'); best(x => x.p.pos === 'P', 'GUY', 'guy');
     best(x => x.t.conf === 'SEC' && DY.SIDE(x.p.pos) === 'O' && x.p.pos !== 'OT' && x.p.pos !== 'IOL', 'SECO', 'seco');
     best(x => x.t.conf === 'SEC' && DY.SIDE(x.p.pos) === 'D', 'SECD', 'secd');

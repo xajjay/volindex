@@ -680,7 +680,8 @@
     const keys = Object.keys(DY.W[p.pos]).concat((DY.EXTRA[p.pos] || []).map(x => x[0])).concat(p.at.rtn != null ? ['rtn'] : []).filter((k, i, a) => a.indexOf(k) === i && p.at[k] != null);
     const bar = (l, v) => `<div class="dy-attr"><span>${esc(l)}</span><div class="dy-ab"><i class="${ovrCls(v)}" style="width:${v}%"></i></div><b>${v}</b></div>`;
     const car = Object.entries(p.car || {}).sort((a, b) => a[0] - b[0]);
-    const cols = statCols(p.pos);
+    const hasRet = [p.s].concat(car.map(c => c[1])).some(c => c && ((c.kr || 0) + (c.pr || 0) + (c.rttd || 0)) > 0);
+    const cols = statCols(p.pos, hasRet);
     const seasonRows = car.map(([y, s]) => `<tr class="${s.real ? 'real' : ''}"><td>${y}${s.real ? ' <small class="dim">real</small>' : ''}</td><td>${esc(s.t || '')}</td><td>${s.gp || 0}</td>${cols.map(c => `<td>${c[1](s)}</td>`).join('')}</tr>`).join('') + (p.s ? `<tr class="cur"><td>${g.season}</td><td>${t ? esc(t.abbr) : ''}</td><td>${p.s.gp || 0}</td>${cols.map(c => `<td>${c[1](p.s)}</td>`).join('')}</tr>` : '');
     const totS = {}; car.forEach(([, s]) => { for (const k in s) if (typeof s[k] === 'number') totS[k] = (totS[k] || 0) + s[k]; }); if (p.s) for (const k in p.s) if (typeof p.s[k] === 'number') totS[k] = (totS[k] || 0) + p.s[k];
     const careerRow = car.length + (p.s ? 1 : 0) > 1 ? `<tr class="tot"><td><b>Career</b></td><td></td><td>${totS.gp || 0}</td>${cols.map(c => `<td><b>${c[1](totS)}</b></td>`).join('')}</tr>` : '';
@@ -708,7 +709,7 @@
       ${p.log && p.log.length ? `<div class="glabel">Timeline</div><ul class="dy-mini">${p.log.slice(0, 10).map(l => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
     </div>`);
   }
-  function statCols(pos) { const c = statCols0(pos); return c.concat([['Snaps', s => s.sn || '—']]); }
+  function statCols(pos, ret) { const v = (s, k) => s[k] || 0; const c = statCols0(pos); if (ret) c.push(['KR', s => v(s, 'kr') + '-' + v(s, 'kry')], ['PR', s => v(s, 'pr') + '-' + v(s, 'pry')], ['Ret TD', s => v(s, 'rttd')]); return c.concat([['Snaps', s => s.sn || '—']]); }
   function statCols0(pos) {
     const v = (s, k) => s[k] || 0;
     if (pos === 'QB') return [['Cmp/Att', s => v(s, 'pc') + '/' + v(s, 'pa')], ['Yds', s => v(s, 'py')], ['TD', s => v(s, 'ptd')], ['INT', s => v(s, 'pi')], ['Rush', s => v(s, 'ry')], ['RTD', s => v(s, 'rtd')]];
@@ -980,14 +981,15 @@
     return `<div class="box"><div class="glabel">Find a player</div><input id="dyPsearch" class="dy-in" placeholder="Search any player by name" value="${esc(V.psearch || '')}" autocomplete="off">
       ${q.length >= 2 ? (res.length ? `<div class="dy-scroll"><table class="dyt dy-tight"><thead><tr><th>Player</th><th>Pos</th><th>Team</th><th>Class</th><th>OVR</th></tr></thead><tbody>${res.map(p => `<tr><td>${plink(p)}</td><td>${p.pos}</td><td>${p.t != null && T(p.t) ? tlink(p.t, false) : p.draft ? 'Drafted ' + (p.draft.y || '') : p.t0 != null && T(p.t0) ? '<span class="dim">Former: ' + esc(T(p.t0).name) + '</span>' : '<span class="dim">Gone</span>'}</td><td>${yrLabel(p)}</td><td>${ovrB(p.ovr)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">No player by that name.</p>') : '<p class="dim small">Type at least two letters. Every player on every team, plus the ones who have left.</p>'}</div>`;
   }
-  const LPOS = { All: null, QB: ['QB'], RB: ['RB'], WR: ['WR'], TE: ['TE'], OL: ['OT', 'IOL'], DL: ['EDGE', 'DT'], LB: ['LB'], DB: ['CB', 'S'], ST: ['K', 'P'] };
+  const LPOS = { All: null, QB: ['QB'], RB: ['RB'], WR: ['WR'], TE: ['TE'], OL: ['OT', 'IOL'], DL: ['EDGE', 'DT'], LB: ['LB'], DB: ['CB', 'S'], ST: ['K', 'P'], Returner: 'RET' };
   function legacyPage(b) {
     const g = G(), ab = DY.userT().abbr, pos = V.lpos || 'All', set = LPOS[pos];
-    const rows = DY.legacyBoard(400).filter(x => !set || set.includes(x.p.pos)).slice(0, 10);
+    const retTot = p => Object.values(p.car || {}).filter(c => c.t === ab).reduce((a, c) => a + (c.kr || 0) + (c.pr || 0), 0);
+    const rows = DY.legacyBoard(400).filter(x => !set || (set === 'RET' ? retTot(x.p) >= 10 || Object.values(x.p.car || {}).some(c => c.t === ab && c.rttd) : set.includes(x.p.pos))).slice(0, 10);
     const line = p => { const yrs = Object.entries(p.car || {}).filter(([, c]) => c.t === ab && (c.gp || 0) > 0); const sum = k => Math.round(yrs.reduce((a, [, c]) => a + (c[k] || 0), 0));
-      const bits = []; if (sum('py')) bits.push(sum('py') + ' pass yds, ' + sum('ptd') + ' TD'); if (sum('ry') > 150) bits.push(sum('ry') + ' rush yds'); if (sum('rcy') > 150) bits.push(sum('rcy') + ' rec yds'); if (sum('sck') >= 3) bits.push(sum('sck') + ' sacks'); if (sum('int') >= 2) bits.push(sum('int') + ' INT'); if (sum('tk') > 60) bits.push(sum('tk') + ' tackles'); if (sum('fgm')) bits.push(sum('fgm') + ' FG');
+      const bits = []; if (sum('py')) bits.push(sum('py') + ' pass yds, ' + sum('ptd') + ' TD'); if (sum('ry') > 150) bits.push(sum('ry') + ' rush yds'); if (sum('rcy') > 150) bits.push(sum('rcy') + ' rec yds'); if (sum('sck') >= 3) bits.push(sum('sck') + ' sacks'); if (sum('int') >= 2) bits.push(sum('int') + ' INT'); if (sum('tk') > 60) bits.push(sum('tk') + ' tackles'); if (sum('fgm')) bits.push(sum('fgm') + ' FG'); if (sum('kr') + sum('pr') >= 10) bits.push((sum('kr') + sum('pr')) + ' returns, ' + (sum('kry') + sum('pry')) + ' yds' + (sum('rttd') ? ', ' + sum('rttd') + ' return TD' : ''));
       return { yrs: yrs.length, txt: bits.join(' · ') }; };
-    b.innerHTML = `<div class="box"><button class="btn" data-hview="main">‹ Back to history</button><div class="glabel" style="margin-top:10px">Legacy: the ${pos === 'All' ? '10 best players' : 'top 10 ' + pos} you've coached</div>
+    b.innerHTML = `<div class="box"><button class="btn" data-hview="main">‹ Back to history</button><div class="glabel" style="margin-top:10px">Legacy: the ${pos === 'All' ? '10 best players' : 'top 10 ' + (pos === 'Returner' ? 'returners' : pos)} you've coached</div>
       <p class="dim small">Ranked on impact while at ${esc(DY.UN())} only: record-setting and big seasons, awards (Heisman, All-American, conference honors), draft position, team wins and titles during their years, and how many seasons they delivered.</p>
       <div class="gchips dy-chips">${Object.keys(LPOS).map(k => `<button data-lpos="${k}" aria-pressed="${pos === k}">${k}</button>`).join('')}</div>
       <table class="dyt"><thead><tr><th>#</th><th>Player</th><th>Pos</th><th>Seasons</th><th>Honors</th><th class="hide-s">Production</th><th>Score</th></tr></thead><tbody>${rows.map((x, i) => { const p = x.p, L = line(p), aw = (p.aw || []);

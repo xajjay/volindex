@@ -1007,9 +1007,9 @@
     let s = 0;
     const peak = Math.max(p.ovr, ...Object.values(p.peakO || {}));
     s += Math.max(0, peak - 70) * 2.2;
-    (p.aw || []).forEach(a => { s += { HEIS: 70, HEISF: 18, AA1: 30, AA2: 18, FRAA: 8, SEC1: 12, SEC2: 6, SECO: 16, SECD: 16, SECF: 8, OBRIEN: 20, WALKER: 20, BILET: 20, MACKEY: 16, OUTLAND: 20, BEDNARIK: 22, BUTKUS: 18, THORPE: 18, GROZA: 10, GUY: 8 }[a.a] || 0; });
+    (p.aw || []).forEach(a => { s += { HEIS: 70, HEISF: 18, AA1: 30, AA2: 18, FRAA: 8, SEC1: 12, SEC2: 6, SECO: 16, SECD: 16, SECF: 8, OBRIEN: 20, WALKER: 20, BILET: 20, MACKEY: 16, OUTLAND: 20, BEDNARIK: 22, BUTKUS: 18, THORPE: 18, GROZA: 10, GUY: 8, JET: 14 }[a.a] || 0; });
     const ab = DY.userT().abbr; let yrs = 0;
-    for (const y in p.car) { const c = p.car[y]; if (c.t !== ab) continue; if ((c.gp || 0) >= 5) yrs++; s += (c.py || 0) / 400 + (c.ptd || 0) * 0.8 + (c.ry || 0) / 120 + (c.rtd || 0) * 1.2 + (c.rcy || 0) / 100 + (c.rctd || 0) * 1.2 + (c.sck || 0) * 2 + (c.int || 0) * 3 + (c.tk || 0) / 12 + (c.fgm || 0) * 0.5 + (c.gp || 0) * 0.4;
+    for (const y in p.car) { const c = p.car[y]; if (c.t !== ab) continue; if ((c.gp || 0) >= 5) yrs++; s += (c.py || 0) / 400 + (c.ptd || 0) * 0.8 + (c.ry || 0) / 120 + (c.rtd || 0) * 1.2 + (c.rcy || 0) / 100 + (c.rctd || 0) * 1.2 + (c.sck || 0) * 2 + (c.int || 0) * 3 + (c.tk || 0) / 12 + (c.fgm || 0) * 0.5 + (c.rttd || 0) * 3 + ((c.kry || 0) + (c.pry || 0)) / 250 + (c.gp || 0) * 0.4;
       const h = (G().hist || []).find(z => z.y === +y); if (h && (c.gp || 0) >= 5) { s += Math.max(0, h.w - 8) * 0.9 + (h.sec ? 4 : 0) + (h.finish === 'National champions' ? 25 : h.cfpSeed ? 5 : 0); } }
     s += Math.max(0, yrs - 1) * 5;
     if (p.draft) s += { 1: 30, 2: 18, 3: 11, 4: 8, 5: 5, 6: 4, 7: 3 }[p.draft.rd] || 0;
