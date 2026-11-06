@@ -961,6 +961,30 @@
       const sc = (t.w - 6.5) * 2.4 + (ap && ap <= 25 ? (26 - ap) * 0.25 : 0) + (conf ? 3 : 0) + (e.cfp ? 4 : 0) + pw * 2 + (natl ? 10 : 0);
       c.pr = Math.round(Math.max(1, Math.min(99, c.pr + sc * 0.5 - (c.pr - 50) * 0.06)));
     });
+    try { DY.checkCoachRecords(); } catch (e) { }
+  };
+  // the real record book before 1990 (retired coaches: major-college career wins and national titles), and who breaks it in this dynasty
+  DY.COACH_BOOK = {
+    w: [['Bear Bryant', 'Kentucky, Texas A&M, Alabama', 323, '1945–82'], ['Pop Warner', 'Georgia, Cornell, Pittsburgh, Stanford', 319, '1895–1938'], ['Amos Alonzo Stagg', 'Chicago, Pacific', 314, '1890–1946'], ['Woody Hayes', 'Ohio State', 238, '1946–78']],
+    nt: [['Bear Bryant', 'Alabama', 6, '1961–79'], ['Bernie Bierman', 'Minnesota', 5, '1934–41'], ['Frank Leahy', 'Notre Dame', 4, '1943–49'], ['Bud Wilkinson', 'Oklahoma', 3, '1950–56'], ['Darrell Royal', 'Texas', 3, '1963–70']] };
+  DY.coachRecords = () => {
+    const g = G(), B = DY.coachBoard(), out = {};
+    [['w', 'Career wins'], ['nt', 'National championships']].forEach(([k, label]) => {
+      const sim = B.rows.filter(r => r[k] > 0).map(r => ({ n: r.n, t: r.t, v: r[k], sim: true, y: r.yrs + ' seasons here' }));
+      const book = DY.COACH_BOOK[k].map(r => ({ n: r[0], t: r[1], v: r[2], y: r[3], sim: false }));
+      const rows = book.concat(sim).sort((a, b) => b.v - a.v || (a.sim ? 1 : -1)).slice(0, 8), bv = book[0].v;
+      out[k] = { label, rows, bookTop: book[0], broken: g.coachRec && g.coachRec[k] || null, bv };
+    });
+    return out;
+  };
+  DY.checkCoachRecords = () => {
+    const g = G(), B = DY.coachBoard(); g.coachRec = g.coachRec || {};
+    [['w', 'career wins', 'wins'], ['nt', 'national titles', 'titles']].forEach(([k, label, un]) => {
+      const cur = g.coachRec[k], bar = cur ? cur.v : DY.COACH_BOOK[k][0][2], who = cur ? cur.n : DY.COACH_BOOK[k][0][0];
+      const top = B.rows.filter(r => r[k] > bar).sort((a, b) => b[k] - a[k])[0];
+      if (top && top.n !== who) { g.coachRec[k] = { n: top.n, t: top.t, v: top[k], y: g.season, prev: who, pv: bar }; DY.news('record', `RECORD: ${top.n} (${top.t}) passes ${who} for the most ${label} in college football history`, `${top[k]} ${un}, past ${bar}.`); }
+      else if (top && cur && top.n === who && top[k] > cur.v) cur.v = top[k];
+    });
   };
   DY.coachLine = name => { const c = DY.cs(name); return c; };
   DY.coachBoard = () => {

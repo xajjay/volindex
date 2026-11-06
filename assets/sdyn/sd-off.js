@@ -418,29 +418,31 @@
   };
   /* ---------- preseason camp: a team focus and three players who get extra reps ---------- */
   SD.CAMP = {
-    hoops: { shooting: ['Shooting', ['thr', 'mid', 'ft']], handle: ['Ball handling', ['hnd', 'iq']], defense: ['Defense', ['pdf', 'idf', 'stl', 'blk']], rebound: ['Rebounding', ['reb']], inside: ['Inside scoring', ['ins']], conditioning: ['Conditioning', ['sta', 'ath']] },
-    diamond: { hitting: ['Hitting', ['con', 'pow', 'eye']], pitching: ['Pitching', ['vel', 'stf', 'ctl']], stamina: ['Conditioning', ['sta']], defense: ['Defense', ['fld', 'arm']], speed: ['Speed and baserunning', ['spd']] },
+    hoops: { shooting: ['Shooting', ['thr', 'mid', 'ft']], handle: ['Ball handling', ['hnd', 'iq']], defense: ['Defense', ['pdf', 'idf', 'stl', 'blk']], rebound: ['Rebounding', ['reb']], pot: ['Potential (raise his ceiling)', []], inside: ['Inside scoring', ['ins']], conditioning: ['Conditioning', ['sta', 'ath']] },
+    diamond: { hitting: ['Hitting', ['con', 'pow', 'eye']], pitching: ['Pitching', ['vel', 'stf', 'ctl']], stamina: ['Conditioning', ['sta']], defense: ['Defense', ['fld', 'arm']], speed: ['Speed and baserunning', ['spd']], pot: ['Potential (raise his ceiling)', []] },
   };
   SD.CAMP_MAX = 3;
   // focuses that make sense for one player (pitchers work on arms, hitters on bats and gloves)
-  SD.campOptions = p => Object.entries(SD.CAMP[SD.kind()]).filter(([k, v]) => v[1].some(a => p.at[a] != null) && (SD.kind() === 'hoops' || SD.isPit(p) ? true : !['pitching', 'stamina'].includes(k)));
+  SD.campOptions = p => Object.entries(SD.CAMP[SD.kind()]).filter(([k, v]) => (k === 'pot' || v[1].some(a => p.at[a] != null)) && (SD.kind() === 'hoops' || SD.isPit(p) ? true : !['pitching', 'stamina'].includes(k)));
   SD.campState = () => { const g = G(); if (!g.camp || g.camp.y !== g.season || !g.camp.pf) g.camp = { y: g.season, pf: {}, picks: [], done: false, res: null }; return g.camp; };
   SD.campPick = (id, focus) => { const C = SD.campState(), p = SD.P(id), o = SD.campOptions(p); if (!o.length) return; C.pf[id] = o.some(x => x[0] === focus) ? focus : o[0][0]; if (!C.picks.includes(id)) C.picks.push(id); };
   SD.campSet = (id, f) => { const C = SD.campState(); if (C.picks.includes(id)) SD.campPick(id, f); };
   SD.runCamp = auto => {
     const g = G(), C = SD.campState(), ut = SD.userT(); if (C.done) return;
     if (auto && !C.picks.length) ut.roster.map(SD.P).filter(p => p.yr <= 2).sort((a, b) => (b.ceil - b.ovr) - (a.ceil - a.ovr)).slice(0, 3).forEach(p => {
-      const o = SD.campOptions(p).map(([k, v]) => [k, v[1].reduce((s, a) => s + (p.at[a] != null ? p.at[a] : 99), 0) / v[1].length]).sort((a, b) => a[1] - b[1]); if (o.length) SD.campPick(p.id, o[0][0]);
+      const o = SD.campOptions(p).filter(x => x[0] !== 'pot').map(([k, v]) => [k, v[1].reduce((s, a) => s + (p.at[a] != null ? p.at[a] : 99), 0) / v[1].length]).sort((a, b) => a[1] - b[1]); if (o.length) SD.campPick(p.id, o[0][0]);
     });
     const res = [];
     ut.roster.map(SD.P).forEach(p => {
       const before = p.ovr, extra = C.picks.includes(p.id), wk = (p.tr.work - 82) / 30, F = extra ? SD.CAMP[SD.kind()][C.pf[p.id]] : null;
       // only the three picked players train; the gain is a slight bump in the chosen skill
       if (F) F[1].forEach(k => { if (p.at[k] != null) p.at[k] = Math.round(clamp(p.at[k] + rr(0.8, 2.4) + wk, 40, 99)); });
-      SD.setOvr(p); if (extra) res.push({ id: p.id, before, after: p.ovr, extra, foc: F ? F[0] : null });
+      let pg = 0;
+      if (extra && C.pf[p.id] === 'pot') { const was = p.ceil; p.ceil = Math.min(99, p.ceil + ri(1, 3) + (p.tr.work >= 88 ? 1 : 0)); pg = p.ceil - was; if (SD.gradeOfCeil) p.potG = SD.gradeOfCeil(p.ceil); }
+      SD.setOvr(p); if (extra) res.push({ id: p.id, before, after: p.ovr, extra, foc: F ? F[0] : null, pg });
     });
     C.done = true; C.res = res.sort((a, b) => (b.after - b.before) - (a.after - a.before));
-    SD.news('season', 'Preseason camp', C.res.slice(0, 3).map(x => `${SD.P(x.id).n} +${x.after - x.before}${x.foc ? ' (' + x.foc.toLowerCase() + ')' : ''}`).join(', '));
+    SD.news('season', 'Preseason camp', C.res.slice(0, 3).map(x => `${SD.P(x.id).n} ${x.pg ? 'ceiling +' + x.pg : '+' + (x.after - x.before)}${x.foc && !x.pg ? ' (' + x.foc.toLowerCase() + ')' : ''}`).join(', '));
   };
   SD.portalPlayers = () => { const P = G().off.portal; return P ? P.pool.map(SD.P).filter(p => p && p.portal) : []; };
   SD.newcomers = () => { const g = G(); return (g.recruit && !g.recruit.signed ? Math.min(SD.CLASS[g.sport], SD.myCommits().length) : 0) + Object.keys(g.off && g.off.portal ? g.off.portal.mine : {}).length; };
