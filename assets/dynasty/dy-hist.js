@@ -20,7 +20,7 @@
   }
   DY.loadHist = year => year >= 2026 ? Promise.all([script('data/hist/fb-2026.js').catch(() => null), script('data/hist/fb-classes.js').catch(() => null)]) : Promise.all([script('data/hist/fb-sched.js'), script('data/hist/fb-classes.js'), script('data/hist/fb-tnclasses.js').catch(() => null), year ? script('data/hist/fb-' + year + '.js') : null]);
   // a saved historical dynasty: the schedules and classes must be loaded before it runs
-  DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); try { DY.fixHistSched(g); } catch (e) { } try { if (g.sched && g.sched.length && g.sched.every(x => !x.res && !x.real)) DY.balanceHome(g.sched); } catch (e) { } return g; }) : Promise.resolve(g);   // (a saved generated slate that has not started gets the home/away fix too)
+  DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); try { DY.dedupePool(g); } catch (e) { } try { DY.fixHistSched(g); } catch (e) { } try { if (g.sched && g.sched.length && g.sched.every(x => !x.res && !x.real)) DY.balanceHome(g.sched); } catch (e) { } return g; }) : Promise.resolve(g);   // (a saved generated slate that has not started gets the home/away fix too)
 
   /* ---------- the era: conferences, title games, the playoff ---------- */
   const NO_CCG = y => {
@@ -344,16 +344,43 @@
 
   /* ---------- recruiting: real players, re-ranked by their careers ---------- */
   // replaces the top of a generated class with the real class of that year (stars by where their careers ranked them)
+  const PGRP = { OT: 'OL', IOL: 'OL', OL: 'OL', EDGE: 'DL', DT: 'DL', DL: 'DL', CB: 'DB', S: 'DB', DB: 'DB', K: 'ST', P: 'ST', PK: 'ST', LS: 'ST' };
+  const realPos0 = (pos, r) => pos;
+  const stOf = h => { const m = /,\s*([A-Z]{2})\s*$/.exec(h || ''); return m ? m[1] : null; };
+  // the real names already in this dynasty (rosters, former players, signees and recruits) so no real person is created twice
+  DY.realDupe = g => {
+    const nk = s => String(s || '').toLowerCase().replace(/[^a-z]/g, '');
+    if (!g.realSeen) { g.realSeen = []; Object.values(g.P || {}).concat(Object.values((g.recruit && g.recruit.pool) || {})).forEach(p => { if (p && (p.realName || p.real || p.rec && p.rec.real)) g.realSeen.push([nk(p.n), PGRP[p.pos] || p.pos, stOf(p.home)]); }); }
+    const idx = {}; g.realSeen.forEach(x => (idx[x[0]] = idx[x[0]] || []).push(x));
+    const same = (name, pos, home) => (idx[nk(name)] || []).some(x => (!x[1] || !pos || x[1] === (PGRP[pos] || pos)));
+    return { has: same, add: (name, pos, home) => { const x = [nk(name), PGRP[pos] || pos, stOf(home)]; g.realSeen.push(x); (idx[x[0]] = idx[x[0]] || []).push(x); } };
+  };
+  // an older save's current class: drop real recruits who are already on a roster or listed twice
+  DY.dedupePool = g => {
+    g.fx = g.fx || {}; const R = g.recruit; if (!R || !R.pool || g.fx.dedupe1) return; g.fx.dedupe1 = 1;
+    const nk = s => String(s || '').toLowerCase().replace(/[^a-z]/g, ''), seen = {};
+    const keyOf = p => nk(p.n);
+    Object.values(g.P || {}).forEach(p => { if (p && (p.realName || p.real)) (seen[keyOf(p)] = seen[keyOf(p)] || []).push(p); });
+    Object.keys(R.pool).forEach(id => {
+      const p = R.pool[id]; if (!p || !(p.realName || p.real)) return;
+      const hit = (seen[keyOf(p)] || []).some(q => q.id !== p.id && (PGRP[q.pos] || q.pos) === (PGRP[p.pos] || p.pos));
+      if (hit) { delete R.pool[id]; if (R.board) R.board = R.board.filter(x => x !== +id); } else (seen[keyOf(p)] = seen[keyOf(p)] || []).push(p);
+    });
+  };
   DY.histClass = (year, list, prospectFn) => {
     const g = G(); if (!g || !root.DY_HCLASS || !root.DY_HCLASS[year]) return;
     if (!g.hx && year < 2027) return;                      // the 2026 game: real classes from 2027 on
     const real = root.DY_HCLASS[year], nk = s => String(s || '').toLowerCase().replace(/[^a-z]/g, '');
     const have = new Set(list.filter(p => p.real).map(p => nk(p.n)));   // Tennessee's real commits are already in the class
+    // one real person appears once: the same name (same home state and position group where known) is never signed a second time in a later class or alongside a player already on a roster
+    const dupe = DY.realDupe(g);
+    const isDup = (name, pos, home) => dupe.has(name, pos, home);
+    const mark = (p) => dupe.add(p.n, p.pos, p.home);
     const gen = list.filter(p => !p.real).sort((a, b) => b.rec.c - a.rec.c);
     let gi = 0;
     real.forEach((r, i) => {
       const [name, pos, school, val, , , home, comp] = r;
-      if (have.has(nk(name))) return;
+      if (have.has(nk(name)) || isDup(name, realPos0(pos, r), home)) return;
       const old = gen[gi++]; if (!old) return;
       const hm = /,\s*([A-Z]{2})$/.exec(home || '');
       const st = hm ? hm[1] : (DY.byName(school) || {}).st || old.st;
@@ -368,6 +395,7 @@
       if (sch && sch.fbs) { p.realSchool = sch.id; p.interest[sch.id] = Math.max(p.interest[sch.id] || 0, sch.id === DY.UT_ID ? 60 : 45); }
       p.realName = true;
       const at = list.indexOf(old); if (at >= 0) list[at] = p;
+      mark(p);
     });
     // Tennessee's real signees for the year (top of the class by 247 rating): in the class, committed to the Vols
     const tn = root.DY_TNCLASS && root.DY_TNCLASS[year];
@@ -377,6 +405,7 @@
         const [name, pos, home, comp] = r, key = nk(name);
         let p = list.find(x => nk(x.n) === key);
         if (!p) {
+          if (isDup(name, pos, home)) return;
           const old = spare(); if (!old) return;
           const hm = /,\s*([A-Z]{2})$/.exec(home || '');
           p = prospectFn(pos, comp, { n: name, home, st: hm ? hm[1] : old.st });
@@ -384,7 +413,7 @@
           p.ceil = Math.max(p.ceil, Math.round(clamp(78 + (comp - 0.85) * 90, 76, 95))); p.potG = DY.scoutGrade(p.ceil);
           list[list.indexOf(old)] = p;
         }
-        p.real = true; p.commit = DY.UT_ID; p.firm = true; p.offer = true; p.realSchool = DY.UT_ID; p.interest[DY.UT_ID] = 200;
+        p.real = true; p.commit = DY.UT_ID; p.firm = true; p.offer = true; p.realSchool = DY.UT_ID; p.interest[DY.UT_ID] = 200; mark(p);
       });
     }
   };
