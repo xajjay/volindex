@@ -8,19 +8,19 @@
 window.LINEUP = window.LINEUP || {};
 window.LINEUP.wbb = {
   "label": "2026-27 projected starting five",
-  "updated": "2026-11-04",
-  "rev": 2,
-  "basedOn": "The Vol Index projected starting five (unofficial); adjusted after the season opener vs. Duquesne (109-62, Nov. 2): starters and minutes from the box score",
+  "updated": "2026-11-05",
+  "rev": 3,
+  "basedOn": "The Vol Index projected starting five (unofficial): Jada Eads, Rylie Theuerkauf, Kaylene Smikle, Gabby Minus and Aaliyah Moore",
   "chart": {
     "Starting five": [
       ["PG", ["Jada Eads", "Kennedy Fauntleroy", "Shaelyn Steele"]],
-      ["SG", ["Kaylene Smikle", "Rylie Theuerkauf", "Avery Mills"]],
-      ["G/F", ["Naomi White", "Harissoum Coulibaly", "Rylie Theuerkauf"]],
+      ["SG", ["Rylie Theuerkauf", "Avery Mills", "Naomi White"]],
+      ["G/F", ["Kaylene Smikle", "Naomi White", "Harissoum Coulibaly"]],
       ["F", ["Gabby Minus", "Fatmata Janneh", "Riley Makalusky"]],
-      ["F/C", ["Zhen Craft", "Aaliyah Moore", "Harper Peterson"]]
+      ["F/C", ["Aaliyah Moore", "Zhen Craft", "Harper Peterson"]]
     ],
     "Rotation": [
-      ["First off the bench", ["Rylie Theuerkauf", "Aaliyah Moore", "Kennedy Fauntleroy", "Fatmata Janneh"]],
+      ["First off the bench", ["Naomi White", "Zhen Craft", "Kennedy Fauntleroy", "Fatmata Janneh"]],
       ["Rest of rotation", ["Harissoum Coulibaly", "Riley Makalusky"]],
       ["Developing", ["Harper Peterson", "Shaelyn Steele", "Irene Oboavwoduo"]],
       ["Did not play (opener)", ["Avery Mills"]]
