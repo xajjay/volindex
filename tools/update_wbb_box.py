@@ -1,7 +1,7 @@
 """
 The Vol Index - women's basketball box-score analytics
 =======================================================
-Writes data/wbb-box.js (window.SITE_WBBBOX), shown on the Women's Hoops "Advanced" tab:
+Writes data/wbb-analytics.js (window.SITE_WBBBOX), shown on the Women's Hoops "Advanced" tab:
 team four factors, player advanced stats, a game-by-game efficiency log and per-player game logs.
 
 Source: SportsDataverse (wehoop) women's college basketball player box scores, ESPN data republished daily
@@ -12,7 +12,7 @@ player lines, so only one file is downloaded (about 3 MB).
     python tools/update_wbb_box.py --gameday     # only runs if the main updater just changed data/wbb-auto.js
 
 FAIL-SAFE (this is optional extra data, so nothing here may ever break the site or the rest of the update):
-  1. Download retries; any failure keeps the last good data/wbb-box.js and exits 0.
+  1. Download retries; any failure keeps the last good data/wbb-analytics.js and exits 0.
   2. Schema check: if the source renamed columns, skip instead of writing garbage.
   3. Sanity checks: Tennessee must have games, minutes must add up near a real game's length, scores must be
      plausible, and the new file may never have FEWER games than the one already published.
@@ -22,7 +22,7 @@ FAIL-SAFE (this is optional extra data, so nothing here may ever break the site 
 import csv, datetime, io, json, os, subprocess, sys, time, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "data", "wbb-box.js")
+OUT = os.path.join(ROOT, "data", "wbb-analytics.js")
 TEAM_ID = "2633"      # ESPN's id for Tennessee
 URL = "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/espn_womens_college_basketball_player_boxscores/player_box_{yr}.csv"
 REQUIRED = ["game_id", "game_date", "athlete_display_name", "team_id", "minutes", "field_goals_made", "field_goals_attempted",

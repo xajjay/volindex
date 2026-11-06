@@ -150,7 +150,7 @@ def check_wbb(t, findings):
     """Women's basketball box-score analytics (SportsDataverse): refreshed daily in season, and not lagging the site's results."""
     if not in_window(t, SEASON_WINDOW["wbb"]): return
     try:
-        x = open(os.path.join(DATA, "wbb-box.js"), encoding="utf-8").read()
+        x = open(os.path.join(DATA, "wbb-analytics.js"), encoding="utf-8").read()
         c = json.loads(x.split("window.SITE_WBBBOX = ", 1)[1].rsplit(";", 1)[0])
     except Exception:
         c = None

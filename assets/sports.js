@@ -545,7 +545,7 @@
       <p class="dim small">Advanced stats: <a href="https://collegebasketballdata.com" target="_blank" rel="noopener">Data provided by CollegeBasketballData.com</a>${C.updated ? ' · updated ' + fmtDate(C.updated, { month: 'short', day: 'numeric' }) : ''}. Regular-season games only.</p></div>`;
   }
 
-  /* ---------- women's basketball box-score analytics (data/wbb-box.js, built from SportsDataverse/wehoop box scores) ---------- */
+  /* ---------- women's basketball box-score analytics (data/wbb-analytics.js, built from SportsDataverse/wehoop box scores) ---------- */
   function wbbBoxSection() {
     const C = window.SITE_WBBBOX; if (!C || !C.players || !C.players.length) return '';
     const f = (v, d = 1) => v == null ? '—' : (+v).toFixed(d);
