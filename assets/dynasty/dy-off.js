@@ -468,7 +468,7 @@
     });
     const ut = DY.userT();
     g.off.leaving = ut.roster.filter(id => DY.P(id).leave).map(id => ({ id, why: DY.P(id).leave }));
-    g.off.pitched = {};
+    g.off.pitched = {}; g.off.lc = DY.LAST_CHANCES;
     DY.updateLegacy();
     DY.coachSeason();
     DY.jobReview();
@@ -598,6 +598,20 @@
     const ok = chance(ch);
     o.pitched[id] = ok;
     if (ok) { p.leave = null; p.nil += raise; o.leaving = o.leaving.filter(x => x.id !== id); DY.addLog(p, `Returned for another season (NIL now ${DY.money(p.nil)}).`); DY.news('nil', `${p.n} is coming back to ${DY.UN()}`, `He had declared for the NFL Draft.`, { pid: p.id }); }
+    return ok ? `${p.n} is coming back!` : `${p.n} is staying in the draft.`;
+  };
+  // two last-chance persuasions a year: a personal visit with far better odds than the regular pitch, for any early entrant (even one who already turned your pitch down)
+  DY.LAST_CHANCES = 2;
+  DY.lastChanceOdds = p => { const dg = p.dg || DY.draftGrade(p); return clamp(0.93 - Math.max(0, dg - 88) * 0.012 + (p.tr.loyal - 72) / 500, 0.6, 0.97); };
+  DY.lastChance = id => {
+    const g = G(), o = g.off, p = DY.P(id);
+    if (!p || p.leave !== 'nfl') return 'He is not in the draft.';
+    if (o.lc == null) o.lc = DY.LAST_CHANCES;
+    if (o.lc <= 0) return 'You are out of last-chance visits this year.';
+    o.lc--;
+    const ok = chance(DY.lastChanceOdds(p));
+    o.pitched[id] = ok;
+    if (ok) { p.leave = null; o.leaving = o.leaving.filter(x => x.id !== id); DY.addLog(p, 'Returned for another season after a last-chance visit.'); DY.news('nil', `${p.n} is coming back to ${DY.UN()}`, `He had declared for the NFL Draft, but a last visit from the head coach changed his mind.`, { pid: p.id }); }
     return ok ? `${p.n} is coming back!` : `${p.n} is staying in the draft.`;
   };
   // in-season look ahead: how likely a junior or older is to leave early for the NFL

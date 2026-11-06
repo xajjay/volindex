@@ -20,7 +20,7 @@
   }
   DY.loadHist = year => year >= 2026 ? Promise.all([script('data/hist/fb-2026.js').catch(() => null), script('data/hist/fb-classes.js').catch(() => null)]) : Promise.all([script('data/hist/fb-sched.js'), script('data/hist/fb-classes.js'), script('data/hist/fb-tnclasses.js').catch(() => null), year ? script('data/hist/fb-' + year + '.js') : null]);
   // a saved historical dynasty: the schedules and classes must be loaded before it runs
-  DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); try { DY.dedupePool(g); } catch (e) { } try { DY.fixHistSched(g); } catch (e) { } try { if (g.sched && g.sched.length && g.sched.every(x => !x.res && !x.real)) DY.balanceHome(g.sched); } catch (e) { } return g; }) : Promise.resolve(g);   // (a saved generated slate that has not started gets the home/away fix too)
+  DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); try { DY.dedupePool(g); } catch (e) { } try { DY.lcMigrate(g); } catch (e) { } try { DY.fixHistSched(g); } catch (e) { } try { if (g.sched && g.sched.length && g.sched.every(x => !x.res && !x.real)) DY.balanceHome(g.sched); } catch (e) { } return g; }) : Promise.resolve(g);   // (a saved generated slate that has not started gets the home/away fix too)
 
   /* ---------- the era: conferences, title games, the playoff ---------- */
   const NO_CCG = y => {
@@ -366,6 +366,15 @@
       const hit = (seen[keyOf(p)] || []).some(q => q.id !== p.id && (PGRP[q.pos] || q.pos) === (PGRP[p.pos] || p.pos));
       if (hit) { delete R.pool[id]; if (R.board) R.board = R.board.filter(x => x !== +id); } else (seen[keyOf(p)] = seen[keyOf(p)] || []).push(p);
     });
+  };
+  // this dynasty: Dobbs and Kamara come back this offseason; the offseason in progress gets its two last-chance visits
+  DY.lcMigrate = g => {
+    g.fx = g.fx || {}; if (g.fx.lc1) return; g.fx.lc1 = 1;
+    const sure = ['Joshua Dobbs', 'Alvin Kamara'];     // this offseason only; next year they declare like anyone else and you can use a last-chance visit
+    const o = g.off; if (!o || o.stage == null) return;
+    if (o.lc == null) o.lc = 2;
+    const ut = DY.userT();
+    (ut.roster || []).map(DY.P).forEach(p => { if (p && p.leave === 'nfl' && sure.includes(p.n)) { p.leave = null; if (o.leaving) o.leaving = o.leaving.filter(x => x.id !== p.id); if (o.pitched) delete o.pitched[p.id]; DY.addLog(p, 'Returned for another season.'); DY.news('nil', `${p.n} is coming back to ${DY.UN()}`, 'He had declared for the NFL Draft, but changed his mind.', { pid: p.id }); } });
   };
   DY.histClass = (year, list, prospectFn) => {
     const g = G(); if (!g || !root.DY_HCLASS || !root.DY_HCLASS[year]) return;
