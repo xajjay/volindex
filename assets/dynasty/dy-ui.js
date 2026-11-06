@@ -1017,7 +1017,7 @@
     if (V.hview === 'legacy') return legacyPage(b);
     if (V.hview && V.hview.indexOf('season:') === 0) return seasonPage(b, +V.hview.slice(7));
     const c = g.coach, titles = g.hist.filter(h => h.finish === 'National champions').length, secT = g.hist.filter(h => h.sec).length, cfp = g.hist.filter(h => h.cfpSeed).length;
-    const recRows = scope => Object.entries(DY.REC_MAP).map(([name, k]) => { const r = g.rec[scope][k]; return r ? `<tr class="${r.real ? '' : 'me'}"><td>${esc(name)}</td><td>${r.pid ? plink(DY.P(r.pid), r.n) : esc(r.n)}</td><td><b>${r.v}</b></td><td class="small">${esc(r.y)}${r.note ? ' · ' + esc(r.note) : ''}${r.prev ? ' · broke ' + esc(r.prev) + "'s record" : ''}</td></tr>` : ''; }).join('');
+    DY.fillRecords(); const recRows = scope => Object.entries(DY.REC_MAP).map(([name, k]) => { const r = g.rec[scope][k]; return r ? `<tr class="${r.real ? '' : 'me'}"><td>${esc(name)}</td><td>${r.pid ? plink(DY.P(r.pid), r.n) : esc(r.n)}</td><td><b>${r.v}</b></td><td class="small">${esc(r.y)}${r.note ? ' · ' + esc(r.note) : ''}${r.prev ? ' · broke ' + esc(r.prev) + "'s record" : ''}</td></tr>` : ''; }).join('');
     const leg = DY.legacyBoard(10);
     const ser = g.series || {};
     const riv = DY.UT_RIVALS.filter(n => ser[n]).map(n => ({ n, ...ser[n] })).concat(Object.entries(ser).filter(([n]) => !DY.UT_RIVALS.includes(n)).map(([n, v]) => ({ n, ...v })).sort((a, b) => (b.w + b.l) - (a.w + a.l)).slice(0, 6));

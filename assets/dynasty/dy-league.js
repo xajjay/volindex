@@ -827,7 +827,7 @@
   };
 
   /* ---------- program records (seeded with the real UT record book) ---------- */
-  const REC_MAP = { 'Passing yards': 'py', 'Passing TDs': 'ptd', 'Rushing yards': 'ry', 'Rushing TDs': 'rtd', 'Receptions': 'rc', 'Receiving yards': 'rcy', 'Receiving TDs': 'rctd', 'Tackles': 'tk', 'Sacks': 'sck', 'Interceptions': 'int', 'Field goals': 'fgm' };
+  const REC_MAP = { 'Passing yards': 'py', 'Passing TDs': 'ptd', 'Rushing yards': 'ry', 'Rushing TDs': 'rtd', 'Receptions': 'rc', 'Receiving yards': 'rcy', 'Receiving TDs': 'rctd', 'Tackles': 'tk', 'Sacks': 'sck', 'Interceptions': 'int', 'Field goals': 'fgm', 'Return TDs': 'rttd' };
   DY.REC_MAP = REC_MAP;
   DY.initRecords = () => {
     const g = G(), R = root.SITE && root.SITE.footballRecords;
@@ -835,9 +835,12 @@
     // another school: its record book starts blank and fills in as your players set marks
     if (!DY.isTN()) { for (const scope of ['game', 'season', 'career']) for (const name in REC_MAP) g.rec[scope][REC_MAP[name]] = { v: 0, n: '—', y: '', note: '', real: true, blank: true }; return; }
     for (const scope of ['game', 'season', 'career']) (R && R[scope] || []).forEach(r => { const k = REC_MAP[r[0]]; if (k) g.rec[scope][k] = { v: r[2], n: r[1], y: r[3], note: r[4] || '', real: true }; });
+    DY.fillRecords();
   };
+  // records with no real mark (return TDs) start at zero; also upgrades older saves
+  DY.fillRecords = () => { const g = G(); if (!g.rec) return; for (const scope of ['game', 'season', 'career']) for (const name in REC_MAP) { const k = REC_MAP[name]; if (!g.rec[scope][k]) g.rec[scope][k] = { v: 0, n: '—', y: '', note: '', real: true, blank: true }; } };
   DY.checkRecords = (GM, x) => {
-    const g = G();
+    const g = G(); DY.fillRecords();
     for (const id in GM.ps) { const p = DY.P(+id), l = GM.ps[id]; if (!p) continue; for (const k in NAT.game) if (l[k] && l[k] >= NAT.game[k][0][0] * 0.6) DY.checkNat('game', k, l[k], p, 'vs. ' + DY.T(DY.oppOf(x)).name); }
     for (const id in GM.ps) {
       const p = DY.P(+id); if (!p || p.t !== g.user) continue; const l = GM.ps[id];
@@ -853,7 +856,7 @@
     }
   };
   DY.updateRecordsSeason = () => {
-    const g = G(), ut = DY.userT();
+    const g = G(), ut = DY.userT(); DY.fillRecords();
     DY.natSeason();
     ut.roster.map(DY.P).forEach(p => {
       for (const name in REC_MAP) {
