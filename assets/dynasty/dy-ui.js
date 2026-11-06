@@ -243,7 +243,7 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-mor],[data-tid],[data-vteam],[data-tab],[data-act],[data-pid],[data-pedit],[data-psave],[data-push],[data-job],[data-rid],[data-box],[data-sort],[data-rpos],[data-dmove],[data-ract],[data-roffer],[data-radd],[data-rrm],[data-rradd],[data-nilans],[data-retain],[data-poffer],[data-conf],[data-ppos],[data-prpos],[data-statk],[data-stab],[data-more],[data-slot],[data-set],[data-rfind],[data-goto],[data-recs],[data-hview],[data-lpos],[data-ahead],[data-dview],[data-nilstep],[data-persuade],[data-cut],[data-camp],[data-nilf],[data-dunit],[data-dproj],[data-gside]');
+    const el = e.target.closest('[data-mor],[data-tid],[data-vteam],[data-tab],[data-act],[data-pid],[data-pedit],[data-devedit],[data-devsave],[data-devunlock],[data-devlock],[data-psave],[data-push],[data-job],[data-rid],[data-box],[data-sort],[data-rpos],[data-dmove],[data-ract],[data-roffer],[data-radd],[data-rrm],[data-rradd],[data-nilans],[data-retain],[data-poffer],[data-conf],[data-ppos],[data-prpos],[data-statk],[data-stab],[data-more],[data-slot],[data-set],[data-rfind],[data-goto],[data-recs],[data-hview],[data-lpos],[data-ahead],[data-dview],[data-nilstep],[data-persuade],[data-cut],[data-camp],[data-nilf],[data-dunit],[data-dproj],[data-gside]');
     if (!el) { const m = APP.querySelector('.dy-menu-in'); if (m && !m.hidden && !e.target.closest('.dy-menu')) m.hidden = true; return; }
     const g = G(), d = el.dataset;
     if (el.tagName === 'A') e.preventDefault();
@@ -275,6 +275,10 @@
     if (d.job) { const err = DY.takeJob(+d.job); V.msg = err || `Welcome to ${DY.UN()}.`; return keep(); }
     if (d.act === 'cfpdone') { if (g.post) g.post.seen = true; V.tab = 'playoff'; return hub(); }
     if (d.push) { V.msg = DY.encourage(+d.push); closeModal(); return keep(); }
+    if (d.devunlock) { const c = APP.querySelector('#devCode'); DEVEDIT.unlock(c && c.value).then(err => { V.msg = err || 'Owner editor unlocked for an hour.'; keep(); }); return; }
+    if (d.devlock) { DEVEDIT.lock(); V.msg = 'Editor locked.'; return keep(); }
+    if (d.devedit) { if (!DEVEDIT.on()) return; const p = DY.P(+d.devedit); if (p) modal(DEVEDIT.form(p, devCfg())); return; }
+    if (d.devsave) { if (!DEVEDIT.on()) return; const p = DY.P(+d.devsave); if (p) V.msg = DEVEDIT.apply(p, devCfg()); closeModal(); return keep(); }
     if (d.pedit) return editCard(+d.pedit);
     if (d.psave) { V.msg = saveEdit(+d.psave); closeModal(); return keep(); }
     if (d.mor) { const [a, id, ty] = d.mor.split('|'), p = DY.P(+id), A = DY.moraleAdapter(); V.msg = a === 'p' ? MORALE.promise(A, p, ty) : a === 't' ? MORALE.talk(A, p) : a === 'i' ? MORALE.ignore(A, p) : ''; autosave(); return keep(); }
@@ -617,6 +621,12 @@
 
   /* ---------- player card ---------- */
   // editing a generated player: name, number and bio (never the ratings)
+  function devCfg() {
+    return { posList: Object.keys(DY.POS_NAME), yrs: [[1, 'Freshman'], [2, 'Sophomore'], [3, 'Junior'], [4, 'Senior'], [5, 'Fifth year']], attrs: p => Object.keys(p.at).map(k => [k, DY.ATTR_NAME[k] || k]),
+      ht: p => Math.floor(p.ht / 12) + '-' + p.ht % 12, grade: DY.gradeOf, setOvr: DY.setOvr, fit: (p, v) => DY.fitOvr(p, v, {}),
+      setPos: (p, pos, ht) => { const q = DY.makePlayer(pos, p.ovr, { tmp: -1, yr: p.yr }); p.pos = pos; p.at = q.at; p.arch = q.arch; if (ht) p.ht = ht; DY.setOvr(p); },
+      after: p => { if (p.t != null && T(p.t) && DY.refreshDepth) DY.refreshDepth(T(p.t)); if (G().recruit && DY.rankClasses) DY.rankClasses(); } };
+  }
   function editCard(id) {
     const p = DY.P(id); if (!p || p.real) return;
     const f = (k, l, v, extra) => `<label class="dy-edrow"><span>${l}</span><input class="dy-in" data-ed="${k}" value="${esc(v == null ? '' : v)}" ${extra || ''}></label>`;
@@ -683,7 +693,7 @@
         ${hideT ? `<div class="dy-pc-ovr"><span class="dy-tstars big">${'★'.repeat(DY.tStars(p))}</span><small>Transfer · OVR ${DY.tRange(p).join('-')}</small></div>` : `<div class="dy-pc-ovr">${ovrB(p.ovr)}<small>OVR</small><span class="dy-pot big">${p.potG}</span><small>Potential</small></div>`}</div>
       <div class="dy-pc-tags"><span class="chip">${esc(p.arch)}</span><span class="chip" title="${esc(pd)}">${esc(pl)}</span><span class="chip">${rec}</span>${p.nil ? `<span class="chip">NIL ${DY.money(p.nil)}</span>` : ''}${p.inj && p.inj.wks > 0 ? `<span class="chip dy-l">${esc(p.inj.what)} · ${p.inj.wks} wk</span>` : ''}${p.el ? `<span class="chip">${p.el} season${p.el > 1 ? 's' : ''} of eligibility</span>` : ''}</div>
       ${g.phase === 'offseason' && p.t === g.user && g.off && ['recap', 'nil', 'portal'].includes(g.off.stage) && p.tin !== g.season && !(g.off.portal && g.off.portal.round > 1) ? `<p><button class="btn" data-push="${p.id}">${p.pushOut ? 'Undo: keep him' : 'Encourage to transfer'}</button> <small class="dim">He enters the portal and frees his roster spot and NIL money.</small></p>` : ''}
-      ${!p.real ? `<p><button class="btn" data-pedit="${p.id}">Edit player</button> <small class="dim">Name, number and bio. Ratings stay as they are.</small></p>` : ''}
+      ${DEVEDIT.btn(p.id)}${!p.real ? `<p><button class="btn" data-pedit="${p.id}">Edit player</button> <small class="dim">Name, number and bio. Ratings stay as they are.</small></p>` : ''}
       <p class="dy-scout"><b>Scouting report:</b> ${esc(DY.scoutReport(p))}${p.note ? ' ' + esc(p.note) : ''} <i>${esc(pd)}</i></p>
       ${p.aw && p.aw.length ? `<p class="small"><b>Honors:</b> ${p.aw.map(a => a.y + ' ' + esc(DY.AWARD_NAME[a.a] || a.a)).join(' · ')}</p>` : ''}
       ${p.honReal && p.honReal.length ? `<p class="small dim">Before the dynasty: ${esc(p.honReal.join('; '))}</p>` : ''}
@@ -849,7 +859,7 @@
     const pot = lvl >= 2 ? p.potG : '?';
     const tg = lvl >= 3 ? (p.gem ? '<span class="chip dy-w">GEM</span>' : p.bust ? '<span class="chip dy-l">BUST risk</span>' : '<span class="chip">As advertised</span>') : '';
     const ints = Object.entries(p.interest).sort((a, b) => b[1] - a[1]), top = ints[0] ? ints[0][1] : 1;
-    modal(`<div class="dy-pc"><div class="dy-pc-head"><div class="dy-pc-num">${p.pos}</div><div><h3>${esc(p.n)}</h3><div class="dim">${DY.htStr(p.ht)}, ${p.wt} lbs · ${esc(p.home)} · ${esc(p.hs)}</div>
+    modal(`${DEVEDIT.btn(id)}<div class="dy-pc"><div class="dy-pc-head"><div class="dy-pc-num">${p.pos}</div><div><h3>${esc(p.n)}</h3><div class="dim">${DY.htStr(p.ht)}, ${p.wt} lbs · ${esc(p.home)} · ${esc(p.hs)}</div>
       <div><span class="dy-stars">${stars(p.rec.stars)}</span> ${p.rec.c.toFixed(4)} composite · No. ${p.rec.nat} nationally · No. ${p.rec.posRank} ${p.pos} · No. ${p.rec.stRank} in ${p.st}</div></div>
       <div class="dy-pc-ovr"><span class="dy-ovr m">${ovrTxt}</span><small>OVR now</small><span class="dy-pot big">${pot}</span><small>Potential</small></div></div>
       <div class="dy-pc-tags">${p.realUT ? '<span class="chip ut" title="A real-life Tennessee commit">Real UT commit</span>' : ''}${tg}<span class="chip">${esc(p.arch)}</span><span class="chip">Scouted ${lvl}/3</span>${p.commit != null ? `<span class="chip">Committed: ${esc(T(p.commit).name)}</span>` : ''}${p.nilOffer ? `<span class="chip">NIL promise ${DY.money(p.nilOffer)}${p.nilLocked ? ' (locked)' : ''}</span>` : ''}</div>
@@ -1056,7 +1066,7 @@
       <div class="gfield"><div class="glabel">G6 + independents 24-team playoff</div>${seg('g6po', [['off', 'Off'], ['on', 'On (from 2027)'], ['always', 'On every season']])}<p class="dim small">A separate bracket for Group of 6 teams and independents. A G6 champion that also earns a CFP spot can pick one.</p>${seg('g6pref', [['cfp', 'My G6 champ plays the CFP'], ['g6', 'My G6 champ plays the G6 playoff']])}</div>
       <div class="gfield"><div class="glabel">Difficulty</div>${seg('difficulty', [['freshman', 'Freshman'], ['varsity', 'Varsity (default)'], ['heisman', 'Heisman (hard)']])}</div>
       <div class="gfield"><div class="glabel">Injuries</div>${seg('injuries', [[true, 'On'], [false, 'Off']])}</div>
-      <div class="gfield"><div class="glabel">Screen shake</div>${seg('shake', [[true, 'On'], [false, 'Off']])}</div></div></div></div>`;
+      <div class="gfield"><div class="glabel">Screen shake</div>${seg('shake', [[true, 'On'], [false, 'Off']])}</div>${DEVEDIT.box()}</div></div></div>`;
   }
 
   /* ---------- offseason ---------- */

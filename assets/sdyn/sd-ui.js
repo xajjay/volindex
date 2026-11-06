@@ -162,11 +162,15 @@
 
   /* ---------- events ---------- */
   function onClick(e) {
-    const el = e.target.closest('[data-hview],[data-rid],[data-mor],[data-tab],[data-job],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-rradd],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-rotauto],[data-ord],[data-gid],[data-lpos],[data-lmore],[data-srecs],[data-tctab]'); if (!el) return;
+    const el = e.target.closest('[data-hview],[data-rid],[data-mor],[data-tab],[data-job],[data-act],[data-pid],[data-treg],[data-team],[data-push],[data-ncadd],[data-ncrm],[data-campf],[data-campp],[data-pedit],[data-devedit],[data-devsave],[data-devunlock],[data-devlock],[data-psave],[data-ahead],[data-more],[data-rpos],[data-statk],[data-stab],[data-conf],[data-ract],[data-radd],[data-rrm],[data-rradd],[data-roffer],[data-rfind],[data-nilf],[data-nilans],[data-nilstep],[data-persuade],[data-poffer],[data-ppos],[data-cut],[data-set],[data-box],[data-rot],[data-rotauto],[data-ord],[data-gid],[data-lpos],[data-lmore],[data-srecs],[data-tctab]'); if (!el) return;
     const d = el.dataset, g = G();
     if (el.tagName === 'A') e.preventDefault();
     if (d.mor) { const [a, id, ty] = d.mor.split('|'), p = SD.P(+id), A = SD.moraleAdapter(); V.msg = a === 'p' ? MORALE.promise(A, p, ty) : a === 't' ? MORALE.talk(A, p) : a === 'i' ? MORALE.ignore(A, p) : ''; autosave(); return keep(); }
     if (d.tab) { V.tab = d.tab; V.msg = null; return hub(); }
+    if (d.devunlock) { const c = APP.querySelector('#devCode'); DEVEDIT.unlock(c && c.value).then(err => { V.msg = err || 'Owner editor unlocked for an hour.'; keep(); }); return; }
+    if (d.devlock) { DEVEDIT.lock(); V.msg = 'Editor locked.'; return keep(); }
+    if (d.devedit) { if (!DEVEDIT.on()) return; const p = SD.P(+d.devedit); if (p) modal(DEVEDIT.form(p, devCfg())); return; }
+    if (d.devsave) { if (!DEVEDIT.on()) return; const p = SD.P(+d.devsave); if (p) V.msg = DEVEDIT.apply(p, devCfg()); closeModal(); return keep(); }
     if (d.pedit) return editCard(+d.pedit);
     if (d.psave) { V.msg = saveEdit(+d.psave); closeModal(); return keep(); }
     if (d.rid) return prospectCard(+d.rid);
@@ -685,7 +689,7 @@
     const bar = (l, v) => `<div class="dy-attr"><span>${esc(l)}</span><div class="dy-ab"><i class="${ovrCls(v)}" style="width:${v}%"></i></div><b>${v}</b></div>`;
     const [pl, pd] = SD.persLabel(p), lvl = Math.min(3, p.scout || 0);
     const ovrTxt = lvl >= 3 ? `${p.ovr}` : lvl === 2 ? `${p.ovr - 2}-${p.ovr + 2}` : lvl === 1 ? `${p.ovr - 5}-${p.ovr + 5}` : '??', potTxt = lvl >= 2 ? SD.gradeOfCeil(p.ceil || p.ovr) : '?';
-    modal(`<div class="dy-pc"><div class="dy-pc-head"><div class="dy-pc-num">${p.pos}</div><div><h3>${esc(p.n)}</h3><div class="dim">${hoops() && p.ht ? Math.floor(p.ht / 12) + "'" + (p.ht % 12) + '" · ' : ''}${esc(p.home)}</div>
+    modal(`${DEVEDIT.btn(id)}<div class="dy-pc"><div class="dy-pc-head"><div class="dy-pc-num">${p.pos}</div><div><h3>${esc(p.n)}</h3><div class="dim">${hoops() && p.ht ? Math.floor(p.ht / 12) + "'" + (p.ht % 12) + '" · ' : ''}${esc(p.home)}</div>
       <div><span class="dy-stars">${stars(p.rec.stars)}</span> No. ${p.rec.natl} nationally${p.arch ? ' · ' + esc(p.arch) : ''}</div></div>
       <div class="dy-pc-ovr"><span class="dy-ovr m">${ovrTxt}</span><small>OVR now</small><span class="dy-pot big">${potTxt}</span><small>Potential</small></div></div>
       <div class="dy-pc-tags">${p.realUT ? '<span class="chip ut">Real UT commit</span>' : ''}<span class="chip">Scouted ${lvl}/3</span>${p.commit != null ? `<span class="chip">Committed: ${esc(T(p.commit).name)}</span>` : ''}${p.offer ? '<span class="chip">Offered</span>' : ''}${p.nilOffer ? `<span class="chip">NIL promise ${SD.money(p.nilOffer)}</span>` : ''}${p.rpromise && window.MORALE ? `<span class="chip">Promised: ${esc(MORALE.TYPES[p.rpromise].short)}</span>` : ''}</div>
@@ -817,6 +821,7 @@
       <div class="gfield"><div class="glabel">Recruiting</div>${seg('recruiting', [['manual', 'I recruit'], ['auto', 'Auto'], ['off', 'Off']])}</div>
       ${SD.portalOn() ? `<div class="gfield"><div class="glabel">Transfer portal</div>${seg('portal', [['manual', 'I manage it'], ['auto', 'Auto']])}</div>` : '<div class="gfield"><p class="dim small">No transfer portal in this era (it opened in October 2018).</p></div>'}
       <div class="gfield"><div class="glabel">Locker room (morale and promises)</div>${seg('morale', [['off', 'Off'], ['on', 'On']])}<p class="dim small">Players have moods, personalities and a relationship with you. Stars expect roles and money that fit them; you can make promises any time and keep them to earn loyalty. A few quiet alerts a season, nothing forced.</p></div>
+      ${DEVEDIT.box()}
       <div class="grow"><button class="btn" data-act="export">Export save file</button><button class="btn" data-act="quit">Quit to menu</button></div></div>`;
   }
 
@@ -865,6 +870,20 @@
   }
 
   /* ---------- editing a generated player (not the ratings) ---------- */
+  function devCfg() {
+    const names = Object.assign({}, SD.ATTR.hoops, SD.ATTR.bat, SD.ATTR.pit);
+    return { posList: SD.POS[SD.kind()].slice(), yrs: [[1, 'Freshman'], [2, 'Sophomore'], [3, 'Junior'], [4, 'Senior'], [5, 'Fifth year']], attrs: p => Object.keys(p.at).map(k => [k, names[k] || k]),
+      ht: p => p.ht ? Math.floor(p.ht / 12) + '-' + p.ht % 12 : '', grade: SD.gradeOfCeil, setOvr: SD.setOvr,
+      fit: (p, v) => { for (let i = 0; i < 6 && Math.abs(v - p.ovr) >= 1; i++) { const d = (v - p.ovr) * 0.8; Object.keys(p.at).forEach(k => { p.at[k] = Math.round(Math.max(25, Math.min(99, p.at[k] + d))); }); SD.setOvr(p); } },
+      setPos: (p, pos, ht) => {
+        if (SD.kind() === 'hoops') return SD.reposition(p, pos, ht);
+        const toPit = pos === 'SP' || pos === 'RP', wasPit = SD.isPit(p); p.pos = pos; if (ht) p.ht = ht;
+        if (toPit !== wasPit) { const ks = toPit ? ['vel', 'stf', 'ctl', 'sta'] : ['con', 'pow', 'eye', 'spd', 'fld', 'arm']; p.at = {}; ks.forEach(k => { p.at[k] = Math.round(Math.max(40, Math.min(99, p.ovr + (Math.random() - 0.5) * 12))); }); }
+        SD.setOvr(p);
+      },
+      extra: p => p.pros ? '<label class="dy-edrow"><span>Scouting</span><select class="dy-in" data-dv="scout" data-o="' + p.scout + '">' + [[0, 'Not scouted'], [1, 'Basic'], [2, 'Good'], [3, 'Fully scouted']].map(o => '<option value="' + o[0] + '"' + (o[0] === p.scout ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></label>' : '',
+      applyExtra: (p, get, changed) => { if (changed('scout')) p.scout = +get('scout'); } };
+  }
   function editCard(id) {
     const p = SD.P(id); if (!p || p.real) return;
     const f = (k, l, v, extra) => `<label class="dy-edrow"><span>${l}</span><input class="dy-in" data-ed="${k}" value="${esc(v == null ? '' : v)}" ${extra || ''}></label>`;
@@ -909,7 +928,7 @@
       <div class="dy-pc-tags"><span class="chip" title="${esc(pd)}">${esc(pl)}</span>${p.rec && !p.rec.walkon ? `<span class="chip">${'★'.repeat(p.rec.stars || 0)}${p.rec.natl ? ' · No. ' + p.rec.natl : ''}</span>` : '<span class="chip">Walk-on</span>'}${p.nil ? `<span class="chip">NIL ${SD.money(p.nil)}</span>` : ''}</div>
       ${p.note ? `<p class="small dim">${esc(p.note)}</p>` : ''}
       ${g.phase === 'offseason' && p.t === g.user && g.off && ['recap', 'nil', 'portal'].includes(g.off.stage) && SD.portalOn() && p.tin !== g.season ? `<p><button class="btn" data-push="${p.id}">${p.pushOut ? 'Undo: keep him' : 'Encourage to transfer'}</button> <small class="dim">He enters the portal and frees his roster spot and NIL money.</small></p>` : ''}
-      ${!p.real ? `<p><button class="btn" data-pedit="${p.id}">Edit player</button> <small class="dim">Name, number and bio. Ratings stay as they are.</small></p>` : ''}
+      ${DEVEDIT.btn(p.id)}${!p.real ? `<p><button class="btn" data-pedit="${p.id}">Edit player</button> <small class="dim">Name, number and bio. Ratings stay as they are.</small></p>` : ''}
       ${p.aw && p.aw.length ? `<p class="small"><b>Honors:</b> ${p.aw.map(a => a.y + ' ' + ({ POY: 'National Player of the Year', AA1: 'All-American', SEC1: 'All-SEC first team', SEC2: 'All-SEC second team', SECPOY: 'SEC Player of the Year', SECFR: 'SEC Freshman of the Year', SECAF: 'SEC All-Freshman team', SECDPOY: 'SEC Defensive Player of the Year', SECDEF: 'SEC All-Defensive team', SEC6: 'SEC Sixth Man of the Year', SECNEW: 'SEC Newcomer of the Year', AA3: 'Third-team All-American' }[a.a] || a.a)).join(' · ')}</p>` : ''}
       <div class="dy-pc-cols"><div><div class="glabel">Ratings</div>${hideT ? '<p class="small dim">In the portal: a star rating and a range until he signs.</p>' : keys.map(k => bar(names[k], p.at[k])).join('')}</div>
       <div><div class="glabel">Personality</div>${Object.keys(SD.TRAITS).map(k => bar(SD.TRAITS[k], p.tr[k])).join('')}</div></div>
