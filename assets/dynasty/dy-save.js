@@ -21,8 +21,32 @@
     const cs = new root.CompressionStream('gzip'), w = cs.writable.getWriter(); w.write(new root.TextEncoder().encode(txt)); w.close();
     return new root.Response(cs.readable).arrayBuffer().then(b => new Uint8Array(b));
   }
+  // plain-JS inflate, for older phone browsers that have no DecompressionStream (older iPhones, some in-app browsers)
+  function inflateRaw(src, pos) {
+    let out = new Uint8Array(src.length * 6), op = 0, bb = 0, bc = 0;
+    const need = n => { if (op + n > out.length) { const o = new Uint8Array(Math.max(out.length * 2, op + n)); o.set(out); out = o; } };
+    const bits = n => { while (bc < n) { bb |= src[pos++] << bc; bc += 8; } const v = bb & ((1 << n) - 1); bb >>>= n; bc -= n; return v; };
+    const build = lens => { const cnt = new Uint16Array(16), offs = new Uint16Array(16), sym = new Uint16Array(lens.length); lens.forEach(l => cnt[l]++); cnt[0] = 0; for (let i = 1; i < 16; i++) offs[i] = offs[i - 1] + cnt[i - 1]; lens.forEach((l, i) => { if (l) sym[offs[l]++] = i; }); return { cnt, sym }; };
+    const dec = h => { let code = 0, first = 0, idx = 0; for (let l = 1; l < 16; l++) { code |= bits(1); const c = h.cnt[l]; if (code - c < first) return h.sym[idx + (code - first)]; idx += c; first += c; first <<= 1; code <<= 1; } throw new Error('bad data'); };
+    const LB = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258], LE = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0];
+    const DB = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577], DE = [0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13];
+    const fl = new Array(288).fill(8, 0, 144).fill(9, 144, 256).fill(7, 256, 280).fill(8, 280), FIXL = build(fl), FIXD = build(new Array(30).fill(5));
+    const block = (lc, dc) => { for (;;) { const s = dec(lc); if (s < 256) { need(1); out[op++] = s; } else if (s === 256) return; else { const i = s - 257, len = LB[i] + bits(LE[i]), d = dec(dc), dist = DB[d] + bits(DE[d]); need(len); for (let k = 0; k < len; k++, op++) out[op] = out[op - dist]; } } };
+    let last;
+    do {
+      last = bits(1); const t = bits(2);
+      if (t === 0) { bb = 0; bc = 0; const len = src[pos] | (src[pos + 1] << 8); pos += 4; need(len); out.set(src.subarray(pos, pos + len), op); op += len; pos += len; }
+      else if (t === 1) block(FIXL, FIXD);
+      else if (t === 2) { const nl = bits(5) + 257, nd = bits(5) + 1, nc = bits(4) + 4, ORD = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15], cl = new Array(19).fill(0); for (let i = 0; i < nc; i++) cl[ORD[i]] = bits(3);
+        const ch = build(cl), ls = []; while (ls.length < nl + nd) { const s = dec(ch); if (s < 16) ls.push(s); else { let r, v = 0; if (s === 16) { v = ls[ls.length - 1]; r = 3 + bits(2); } else if (s === 17) r = 3 + bits(3); else r = 11 + bits(7); while (r--) ls.push(v); } }
+        block(build(ls.slice(0, nl)), build(ls.slice(nl))); }
+      else throw new Error('bad data');
+    } while (!last);
+    return out.subarray(0, op);
+  }
   function gunzip(bytes) {
     if (bytes[0] !== 0x1f || bytes[1] !== 0x8b) return Promise.resolve(new root.TextDecoder().decode(bytes));
+    if (!root.DecompressionStream) return new Promise(res => { let p = 10; const fl = bytes[3]; if (fl & 4) p += 2 + (bytes[p] | (bytes[p + 1] << 8)); if (fl & 8) while (bytes[p++]); if (fl & 16) while (bytes[p++]); if (fl & 2) p += 2; setTimeout(() => res(new root.TextDecoder().decode(inflateRaw(bytes, p))), 0); });
     const ds = new root.DecompressionStream('gzip'), w = ds.writable.getWriter(); w.write(bytes); w.close();
     return new root.Response(ds.readable).text();
   }
