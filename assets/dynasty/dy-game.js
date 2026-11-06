@@ -331,7 +331,7 @@
     if (need === 'half') { el.innerHTML = halfHtml(GM); return; }
     if (need === 'pat') {
       const k = DY.lineup(GM.T[us]).K[0], xp = Math.round(Math.min(99.5, 94.5 + ((k ? k.at.kac : 65) - 70) / 3));
-      const forced = GM.ot && GM.ot.n >= 2;
+      const forced = GM.ot && GM.ot.n >= 3;
       el.innerHTML = `<div class="dyg-call-h">Touchdown! The try</div><div class="dyg-grid2">${forced ? '' : `<button class="dyg-big" data-pat="xp">Kick the extra point<small>${xp}%</small></button>`}<button class="dyg-big" data-pat="2pt">Go for two<small>${forced ? 'required in 2OT+' : 'about 45%'}</small></button></div>
         <div class="dyg-2pt" hidden><div class="dyg-call-h">Two-point play</div><div class="dyg-chips"><button data-two="run">Run it in</button><button data-two="qb">QB keeper</button><button data-two="quick">Quick pass</button><button data-two="pa">Play action</button><button data-two="rpo">RPO</button></div></div>`;
       return;

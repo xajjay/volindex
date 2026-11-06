@@ -326,7 +326,7 @@
   };
   DY.aiPat = (GM, s) => {
     const lead = GM.score[s] - GM.score[other(s)];
-    if (GM.ot && GM.ot.n >= 2) return '2pt';
+    if (GM.ot && GM.ot.n >= 3) return '2pt';
     if (GM.q === 4 && GM.clock <= 600 && [-2, -5, -10, -9, 1, 5, -16].includes(lead)) return '2pt';
     if (GM.q === 4 && GM.clock <= 120 && lead === -1) return chance(0.35) ? '2pt' : 'xp';
     return 'xp';
@@ -492,15 +492,14 @@
     return { type: 'pat', text, anim, s, ok, two: choice === '2pt' };
   }
 
-  /* overtime (college): each team gets a possession from the 25; 2OT on must go for two; 3OT on alternating two-point plays */
+  /* overtime (the old college rules): each team gets a possession from the 25 in turn; from 3OT on a touchdown must be followed by a two-point try */
   function otStart(GM) {
     if (!GM.ot) GM.ot = { n: 1, first: other(GM.tossWinner), done: 0 };
     const o = GM.ot;
     GM.q = 4 + o.n; GM.clock = 0; GM.to = { h: 1, a: 1 };
     GM.poss = o.done === 0 ? o.first : other(o.first);
-    GM.ot.needTD = o.n >= 2;
-    if (o.n >= 3) { GM.ball = 97; GM.down = 1; GM.togo = 3; o.shootout = true; }
-    else { GM.ball = 75; GM.down = 1; GM.togo = 10; o.shootout = false; }
+    GM.ot.needTD = false;                       // field goals count in every overtime
+    GM.ball = 75; GM.down = 1; GM.togo = 10; o.shootout = false;     // always a possession from the 25 (no two-point shootout)
     startDrive(GM, GM.poss, 'OT'); GM.next = 'scrim';
     return { type: 'ot', text: `${o.n === 1 ? 'OVERTIME' : (o.n === 2 ? 'DOUBLE' : o.n === 3 ? 'TRIPLE' : o.n + 'X') + ' OVERTIME'}: ${GM.T[GM.poss].name} ball ${o.shootout ? 'for a two-point play' : 'at the 25'}.`, anim: { kind: 'none' }, s: GM.poss, tag: o.n === 1 ? 'OVERTIME' : o.n + 'OT' };
   }
@@ -1115,7 +1114,7 @@
     if (GM.next === 'scrim' && GM.q <= 4 && GM.clock <= 0) {
       if (!td && !safety) { const eq = endQuarter(GM, ''); text = text + ' ' + eq.text; tag = tag || eq.tag; }
     }
-    if (GM.ot && GM.next === 'scrim' && (turnover || r.kind === 'fg' || (GM.ot.shootout && !td))) {
+    if (GM.ot && (GM.next === 'scrim' || (r.kind === 'fg' && r.ok)) && (turnover || r.kind === 'fg' || (GM.ot.shootout && !td))) {
       // possession over without a touchdown (two-point shootout plays end after one snap)
       if (GM.ot.shootout && !turnover && r.kind !== 'fg') { /* failed try */ }
       if (r.kind === 'fg' && r.ok) {}
