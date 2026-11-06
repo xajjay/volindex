@@ -132,7 +132,7 @@
         <div class="dyg-wp" title="Win probability"><span id="dygWp"></span></div>
         <div class="dyg-fieldwrap"><canvas aria-label="Field: live play"></canvas><div class="dyg-banner" id="dygBanner"></div><div class="dyg-noise" id="dygNoise"></div><div class="dyg-pop" id="dygPop"></div><div class="dyg-cap" id="dygCap" aria-live="polite"></div></div>
         <div class="dyg-bars" id="dygBars" hidden></div>
-        <div class="dyg-fullbar"><button data-fullx="1">✕ Exit full screen</button><button data-pause="1" class="dyg-fp-pause">❚❚ / ▶</button></div>
+        <div class="dyg-fullbar"><button data-fullx="1">✕ Exit full screen</button><button data-pause="1" class="dyg-fp-pause">❚❚ / ▶</button><button data-fullsnap="1" class="dyg-fp-snap" hidden>SNAP</button></div>
       </div>
       <div class="dyg-ctrl" id="dygCtrl"></div>
       <div class="dyg-simbar" id="dygSim"></div>
@@ -317,6 +317,7 @@
   function renderPanel(need) {
     const GM = S.GM, el = S.el.querySelector('#dygCtrl'), sim = S.el.querySelector('#dygSim');
     if (GM.over) return;
+    { const fs = S.el.querySelector('.dyg-fp-snap'); if (fs) { const live = need && need !== 'busy'; fs.hidden = !live; if (live) fs.textContent = need === 'def' ? 'SNAP (defense)' : need === 'pat' ? 'KICK PAT' : need === 'plan' || need === 'half' ? 'START' : 'SNAP'; } }
     const us = GM.user, them = us === 'h' ? 'a' : 'h';
     sim.innerHTML = need === 'plan' ? '' : `<div class="dyg-sims"><span class="dyg-lab">Sim to</span>${[['drive', 'End of drive'], ['quarter', 'End of quarter'], ['half', 'End of half'], ['big', 'Big moment'], ['end', 'Final']].map(([k, l]) => `<button data-sim="${k}">${l}</button>`).join('')}</div>
       <div class="dyg-speed"><span class="dyg-lab">View</span><button data-speed="slow" aria-pressed="${S.speed === 'slow'}">Slow</button><button data-speed="fast" aria-pressed="${S.speed === 'fast'}">Fast</button>
@@ -481,6 +482,7 @@
       if (d.watch) { GM.coach = GM.coach === 'watch' ? (DY.G.settings.coachMode === 'watch' ? 'offense' : DY.G.settings.coachMode) : 'watch'; if (GM.coach === 'watch') S.paused = false; barsMode(); if (!S.busy) loop(); return; }
       if (d.full) { toggleFull(true); return; }
       if (d.fullx) { toggleFull(false); return; }
+      if (d.fullsnap) { if (!S.busy && DY.needs(GM)) doStep({}); return; }   // full screen: the staff makes the call (as in Watch only) but you pick the moment
       if (d.watchone) { S.watchOne = true; barsMode(); clearTimeout(S.timer); if (!S.busy) doStep({}); return; }
       if (S.busy) return;
       if (d.plan) return doStep({ plan: d.plan });

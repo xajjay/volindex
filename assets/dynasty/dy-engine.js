@@ -153,6 +153,7 @@
   DY.aiDef = (GM, defSide) => {
     const offSide = other(defSide), lead = GM.score[defSide] - GM.score[offSide];
     if ((GM.q === 4 || GM.q === 2) && GM.clock <= 40 && lead > 0 && lead <= 8 + (GM.q === 2 ? 99 : 0) && GM.ball < 60) return { d: 'prev', lean: 'M' };
+    if (GM.q === 4 && GM.clock <= 12 && lead > 0 && lead <= 8 && GM.ball < 80) return { d: 'prev', lean: 'M' };     // last snap: protect the end zone
     if (GM.q === 4 && GM.clock <= 75 && lead >= 4 && lead <= 8) return { d: chance(0.6) ? 'prev' : 'c4', lean: 'M' };
     let pp = predPass(GM, offSide);
     // read the offense's habits (repeat calls get sniffed out)
@@ -226,6 +227,11 @@
     // end of half / game: kick it
     if ((GM.q === 2 || (GM.q === 4 && lead >= -3 && lead <= 0)) && GM.clock <= 8 && fgDist <= range + 3) return { k: 'fg' };
     if (GM.q >= 5 && GM.down === 4 && fgDist <= range && (GM.ot && GM.ot.needTD !== true)) return { k: 'fg' };
+    // the last play of the half or game: do not check it down. Trailing and out of field-goal range (or needing a touchdown) means everything goes deep
+    const distGoal = 100 - GM.ball, needTD = lead < -3 || fgDist > range + 3;
+    if (GM.q === 4 && GM.clock <= 8 && lead < 0 && needTD) return distGoal >= 25 ? { k: 'pass', t: 'deep', hm: true } : { k: 'pass', t: 'deep' };
+    if (GM.q === 2 && GM.clock <= 6 && fgDist > range + 3) return GM.ball >= 40 && distGoal >= 22 ? { k: 'pass', t: 'deep', hm: true } : { k: 'kneel' };
+    if (GM.q === 4 && GM.clock <= 25 && lead < 0 && needTD && distGoal > 30) { const w = { deep: 0.5, med: 0.38, quick: 0.07, pa: 0.05 }; return Object.assign(out, { k: 'pass', t: wpick(Object.keys(w), k2 => w[k2]), tempo: 'hurry' }); }
     // spike to stop the clock
     if (two && GM.running && GM.to[s] === 0 && GM.clock <= 35 && GM.clock > 4 && GM.down < 4 && lead <= 0) return { k: 'spike' };
     if (GM.down === 4) {
@@ -536,6 +542,12 @@
     else if (ocall.k === 'kneel') r = { kind: 'kneel', yards: -1, time: 3, stop: false, text: `${last(pers(GM, s).QB)} takes a knee.`, short: 'kneel', anim: { kind: 'kneel' } };
     else if (ocall.k === 'spike') r = { kind: 'spike', yards: 0, time: 2, stop: true, inc: true, text: `${last(pers(GM, s).QB)} spikes the ball to stop the clock.`, short: 'spike', anim: { kind: 'spike' } };
     else r = resolve(GM, s, ocall, dcall, false);
+    // a Hail Mary is a jump ball in a crowd: most fall incomplete, now and then one is tipped to a receiver in the end zone
+    if (ocall.hm && r && r.kind === 'pass') {
+      const O = pers(GM, s), qb = O.QB, tgt = r.target || O.WR[0];
+      if (chance(0.72)) r = { kind: 'inc', t: 'deep', passer: qb, target: tgt, yards: 0, events: ['The ball hangs in the air and comes down in a crowd of players. Knocked away in the end zone.'], text0: `${last(qb)} heaves a Hail Mary — incomplete`, time: 4, anim: { kind: 'pass', t: 'deep', inc: true, role: 'WR1' }, inc: true };
+      else { if (chance(0.6)) r.yards = Math.max(r.yards, 100 - GM.ball); r.text0 = 'HAIL MARY! ' + r.text0; }
+    }
     // record tendencies (the defense learns from these)
     if (ocall.k === 'run' || ocall.k === 'pass') {
       const k = startTogo <= 3 && startDown >= 2 ? 's' : (startTogo >= 7 && startDown >= 2) ? 'l' : 'e';
