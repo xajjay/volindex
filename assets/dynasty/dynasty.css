@@ -703,6 +703,7 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
 @media (max-width: 560px) { .dy-edgrid { grid-template-columns: 1fr; } }
 .dyg-tabs { overflow-x: auto; scrollbar-width: none; }
 .dyg-tabs button { white-space: nowrap; }
-.dyg-sub { display: grid; gap: 10px; padding-top: 8px; }
+.dyg-subs { display: grid; gap: 10px; padding-top: 8px; }
 .dyg-subrow { display: grid; grid-template-columns: minmax(110px, 160px) minmax(0, 1fr); align-items: center; gap: 10px; font-weight: 700; }
 .dyg-subrow select { min-width: 0; }
+@media (max-width: 760px) { .dyg-ctrl .dyg-snap { position: sticky; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 5; box-shadow: 0 6px 16px -6px rgba(0,0,0,.55); } }

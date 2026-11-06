@@ -527,7 +527,7 @@
       const rows = GM.plays.slice().reverse().slice(0, 160);
       el.innerHTML = `<ol class="dyg-pbp">${rows.map(p => `<li class="${p.big ? 'big' : ''} ${p.tag && /TOUCHDOWN|PICK|GOOD|FIELD GOAL|SAFETY/.test(p.tag) ? 'score' : ''}"><span class="dyg-pq">${p.q <= 4 ? 'Q' + p.q : 'OT'}</span><span class="dyg-pt" style="--tc:${GM.T[p.s] ? GM.T[p.s].c1 : '#888'}">${GM.T[p.s] ? esc(GM.T[p.s].abbr) : ''}</span><span>${p.head ? `<small>${esc(p.head)}</small> ` : ''}${esc(p.text)}${p.events && p.events.length ? `<em> ${p.events.map(esc).join(' ')}</em>` : ''}</span></li>`).join('')}</ol>`;
     } else if (S.tab === 'box') el.innerHTML = DYG.boxHtml(GM.T, GM.ts, GM.lineScore, GM.ps);
-    else if (S.tab === 'sub') { if (!el.contains(document.activeElement) || !el.querySelector('.dyg-sub')) el.innerHTML = subHtml(GM); }
+    else if (S.tab === 'sub') { if (!el.contains(document.activeElement) || !el.querySelector('.dyg-subs')) el.innerHTML = subHtml(GM); }
     else el.innerHTML = driveChart(GM);
   }
   // substitutions: pick who plays QB, RB, TE and the three WR spots on your offense; it holds for the rest of that drive (a hurt player comes out)
@@ -535,7 +535,7 @@
     const us = GM.user, L = GM.L[us], U = GM.sub && GM.sub.side === us ? GM.sub : {}, onO = GM.poss === us;
     const sel = (key, pos, label) => `<label class="dyg-subrow"><span>${label}</span><select data-sub="${key}" class="dy-in"><option value="">Coach's rotation</option>${(L[pos] || []).map(p => `<option value="${p.id}" ${U[key] === p.id ? 'selected' : ''}>#${p.num} ${esc(p.n)} · ${p.ovr}${p.yr ? ' · ' + ['', 'FR', 'SO', 'JR', 'SR', 'GR'][Math.min(5, p.yr)] : ''}</option>`).join('')}</select></label>`;
     const any = Object.keys(U).some(k => k !== 'side' && k !== 'dn' && U[k] != null);
-    return `<div class="dyg-sub"><p class="dim small">Choose who you want on the field. The player is in from the next snap and stays in for the rest of this drive${onO ? '' : ' (your next offensive drive, since your defense is on the field)'}, then the coach's rotation takes over again. A player who gets hurt comes out.</p>
+    return `<div class="dyg-subs"><p class="dim small">Choose who you want on the field. The player is in from the next snap and stays in for the rest of this drive${onO ? '' : ' (your next offensive drive, since your defense is on the field)'}, then the coach's rotation takes over again. A player who gets hurt comes out.</p>
       ${sel('QB', 'QB', 'Quarterback')}${sel('RB', 'RB', 'Running back')}${sel('TE', 'TE', 'Tight end')}${sel('WR1', 'WR', 'Wide receiver 1')}${sel('WR2', 'WR', 'Wide receiver 2')}${sel('WR3', 'WR', 'Wide receiver 3 (slot)')}
       ${any ? '<div class="grow"><button class="btn" data-subclear="1">Back to the coach\'s rotation</button></div>' : ''}</div>`;
   }
