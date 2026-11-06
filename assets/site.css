@@ -770,3 +770,9 @@ html.fb-open { overflow: hidden; }
 .pt-tabs button[aria-selected="true"] small { color: #fff; opacity: .9; }
 .pt-panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 8px; margin-bottom: 8px; }
 .pt-soon { opacity: .6; } .pt-soon b { color: var(--muted) !important; }
+
+/* sortable stat tables */
+th.sortable-th { cursor: pointer; user-select: none; }
+th.sortable-th:hover { color: var(--accent, #FF8200); }
+th.sorted-asc::after { content: ' \25B2'; font-size: .8em; }
+th.sorted-desc::after { content: ' \25BC'; font-size: .8em; }

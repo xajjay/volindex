@@ -202,7 +202,7 @@
   function wireStatsAuto(D) {
     const draw = () => {
       const box = $('#sStats');
-      if (sView === 'team') { box.innerHTML = teamTable(D); return; }
+      if (sView === 'team') { box.innerHTML = teamTable(D); makeSortable(box); return; }
       const cfg = STATCFG[D.key] || [];
       box.innerHTML = `<div class="controls" style="margin-bottom:12px"><div class="seg" role="group" aria-label="Stat category">${cfg.map((c, i) => `<button data-sc="${i}" aria-pressed="${i === sCat}">${esc(c[0])}</button>`).join('')}</div>
         <input type="search" id="sStatQ" placeholder="Filter by name" value="${esc(sQ)}" aria-label="Filter players"></div><div id="sStatT">${playerTable(D)}</div>`;
@@ -583,6 +583,36 @@
       <p class="dim small">Box scores: <a href="https://wehoop.sportsdataverse.org/" target="_blank" rel="noopener">SportsDataverse (wehoop)</a>, ESPN data${C.through ? ' through ' + fmtDate(C.through, { month: 'short', day: 'numeric' }) : ''}. Advanced numbers are calculated by The Vol Index from the box scores.</p>`;
   }
 
+  /* Click any column header on a stats table to sort it: numbers highest first, then lowest first; text A to Z, then Z to A. */
+  function makeSortable(root) {
+    root.querySelectorAll('table').forEach(tbl => {
+      const head = tbl.tHead && tbl.tHead.rows[0]; if (!head || head.querySelector('button') || tbl.dataset.sortable === 'off') return;
+      const body = tbl.tBodies[0]; if (!body || body.rows.length < 2) return;
+      const val = td => { const t = (td ? td.textContent : '').replace(/\u2212/g, '-').trim(); const m = t.replace(/^No\.\s*/i, '').match(/-?\d+(\.\d+)?/); return { t, n: m && t !== '—' ? parseFloat(m[0]) : null }; };
+      [...head.cells].forEach((th, ci) => {
+        const label = th.textContent.trim().toLowerCase();
+        if (/^(date|when|#)$/.test(label)) return;
+        th.classList.add('sortable-th'); th.tabIndex = 0; th.setAttribute('role', 'columnheader'); th.title = 'Click to sort';
+        const go = () => {
+          const rows = [...body.rows];
+          const vals = rows.map(r => val(r.cells[ci]));
+          const numeric = vals.filter(v => v.t && v.t !== '—').length > 0 && vals.filter(v => v.n != null).length >= vals.filter(v => v.t && v.t !== '—').length * 0.6;
+          const prev = th.getAttribute('aria-sort');
+          const dir = prev === 'descending' ? 1 : prev === 'ascending' ? -1 : (numeric ? -1 : 1);   // first click: highest first / A to Z
+          [...head.cells].forEach(c => { c.removeAttribute('aria-sort'); c.classList.remove('sorted-asc', 'sorted-desc'); });
+          th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); th.classList.add(dir > 0 ? 'sorted-asc' : 'sorted-desc');
+          const order = rows.map((r, i) => ({ r, v: vals[i], i }));
+          order.sort((a, b) => {
+            if (numeric) { const an = a.v.n, bn = b.v.n; if (an == null && bn == null) return a.i - b.i; if (an == null) return 1; if (bn == null) return -1; return (an - bn) * dir || a.i - b.i; }
+            return a.v.t.localeCompare(b.v.t) * dir || a.i - b.i;
+          });
+          order.forEach(o => body.appendChild(o.r));
+        };
+        th.addEventListener('click', go); th.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+      });
+    });
+  }
+
   /* ---------- recruiting ---------- */
   function recruiting(D) {
     const R = (window.RECRUITING || {})[D.key] || {};
@@ -827,6 +857,7 @@ ${rows}
     if (tab === 'roster') wireRoster(D);
     if (tab === 'lineup') wireLineup(D);
     if (tab === 'stats' && D.statsAuto) wireStatsAuto(D);
+    if (tab === 'advanced' || tab === 'ratings' || (tab === 'stats' && !D.statsAuto)) makeSortable(app);
     app.querySelectorAll('[data-sg]').forEach(el => { const go = () => openGameSport(D, +el.dataset.sg); el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter') go(); }); });
     wirePlayersSport(D, app);
     app.querySelectorAll('[data-season]').forEach(el => { const go = () => openSeasonSport(D, el.dataset.season); el.addEventListener('click', go); el.addEventListener('keydown', e => { if (e.key === 'Enter') go(); }); });
