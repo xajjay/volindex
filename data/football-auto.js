@@ -123,7 +123,7 @@ window.SITE_AUTO.football = {
    ],
    "ypg": [
     394.5,
-    61,
+    60,
     9
    ],
    "rushYpg": [
@@ -1167,7 +1167,7 @@ window.SITE_AUTO.football = {
    "Amare Campbell": [
     {
      "stat": "Tackles for loss",
-     "rank": 49
+     "rank": 50
     }
    ],
    "Tyree Weathersby": [
@@ -1177,7 +1177,7 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Tackles for loss",
-     "rank": 39
+     "rank": 40
     }
    ],
    "Xavier Gilliam": [
@@ -1193,7 +1193,7 @@ window.SITE_AUTO.football = {
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 37
+     "rank": 38
     }
    ],
    "Ty Redmond": [
@@ -1471,11 +1471,11 @@ window.SITE_AUTO.football = {
   "Kentucky": {
    "tv": "ESPN",
    "kick": "2026-11-07T23:15Z",
-   "line": "TENN -6.5",
+   "line": "TENN -5.5",
    "ou": 49.5,
-   "ml": "-238",
+   "ml": "-205",
    "book": "DraftKings",
-   "win": 66.8
+   "win": 66.7
   },
   "Texas A&M": {
    "tv": null,
@@ -1511,7 +1511,7 @@ window.SITE_AUTO.football = {
     "Total yards per game",
     "Total offense",
     394.5,
-    61,
+    60,
     9,
     false
    ],
@@ -1520,7 +1520,7 @@ window.SITE_AUTO.football = {
     "Yards per play",
     "Total offense",
     5.65,
-    85,
+    84,
     10,
     false
    ],
@@ -1538,7 +1538,7 @@ window.SITE_AUTO.football = {
     "Completion %",
     "Passing",
     64.3,
-    56,
+    57,
     10,
     false
    ],
@@ -1601,7 +1601,7 @@ window.SITE_AUTO.football = {
     "Rushing TDs",
     "Rushing",
     21.0,
-    12,
+    13,
     2,
     false
    ],
@@ -1655,7 +1655,7 @@ window.SITE_AUTO.football = {
     "Penalty yards per game",
     "Downs",
     62.1,
-    92,
+    91,
     8,
     true
    ],
@@ -1790,7 +1790,7 @@ window.SITE_AUTO.football = {
     "Turnover margin",
     "Run defense",
     3.0,
-    36,
+    37,
     5,
     false
    ],
@@ -1808,7 +1808,7 @@ window.SITE_AUTO.football = {
     "Punt return average",
     "Returning",
     10.5,
-    58,
+    57,
     7,
     false
    ],
