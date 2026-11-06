@@ -169,8 +169,8 @@
     if (d.tab) { V.tab = d.tab; V.msg = null; return hub(); }
     if (d.devunlock) { const c = APP.querySelector('#devCode'); DEVEDIT.unlock(c && c.value).then(err => { V.msg = err || 'Owner editor unlocked for an hour.'; keep(); }); return; }
     if (d.devlock) { DEVEDIT.lock(); V.msg = 'Editor locked.'; return keep(); }
-    if (d.devedit) { if (!DEVEDIT.on()) return; const p = SD.P(+d.devedit); if (p) modal(DEVEDIT.form(p, devCfg())); return; }
-    if (d.devsave) { if (!DEVEDIT.on()) return; const p = SD.P(+d.devsave); if (p) V.msg = DEVEDIT.apply(p, devCfg()); closeModal(); return keep(); }
+    if (d.devedit) { if (!DEVEDIT.on()) return; const p = SD.P(+d.devedit) || (G().recruit && G().recruit.pool[+d.devedit]); if (p) modal(DEVEDIT.form(p, devCfg())); return; }
+    if (d.devsave) { if (!DEVEDIT.on()) return; const p = SD.P(+d.devsave) || (G().recruit && G().recruit.pool[+d.devsave]); if (p) V.msg = DEVEDIT.apply(p, devCfg()); closeModal(); return keep(); }
     if (d.pedit) return editCard(+d.pedit);
     if (d.psave) { V.msg = saveEdit(+d.psave); closeModal(); return keep(); }
     if (d.rid) return prospectCard(+d.rid);
