@@ -369,9 +369,10 @@
   function swing(GM, s, v) { GM.mom = clamp(GM.mom + (s === 'h' ? v : -v), -1, 1); }
 
   // how far a return is meant to go: from the returner's return rating, the blocking and luck. 400 is a breakaway (a touchdown unless he is caught from behind)
+  DY.RET_OPEN = { kick: [0.004, 0.0017], punt: [-0.005, 0.0029] }; DY.RET_CONV = { kick: 0.95, punt: 0.5 };     // chance a return springs free, how it grows with the return rating, and how often a free return in the formula (non-live) sim scores
   DY.retDist = (kind, rt) => {
     const d0 = rt - 72;
-    if (chance(0.0145 + Math.max(0, rt - 60) * 0.0013)) return 400;      // breakaway: about 3% for a typical starting returner, about 5% for the best in the country
+    if (chance(Math.max(0.004, DY.RET_OPEN[kind][0] + Math.max(0, rt - 60) * DY.RET_OPEN[kind][1]))) return 400;      // a seam opens (blocks hold, the coverage takes bad angles): whether he scores is then up to the physics of the run
     return kind === 'kick' ? clamp(20.5 + d0 * 0.32 + gauss() * 9.5 + (chance(0.25) ? rr(4, 14) : 0), 5, 62) : clamp(9 + d0 * 0.16 + gauss() * 7 + (chance(0.15) ? rr(10, 28) : 0), 0, 50);
   };
   /* kickoffs and free kicks */
@@ -407,7 +408,7 @@
     }
     else {
       const rt = KR ? DY.rtnOf(KR) : 60, R = DY.retDist('kick', rt);
-      ret = R === 400 ? 110 : Math.min(R * 0.86, 100 - Math.max(1, land) - 1);
+      ret = R === 400 ? (chance(DY.RET_CONV.kick) ? 110 : rr(35, 70)) : Math.min(R * 0.86, 100 - Math.max(1, land) - 1);
       if (chance(0.007)) fumble = true;
     }
     const kicker = GM.T[ks].abbr;
@@ -906,7 +907,7 @@
       let liveR = null;
       if (fc && GM.live && DY.SIM && pr) { try { result.trk = DY.SIM.returnPlay(GM, other(s), { kind: 'punt', land: Math.max(1, recv), hang: 4.2, returner: pr, mode: 'fc' }).trk; } catch (e) { } }
       if (!fc && !muff && GM.live && DY.SIM && pr) { liveR = DY.SIM.returnPlay(GM, other(s), { kind: 'punt', land: Math.max(1, recv), hang: 4.2, returner: pr }); ret = liveR.ret; td = liveR.td; if (liveR.tackler) add(GM, liveR.tackler, 'tk'); result.trk = liveR.trk; }
-      else if (!fc && !muff) { const R = DY.retDist('punt', pr ? DY.rtnOf(pr) : 60); if (R === 400) { td = true; ret = recv >= 99 ? 1 : 100 - recv; } else ret = Math.min(R * 0.62, 99 - recv); }
+      else if (!fc && !muff) { const R = DY.retDist('punt', pr ? DY.rtnOf(pr) : 60); if (R === 400) { if (chance(DY.RET_CONV.punt)) { td = true; ret = recv >= 99 ? 1 : 100 - recv; } else ret = rr(20, 45); } else ret = Math.min(R * 0.62, 99 - recv); }
       if (rush && !td) ret = Math.round(ret * 0.55);
       add(GM, pt, 'pn'); add(GM, pt, 'pny', Math.round(gross)); if (recv <= 20) add(GM, pt, 'i20');
       result.text = `${last(pt)} punts ${Math.round(gross)} yards to the ${DY.spotName(GM, other(s), Math.round(recv))}. ` + (fc ? `Fair catch by ${last(pr)}.` : muff ? `MUFFED by ${last(pr)}! ` : td ? `${last(pr)} takes it back... TOUCHDOWN!` : `${last(pr)} returns ${Math.round(ret)} yards.`);

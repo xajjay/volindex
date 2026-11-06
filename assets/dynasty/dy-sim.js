@@ -1184,7 +1184,7 @@
     const block = [...R.OT.slice(0, 2), ...R.IOL.slice(0, 2), R.TE[0], ...R.LB.slice(0, 2), ...R.WR.slice(1, 3), R.RB[1] || R.RB[0], R.S[1] || R.S[0], R.CB[2] || R.CB[0]].filter(Boolean).filter(p => p !== retr).filter((p, i, a) => a.indexOf(p) === i).slice(0, 10);
     const land = k.land, hang = k.hang; W.conv = 11 + rnd() * 8; W.land0 = k.land; W.kk = k.kind; W.tkAdj = 0;
     // how far this return is meant to go (set by the returner's rating, the blocking and luck); the contact physics is real, but the tackles are made likelier as he nears that spot
-    { W.Rt = DY.retDist(k.kind, DY.rtnOf(k.returner)); if (W.Rt === 400) W.tkAdj = -0.75; }
+    { W.Rt = DY.retDist(k.kind, DY.rtnOf(k.returner)); if (W.Rt === 400) W.tkAdj = k.kind === 'punt' ? -0.6 : -0.45; }
     // positions when the ball comes down
     const r = { p: retr }; const ra = agent(W, retr, 'o', 'KR', land - 1.5, 0); ra.gdir = 1;
     // the returner's return rating: burst and nerve with the ball in his hands (an 85 is a real threat, a 55 takes what is there)
@@ -1194,7 +1194,7 @@
     // coverage players: spread across the field, arriving as the ball comes down
     cover.forEach((p, i) => {
       const lane = -24 + i * (48 / Math.max(1, cover.length - 1));
-      const ahead = k.kind === 'punt' ? (i < 2 ? 4 : 15 + (i % 4) * 3) : clamp(5 + Math.min(W.Rt, 42) * 1.3, 12, 80) + ((i * 7) % 11) * 1.4 - 4;
+      const ahead = k.kind === 'punt' ? (i < 2 ? 4 : 15 + (i % 4) * 3) : clamp(W.Rt === 400 ? 34 : 5 + Math.min(W.Rt, 42) * 1.3, 12, 80) + ((i * 7) % 11) * 1.4 - 4;
       const a = agent(W, p, 'd', 'C' + i, land + ahead + (i === 0 ? 14 : 0), lane * (i < 2 && k.kind === 'punt' ? 0.9 : 0.85));
       a.top *= k.kind === 'kick' ? 0.96 : 0.97; a.vx = -a.top * 0.92; a.task = 'cover';
     });
