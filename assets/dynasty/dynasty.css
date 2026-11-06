@@ -701,3 +701,8 @@ html.dyg-noscroll, html.dyg-noscroll body { overflow: hidden; }
 .dy-edgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
 .dy-edgrid .dy-edrow { grid-template-columns: 1fr 70px; }
 @media (max-width: 560px) { .dy-edgrid { grid-template-columns: 1fr; } }
+.dyg-tabs { overflow-x: auto; scrollbar-width: none; }
+.dyg-tabs button { white-space: nowrap; }
+.dyg-sub { display: grid; gap: 10px; padding-top: 8px; }
+.dyg-subrow { display: grid; grid-template-columns: minmax(110px, 160px) minmax(0, 1fr); align-items: center; gap: 10px; font-weight: 700; }
+.dyg-subrow select { min-width: 0; }

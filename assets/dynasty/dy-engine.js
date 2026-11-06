@@ -76,6 +76,19 @@
       K: L.K[0], P: L.P[0], KR: L.KR, PR: L.PR,
       TE2: at(L.TE, 1), WR4: at(L.WR, 3), WR5: at(L.WR, 4), FB: L.RB[1] || L.TE[1] || L.RB[0],
     };
+    // the coach's own substitutions (Substitutions tab): hold for the rest of that offensive drive, and never put a hurt player (already gone from the depth chart) on the field
+    const U = GM.sub && GM.sub.side === s && GM.poss === s && GM.drive && GM.drive.s === s && !GM.drive.res ? GM.sub : null;
+    if (U) {
+      const dn = (GM.drives || []).length;
+      if (U.dn == null) U.dn = dn;
+      if (U.dn !== dn) GM.sub = null;
+      else {
+        const pk = (id, pos) => { const p = id != null ? DY.P(id) : null; return p && (L[pos] || []).includes(p) ? p : null; };
+        const q = pk(U.QB, 'QB'), r = pk(U.RB, 'RB'), te = pk(U.TE, 'TE');
+        if (q) P.QB = q; if (r) P.RB = r; if (te) P.TE = te;
+        [U.WR1, U.WR2, U.WR3].forEach((id, i) => { const w = pk(id, 'WR'); if (!w) return; const j = P.WR.indexOf(w); if (j >= 0 && j !== i) P.WR[j] = P.WR[i]; P.WR[i] = w; });
+      }
+    }
     if (garbage && L.OT.length > 2) P.OL[0] = L.OT[2];
     if (garbage && L.IOL.length > 3) P.OL[2] = L.IOL[3];
     // a thin or injury-hit room never leaves a hole on the field: borrow from the nearest group
@@ -355,7 +368,7 @@
     return res;
   };
 
-  function startDrive(GM, s, how) { GM.drive = { s, start: GM.ball, q: GM.q, clock: GM.clock, plays: 0, yds: 0, how, res: null }; GM.drives.push(GM.drive); }
+  function startDrive(GM, s, how) { GM.drive = { s, start: GM.ball, q: GM.q, clock: GM.clock, plays: 0, yds: 0, how, res: null }; GM.drives.push(GM.drive); if (GM.sub && GM.sub.dn != null && GM.sub.dn !== GM.drives.length) GM.sub = null; }
   function endDrive(GM, res) { if (GM.drive && !GM.drive.res) { GM.drive.res = res; GM.drive.endClock = GM.clock; GM.drive.endQ = GM.q; } }
   function changePoss(GM, newBall, how) {
     GM.poss = other(GM.poss); GM.ball = Math.round(clamp(newBall, 1, 99)); GM.down = 1; GM.togo = Math.min(10, 100 - GM.ball); GM.running = false;

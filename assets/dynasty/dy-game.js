@@ -136,7 +136,7 @@
       </div>
       <div class="dyg-ctrl" id="dygCtrl"></div>
       <div class="dyg-simbar" id="dygSim"></div>
-      <div class="dyg-tabs" role="tablist"><button data-tab="pbp" aria-selected="true">Play-by-play</button><button data-tab="chart">Drive chart</button><button data-tab="box">Box score</button></div>
+      <div class="dyg-tabs" role="tablist"><button data-tab="pbp" aria-selected="true">Play-by-play</button><button data-tab="chart">Drive chart</button><button data-tab="box">Box score</button><button data-tab="sub">Substitutions</button></div>
       <div class="dyg-panel" id="dygPanel"></div>
     </div>`;
   }
@@ -461,12 +461,19 @@
   function bind() {
     S.el.addEventListener('change', e => {
       const t = e.target; if (!S) return;
+      if (t.dataset.sub) {
+        const GM = S.GM; if (!GM.sub || GM.sub.side !== GM.user) GM.sub = { side: GM.user, dn: null };
+        const k = t.dataset.sub, v = t.value ? +t.value : null; GM.sub[k] = v;
+        if (v != null && k.startsWith('WR')) ['WR1', 'WR2', 'WR3'].forEach(o => { if (o !== k && GM.sub[o] === v) GM.sub[o] = null; });   // one man cannot hold two spots
+        S.el.querySelector('#dygPanel').innerHTML = subHtml(GM); return;
+      }
       if (t.dataset.pick) { S.play[t.dataset.pick] = t.value || null; renderPanel(DY.needs(S.GM)); }
       if (t.dataset.form) { S.form = t.value; renderPanel(DY.needs(S.GM)); }
     });
     S.el.addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b || !S) return;
       const GM = S.GM, d = b.dataset;
+      if (d.subclear) { GM.sub = null; S.el.querySelector('#dygPanel').innerHTML = subHtml(GM); return; }
       if (d.tab) { S.tab = d.tab; S.el.querySelectorAll('.dyg-tabs button').forEach(x => x.setAttribute('aria-selected', x === b)); renderTab(); return; }
       if (S.busy && d.sim) { S.pendSim = d.sim; b.textContent = 'After this play…'; return; }
       if (d.pause) { S.paused = !S.paused; if (!S.busy) loop(); else renderPanel('busy'); return; }
@@ -520,7 +527,17 @@
       const rows = GM.plays.slice().reverse().slice(0, 160);
       el.innerHTML = `<ol class="dyg-pbp">${rows.map(p => `<li class="${p.big ? 'big' : ''} ${p.tag && /TOUCHDOWN|PICK|GOOD|FIELD GOAL|SAFETY/.test(p.tag) ? 'score' : ''}"><span class="dyg-pq">${p.q <= 4 ? 'Q' + p.q : 'OT'}</span><span class="dyg-pt" style="--tc:${GM.T[p.s] ? GM.T[p.s].c1 : '#888'}">${GM.T[p.s] ? esc(GM.T[p.s].abbr) : ''}</span><span>${p.head ? `<small>${esc(p.head)}</small> ` : ''}${esc(p.text)}${p.events && p.events.length ? `<em> ${p.events.map(esc).join(' ')}</em>` : ''}</span></li>`).join('')}</ol>`;
     } else if (S.tab === 'box') el.innerHTML = DYG.boxHtml(GM.T, GM.ts, GM.lineScore, GM.ps);
+    else if (S.tab === 'sub') { if (!el.contains(document.activeElement) || !el.querySelector('.dyg-sub')) el.innerHTML = subHtml(GM); }
     else el.innerHTML = driveChart(GM);
+  }
+  // substitutions: pick who plays QB, RB, TE and the three WR spots on your offense; it holds for the rest of that drive (a hurt player comes out)
+  function subHtml(GM) {
+    const us = GM.user, L = GM.L[us], U = GM.sub && GM.sub.side === us ? GM.sub : {}, onO = GM.poss === us;
+    const sel = (key, pos, label) => `<label class="dyg-subrow"><span>${label}</span><select data-sub="${key}" class="dy-in"><option value="">Coach's rotation</option>${(L[pos] || []).map(p => `<option value="${p.id}" ${U[key] === p.id ? 'selected' : ''}>#${p.num} ${esc(p.n)} · ${p.ovr}${p.yr ? ' · ' + ['', 'FR', 'SO', 'JR', 'SR', 'GR'][Math.min(5, p.yr)] : ''}</option>`).join('')}</select></label>`;
+    const any = Object.keys(U).some(k => k !== 'side' && k !== 'dn' && U[k] != null);
+    return `<div class="dyg-sub"><p class="dim small">Choose who you want on the field. The player is in from the next snap and stays in for the rest of this drive${onO ? '' : ' (your next offensive drive, since your defense is on the field)'}, then the coach's rotation takes over again. A player who gets hurt comes out.</p>
+      ${sel('QB', 'QB', 'Quarterback')}${sel('RB', 'RB', 'Running back')}${sel('TE', 'TE', 'Tight end')}${sel('WR1', 'WR', 'Wide receiver 1')}${sel('WR2', 'WR', 'Wide receiver 2')}${sel('WR3', 'WR', 'Wide receiver 3 (slot)')}
+      ${any ? '<div class="grow"><button class="btn" data-subclear="1">Back to the coach\'s rotation</button></div>' : ''}</div>`;
   }
   const colOf = p => { const a = p.anim || {}; if (a.wiped || p.type === 'pen') return 'flag'; if (a.kind === 'sack') return 'neg'; if (p.turnover || (a.int)) return 'to'; if (a.kind === 'run') return (a.yards || 0) < 0 ? 'neg' : 'run'; if (a.kind === 'pass') return a.inc ? 'inc' : (a.yards || 0) < 0 ? 'neg' : 'pass'; if (a.kind === 'kick' || a.kind === 'punt') return 'st'; return 'st'; };
   // the drive chart: each drive on its own strip
