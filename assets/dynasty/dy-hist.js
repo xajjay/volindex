@@ -96,27 +96,59 @@
       out.push({ o: o.id, home: r[1] === 'Tennessee', wk: clamp(Math.floor((Date.parse(season + '-' + r[0] + 'T12:00:00Z') - mon) / (7 * 864e5)) + 1, 1, 5) }); });
     return out.length ? out : null;
   };
+  // Tennessee-Vanderbilt is the in-state rivalry and closes Tennessee's regular season, whatever the real calendar of a given year did.
+  // Swap it with Tennessee's current last game; a third team's game that then collides is slid to the freed week, or another open week, or dropped
+  DY.vandyLast = (games, from) => {
+    const UT = DY.UT_ID, vu = DY.byName('Vanderbilt'); if (UT == null || !vu) return false; const VU = vu.id;
+    const ok = x => x.res == null && !x.played && x.wk >= (from || 0);
+    const mine = games.filter(x => x.h === UT || x.a === UT), V = mine.find(x => x.h === VU || x.a === VU);
+    if (!V || !ok(V)) return false;
+    const L = mine.filter(x => x !== V).sort((p, q) => q.wk - p.wk)[0];
+    if (!L || L.wk < V.wk || !ok(L)) return false;
+    const LO = L.h === UT ? L.a : L.h, oldWk = V.wk, newWk = L.wk, last = DY.LAST_WK || 13;
+    const at = (t, w, not) => t >= 1000 ? null : games.find(x => x !== not && x.wk === w && (x.h === t || x.a === t));
+    const conflicts = [[VU, newWk, oldWk, V], [LO, oldWk, newWk, L]].map(([t, w]) => at(t, w, t === VU ? V : L)).filter(Boolean);
+    if (conflicts.some(m => !ok(m) || m.h === UT || m.a === UT)) return false;
+    V.wk = newWk; L.wk = oldWk;
+    conflicts.forEach(m => {
+      const freeFor = w => w >= 0 && w <= last && ![m.h, m.a].some(t => t < 1000 && (at(t, w, m) || (t === UT && (V.wk === w || L.wk === w))));
+      const prefer = m.wk === newWk ? oldWk : newWk;
+      let w = freeFor(prefer) ? prefer : null; for (let k = 1; w == null && k <= last; k++) { if (freeFor(m.wk + k)) w = m.wk + k; else if (freeFor(m.wk - k)) w = m.wk - k; }
+      if (w == null) games.splice(games.indexOf(m), 1); else m.wk = w;
+    });
+    games.sort((p, q) => p.wk - q.wk);
+    return true;
+  };
   // saves made before the schedule data was fixed (Saturday-night games on rivalry weekend were dropped, so some teams, Tennessee in 2013 for one, played 11): put the real games the season is missing back in
   DY.fixHistSched = g => {
     g.fx = g.fx || {};
-    if (g.fx.sched2 || !g.hx || !g.sched || !g.sched.length || !DY.isHistSeason(g, g.season)) return;
-    g.fx.sched2 = 1;
-    const keep = g.sched, wkKeep = g.hx.wk && g.hx.wk[g.season] ? Object.assign({}, g.hx.wk[g.season]) : null, lastWk = DY.LAST_WK;
-    let fresh = null; try { fresh = DY.histSchedule(g.season); } finally { g.sched = keep; if (wkKeep) g.hx.wk[g.season] = wkKeep; DY.LAST_WK = lastWk; }
-    if (!fresh) return;
-    const busy = {}, pair = new Set();
-    keep.forEach(x => { if (x.h < 1000) busy[x.h + '|' + x.wk] = 1; if (x.a < 1000) busy[x.a + '|' + x.wk] = 1; if (x.h < 1000 && x.a < 1000) pair.add(Math.min(x.h, x.a) + '|' + Math.max(x.h, x.a)); });
-    const from = g.phase === 'season' ? (g.week || 0) : 0; let n = 0;
-    fresh.forEach(x => {
-      if (x.wk < from || (x.h < 1000 && busy[x.h + '|' + x.wk]) || (x.a < 1000 && busy[x.a + '|' + x.wk])) return;
-      if (x.h < 1000 && x.a < 1000 && pair.has(Math.min(x.h, x.a) + '|' + Math.max(x.h, x.a))) return;
-      if ((x.h >= 1000 || x.a >= 1000) && !(x.h === DY.UT_ID || x.a === DY.UT_ID)) return;   // (only real I-A games are added back: no FCS stand-ins for other teams)
-      keep.push(Object.assign({}, x, { id: g.season + '-fx' + (n++), res: null }));
-      if (x.h < 1000) busy[x.h + '|' + x.wk] = 1; if (x.a < 1000) busy[x.a + '|' + x.wk] = 1; if (x.h < 1000 && x.a < 1000) pair.add(Math.min(x.h, x.a) + '|' + Math.max(x.h, x.a));
-    });
-    if (n) keep.sort((p, q) => p.wk - q.wk);
+    if (!g.hx || !g.sched || !g.sched.length || !DY.isHistSeason(g, g.season)) return;
+    const from0 = g.phase === 'season' ? (g.week || 0) : 0, keep = g.sched;
+    if (!g.fx.sched2) {
+      g.fx.sched2 = 1;
+      const wkKeep = g.hx.wk && g.hx.wk[g.season] ? Object.assign({}, g.hx.wk[g.season]) : null, lastWk = DY.LAST_WK;
+      let fresh = null; try { fresh = DY.histSchedule(g.season, true); } finally { g.sched = keep; if (wkKeep) g.hx.wk[g.season] = wkKeep; DY.LAST_WK = lastWk; }
+      if (fresh) {
+        const busy = {}, pair = new Set();
+        keep.forEach(x => { if (x.h < 1000) busy[x.h + '|' + x.wk] = 1; if (x.a < 1000) busy[x.a + '|' + x.wk] = 1; if (x.h < 1000 && x.a < 1000) pair.add(Math.min(x.h, x.a) + '|' + Math.max(x.h, x.a)); });
+        let n = 0;
+        fresh.forEach(x => {
+          if (x.wk < from0 || (x.h < 1000 && busy[x.h + '|' + x.wk]) || (x.a < 1000 && busy[x.a + '|' + x.wk])) return;
+          if (x.h < 1000 && x.a < 1000 && pair.has(Math.min(x.h, x.a) + '|' + Math.max(x.h, x.a))) return;
+          if ((x.h >= 1000 || x.a >= 1000) && !(x.h === DY.UT_ID || x.a === DY.UT_ID)) return;   // (only real I-A games are added back: no FCS stand-ins for other teams)
+          keep.push(Object.assign({}, x, { id: g.season + '-fx' + (n++), res: null }));
+          if (x.h < 1000) busy[x.h + '|' + x.wk] = 1; if (x.a < 1000) busy[x.a + '|' + x.wk] = 1; if (x.h < 1000 && x.a < 1000) pair.add(Math.min(x.h, x.a) + '|' + Math.max(x.h, x.a));
+        });
+        if (n) keep.sort((p, q) => p.wk - q.wk);
+      }
+    }
+    if (!g.fx.sched3) {
+      g.fx.sched3 = 1; g.fx.vandy1 = 1;
+      DY.vandyLast(keep, from0);
+      if (g.season >= 2006) { const b2 = {}; keep.forEach(x => { if (x.h < 1000) b2[x.h + '|' + x.wk] = 1; if (x.a < 1000) b2[x.a + '|' + x.wk] = 1; }); const before = keep.length; fillFcs(g.season, keep, b2, Math.max(1, from0)); if (keep.length > before) keep.sort((p, q) => p.wk - q.wk); }
+    }
   };
-  DY.histSchedule = season => {
+  DY.histSchedule = (season, raw) => {
     const g = G(); if (!DY.isHistSeason(g, season)) return null;
     const S = root.DY_HSCHED[season], games = [], busy = {};
     if (!S.g.length) return genSchedule(season);
@@ -151,22 +183,22 @@
         if (w < 0) return; busy[UT + '|' + w] = 1; if (pk.o < 1000) busy[pk.o + '|' + w] = 1;
         games.push({ id: season + '-' + games.length + 'p', wk: w, h: pk.home ? UT : pk.o, a: pk.home ? pk.o : UT, conf: false, neutral: false, tag: null, res: null, real: false, pick: true }); });
     }
+    if (!raw && DY.vandyLast(games, 0)) { Object.keys(busy).forEach(k => delete busy[k]); games.forEach(x => { if (x.h < 1000) busy[x.h + '|' + x.wk] = 1; if (x.a < 1000) busy[x.a + '|' + x.wk] = 1; }); }
     fillFcs(season, games, busy);
     games.sort((x, y) => x.wk - y.wk);
     g.sched = games;
     return games;
   };
   // the record before 2007 only has games between I-A teams: fill everyone to eleven with I-AA opponents
-  function fillFcs(season, games, busy) {
+  function fillFcs(season, games, busy, from) {
     const g = G(), cnt = {};
     games.forEach(x => { cnt[x.h] = (cnt[x.h] || 0) + 1; cnt[x.a] = (cnt[x.a] || 0) + 1; });
-    const want = season >= 2006 ? 12 : 11;
+    const want = season >= 2006 ? 12 : 11;      // every team plays a twelve-game regular season from 2006 (the real record is kept as it was in 2001-2005)
     g.teams.filter(t => !t.dorm).forEach(t => {
-      for (let w = 1; w <= DY.LAST_WK && (cnt[t.id] || 0) < want; w++) {
+      for (let w = Math.max(0, from || 0) || 1; w <= DY.LAST_WK && (cnt[t.id] || 0) < want; w++) {
         if (busy[t.id + '|' + w]) continue;
-        if ((cnt[t.id] || 0) >= want - 1 && season >= 2006) break;   // the modern record is complete: at most one added
         const f = DY.FCS[(hash(t.name + season) + w) % DY.FCS.length];
-        games.push({ id: season + '-' + games.length, wk: w, h: t.id, a: f.id, conf: false, neutral: false, tag: null, res: null });
+        games.push({ id: season + '-' + games.length + (from ? 'f' : ''), wk: w, h: t.id, a: f.id, conf: false, neutral: false, tag: null, res: null });
         busy[t.id + '|' + w] = 1; cnt[t.id] = (cnt[t.id] || 0) + 1;
       }
     });
