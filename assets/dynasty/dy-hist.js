@@ -20,7 +20,7 @@
   }
   DY.loadHist = year => year >= 2026 ? Promise.all([script('data/hist/fb-2026.js').catch(() => null), script('data/hist/fb-classes.js').catch(() => null)]) : Promise.all([script('data/hist/fb-sched.js'), script('data/hist/fb-classes.js'), script('data/hist/fb-tnclasses.js').catch(() => null), year ? script('data/hist/fb-' + year + '.js') : null]);
   // a saved historical dynasty: the schedules and classes must be loaded before it runs
-  DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); try { if (g.sched && g.sched.length && g.sched.every(x => !x.res && !x.real)) DY.balanceHome(g.sched); } catch (e) { } return g; }) : Promise.resolve(g);   // (a saved generated slate that has not started gets the home/away fix too)
+  DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); try { DY.fixHistSched(g); } catch (e) { } try { if (g.sched && g.sched.length && g.sched.every(x => !x.res && !x.real)) DY.balanceHome(g.sched); } catch (e) { } return g; }) : Promise.resolve(g);   // (a saved generated slate that has not started gets the home/away fix too)
 
   /* ---------- the era: conferences, title games, the playoff ---------- */
   const NO_CCG = y => {
@@ -95,6 +95,26 @@
     rows.forEach(r => { const o = DY.byName(r[1] === 'Tennessee' ? r[2] : r[1]); if (!o) return;
       out.push({ o: o.id, home: r[1] === 'Tennessee', wk: clamp(Math.floor((Date.parse(season + '-' + r[0] + 'T12:00:00Z') - mon) / (7 * 864e5)) + 1, 1, 5) }); });
     return out.length ? out : null;
+  };
+  // saves made before the schedule data was fixed (Saturday-night games on rivalry weekend were dropped, so some teams, Tennessee in 2013 for one, played 11): put the real games the season is missing back in
+  DY.fixHistSched = g => {
+    g.fx = g.fx || {};
+    if (g.fx.sched2 || !g.hx || !g.sched || !g.sched.length || !DY.isHistSeason(g, g.season)) return;
+    g.fx.sched2 = 1;
+    const keep = g.sched, wkKeep = g.hx.wk && g.hx.wk[g.season] ? Object.assign({}, g.hx.wk[g.season]) : null, lastWk = DY.LAST_WK;
+    let fresh = null; try { fresh = DY.histSchedule(g.season); } finally { g.sched = keep; if (wkKeep) g.hx.wk[g.season] = wkKeep; DY.LAST_WK = lastWk; }
+    if (!fresh) return;
+    const busy = {}, pair = new Set();
+    keep.forEach(x => { if (x.h < 1000) busy[x.h + '|' + x.wk] = 1; if (x.a < 1000) busy[x.a + '|' + x.wk] = 1; if (x.h < 1000 && x.a < 1000) pair.add(Math.min(x.h, x.a) + '|' + Math.max(x.h, x.a)); });
+    const from = g.phase === 'season' ? (g.week || 0) : 0; let n = 0;
+    fresh.forEach(x => {
+      if (x.wk < from || (x.h < 1000 && busy[x.h + '|' + x.wk]) || (x.a < 1000 && busy[x.a + '|' + x.wk])) return;
+      if (x.h < 1000 && x.a < 1000 && pair.has(Math.min(x.h, x.a) + '|' + Math.max(x.h, x.a))) return;
+      if ((x.h >= 1000 || x.a >= 1000) && !(x.h === DY.UT_ID || x.a === DY.UT_ID)) return;   // (only real I-A games are added back: no FCS stand-ins for other teams)
+      keep.push(Object.assign({}, x, { id: g.season + '-fx' + (n++), res: null }));
+      if (x.h < 1000) busy[x.h + '|' + x.wk] = 1; if (x.a < 1000) busy[x.a + '|' + x.wk] = 1; if (x.h < 1000 && x.a < 1000) pair.add(Math.min(x.h, x.a) + '|' + Math.max(x.h, x.a));
+    });
+    if (n) keep.sort((p, q) => p.wk - q.wk);
   };
   DY.histSchedule = season => {
     const g = G(); if (!DY.isHistSeason(g, season)) return null;

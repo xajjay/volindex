@@ -393,7 +393,7 @@
           ${sub === 'auto' ? '' : `<label class="dyg-sel"><span class="dyg-lab">Play</span><select data-pick="${sub}"><option value="">Auto (staff picks)</option>${list.map(n => `<option ${S.play[sub] === n ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label>`}
           <label class="dyg-sel"><span class="dyg-lab">Formation</span><select data-form="1"><option value="auto">Auto</option>${forms.map(f => `<option value="${f}" ${S.form === f ? 'selected' : ''}>${esc(DY.FORMS[f].name)}</option>`).join('')}</select></label>
         </div>
-        <button class="dyg-snap" data-snap="${tab}">SNAP <small>${esc(sub === 'auto' ? (tab === 'run' ? 'Run: staff call' : 'Pass: staff call') : S.play[sub] || (tab === 'run' ? subs.find(x => x[0] === sub)[1] + ' run' : subs.find(x => x[0] === sub)[1] + ' pass'))}${dirs ? ' · ' + { A: 'auto direction', L: 'left', M: 'middle', R: 'right' }[dir] : ''}</small></button>`;
+        <button class="dyg-snap" data-snap="${tab}">SNAP <small>${esc(tab === 'pass' && sub === 'deep' && DY.hmSpot(GM, us) ? 'Hail Mary' : sub === 'auto' ? (tab === 'run' ? 'Run: staff call' : 'Pass: staff call') : S.play[sub] || (tab === 'run' ? subs.find(x => x[0] === sub)[1] + ' run' : subs.find(x => x[0] === sub)[1] + ' pass'))}${dirs ? ' · ' + { A: 'auto direction', L: 'left', M: 'middle', R: 'right' }[dir] : ''}</small></button>`;
     } else if (tab === 'rpo') {
       const list = ['auto'].concat(DY.BOOK.rpo.map(b => b.n)), cur = S.osub.rpo || 'auto';
       body = `<div class="dyg-chips dyg-sub">${list.map(n => `<button data-orpo="${esc(n)}" aria-pressed="${cur === n}">${n === 'auto' ? 'Auto' : esc(n)}</button>`).join('')}</div>

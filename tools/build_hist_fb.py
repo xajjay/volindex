@@ -63,11 +63,31 @@ for y in range(2001, 2027):
                 n = dyname(r[s + '_team'])
                 if n and n in DYT: conf[n] = CONF.get(r[s + '_conference'], 'IND')
     res = []
+    # conference title games (many have no notes). A same-conference game in early December (UTC) is either the championship or a
+    # regular rivalry-weekend game (a Saturday-night kickoff on Nov 30 is Dec 1 in UTC). It is the championship only when both teams
+    # have already played the conference's full league schedule, so count each team's league games game by game.
+    maybe = lambda r: r['season_type'] == 'regular' and r['conference_game'] == 'TRUE' and r['start_date'][5:7] == '12' and r['home_conference'] == r['away_conference'] and int(r['start_date'][8:10]) <= 9 and r['home_team'] not in ('Army', 'Navy')
+    tot, per = collections.Counter(), collections.defaultdict(int)
+    for r in rows:
+        if r['season_type'] == 'regular' and r['conference_game'] == 'TRUE' and r['home_conference'] == r['away_conference']:
+            for t in (r['home_team'], r['away_team']): per[t] += 1
+    league_n, cteams = {}, collections.defaultdict(set)
+    for r in rows:
+        if r['season_type'] == 'regular' and r['conference_game'] == 'TRUE' and r['home_conference'] == r['away_conference']: cteams[r['home_conference']].update((r['home_team'], r['away_team']))
+    for c, ts in cteams.items(): league_n[c] = collections.Counter(per[t] for t in ts).most_common(1)[0][0]
+    played = collections.defaultdict(int)
+    for r in sorted((r for r in rows if r['season_type'] == 'regular' and r['conference_game'] == 'TRUE' and r['home_conference'] == r['away_conference'] and not maybe(r)), key=lambda r: r['start_date']):
+        for t in (r['home_team'], r['away_team']): played[t] += 1
+    ccg = set()
+    for r in sorted((r for r in rows if maybe(r)), key=lambda r: r['start_date']):
+        n = league_n.get(r['home_conference'])
+        if n and played[r['home_team']] >= n and played[r['away_team']] >= n: ccg.add(r['game_id'])
+        else:
+            for t in (r['home_team'], r['away_team']): played[t] += 1
     for r in rows:
         if r['season_type'] != 'regular': continue
         if re.search(r'Championship', r.get('notes') or '', re.I) and r['conference_game'] == 'TRUE' and int(r['week']) >= 13: continue
-        # conference title games (some have no notes): a conference game in December
-        if r['conference_game'] == 'TRUE' and r['start_date'][5:7] == '12' and r['home_conference'] == r['away_conference'] and int(r['start_date'][8:10]) <= 9 and r['home_team'] not in ('Army', 'Navy'): continue
+        if r['game_id'] in ccg: continue
         h, a = r['home_team'], r['away_team']
         hn, an = dyname(h), dyname(a)
         hf, af = r['home_division'] == 'fbs', r['away_division'] == 'fbs'

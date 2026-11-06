@@ -217,6 +217,13 @@
     let p = 0.995 - Math.max(0, dist - 20) * 0.0105 * (1.15 - (kac - 70) / 90) - Math.max(0, dist - range) * 0.07;
     return clamp(p, 0.02, 0.99);
   };
+  // the last snap of the game (trailing, need a touchdown) or of the half (out of field-goal range, with a long way to go): a deep ball is a Hail Mary
+  DY.hmSpot = (GM, s) => {
+    const lead = GM.score[s] - GM.score[other(s)], range = DY.fgRange(pers(GM, s).K), fgDist = 100 - GM.ball + 17, distGoal = 100 - GM.ball;
+    if (GM.q === 4 && GM.clock <= 8 && lead < 0 && (lead < -3 || fgDist > range + 3)) return distGoal >= 25;
+    if (GM.q === 2 && GM.clock <= 6 && fgDist > range + 3) return GM.ball >= 40 && distGoal >= 22;
+    return false;
+  };
   DY.aiOff = (GM, s) => {
     const P = pers(GM, s), lead = GM.score[s] - GM.score[other(s)], late = GM.q === 4 && GM.clock <= 300, two = (GM.q === 2 || GM.q === 4) && GM.clock <= 120;
     const fgDist = 100 - GM.ball + 17, range = DY.fgRange(P.K);
@@ -529,6 +536,7 @@
     if (pre) { pre.text = toText + pre.text; return pre; }
     // the calls
     const ocall = (GM.user === s && GM.coach !== 'watch' && uc.call) ? uc.call : DY.aiOff(GM, s);
+    if (ocall.k === 'pass' && ocall.t === 'deep' && !ocall.hm && DY.hmSpot(GM, s)) ocall.hm = true;     // your deep shot on the last snap is a Hail Mary
     if (GM.user === s && ocall.tempo) { GM.hurry[s] = ocall.tempo === 'hurry'; GM.chew[s] = ocall.tempo === 'chew'; }
     else if (GM.user !== s) { GM.hurry[s] = ocall.tempo === 'hurry'; GM.chew[s] = ocall.tempo === 'chew'; }
     let dcall = (GM.user === d && GM.coach === 'full' && uc.dcall) ? resolveDcall(uc.dcall, GM) : DY.aiDef(GM, d);
