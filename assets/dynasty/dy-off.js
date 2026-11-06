@@ -433,7 +433,7 @@
   DY.OFF_LABEL = { recap: 'Season recap', nil: 'NIL & budget', portal: 'Transfer portal', signing: 'Signing day', draft: 'NFL Draft', progress: 'Progression', cuts: 'Roster cut-down', schedule: 'Non-conference schedule' };
   const OFF_ALL = ['recap', 'nil', 'portal', 'signing', 'draft', 'progress', 'cuts', 'schedule'];
   // NIL turned off at setup (or before the NIL era): no NIL stage in the offseason
-  Object.defineProperty(DY, 'OFF_ORDER', { get: () => (DY.G && (DY.G.settings.nil === 'off' || (DY.G.hx && DY.G.season < 2021))) ? OFF_ALL.filter(x => x !== 'nil') : OFF_ALL });
+  Object.defineProperty(DY, 'OFF_ORDER', { get: () => { const G0 = DY.G; if (!G0) return OFF_ALL; const noNil = G0.settings.nil === 'off' || (G0.hx && G0.season < 2021), noPortal = G0.settings.portal === 'off'; return noNil || noPortal ? OFF_ALL.filter(x => !(noNil && x === 'nil') && !(noPortal && x === 'portal')) : OFF_ALL; } });
   // NIL only exists from 2021 on: a historical dynasty has no NIL promises, budgets or raises before that, whatever the setting says
   DY.nilOn = () => !(DY.G && (DY.G.settings.nil === 'off' || (DY.G.hx && DY.G.season < 2021)));
   // limits per offseason (AJ): 30 newcomers (20 high school, 20 transfers), 30 departures, 15 transfers out, 15 NFL entries
@@ -622,7 +622,7 @@
   // one tap through the rest of the offseason: the staff makes the remaining calls like Auto (stops only for a fired coach)
   DY.offAdvance = () => {
     const g = G(), keep = { nil: g.settings.nil, portal: g.settings.portal };
-    g.settings.nil = 'auto'; g.settings.portal = 'auto';
+    g.settings.nil = 'auto'; if (keep.portal !== 'off') g.settings.portal = 'auto';
     try {
       let n = 0;
       while (g.phase === 'offseason' && n++ < 20) {
@@ -634,7 +634,8 @@
     return null;
   };
   DY.offNext = () => {
-    const g = G(), o = g.off, i = DY.OFF_ORDER.indexOf(o.stage);
+    const g = G(), o = g.off; let i = DY.OFF_ORDER.indexOf(o.stage);
+    if (i < 0) { const full = Object.getOwnPropertyDescriptor(DY, 'OFF_ORDER').get(); i = Math.max(0, full.findIndex(x => x === o.stage)); }   // a save left sitting on a stage that is now switched off
     leaveStage(o.stage);
     if (i >= DY.OFF_ORDER.length - 1) return DY.newSeason();
     o.stage = DY.OFF_ORDER[i + 1];
@@ -905,7 +906,23 @@
   };
 
   /* cut-down day: get under the roster limit before the season (you choose, or the staff cuts the lowest) */
-  DY.cutScore = p => p.ovr + (DY.GRADES.length - DY.gradeIdx(p.potG)) * 0.8 - p.yr * 0.6 + (p.captain ? 20 : 0) + (p.pos === 'K' || p.pos === 'P' ? 6 : 0);
+  // how little a player is worth to keep: current ability, room to grow (more for the young), his place on the depth chart, and whether the group is thin.
+  // An old, low-rated player buried behind several others with no upside is the first to go; a young high-ceiling prospect or a needed backup is not.
+  const CUT_MIN = { QB: 2, RB: 2, WR: 4, TE: 2, OT: 3, IOL: 4, EDGE: 3, DT: 3, LB: 3, CB: 3, S: 3, K: 1, P: 1 };
+  DY.cutScore = p => {
+    const g = G(), t = p.t != null && g.teams ? g.teams[p.t] : null, el = Math.max(1, p.el || 1), gi = DY.GRADES.length - DY.gradeIdx(p.potG);
+    const room = Math.max(0, (p.ceil != null ? p.ceil : p.ovr + gi * 1.2) - p.ovr);
+    let s = p.ovr + room * Math.min(1, el / 4) * 0.6 + gi * 0.5;
+    if (t) {
+      const mates = t.roster.map(DY.P).filter(x => x && x.pos === p.pos);
+      const rank = mates.filter(x => x !== p && (x.ovr > p.ovr || (x.ovr === p.ovr && x.id < p.id))).length, st = DY.STARTERS[p.pos] || 1;
+      if (rank < st) s += 14; else if (rank < st * 2) s += 6;
+      const buried = Math.max(0, rank - Math.ceil(st * 1.5) + 1);
+      s -= buried * 4 * (1 + Math.max(0, (p.yr || 1) - 2) * 0.35);
+      if (mates.length <= (CUT_MIN[p.pos] || 2)) s += 30;
+    }
+    return s + (p.captain ? 20 : 0);
+  };
   DY.cutsNeeded = () => Math.max(0, DY.userT().roster.length - DY.rosterMax());
   DY.autoCuts = final => {
     const g = G(), ut = DY.userT(), o = g.off;
