@@ -842,7 +842,7 @@
     }
     // pressure
     if (margin < -0.5) {
-      const sackP = clamp(0.62 - (E(GM, qb, 'agi', s) + E(GM, qb, 'spd', s)) / 420 - (E(GM, qb, 'awr', s) - 70) / 190, 0.16, 0.72) * (t === 'quick' ? 0.45 : 1);
+      const sackP = clamp((0.62 - (E(GM, qb, 'agi', s) + E(GM, qb, 'spd', s)) / 420 - (E(GM, qb, 'awr', s) - 70) / 190) * 1.45, 0.22, 0.85) * (t === 'quick' ? 0.45 : 1);
       if (chance(sackP)) {
         const sk = DY.fixSack(GM, winner()); const y = -Math.round(rr(4, 10));
         let strip = chance(0.10 + (sk.at.pmv || 60) / 1500);
