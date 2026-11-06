@@ -853,7 +853,7 @@
     const g = G(), R = g.recruit, ut = DY.userT();
     const userOff = g.settings.recruiting === 'off';
     const counts = {}; g.teams.forEach(t => counts[t.id] = 0);
-    const cap = t => t.user ? Math.max(0, Math.min(DY.CAP.hs, DY.CAP.newcomers - DY.transfersIn(), DY.rosterMax() + 6 - t.roster.length)) : Math.max(0, DY.CPU_ROSTER - t.roster.length);
+    const cap = t => t.user ? Math.max(0, Math.min(DY.CAP.hs, DY.CAP.newcomers - DY.transfersIn(), DY.rosterMax() + 6 - t.roster.length)) : Math.max(0, DY.CPU_ROSTER + 5 - t.roster.length);   // CPU rosters may run a few over on signing day; the cut-down trims them back to 85
     const sign = (p, t) => {
       delete p.pros; delete p.interest; delete p.acts; p.t = t.id; p.yr = 1; p.el = 5; p.car = {}; p.aw = []; p.log = []; p.firstY = g.season + 1;
       p.nil = t.user ? Math.round((p.nilOffer || DY.recruitNil(p) * 0.8) / 5000) * 5000 : 0;
@@ -876,7 +876,7 @@
       const n = cap(t) - counts[t.id];
       const needs = DY.teamNeeds(t);
       // Tennessee (when recruiting is on) only fills real holes: positions where next year's roster is short
-      let fill = t.user && !userOff && !R.locked && DY.myCommits().length >= 14 ? 0 : t.user && !userOff ? Object.keys(needs).filter(k => needs[k] >= 2).reduce((s, k) => s + Math.ceil(needs[k] / 2), 0) : Math.min(n, t.user ? 20 : 16);
+      let fill = t.user && !userOff && !R.locked && DY.myCommits().length >= 14 ? 0 : t.user && !userOff ? Object.keys(needs).filter(k => needs[k] >= 2).reduce((s, k) => s + Math.ceil(needs[k] / 2), 0) : t.user ? Math.min(n, 20) : Math.min(n, Math.max(0, Math.round(clamp(21 + gauss() * 1.8, 17, 25)) - counts[t.id]));   // a CPU program signs a full class of about 21 (17-25), room permitting
       if (t.user && !userOff) { Object.keys(needs).forEach(k => { needs[k] = needs[k] >= 2 ? Math.ceil(needs[k] / 2) : 0; }); }
       for (let i = 0; i < Math.min(n, fill); i++) {
         if (t.user && !userOff && !Object.values(needs).some(v => v > 0)) break;
