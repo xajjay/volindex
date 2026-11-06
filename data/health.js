@@ -1,6 +1,6 @@
 /* Written by tools/health_check.py. Do not edit by hand. */
 window.SITE_HEALTH = {
- "checked": "2026-11-05",
+ "checked": "2026-11-06",
  "counts": {
   "baseball": 57,
   "football": 12,
@@ -14,28 +14,28 @@ window.SITE_HEALTH = {
   {
    "area": "manual",
    "level": "warn",
-   "msg": "KenPom / Torvik / EvanMiya ratings last edited 23 days ago (check every 14). Refresh the basketball ratings."
+   "msg": "KenPom / Torvik / EvanMiya ratings last edited 24 days ago (check every 14). Refresh the basketball ratings."
   },
   {
    "area": "manual",
    "level": "warn",
-   "msg": "Football depth chart last edited 16 days ago (check every 14). Re-check the depth chart after the latest game/injury news."
+   "msg": "Football depth chart last edited 17 days ago (check every 14). Re-check the depth chart after the latest game/injury news."
   },
   {
    "area": "manual",
    "level": "warn",
-   "msg": "Volleyball lineup last edited 24 days ago (check every 21). Re-check the projected lineup."
+   "msg": "Volleyball lineup last edited 25 days ago (check every 21). Re-check the projected lineup."
   },
   {
    "area": "manual",
    "level": "warn",
-   "msg": "Soccer lineup last edited 24 days ago (check every 21). Re-check the projected lineup."
+   "msg": "Soccer lineup last edited 25 days ago (check every 21). Re-check the projected lineup."
   }
  ],
  "manual": [
   {
    "active": true,
-   "ageDays": 15,
+   "ageDays": 16,
    "edited": "2026-10-21",
    "file": "data/recruiting.js",
    "label": "On3 / recruiting rankings",
@@ -43,7 +43,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 23,
+   "ageDays": 24,
    "edited": "2026-10-13",
    "file": "data/ratings-bb.js",
    "label": "KenPom / Torvik / EvanMiya ratings",
@@ -51,7 +51,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 16,
+   "ageDays": 17,
    "edited": "2026-10-20",
    "file": "data/football-depth.js",
    "label": "Football depth chart",
@@ -59,7 +59,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 0,
+   "ageDays": 1,
    "edited": "2026-11-05",
    "file": "data/mbb-lineup.js",
    "label": "Men's basketball lineup",
@@ -67,7 +67,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 0,
+   "ageDays": 1,
    "edited": "2026-11-05",
    "file": "data/wbb-lineup.js",
    "label": "Women's basketball lineup",
@@ -75,7 +75,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 24,
+   "ageDays": 25,
    "edited": "2026-10-12",
    "file": "data/volleyball-lineup.js",
    "label": "Volleyball lineup",
@@ -83,7 +83,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 24,
+   "ageDays": 25,
    "edited": "2026-10-12",
    "file": "data/soccer-lineup.js",
    "label": "Soccer lineup",
@@ -91,7 +91,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": false,
-   "ageDays": 20,
+   "ageDays": 21,
    "edited": "2026-10-16",
    "file": "data/baseball-lineup.js",
    "label": "Baseball lineup",
@@ -99,7 +99,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": false,
-   "ageDays": 24,
+   "ageDays": 25,
    "edited": "2026-10-12",
    "file": "data/softball-lineup.js",
    "label": "Softball lineup",
@@ -109,7 +109,7 @@ window.SITE_HEALTH = {
  "ok": false,
  "sports": [
   {
-   "ageDays": -1,
+   "ageDays": 0,
    "games": 12,
    "key": "football",
    "poll": null,
@@ -117,7 +117,7 @@ window.SITE_HEALTH = {
    "updated": "2026-11-06"
   },
   {
-   "ageDays": -1,
+   "ageDays": 0,
    "games": 34,
    "key": "mbb",
    "poll": "AP Top 25",
@@ -125,7 +125,7 @@ window.SITE_HEALTH = {
    "updated": "2026-11-06"
   },
   {
-   "ageDays": -1,
+   "ageDays": 0,
    "games": 33,
    "key": "wbb",
    "poll": "AP Top 25",
@@ -133,7 +133,7 @@ window.SITE_HEALTH = {
    "updated": "2026-11-06"
   },
   {
-   "ageDays": -1,
+   "ageDays": 0,
    "games": 57,
    "key": "baseball",
    "poll": null,
@@ -141,7 +141,7 @@ window.SITE_HEALTH = {
    "updated": "2026-11-06"
   },
   {
-   "ageDays": -1,
+   "ageDays": 0,
    "games": 33,
    "key": "softball",
    "poll": null,
@@ -149,7 +149,7 @@ window.SITE_HEALTH = {
    "updated": "2026-11-06"
   },
   {
-   "ageDays": -1,
+   "ageDays": 0,
    "games": 27,
    "key": "volleyball",
    "poll": "AVCA Coaches Poll",
@@ -157,7 +157,7 @@ window.SITE_HEALTH = {
    "updated": "2026-11-06"
   },
   {
-   "ageDays": -1,
+   "ageDays": 0,
    "games": 18,
    "key": "soccer",
    "poll": "United Soccer Coaches",
