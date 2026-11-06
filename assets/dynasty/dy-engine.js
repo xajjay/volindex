@@ -371,7 +371,7 @@
   // how far a return is meant to go: from the returner's return rating, the blocking and luck. 400 is a breakaway (a touchdown unless he is caught from behind)
   DY.retDist = (kind, rt) => {
     const d0 = rt - 72;
-    if (chance(kind === 'kick' ? 0.0045 + Math.max(0, d0) * 0.0004 : 0.0035 + Math.max(0, d0) * 0.0004)) return 400;
+    if (chance(0.0145 + Math.max(0, rt - 60) * 0.0013)) return 400;      // breakaway: about 3% for a typical starting returner, about 5% for the best in the country
     return kind === 'kick' ? clamp(20.5 + d0 * 0.32 + gauss() * 9.5 + (chance(0.25) ? rr(4, 14) : 0), 5, 62) : clamp(9 + d0 * 0.16 + gauss() * 7 + (chance(0.15) ? rr(10, 28) : 0), 0, 50);
   };
   /* kickoffs and free kicks */
