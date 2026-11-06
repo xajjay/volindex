@@ -944,7 +944,7 @@
       if (rush && !td) ret = Math.round(ret * 0.55);
       add(GM, pt, 'pn'); add(GM, pt, 'pny', Math.round(gross)); if (recv <= 20) add(GM, pt, 'i20');
       result.text = `${last(pt)} punts ${Math.round(gross)} yards to the ${DY.spotName(GM, other(s), Math.round(recv))}. ` + (fc ? `Fair catch by ${last(pr)}.` : muff ? `MUFFED by ${last(pr)}! ` : td ? `${last(pr)} takes it back... TOUCHDOWN!` : `${last(pr)} returns ${Math.round(ret)} yards.`);
-      if (!fc && !muff && !td) { add(GM, pr, 'pr'); add(GM, pr, 'pry', Math.round(ret)); }
+      if (!fc && !muff) { add(GM, pr, 'pr'); add(GM, pr, 'pry', Math.round(Math.min(ret, 100))); }
       if (muff) { const rec = chance(0.55); result.text += rec ? `${GM.T[s].name} RECOVERS!` : `${last(pr)} falls on it.`; if (rec) { result.muffRec = true; result.newBallSame = Math.round(land); } add(GM, pr, 'fum'); }
       result.newBall = td ? 100 : clamp(Math.round(recv + ret), 1, 99); result.ret = Math.round(ret); result.td = td; result.pr = pr; result.net = Math.round(gross - ret);
       if (td) add(GM, pr, 'rttd');
