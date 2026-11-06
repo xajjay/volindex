@@ -771,9 +771,9 @@
   }
 
   // kick and punt returners: the staff's pick (fastest, shiftiest) or yours
-  const retRating = p => Math.round(Math.min(99, (p.at.spd * 1 + p.at.acc * 0.5 + (p.at.elu || 60) * 0.4 + (p.at.cth || 60) * 0.25) / 2.15));
+  const retRating = p => Math.round(DY.rtnOf(p));
   function retBox(t, LU) {
-    const cands = t.roster.map(DY.P).filter(p => p && ['RB', 'WR', 'CB', 'S', 'TE', 'LB', 'QB'].includes(p.pos)).sort((a, b) => retRating(b) - retRating(a)).slice(0, 18);
+    const cands = t.roster.map(DY.P).filter(p => p && !['K', 'P', 'OT', 'IOL', 'EDGE', 'DT'].includes(p.pos)).sort((a, b) => retRating(b) - retRating(a)).filter((p, i) => i < 30 || p.id === t.kr || p.id === t.pr);
     const sel = (k, cur) => `<select data-ret="${k}"><option value="">Staff's choice${!t[k] && cur ? ` (${esc(cur.n)})` : ''}</option>${cands.map(p => `<option value="${p.id}" ${t[k] === p.id ? 'selected' : ''}>${esc(p.n)} · ${p.pos} · return ${retRating(p)}</option>`).join('')}</select>`;
     return `<div class="dy-rets"><label class="dy-rotrow"><span>Kick returner</span>${sel('kr', LU.KR)}<b></b></label><label class="dy-rotrow"><span>Punt returner</span>${sel('pr', LU.PR)}<b></b></label><p class="small dim">Return rating: speed, acceleration, elusiveness and hands. Staff's choice picks the best healthy returner each week.</p></div>`;
   }
