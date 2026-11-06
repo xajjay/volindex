@@ -838,7 +838,28 @@
     DY.fillRecords();
   };
   // records with no real mark (return TDs) start at zero; also upgrades older saves
-  DY.fillRecords = () => { const g = G(); if (!g.rec) return; for (const scope of ['game', 'season', 'career']) for (const name in REC_MAP) { const k = REC_MAP[name]; if (!g.rec[scope][k]) g.rec[scope][k] = { v: 0, n: '—', y: '', note: '', real: true, blank: true }; } };
+  // historical dynasties: marks set before 1990 (Spiva's 547 tackles, say) can never be reached, so once a season has been played they are replaced by the best from a player in this dynasty
+  DY.REC_CUT = 1990;
+  DY.replaceOldRecords = () => {
+    const g = G(); if (!g.rec || !g.hx || !DY.isTN() || g.season <= g.startSeason) return;
+    g.fx = g.fx || {}; if (g.fx.recPre1) return; g.fx.recPre1 = 1;
+    const ab = DY.userT().abbr, y0 = g.startSeason, players = Object.values(g.P).filter(p => p && p.car);
+    const lastYr = r => { const m = String(r.y || '').match(/\d{4}/g); return m ? Math.max(...m.map(Number)) : null; };
+    const blank = () => ({ v: 0, n: '—', y: '', note: '', real: true, blank: true });
+    for (const scope of ['game', 'season', 'career']) for (const name in REC_MAP) {
+      const k = REC_MAP[name], r = g.rec[scope][k]; if (!r || r.pid || r.blank) continue;
+      const yr = lastYr(r); if (yr == null || yr >= DY.REC_CUT) continue;
+      let best = null;
+      players.forEach(p => {
+        const rows = Object.entries(p.car).filter(([y, c]) => +y >= y0 && c.t === ab && !c.real);
+        if (scope === 'season') { rows.forEach(([y, c]) => { if ((c[k] || 0) > (best ? best.v : 0)) best = { v: c[k], n: p.n, y: String(y), pid: p.id }; }); if (p.s && p.t === g.user && (p.s[k] || 0) > (best ? best.v : 0)) best = { v: p.s[k], n: p.n, y: String(g.season), pid: p.id }; }
+        else if (scope === 'career') { let v = 0, ys = []; rows.forEach(([y, c]) => { v += c[k] || 0; ys.push(+y); }); if (p.s && p.t === g.user) { v += p.s[k] || 0; ys.push(g.season); } if (v > (best ? best.v : 0)) best = { v, n: p.n, y: Math.min(...ys) + '–' + Math.max(...ys), pid: p.id }; }
+        else (p.gl || []).forEach(x => { const l = x.l || {}; if (x.y >= y0 && !x.real && (l[k] || 0) > (best ? best.v : 0)) best = { v: l[k], n: p.n, y: String(x.y), pid: p.id, note: (x.h ? 'vs. ' : 'at ') + x.o }; });
+      });
+      g.rec[scope][k] = best ? Object.assign({ note: '' }, best) : blank();
+    }
+  };
+  DY.fillRecords = () => { const g = G(); if (!g.rec) return; DY.replaceOldRecords(); for (const scope of ['game', 'season', 'career']) for (const name in REC_MAP) { const k = REC_MAP[name]; if (!g.rec[scope][k]) g.rec[scope][k] = { v: 0, n: '—', y: '', note: '', real: true, blank: true }; } };
   DY.checkRecords = (GM, x) => {
     const g = G(); DY.fillRecords();
     for (const id in GM.ps) { const p = DY.P(+id), l = GM.ps[id]; if (!p) continue; for (const k in NAT.game) if (l[k] && l[k] >= NAT.game[k][0][0] * 0.6) DY.checkNat('game', k, l[k], p, 'vs. ' + DY.T(DY.oppOf(x)).name); }
