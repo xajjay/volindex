@@ -368,6 +368,12 @@
   }
   function swing(GM, s, v) { GM.mom = clamp(GM.mom + (s === 'h' ? v : -v), -1, 1); }
 
+  // how far a return is meant to go: from the returner's return rating, the blocking and luck. 400 is a breakaway (a touchdown unless he is caught from behind)
+  DY.retDist = (kind, rt) => {
+    const d0 = rt - 72;
+    if (chance(kind === 'kick' ? 0.0045 + Math.max(0, d0) * 0.0004 : 0.0035 + Math.max(0, d0) * 0.0004)) return 400;
+    return kind === 'kick' ? clamp(20.5 + d0 * 0.32 + gauss() * 9.5 + (chance(0.25) ? rr(4, 14) : 0), 5, 62) : clamp(9 + d0 * 0.16 + gauss() * 7 + (chance(0.15) ? rr(10, 28) : 0), 0, 50);
+  };
   /* kickoffs and free kicks */
   function kickoff(GM, free) {
     const ks = GM.kicker, rs = other(ks), KP = pers(GM, ks), RP = pers(GM, rs), K = KP.K, KR = RP.KR;
@@ -392,17 +398,17 @@
     let ret = 0, td = false, fumble = false, tb = false, fc = false;
     if (land <= 0 && chance(0.82)) tb = true;
     else if (land > 0 && land <= 25 && chance(0.35)) fc = true;
+    if ((tb || fc) && GM.live && DY.SIM && KR) { try { GM.liveRet = DY.SIM.returnPlay(GM, rs, { kind: 'kick', land: tb ? -3 : Math.max(1, land), hang: 3.6, returner: KR, mode: tb ? 'tb' : 'fc' }); } catch (e) { GM.liveRet = null; } }
+    else if (tb || fc) { }
     else if (GM.live && DY.SIM && KR) {
       const sim = DY.SIM.returnPlay(GM, rs, { kind: 'kick', land: Math.max(1, land), hang: 3.6, returner: KR });
       ret = sim.ret; td = sim.td; fumble = sim.fum && chance(0.5); GM.liveRet = sim;
       if (sim.tackler) add(GM, sim.tackler, 'tk');
     }
     else {
-      const rv = KR ? (E(GM, KR, 'spd', rs) * 0.45 + E(GM, KR, 'acc', rs) * 0.2 + E(GM, KR, 'elu', rs) * 0.35) : 60;
-      ret = clamp(21 + (rv - 75) / 3.2 + gauss() * 7, 4, 45);
-      if (chance(0.025 + (rv - 80) / 1500)) ret += rr(15, 45);
-      if (chance(0.0045 + Math.max(0, rv - 85) / 2500)) ret = 110;
-      if (chance(0.006)) fumble = true;
+      const rt = KR ? DY.rtnOf(KR) : 60, R = DY.retDist('kick', rt);
+      ret = R === 400 ? 110 : Math.min(R * 0.86, 100 - Math.max(1, land) - 1);
+      if (chance(0.007)) fumble = true;
     }
     const kicker = GM.T[ks].abbr;
     if (tb) { ball = 25; text = `${last(K)} kicks off ${Math.round(dist)} yards into the end zone. Touchback.`; }
@@ -891,15 +897,16 @@
     const gross = clamp(39 + ((pt ? pt.at.kpw : 60) - 62) * 0.33 + gauss() * 5, 22, 66);
     let land = GM.ball + gross; // from the punting team's view
     const result = { kind: 'punt', punter: pt, gross: Math.round(gross), time: 5, events: [] };
-    if (land >= 100) { result.tb = true; result.newBall = 20; result.text = `${last(pt)} punts ${Math.round(gross)} yards into the end zone. Touchback.`; add(GM, pt, 'pn'); add(GM, pt, 'pny', Math.round(100 - GM.ball)); result.net = 100 - GM.ball - 20; }
+    if (land >= 100) { if (GM.live && DY.SIM && pr) { try { result.trk = DY.SIM.returnPlay(GM, other(s), { kind: 'punt', land: -3, hang: 4.2, returner: pr, mode: 'tb' }).trk; } catch (e) { } } result.tb = true; result.newBall = 20; result.text = `${last(pt)} punts ${Math.round(gross)} yards into the end zone. Touchback.`; add(GM, pt, 'pn'); add(GM, pt, 'pny', Math.round(100 - GM.ball)); result.net = 100 - GM.ball - 20; }
     else {
       // aim inside the 20 near midfield
       if (GM.ball >= 50 && land > 94 && chance(0.5 + ((pt ? pt.at.kac : 60) - 70) / 80)) land = rr(88, 97);
       const recv = 100 - land;
       let ret = 0, fc = chance((recv <= 12 ? 0.75 : 0.36) + (rush ? 0.2 : 0)), muff = !fc && chance(0.014), td = false;
       let liveR = null;
+      if (fc && GM.live && DY.SIM && pr) { try { result.trk = DY.SIM.returnPlay(GM, other(s), { kind: 'punt', land: Math.max(1, recv), hang: 4.2, returner: pr, mode: 'fc' }).trk; } catch (e) { } }
       if (!fc && !muff && GM.live && DY.SIM && pr) { liveR = DY.SIM.returnPlay(GM, other(s), { kind: 'punt', land: Math.max(1, recv), hang: 4.2, returner: pr }); ret = liveR.ret; td = liveR.td; if (liveR.tackler) add(GM, liveR.tackler, 'tk'); result.trk = liveR.trk; }
-      else if (!fc && !muff) { ret = clamp(7 + ((pr ? pr.at.agi + pr.at.spd : 150) - 160) / 6 + gauss() * 6, -2, 40); if (chance(0.006)) { td = true; } }
+      else if (!fc && !muff) { const R = DY.retDist('punt', pr ? DY.rtnOf(pr) : 60); if (R === 400) { td = true; ret = recv >= 99 ? 1 : 100 - recv; } else ret = Math.min(R * 0.62, 99 - recv); }
       if (rush && !td) ret = Math.round(ret * 0.55);
       add(GM, pt, 'pn'); add(GM, pt, 'pny', Math.round(gross)); if (recv <= 20) add(GM, pt, 'i20');
       result.text = `${last(pt)} punts ${Math.round(gross)} yards to the ${DY.spotName(GM, other(s), Math.round(recv))}. ` + (fc ? `Fair catch by ${last(pr)}.` : muff ? `MUFFED by ${last(pr)}! ` : td ? `${last(pr)} takes it back... TOUCHDOWN!` : `${last(pr)} returns ${Math.round(ret)} yards.`);

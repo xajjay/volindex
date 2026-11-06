@@ -351,7 +351,7 @@
   /* ---------- the ball carrier: read the space, pick a lane ---------- */
   function carry(W, c, gdir) {
     gdir = gdir || 1;
-    const look = 0.75, vis = c.p ? W.R(c.p, 'bcv') : 70;
+    const look = 0.75, vis = W.ret && W.retVis && c.p === W.retP ? W.retVis : c.p ? W.R(c.p, 'bcv') : 70;
     const pursuers = W.ag.filter(a => a.side !== c.side && a.down <= 0);
     const late = W.GM.q === 4 || W.GM.q === 2;
     const lead = W.GM.score[W.s] - W.GM.score[W.ds];
@@ -420,7 +420,8 @@
       const sp = spd(c);
       let p = K.tk0 + (tq - cv) / K.tkD + (head > 0.3 ? K.tkHead : head < -0.3 ? -K.tkBack : 0) + helpers * K.tkHelp - Math.max(0, sp - 7) * 0.03;
       if (c === W.qb && W.phase === 'pass') p = K.sackP + (tq - (W.R(c.p, 'agi') * 0.5 + W.R(c.p, 'str') * 0.5)) / 90;
-      p = clamp(p, 0.45, 0.97);
+      if (W.Rt != null && c === W.carrier && c.p === W.retP) { const dx = c.x - W.land0; p += dx < W.Rt * 0.7 ? (W.ret && W.kk === 'punt' ? -0.14 : -0.42) : dx > W.Rt ? 0.38 : 0; }
+      p = clamp(p + (W.tkAdj || 0), W.Rt === 400 ? 0.03 : 0.05, 0.97);
       // a defender still engaged with a blocker can only reach out for him
       if (d.eng) { p *= K.tkEng; }
       if (chance(p)) {
@@ -910,7 +911,7 @@
         else if (gd === -1 && c.x <= W.own) { W.td = true; end(W, 'td'); }
         else if (c.y <= W.lmin + 0.1 || c.y >= W.lmax - 0.1) { W.oob = true; c.y = clamp(c.y, W.lmin, W.lmax); end(W, 'oob'); }
       }
-      if (!W.done && W.phase !== 'air') tackles(W);
+      if (!W.done && W.phase !== 'air' && !W.noTackle) tackles(W);
     }
     record(W);
   }
@@ -1174,39 +1175,61 @@
   SIM.returnPlay = (GM, rs, k) => {
     const ks = rs === 'h' ? 'a' : 'h';
     const d = rs === 'h' ? 1 : -1;
-    const W = { GM, s: rs, ds: ks, t: 0, ag: [], by: {}, pairs: [], ev: [], frames: [], lmin: -26.67, lmax: 26.67, toGoal: 100, own: 0, ball: { x: 0, y: 0, z: 0, holder: null, fl: null }, carrier: null, phase: 'kick', boost: { run: 0, pro: 0, rush: 0, box: 0, sep: 0, read: 0 }, dir: d, ret: true };
+    const W = { GM, s: rs, ds: ks, t: 0, ag: [], by: {}, pairs: [], ev: [], frames: [], lmin: -26.67, lmax: 26.67, toGoal: 100, own: 0, ball: { x: 0, y: 0, z: 0, holder: null, fl: null }, carrier: null, phase: 'kick', boost: { run: (k.kind === 'punt' ? 8 : 9) + gauss() * 9, pro: 0, rush: 0, box: 0, sep: 0, read: 0 }, dir: d, ret: true };
     W.R = (p, key) => simR(GM, p, key, rs);
     const L = GM.L[ks], R = GM.L[rs];
     const kicker = k.kind === 'punt' ? (L.P[0] || L.K[0]) : L.K[0];
     const cover = [kicker, ...L.LB.slice(0, 3), ...L.S.slice(0, 2), ...L.CB.slice(0, 2), ...L.WR.slice(0, 2), L.RB[1] || L.RB[0], L.TE[0], L.EDGE[0]].filter(Boolean).filter((p, i, a) => a.indexOf(p) === i).slice(0, 11);
     const retr = k.returner;
     const block = [...R.OT.slice(0, 2), ...R.IOL.slice(0, 2), R.TE[0], ...R.LB.slice(0, 2), ...R.WR.slice(1, 3), R.RB[1] || R.RB[0], R.S[1] || R.S[0], R.CB[2] || R.CB[0]].filter(Boolean).filter(p => p !== retr).filter((p, i, a) => a.indexOf(p) === i).slice(0, 10);
-    const land = k.land, hang = k.hang;
+    const land = k.land, hang = k.hang; W.conv = 11 + rnd() * 8; W.land0 = k.land; W.kk = k.kind; W.tkAdj = 0;
+    // how far this return is meant to go (set by the returner's rating, the blocking and luck); the contact physics is real, but the tackles are made likelier as he nears that spot
+    { W.Rt = DY.retDist(k.kind, DY.rtnOf(k.returner)); if (W.Rt === 400) W.tkAdj = -0.75; }
     // positions when the ball comes down
     const r = { p: retr }; const ra = agent(W, retr, 'o', 'KR', land - 1.5, 0); ra.gdir = 1;
+    // the returner's return rating: burst and nerve with the ball in his hands (an 85 is a real threat, a 55 takes what is there)
+    const rt = DY.rtnOf(retr), rtn = clamp((rt - 72) / 100, -0.2, 0.28);
+    ra.top *= 1 + rtn * 0.22; ra.agi += rtn * 14; W.retP = retr; W.retVis = clamp(rt + 8, 45, 99);
+    const dead = k.mode === 'fc' || k.mode === 'tb';      // fair catch / kneel in the end zone: the coverage closes but nobody is tackled
     // coverage players: spread across the field, arriving as the ball comes down
     cover.forEach((p, i) => {
       const lane = -24 + i * (48 / Math.max(1, cover.length - 1));
-      const ahead = k.kind === 'punt' ? (i < 2 ? 3 : 12 + (i % 4) * 2) : 12 + (i % 3) * 3;
+      const ahead = k.kind === 'punt' ? (i < 2 ? 4 : 15 + (i % 4) * 3) : clamp(5 + Math.min(W.Rt, 42) * 1.3, 12, 80) + ((i * 7) % 11) * 1.4 - 4;
       const a = agent(W, p, 'd', 'C' + i, land + ahead + (i === 0 ? 14 : 0), lane * (i < 2 && k.kind === 'punt' ? 0.9 : 0.85));
-      a.vx = -a.top * 0.92; a.task = 'cover';
+      a.top *= k.kind === 'kick' ? 0.96 : 0.97; a.vx = -a.top * 0.92; a.task = 'cover';
     });
     // the wall: blockers turned to face the coverage
     block.forEach((p, i) => {
       const lane = -20 + i * (40 / Math.max(1, block.length - 1));
-      const a = agent(W, p, 'o', 'B' + i, land + (k.kind === 'punt' ? 6 + (i % 3) * 2 : 8 + (i % 2) * 4), lane * 0.8);
+      const a = agent(W, p, 'o', 'B' + i, land + (k.kind === 'punt' ? 6 + (i % 3) * 2 : 14 + (i % 2) * 5), lane * 0.8);
       a.task = 'rblock'; a.push = { x: 0.2, y: Math.sign(lane) * 0.9 };
     });
     // assign each blocker the nearest coverage man (by lane)
     const cov = W.ag.filter(a => a.side === 'd');
     W.ag.filter(a => a.side === 'o' && a.task === 'rblock').forEach(b => { let best = 99, t = null; cov.forEach(c => { if (c.taken) return; const dd = Math.abs(c.y - b.y); if (dd < best) { best = dd; t = c; } }); if (t) { t.taken = true; b.tgt = t; } });
-    W.ball.holder = ra; W.carrier = ra; W.phase = 'yac'; ra.task = 'carry';
-    W.ev.push({ t: 0, text: k.kind === 'punt' ? 'PUNT RETURN' : 'KICK RETURN', cls: 'meh small' });
+    W.ball.holder = ra; W.carrier = ra; W.phase = 'yac'; ra.task = 'carry'; if (dead) W.noTackle = true;
+    W.ev.push({ t: 0, text: k.mode === 'fc' ? 'FAIR CATCH' : k.mode === 'tb' ? 'TOUCHBACK' : k.kind === 'punt' ? 'PUNT RETURN' : 'KICK RETURN', cls: 'meh small' });
     const brain = W => {
+      if (dead) {
+        // the returner waves for the catch (or takes a knee) and stays put; the coverage runs down and pulls up around him
+        ra.vx = 0; ra.vy = 0;
+        for (const a of W.ag) { if (a === ra) continue; if (a.side === 'd') { const dd = dist(a, ra), stop = k.mode === 'tb' ? 9 : 4 + (a.i % 4); if (dd > stop) steer(a, ra.x, ra.y, 1, false); else { a.vx *= 0.55; a.vy *= 0.55; } } else { a.vx *= 0.7; a.vy *= 0.7; } }
+        if (W.t >= (k.mode === 'tb' ? 2.4 : 2.6)) end(W, k.mode);
+        return;
+      }
       carry(W, W.carrier, 1);
+      // the return is over once he has gone about as far as it was going to go and a coverage man gets to him
+      if (!W.done && W.Rt < 400 && W.carrier === ra && ra.x - land >= W.Rt) {
+        let nb = null, nd = 99; for (const c of W.ag) { if (c.side !== 'd' || c.down > 0) continue; const dd = dist(c, ra); if (dd < nd) { nd = dd; nb = c; } }
+        if (nb && nd < 2.4) { W.tackle = { by: nb, ast: null, t: W.t, eng: false, freed: false, unb: true }; ra.down = 2; nb.down = 1.2; end(W, 'tackle'); return; }
+      }
       for (const a of W.ag) {
         if (a.eng || a.stun > 0 || a.down > 0) continue;
-        if (a.side === 'd') { pursue(W, a, W.carrier); continue; }
+        if (a.side === 'd') {
+          // coverage lanes: the kicking team runs down its own lane and only converges on the ball once he is close (they do not all take a perfect angle at once)
+          if (k.kind === 'kick' && dist(a, W.carrier) > W.conv) { const hold = clamp((a.rec == null ? 0.8 : a.rec), 0.5, 0.9); steer(a, W.carrier.x + 3, a.y0 * 0.8 * hold + W.carrier.y * (1 - 0.8 * hold), 1, false); continue; }
+          pursue(W, a, W.carrier); continue;
+        }
         if (a.task === 'rblock') {
           const t = a.tgt && !a.tgt.eng && a.tgt.down <= 0 ? a.tgt : null;
           if (!t) { let best = 99, u = null; for (const c of W.ag) { if (c.side !== 'd' || c.eng || c.down > 0) continue; const dd = dist(a, c) + dist(c, W.carrier) * 0.5; if (dd < best) { best = dd; u = c; } } a.tgt = u; }

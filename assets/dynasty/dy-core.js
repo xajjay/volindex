@@ -31,7 +31,7 @@
   DY.POS_NAME = { QB: 'Quarterback', RB: 'Running back', WR: 'Wide receiver', TE: 'Tight end', OT: 'Offensive tackle', IOL: 'Interior lineman', EDGE: 'Edge rusher',
     DT: 'Defensive tackle', LB: 'Linebacker', CB: 'Cornerback', S: 'Safety', K: 'Kicker', P: 'Punter', LS: 'Long snapper' };
   DY.SIDE = p => ['QB', 'RB', 'WR', 'TE', 'OT', 'IOL'].includes(p) ? 'O' : ['K', 'P', 'LS'].includes(p) ? 'ST' : 'D';
-  DY.ATTR_NAME = { spd: 'Speed', acc: 'Acceleration', agi: 'Agility', str: 'Strength', awr: 'Awareness', thp: 'Throw power', sac: 'Short accuracy',
+  DY.ATTR_NAME = { rtn: 'Returning', spd: 'Speed', acc: 'Acceleration', agi: 'Agility', str: 'Strength', awr: 'Awareness', thp: 'Throw power', sac: 'Short accuracy',
     mac: 'Medium accuracy', dac: 'Deep accuracy', tup: 'Throw under pressure', car: 'Carrying', btk: 'Break tackle', elu: 'Elusiveness', bcv: 'Ball-carrier vision',
     cth: 'Catching', cit: 'Catch in traffic', srr: 'Short routes', drr: 'Deep routes', rls: 'Release', spc: 'Spectacular catch', rbk: 'Run block', pbk: 'Pass block',
     pmv: 'Power moves', fmv: 'Finesse moves', bsh: 'Block shedding', tak: 'Tackling', pur: 'Pursuit', prc: 'Play recognition', mcv: 'Man coverage', zcv: 'Zone coverage',
@@ -77,6 +77,11 @@
   DY.calcOvr = p => { const w = DY.W[p.pos]; let s = 0; for (const k in w) s += w[k] * (p.at[k] || 50); return Math.round(clamp(s, 25, 99)); };
   DY.setOvr = p => { p.ovr = DY.calcOvr(p); return p.ovr; };
   // build attributes that land on a target overall
+  // return rating: how well a player fields kicks and punts (burst, vision, hands, nerve). Only the skill positions that return get one; it does not feed overall.
+  DY.RTN_POS = ['RB', 'WR', 'CB', 'S'];
+  DY.rtnCalc = (at, ovr, noise) => Math.round(clamp(0.4 * (at.spd || 70) + 0.2 * (at.agi || at.spd || 70) + 0.15 * (at.elu || (at.spd || 70) - 6) + 0.25 * (ovr || 70) - 8 + (noise || 0), 35, 99));
+  // any player's return rating (older saves and players without one get it from speed, agility and elusiveness)
+  DY.rtnOf = p => p ? (p.at.rtn != null ? p.at.rtn : DY.rtnCalc(p.at, p.ovr, ((p.id * 37) % 13 - 6) * 0.9)) : 60;
   DY.makeAttrs = (pos, target, archName) => {
     const arch = (DY.ARCH[pos].find(a => a[0] === archName) || pick(DY.ARCH[pos]));
     const w = DY.W[pos], at = {};
@@ -88,6 +93,7 @@
     }
     for (const [k, off] of DY.EXTRA[pos] || []) at[k] = clamp(target + off + (arch[1][k] || 0) + gauss() * 4, 50, 95);
     if (!at.spd) at.spd = clamp(target - 25 + gauss() * 4, 50, 80);
+    if (DY.RTN_POS.includes(pos) && at.rtn == null) at.rtn = DY.rtnCalc(at, target, gauss() * 6.5);
     if (!at.awr) at.awr = clamp(target - 4 + gauss() * 4, 25, 95);
     if (!at.str) at.str = clamp(target - 10 + gauss() * 5, 25, 95);
     if (!at.tak && DY.SIDE(pos) === 'O') at.tak = clamp(30 + gauss() * 6, 15, 60);
@@ -510,9 +516,9 @@
     const ret = team.roster.map(DY.P).filter(p => p && DY.healthy(p) && ['RB', 'WR', 'CB', 'S'].includes(p.pos));
     const qbIds = L.QB.map(p => p.id);
     const starters = [L.QB[0], L.RB[0], ...L.WR.slice(0, 3), L.TE[0]];
-    const kr = ret.filter(p => !qbIds.includes(p.id) && !starters.slice(0, 1).includes(p)).sort((a, b) => (b.at.spd + b.at.acc * 0.5 + (b.at.elu || 60) * 0.4) - (a.at.spd + a.at.acc * 0.5 + (a.at.elu || 60) * 0.4));
+    const kr = ret.filter(p => !qbIds.includes(p.id) && !starters.slice(0, 1).includes(p)).sort((a, b) => (DY.rtnOf(b) * 0.75 + b.at.spd * 0.25) - (DY.rtnOf(a) * 0.75 + a.at.spd * 0.25));
     L.KR = team.kr && ok(team.kr) ? DY.P(team.kr) : kr[0] || L.RB[0];
-    L.PR = team.pr && ok(team.pr) ? DY.P(team.pr) : kr.sort((a, b) => (b.at.agi + (b.at.cth || 60)) - (a.at.agi + (a.at.cth || 60)))[0] || L.WR[0];
+    L.PR = team.pr && ok(team.pr) ? DY.P(team.pr) : kr.sort((a, b) => (DY.rtnOf(b) * 0.65 + (b.at.cth || 60) * 0.35) - (DY.rtnOf(a) * 0.65 + (a.at.cth || 60) * 0.35))[0] || L.WR[0];
     return L;
   };
   // team strength snapshot (for polls, previews, recruiting)

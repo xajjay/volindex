@@ -677,7 +677,7 @@
     const t = p.t != null ? T(p.t) : (p.t0 != null ? T(p.t0) : null), g = G();
     const hideT = !!(p.portal && p.portal.from !== g.user);
     const [pl, pd] = DY.persLabel(p);
-    const keys = Object.keys(DY.W[p.pos]).concat((DY.EXTRA[p.pos] || []).map(x => x[0])).filter((k, i, a) => a.indexOf(k) === i && p.at[k] != null);
+    const keys = Object.keys(DY.W[p.pos]).concat((DY.EXTRA[p.pos] || []).map(x => x[0])).concat(p.at.rtn != null ? ['rtn'] : []).filter((k, i, a) => a.indexOf(k) === i && p.at[k] != null);
     const bar = (l, v) => `<div class="dy-attr"><span>${esc(l)}</span><div class="dy-ab"><i class="${ovrCls(v)}" style="width:${v}%"></i></div><b>${v}</b></div>`;
     const car = Object.entries(p.car || {}).sort((a, b) => a[0] - b[0]);
     const cols = statCols(p.pos);
@@ -866,7 +866,7 @@
       ${lvl >= 1 ? `<p class="dy-scout"><b>Scouting report:</b> ${esc(DY.scoutReport(p))}</p>` : '<p class="dim">Scout him to see a report and his real ratings.</p>'}
       <div class="dy-pc-cols"><div><div class="glabel">What he wants</div>${p.pref.top.map((k, i) => `<div class="dy-pref"><b>${i + 1}. ${esc(DY.PREFS[k])}</b> <span>${esc(DY.userT().abbr)}: ${DY.grade(f[k])}</span></div>`).join('')}${p.pref.deal ? `<p class="small"><b>Dealbreaker:</b> ${esc(DY.PREFS[p.pref.deal])}</p>` : ''}<p class="small">Overall fit: <b>${DY.grade(DY.fitScore(ut, p))}</b></p></div>
       <div><div class="glabel">Schools in the mix</div>${ints.slice(0, 8).map(([tid, v]) => `<div class="dy-int ${+tid === g.user ? 'me' : ''}"><span>${esc(T(+tid).name)}</span><i style="width:${Math.max(3, v / Math.max(top, 160) * 100)}%;background:${T(+tid).c1}"></i></div>`).join('')}</div></div>
-      ${lvl >= 2 ? `<div class="glabel">Ratings</div>${Object.keys(DY.W[p.pos]).map(k => `<div class="dy-attr"><span>${esc(DY.ATTR_NAME[k])}</span><div class="dy-ab"><i class="${ovrCls(p.at[k])}" style="width:${p.at[k]}%"></i></div><b>${p.at[k]}</b></div>`).join('')}` : ''}
+      ${lvl >= 2 ? `<div class="glabel">Ratings</div>${Object.keys(DY.W[p.pos]).concat(p.at.rtn != null ? ['rtn'] : []).map(k => `<div class="dy-attr"><span>${esc(DY.ATTR_NAME[k])}</span><div class="dy-ab"><i class="${ovrCls(p.at[k])}" style="width:${p.at[k]}%"></i></div><b>${p.at[k]}</b></div>`).join('')}` : ''}
     </div>`);
   }
 

@@ -86,6 +86,11 @@
       Object.values(g.P || {}).forEach(p => p && f(p.tr)); if (g.recruit && g.recruit.pool) Object.values(g.recruit.pool).forEach(p => p && f(p.tr));
       g.fx.tr2 = 1;
     }
+    if (!g.fx.rtn1) {   // return ratings are new: give every returner-type player one (from speed, agility and elusiveness, plus a spread so real specialists exist)
+      const f = p => { if (p && p.at && DY.RTN_POS.includes(p.pos) && p.at.rtn == null) p.at.rtn = DY.rtnCalc(p.at, p.ovr, DY.gauss() * 6.5); };
+      Object.values(g.P || {}).forEach(f); if (g.recruit && g.recruit.pool) Object.values(g.recruit.pool).forEach(f);
+      g.fx.rtn1 = 1;
+    }
     if (!g.fx.roster1 && DY.ensureRoster) {   // CPU rosters with no kicker/punter, 1 corner, 10 running backs: rebalance every team once
       g.teams.forEach(t => { if (t.fbs !== false) DY.ensureRoster(t, t.user ? { minOnly: true } : { trim: true }); });
       g.fx.roster1 = 1;

@@ -983,7 +983,7 @@
     // scouts get a clearer read as he ages
     const err = p.yr >= 3 ? 0.06 : 0.12, ri0 = DY.gradeIdx(DY.gradeOf(p.ceil)), rr0 = rnd();
     p.potG = DY.GRADES[clamp(ri0 + (rr0 < err ? -1 : rr0 < err * 2 ? 1 : 0), 0, DY.GRADES.length - 1)][0];
-    p.yr++;
+    p.yr++; if (p.at && p.at.rtn != null) p.at.rtn = clamp(Math.round(p.at.rtn + gauss() * 2 + (p.yr <= 3 ? 1 : 0)), 35, 99);
     // traits drift
     if (p.yr >= 4) p.tr.lead = Math.min(99, p.tr.lead + ri(0, 3));
     const delta = p.ovr - before;
