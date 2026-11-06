@@ -102,10 +102,29 @@
   function loadScript(src, ready, cb, fail) {
     if (ready()) return cb();
     let s = document.querySelector(`script[data-g="${src}"]`);
-    if (!s) { s = document.createElement('script'); s.src = src; s.dataset.g = src; document.head.appendChild(s); }
+    if (s && s.dataset.done) return cb(); // already ran earlier: its load event will not fire again
+    if (!s) { s = document.createElement('script'); s.src = src; s.dataset.g = src; s.addEventListener('load', () => { s.dataset.done = 1; }); s.addEventListener('error', () => s.remove()); document.head.appendChild(s); }
     s.addEventListener('load', cb, { once: true });
     s.addEventListener('error', fail, { once: true });
   }
+  // several scripts at once: downloaded in parallel but run in the order given. Tags that already ran are skipped, failed tags are removed so a retry starts clean, and a stalled download times out instead of hanging forever.
+  let batchId = 0;
+  function loadOrdered(srcs, done, fail) {
+    const my = ++batchId; let left = 0, over = false;
+    const end = ok => { if (over || my !== batchId) return; over = true; clearTimeout(tm); ok ? done() : fail(); };
+    const tm = setTimeout(() => { srcs.forEach(src => { const t = document.querySelector(`script[data-g="${src}"]`); if (t && !t.dataset.done) t.remove(); }); end(false); }, 30000);
+    srcs.forEach(src => {
+      let t = document.querySelector(`script[data-g="${src}"]`);
+      if (t && t.dataset.done) return;
+      if (t) t.remove(); // started by an earlier attempt and never finished: start it again
+      t = document.createElement('script'); t.src = src; t.async = false; t.dataset.g = src; left++;
+      t.addEventListener('load', () => { t.dataset.done = 1; if (--left === 0) end(true); });
+      t.addEventListener('error', () => { srcs.forEach(x => { const y = document.querySelector(`script[data-g="${x}"]`); if (y && !y.dataset.done) y.remove(); }); end(false); });
+      document.head.appendChild(t);
+    });
+    if (left === 0) end(true);
+  }
+  const retryMsg = (app, msg, again) => { app.innerHTML = `<div class="wrap hub-hero"><div class="eyebrow">Games</div><h1>${esc(msg)}</h1><p><button class="btn" id="vdRetry">Try again</button></p></div>`; const b = app.querySelector('#vdRetry'); if (b) b.onclick = again; };
   function initFootball() {
     if (D) return; D = window.VI_GAMES_DATA;
     ALL = D.players; POOL = ALL.filter(p => p.pool); STARS = ALL.filter(p => p.star);
@@ -778,10 +797,8 @@
   function renderDynasty(app) {
     if (!document.querySelector('link[data-dyn]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/dynasty/dynasty.css?v=' + BUILD; l.dataset.dyn = 1; document.head.appendChild(l); }
     if (window.VI_DYN && window.DYG) return window.VI_DYN.render(app);
-    loading(app, 'Loading Vol Dynasty…');
-    let i = 0;
-    const next = () => { if (i >= DYN_FILES.length) return window.VI_DYN.render(app); const f = 'assets/dynasty/' + DYN_FILES[i++] + '.js?v=' + BUILD; loadScript(f, () => false, next, () => loading(app, 'Could not load Vol Dynasty. Refresh to try again.')); };
-    next();
+    const go = () => { loading(app, 'Loading Vol Dynasty…'); loadOrdered(DYN_FILES.map(f => 'assets/dynasty/' + f + '.js?v=' + BUILD), () => window.VI_DYN.render(app), () => retryMsg(app, 'Vol Dynasty did not finish loading.', go)); };
+    go();
   }
   // Hoops and Diamond Dynasty (basketball, baseball, softball): one set of scripts for all four, plus the football
   // stylesheet and team colors
@@ -801,9 +818,8 @@
     if (window.VI_SDYN && window.SDG) return window.VI_SDYN.render(app, sport);
     loading(app, 'Loading the dynasty…');
     const files = (window.DY && window.DY.TEAMS ? [] : ['assets/dynasty/dy-data.js']).concat(window.MORALE ? [] : ['assets/morale.js']).concat(SDYN_FILES.map(f => 'assets/sdyn/' + f + '.js'));
-    let i = 0;
-    const next = () => { if (i >= files.length) return window.VI_SDYN.render(app, sport); loadScript(files[i++] + '?v=' + BUILD, () => false, next, () => loading(app, 'Could not load the dynasty. Refresh to try again.')); };
-    next();
+    const go = () => { loading(app, 'Loading the dynasty…'); loadOrdered(files.map(x => x + '?v=' + BUILD), () => window.VI_SDYN.render(app, sport), () => retryMsg(app, 'The dynasty did not finish loading.', go)); };
+    go();
   }
   let last = null;
   function rerender() { if (last) render(last.app, last.sport, last.game, true); }
