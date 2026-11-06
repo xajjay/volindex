@@ -42,7 +42,7 @@
       <div class="gcrumb"><a href="#games">Games</a> › <a href="#games-${SPORT}">${crumbSport}</a> › ${esc(sp.title)}</div>
       <div class="dy-hero"><span class="gtag">Preview</span><h1>${esc(sp.title)}</h1><p>${esc(blurb(sp))}</p></div>
       <div class="dy-slots">${[1, 2, 3].map(n => { const s = m[n]; return `<div class="box dy-slot ${s ? '' : 'empty'}"><div class="glabel">Slot ${n}</div>${s ? `<h3>Coach ${esc(s.coach)}</h3><p class="dim">${s.team && s.team !== 'Tennessee' ? esc(s.team) + ' · ' : ''}${esc(s.label)} · ${esc(s.rec)}${s.titles ? ` · ${s.titles} title${s.titles > 1 ? 's' : ''}` : ''}</p><div class="grow"><button class="btn primary" data-load="${n}">Continue</button><button class="btn" data-del="${n}">Delete</button></div>` : `<p class="dim">Empty</p><div class="grow"><button class="btn primary" data-new="${n}">New dynasty</button></div>`}</div>`; }).join('')}</div>
-      <div class="grow"><label class="btn"><input type="file" accept=".gz,application/gzip" id="sdImport" hidden>Import a save file</label></div>
+      <div class="grow"><label class="btn"><input type="file" id="sdImport" hidden>Import a save file</label></div>
       <div class="box dy-cloudbox" id="sdCloud" hidden></div>
       <div class="gnote small">Saves live in this browser (and in your account when you're signed in). This is an early preview: expect balance changes.</div></div>`;
     const cl = APP.querySelector('#sdCloud');

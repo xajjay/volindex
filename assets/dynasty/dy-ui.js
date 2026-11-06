@@ -43,7 +43,7 @@
       <div class="gcrumb"><a href="#games">Games</a> › <a href="#games-football">Football</a> › Vol Dynasty</div>
       <div class="dy-hero"><span class="gtag">Preview</span><h1>Vol Dynasty</h1><p>Take over Tennessee with the real 2026 roster and depth chart, or go back to any season since 2006 with that year's real players on every team. Call every play, recruit, work the portal and your NIL budget, and chase the playoff year after year.</p></div>
       <div class="dy-slots">${[1, 2, 3].map(n => { const s = m[n]; return `<div class="box dy-slot ${s ? '' : 'empty'}"><div class="glabel">Slot ${n}</div>${s ? `<h3>Coach ${esc(s.coach)}</h3><p class="dim">${s.team && s.team !== 'Tennessee' ? esc(s.team) + ' · ' : ''}${esc(s.label)} · ${esc(s.rec)}${s.natl ? ` · ${s.natl} national title${s.natl > 1 ? 's' : ''}` : ''}</p><p class="dim small">Saved ${new Date(s.at).toLocaleString()}</p><div class="grow"><button class="btn primary" data-load="${n}">Continue</button><button class="btn" data-del="${n}">Delete</button></div>` : `<p class="dim">Empty</p><div class="grow"><button class="btn primary" data-new="${n}">New dynasty</button></div>`}</div>`; }).join('')}</div>
-      <div class="grow"><label class="btn"><input type="file" accept=".gz,.vdyn,application/gzip" id="dyImport" hidden>Import a save file</label></div>
+      <div class="grow"><label class="btn"><input type="file" id="dyImport" hidden>Import a save file</label></div>
       <div class="box dy-cloudbox" id="dyCloud" hidden></div>
       <div class="gnote small">Saves live in this browser (and in your account when you're signed in). You can also export one from Settings. This is an early preview: expect balance changes, and saves from a later version may not load.</div>
     </div>`;
