@@ -134,6 +134,8 @@
     const R = G().recruit; if (!R._pc) cpuState(R);
     const have = (R._pc[t.id] || {})[p.pos] || 0, need = (R._need[t.id] || {})[p.pos] || 0, sc = R._sc[t.id] || { 5: 0, 4: 0 };
     if ((R._tot[t.id] || 0) >= 27) return false;
+    // never more than five five-stars in a class, unless they are real recruits who really signed there
+    if (p.rec.stars >= 5 && sc[5] >= 5 && !(p.realName && p.realSchool === t.id)) return false;
     if (relax) return true;
     if (['K', 'P', 'LS'].includes(p.pos)) return have < Math.min(1, need);
     return have < Math.max(p.pos === 'QB' ? 1 : 0, need + (p.rec.stars >= 5 ? 2 : p.rec.stars >= 4 ? 1 : 0));
@@ -318,6 +320,19 @@
       p.commit = tid; if (!g.teams[tid].user) addCommit(R, tid, p);
       if (g.teams[tid].user) logs.push(`COMMIT: ${p.n}, ${p.rec.stars}★ ${p.pos}, signs with ${DY.UN()} in the early period.`);
     }));
+    // the ranked pool is only about 500 players, but a real FBS class is around 20: every CPU school that is short fills out the class with lower-rated signees at the spots it needs
+    const posAll = Object.keys(DY.STARTERS).filter(x => !['K', 'P', 'LS'].includes(x));
+    let nat = Object.values(R.pool).length;
+    g.teams.forEach(t => {
+      if (t.user || t.dorm || !t.fbs && t.fbs !== undefined) return;
+      const want = Math.round(clamp(20.5 + gauss() * 1.6, 17, 24)); let n = R._tot[t.id] || 0;
+      while (n < want) {
+        const pc = R._pc[t.id] || {}, nd = R._need[t.id] || {};
+        const pos = DY.wpick(posAll, x => 0.4 + Math.max(0, (nd[x] || 0) - (pc[x] || 0)) * 2.5 + (DY.STARTERS[x] || 1) * 0.3) || 'WR';
+        const p = prospect(pos, Math.round(rr(0.852, 0.888) * 1e4) / 1e4, { st: t.st });
+        p.rec.nat = ++nat; p.commit = t.id; p.firm = true; R.pool[p.id] = p; addCommit(R, t.id, p); n++;
+      }
+    });
   }
   // program pull: how much a school's pitch counts with a recruit. Blue-chips discount low-prestige programs,
   // so a rebuild takes years of winning (prestige) instead of one good recruiting season. Tennessee-level programs ~1.0.
