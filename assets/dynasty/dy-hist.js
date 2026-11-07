@@ -348,24 +348,44 @@
   const realPos0 = (pos, r) => pos;
   const stOf = h => { const m = /,\s*([A-Z]{2})\s*$/.exec(h || ''); return m ? m[1] : null; };
   // the real names already in this dynasty (rosters, former players, signees and recruits) so no real person is created twice
+  const hKey = h => String(h || '').toLowerCase().replace(/[^a-z]/g, '');
+  const nKey = s => String(s || '').toLowerCase().replace(/[^a-z]/g, '');
+  // the same real person: same name, and either the same hometown or the same position group (a juco or a position change keeps the name but not always the home)
+  DY.sameReal = (a, b) => nKey(a.n) === nKey(b.n) && ((hKey(a.home) && hKey(a.home) === hKey(b.home)) || (PGRP[a.pos] || a.pos) === (PGRP[b.pos] || b.pos));
   DY.realDupe = g => {
-    const nk = s => String(s || '').toLowerCase().replace(/[^a-z]/g, '');
-    if (!g.realSeen) { g.realSeen = []; Object.values(g.P || {}).concat(Object.values((g.recruit && g.recruit.pool) || {})).forEach(p => { if (p && (p.realName || p.real || p.rec && p.rec.real)) g.realSeen.push([nk(p.n), PGRP[p.pos] || p.pos, stOf(p.home)]); }); }
-    const idx = {}; g.realSeen.forEach(x => (idx[x[0]] = idx[x[0]] || []).push(x));
-    const same = (name, pos, home) => (idx[nk(name)] || []).some(x => (!x[1] || !pos || x[1] === (PGRP[pos] || pos)));
-    return { has: same, add: (name, pos, home) => { const x = [nk(name), PGRP[pos] || pos, stOf(home)]; g.realSeen.push(x); (idx[x[0]] = idx[x[0]] || []).push(x); } };
+    const isReal = p => p && (p.realName || p.real || p.rec && p.rec.real);
+    if (!g.realSeen2) { g.realSeen2 = []; Object.values(g.P || {}).concat(Object.values((g.recruit && g.recruit.pool) || {})).forEach(p => { if (isReal(p)) g.realSeen2.push([nKey(p.n), PGRP[p.pos] || p.pos, hKey(p.home)]); }); }
+    const idx = {}; g.realSeen2.forEach(x => (idx[x[0]] = idx[x[0]] || []).push(x));
+    const same = (name, pos, home) => (idx[nKey(name)] || []).some(x => x[1] === (PGRP[pos] || pos) || (x[2] && x[2] === hKey(home)));
+    return { has: same, add: (name, pos, home) => { const x = [nKey(name), PGRP[pos] || pos, hKey(home)]; g.realSeen2.push(x); (idx[x[0]] = idx[x[0]] || []).push(x); } };
   };
-  // an older save's current class: drop real recruits who are already on a roster or listed twice
+  // an older save: one real person exists once. Duplicates still in the recruiting pool are deleted; duplicates already on rosters are released (the one who played more, or the one on your team, stays)
   DY.dedupePool = g => {
-    g.fx = g.fx || {}; const R = g.recruit; if (!R || !R.pool || g.fx.dedupe1) return; g.fx.dedupe1 = 1;
-    const nk = s => String(s || '').toLowerCase().replace(/[^a-z]/g, ''), seen = {};
-    const keyOf = p => nk(p.n);
-    Object.values(g.P || {}).forEach(p => { if (p && (p.realName || p.real)) (seen[keyOf(p)] = seen[keyOf(p)] || []).push(p); });
-    Object.keys(R.pool).forEach(id => {
-      const p = R.pool[id]; if (!p || !(p.realName || p.real)) return;
-      const hit = (seen[keyOf(p)] || []).some(q => q.id !== p.id && (PGRP[q.pos] || q.pos) === (PGRP[p.pos] || p.pos));
-      if (hit) { delete R.pool[id]; if (R.board) R.board = R.board.filter(x => x !== +id); } else (seen[keyOf(p)] = seen[keyOf(p)] || []).push(p);
+    g.fx = g.fx || {}; if (g.fx.dedupe2) return; g.fx.dedupe2 = 1;
+    const R = g.recruit, isReal = p => p && (p.realName || p.real || p.rec && p.rec.real), ut = g.user;
+    const all = Object.values(g.P || {}).filter(isReal), byN = {};
+    const keep = (a, b) => { const sc = p => (p.t === ut ? 1e6 : 0) + (p.gp || 0) * 100 + (p.ovr || 0) - p.id * 1e-6; return sc(a) >= sc(b) ? a : b; };
+    all.forEach(p => (byN[nKey(p.n)] = byN[nKey(p.n)] || []).push(p));
+    Object.values(byN).forEach(v => {
+      if (v.length < 2) return;
+      const kept = [];
+      v.sort((a, b) => (b.t === ut ? 1e6 : 0) + (b.gp || 0) - (a.t === ut ? 1e6 : 0) - (a.gp || 0)).forEach(p => {
+        const twin = kept.find(q => DY.sameReal(p, q));
+        if (!twin) { kept.push(p); return; }
+        const dead = keep(p, twin) === p ? twin : p;
+        if (dead === twin) kept[kept.indexOf(twin)] = p;
+        if (dead.t != null) { const t = g.teams[dead.t]; dead.leave = 'dup'; dead.gone = g.season; dead.t0 = dead.t; dead.t = null; if (t) { t.roster = t.roster.filter(id => id !== dead.id); try { DY.refreshDepth(t); } catch (e) { } } }
+      });
     });
+    if (R && R.pool) {
+      const seen = all.filter(p => p.t != null || (p.gone != null));
+      Object.keys(R.pool).forEach(id => {
+        const p = R.pool[id]; if (!isReal(p)) return;
+        const hit = seen.some(q => q.id !== p.id && DY.sameReal(p, q));
+        if (hit) { delete R.pool[id]; if (R.board) R.board = R.board.filter(x => x !== +id); } else seen.push(p);
+      });
+    }
+    g.realSeen2 = null; DY.realDupe(g);
   };
   // this dynasty: Dobbs and Kamara come back this offseason; the offseason in progress gets its two last-chance visits
   DY.lcMigrate = g => {
