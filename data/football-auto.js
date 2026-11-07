@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-06. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-07. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-06",
+ "updated": "2026-11-07",
  "team": {
   "record": "6-2",
   "sec": "3-2",
@@ -113,12 +113,12 @@ window.SITE_AUTO.football = {
   "ranks": {
    "ppg": [
     32.2,
-    46,
+    45,
     8
    ],
    "oppg": [
     16.2,
-    17,
+    16,
     3
    ],
    "ypg": [
@@ -138,7 +138,7 @@ window.SITE_AUTO.football = {
    ],
    "oypg": [
     288.5,
-    15,
+    14,
     4
    ],
    "oRushYpg": [
@@ -1167,17 +1167,17 @@ window.SITE_AUTO.football = {
    "Amare Campbell": [
     {
      "stat": "Tackles for loss",
-     "rank": 50
+     "rank": 54
     }
    ],
    "Tyree Weathersby": [
     {
      "stat": "Sacks",
-     "rank": 7
+     "rank": 9
     },
     {
      "stat": "Tackles for loss",
-     "rank": 40
+     "rank": 43
     }
    ],
    "Xavier Gilliam": [
@@ -1187,13 +1187,13 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Sacks",
-     "rank": 16
+     "rank": 19
     }
    ],
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 38
+     "rank": 39
     }
    ],
    "Ty Redmond": [
@@ -1217,7 +1217,7 @@ window.SITE_AUTO.football = {
    "Mike Matthews": [
     {
      "stat": "Receiving yards",
-     "rank": 64
+     "rank": 68
     }
    ],
    "DeSean Bishop": [
@@ -1227,7 +1227,7 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Rushing TD",
-     "rank": 9
+     "rank": 10
     }
    ]
   }
@@ -1471,16 +1471,16 @@ window.SITE_AUTO.football = {
   "Kentucky": {
    "tv": "ESPN",
    "kick": "2026-11-07T23:15Z",
-   "line": "TENN -5.5",
+   "line": "TENN -6",
    "ou": 49.5,
    "ml": "-205",
-   "book": "DraftKings",
+   "book": "Draft Kings",
    "win": 66.7
   },
   "Texas A&M": {
    "tv": null,
    "kick": "2026-11-14T05:00Z",
-   "win": 50.5
+   "win": 50.4
   },
   "LSU": {
    "tv": null,
@@ -1502,7 +1502,7 @@ window.SITE_AUTO.football = {
     "Points per game",
     "Total offense",
     32.2,
-    46,
+    45,
     8,
     false
    ],
@@ -1574,7 +1574,7 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     20.0,
-    105,
+    103,
     11,
     true
    ],
@@ -1619,7 +1619,7 @@ window.SITE_AUTO.football = {
     "Yards per reception",
     "Receiving",
     10.92,
-    107,
+    106,
     15,
     false
    ],
@@ -1637,7 +1637,7 @@ window.SITE_AUTO.football = {
     "3rd down conversion %",
     "Downs",
     37.0,
-    93,
+    92,
     14,
     false
    ],
@@ -1646,7 +1646,7 @@ window.SITE_AUTO.football = {
     "4th down conversion %",
     "Downs",
     73.3,
-    11,
+    10,
     3,
     false
    ],
@@ -1673,7 +1673,7 @@ window.SITE_AUTO.football = {
     "Turnovers lost",
     "Downs",
     11.0,
-    71,
+    70,
     4,
     true
    ],
@@ -1682,7 +1682,7 @@ window.SITE_AUTO.football = {
     "Points allowed per game",
     "Points allowed",
     16.2,
-    17,
+    16,
     3,
     true
    ],
@@ -1691,7 +1691,7 @@ window.SITE_AUTO.football = {
     "Yards allowed per game",
     "Yards allowed",
     288.5,
-    15,
+    14,
     4,
     true
    ],
@@ -1700,7 +1700,7 @@ window.SITE_AUTO.football = {
     "Yards per play allowed",
     "Yards allowed",
     4.69,
-    20,
+    19,
     4,
     true
    ],
@@ -1709,7 +1709,7 @@ window.SITE_AUTO.football = {
     "Opponent 3rd down %",
     "Yards allowed",
     31.7,
-    24,
+    22,
     4,
     true
    ],
@@ -1727,7 +1727,7 @@ window.SITE_AUTO.football = {
     "Opponent completion %",
     "Pass defense",
     62.3,
-    80,
+    79,
     8,
     true
    ],
@@ -1763,7 +1763,7 @@ window.SITE_AUTO.football = {
     "Yards per carry allowed",
     "Run defense",
     3.84,
-    54,
+    53,
     10,
     true
    ],
@@ -1772,7 +1772,7 @@ window.SITE_AUTO.football = {
     "Tackles for loss",
     "Run defense",
     65.0,
-    9,
+    10,
     1,
     false
    ],
@@ -1799,7 +1799,7 @@ window.SITE_AUTO.football = {
     "Kick return average",
     "Returning",
     16.2,
-    126,
+    124,
     15,
     false
    ],
