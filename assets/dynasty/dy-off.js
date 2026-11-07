@@ -1067,8 +1067,13 @@
     const g = G(), ids = new Set(Object.keys(g.legacy).map(Number));
     DY.userT().roster.forEach(id => ids.add(id));
     Object.values(g.P).forEach(p => { if (p.t0 === g.user && p.gone) ids.add(p.id); });
-    ids.forEach(id => { const p = DY.P(id); if (!p) return; const played = Object.values(p.car || {}).some(c => (c.gp || 0) > 0 && c.t === DY.userT().abbr); if (!played && !g.legacy[id]) return; g.legacy[id] = DY.legacyScore(p); });
+    ids.forEach(id => { const p = DY.P(id); if (!p) return; const played = Object.values(p.car || {}).some(c => c.t === DY.userT().abbr && ((c.gp || 0) > 0 || (c.kr || 0) + (c.pr || 0) + (c.tk || 0) > 0)); if (!played && !g.legacy[id]) return; g.legacy[id] = DY.legacyScore(p); });
   };
+  // returner legacy: ranked on return production and Jet Awards only, for any player who returned kicks or punts for the program
+  DY.returnerScore = p => { const ab = DY.userT().abbr; let s = 0, n = 0, td = 0; for (const y in p.car) { const c = p.car[y]; if (c.t !== ab) continue; s += (c.rttd || 0) * 14 + ((c.kry || 0) + (c.pry || 0)) / 70 + ((c.kr || 0) + (c.pr || 0)) * 0.15; n += (c.kr || 0) + (c.pr || 0); td += c.rttd || 0; }
+    if (p.s && p.t === G().user) { s += (p.s.rttd || 0) * 14 + ((p.s.kry || 0) + (p.s.pry || 0)) / 70 + ((p.s.kr || 0) + (p.s.pr || 0)) * 0.15; n += (p.s.kr || 0) + (p.s.pr || 0); td += p.s.rttd || 0; }
+    s += (p.aw || []).filter(a => a.a === 'JET').length * 30; return n >= 10 || td ? Math.round(s) : 0; };
+  DY.returnerBoard = n => Object.values(G().P).filter(p => p && p.car).map(p => ({ p, v: DY.returnerScore(p) })).filter(x => x.v > 0).sort((a, b) => b.v - a.v).slice(0, n || 10);
   DY.legacyBoard = n => Object.entries(G().legacy).map(([id, v]) => ({ p: DY.P(+id), v })).filter(x => x.p).sort((a, b) => b.v - a.v).slice(0, n || 10);
 
   /* ---------- captains and preseason camp ---------- */

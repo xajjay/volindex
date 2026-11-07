@@ -20,7 +20,7 @@
   }
   DY.loadHist = year => year >= 2026 ? Promise.all([script('data/hist/fb-2026.js').catch(() => null), script('data/hist/fb-classes.js').catch(() => null)]) : Promise.all([script('data/hist/fb-sched.js'), script('data/hist/fb-classes.js'), script('data/hist/fb-tnclasses.js').catch(() => null), year ? script('data/hist/fb-' + year + '.js') : null]);
   // a saved historical dynasty: the schedules and classes must be loaded before it runs
-  DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); try { DY.dedupePool(g); } catch (e) { } try { DY.lcMigrate(g); } catch (e) { } try { DY.fixHistSched(g); } catch (e) { } try { if (g.sched && g.sched.length && g.sched.every(x => !x.res && !x.real)) DY.balanceHome(g.sched); } catch (e) { } return g; }) : Promise.resolve(g);   // (a saved generated slate that has not started gets the home/away fix too)
+  DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); try { DY.dedupePool(g); } catch (e) { } try { DY.lcMigrate(g); } catch (e) { } try { DY.jetBackfill(g); } catch (e) { } try { DY.fixHistSched(g); } catch (e) { } try { if (g.sched && g.sched.length && g.sched.every(x => !x.res && !x.real)) DY.balanceHome(g.sched); } catch (e) { } return g; }) : Promise.resolve(g);   // (a saved generated slate that has not started gets the home/away fix too)
 
   /* ---------- the era: conferences, title games, the playoff ---------- */
   const NO_CCG = y => {
@@ -386,6 +386,19 @@
       });
     }
     g.realSeen2 = null; DY.realDupe(g);
+  };
+  // Jet Award (best returner) was added after many seasons had been played: give it out for every past season that has none
+  DY.jetBackfill = g => {
+    g.fx = g.fx || {}; if (g.fx.jet2) return; g.fx.jet2 = 1;      // the first version only looked at players with a general award score, so return specialists were skipped: redo every season
+    const ps = Object.values(g.P || {}).filter(p => p && p.car);
+    ps.forEach(p => { if (p.aw) p.aw = p.aw.filter(a => a.a !== 'JET'); });
+    Object.keys(g.awards || {}).forEach(y => {
+      const A = g.awards[y]; if (!A) return; delete A.jet;
+      let best = null, bs = 0;
+      ps.forEach(p => { const c = p.car[y]; if (!c || c.real || (c.kr || 0) + (c.pr || 0) < 6) return; const sc = (c.rttd || 0) * 60 + ((c.kry || 0) + (c.pry || 0)) / 8 + ((c.kr || 0) + (c.pr || 0)) * 0.5; if (sc > bs) { bs = sc; best = p; } });
+      if (best) { A.jet = best.id; best.aw = best.aw || []; if (!best.aw.some(a => a.y === +y && a.a === 'JET')) best.aw.push({ y: +y, a: 'JET' }); }
+    });
+    g.nat = null; if (g.legacy) { try { DY.updateLegacy(); } catch (e) { } }
   };
   // this dynasty: Dobbs and Kamara come back this offseason; the offseason in progress gets its two last-chance visits
   DY.lcMigrate = g => {

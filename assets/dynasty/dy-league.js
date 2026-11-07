@@ -283,6 +283,7 @@
       for (const k in l) if (k !== 't') s[k] = (k === 'rlg' || k === 'rclg' || k === 'fglg') ? Math.max(s[k] || 0, l[k]) : (s[k] || 0) + l[k];
     }
     for (const id in GM.snap) { const p = DY.P(+id); if (!p || +id < 0) continue; p.s = p.s || { gp: 0 }; p.s.gp = (p.s.gp || 0) + 1; }
+    try { DY.natGame(GM, x); } catch (e) { }
     // game logs for Tennessee players and the user game box
     if (x.h === g.user || x.a === g.user) {
       const opp = x.h === g.user ? A : H, home = x.h === g.user;
@@ -816,7 +817,8 @@
     best(x => DY.SIDE(x.p.pos) === 'D', 'BEDNARIK', 'bednarik'); best(x => x.p.pos === 'LB', 'BUTKUS', 'butkus'); best(x => x.p.pos === 'CB' || x.p.pos === 'S', 'THORPE', 'thorpe');
     // Jet Award: best returner in the country, on return touchdowns first, then yards and volume
     const rsc = p => { const s = p.s || {}; return (s.kr || 0) + (s.pr || 0) >= 6 ? (s.rttd || 0) * 60 + ((s.kry || 0) + (s.pry || 0)) / 8 + ((s.kr || 0) + (s.pr || 0)) * 0.5 : 0; };
-    const jet = all.map(x => ({ x, r: rsc(x.p) })).filter(z => z.r > 0).sort((a, b) => b.r - a.r)[0];
+    const jall = []; g.teams.filter(t => t.fbs !== false).forEach(t => t.roster.forEach(id => { const p = DY.P(id); if (p) jall.push({ p, t }); }));
+    const jet = jall.map(x => ({ x, r: rsc(x.p) })).filter(z => z.r > 0).sort((a, b) => b.r - a.r)[0];
     if (jet) { A.jet = jet.x.p.id; give(jet.x.p, 'JET'); }
     best(x => x.p.pos === 'K', 'GROZA', 'groza'); best(x => x.p.pos === 'P', 'GUY', 'guy');
     best(x => x.t.conf === 'SEC' && DY.SIDE(x.p.pos) === 'O' && x.p.pos !== 'OT' && x.p.pos !== 'IOL', 'SECO', 'seco');
@@ -862,7 +864,6 @@
   DY.fillRecords = () => { const g = G(); if (!g.rec) return; DY.replaceOldRecords(); for (const scope of ['game', 'season', 'career']) for (const name in REC_MAP) { const k = REC_MAP[name]; if (!g.rec[scope][k]) g.rec[scope][k] = { v: 0, n: '—', y: '', note: '', real: true, blank: true }; } };
   DY.checkRecords = (GM, x) => {
     const g = G(); DY.fillRecords();
-    for (const id in GM.ps) { const p = DY.P(+id), l = GM.ps[id]; if (!p) continue; for (const k in NAT.game) if (l[k] && l[k] >= NAT.game[k][0][0] * 0.6) DY.checkNat('game', k, l[k], p, 'vs. ' + DY.T(DY.oppOf(x)).name); }
     for (const id in GM.ps) {
       const p = DY.P(+id); if (!p || p.t !== g.user) continue; const l = GM.ps[id];
       for (const name in REC_MAP) {
@@ -892,35 +893,41 @@
     });
   };
   /* ---------- national (FBS) record book: the real marks as of the year you are in, updated when anyone in the dynasty breaks one ---------- */
-  // [value, holder, school, year]; the last entry whose year is before the season is the mark standing at that point
-  const NAT = {
-    game: { py: [[716, 'David Klingler', 'Houston', 1990], [819, 'Patrick Mahomes', 'Texas Tech', 2016]], ptd: [[11, 'David Klingler', 'Houston', 1990]],
-      ry: [[406, 'LaDainian Tomlinson', 'TCU', 1999], [427, 'Samaje Perine', 'Oklahoma', 2014]], rtd: [[8, 'Howard Griffith', 'Illinois', 1990]] },
-    season: { py: [[5188, 'Ty Detmer', 'BYU', 1990], [5833, 'B.J. Symons', 'Texas Tech', 2003], [5967, 'Bailey Zappe', 'Western Kentucky', 2021]],
-      ptd: [[54, 'David Klingler', 'Houston', 1990], [58, 'Colt Brennan', 'Hawaii', 2006], [62, 'Bailey Zappe', 'Western Kentucky', 2021]],
-      ry: [[2628, 'Barry Sanders', 'Oklahoma State', 1988]], rtd: [[37, 'Barry Sanders', 'Oklahoma State', 1988]],
-      rc: [[142, 'Manny Hazard', 'Houston', 1989]], rcy: [[2060, 'Trevor Insley', 'Nevada', 1999]], rctd: [[27, 'Troy Edwards', 'Louisiana Tech', 1998]],
-      sck: [[24, 'Terrell Suggs', 'Arizona State', 2002]], int: [[14, 'Al Worley', 'Washington', 1968]] },
-    career: { py: [[17072, 'Timmy Chang', 'Hawaii', 2004], [19217, 'Case Keenum', 'Houston', 2011]], ptd: [[134, 'Graham Harrell', 'Texas Tech', 2008], [155, 'Case Keenum', 'Houston', 2011]],
-      ry: [[6397, 'Ron Dayne', 'Wisconsin', 1999], [6405, 'Donnel Pumphrey', 'San Diego State', 2016]] }
+  // national records: who holds each FBS mark among every player on every team in this dynasty (game, season, career)
+  const NAT_KEYS = ['py', 'ptd', 'ry', 'rtd', 'rc', 'rcy', 'rctd', 'sck', 'int', 'tk', 'rttd'];
+  DY.NAT_LABEL = { py: 'Passing yards', ptd: 'Passing TDs', ry: 'Rushing yards', rtd: 'Rushing TDs', rc: 'Receptions', rcy: 'Receiving yards', rctd: 'Receiving TDs', sck: 'Sacks', int: 'Interceptions', tk: 'Tackles', rttd: 'Return TDs' };
+  const teamName = (g, ab) => { const t = g.teams.find(q => q.abbr === ab); return t ? t.name : ab || ''; };
+  // built from every player's season rows and game logs, then kept current as games and seasons are played
+  DY.natBuild = () => {
+    const g = G(), y0 = g.startSeason || g.season, N = { game: {}, season: {}, career: {}, v: 2 };
+    for (const sc of ['game', 'season', 'career']) NAT_KEYS.forEach(k => { N[sc][k] = { v: 0, n: '—', t: '', y: '', note: '' }; });
+    const put = (sc, k, v, p, y, t, note) => { const c = N[sc][k]; if (v > c.v) N[sc][k] = { v, n: p.n, t: teamName(g, t), y: String(y), pid: p.id, note: note || '' }; };
+    Object.values(g.P || {}).forEach(p => {
+      if (!p || !p.car) return;
+      const tot = {}, yrs = {}, last = {};
+      for (const y in p.car) { const c = p.car[y]; if (c.real || +y < y0) continue;
+        NAT_KEYS.forEach(k => { const v = c[k] || 0; if (!v) return; put('season', k, v, p, y, c.t); tot[k] = (tot[k] || 0) + v; (yrs[k] = yrs[k] || []).push(+y); }); last.t = c.t; }
+      if (p.s && p.t != null) NAT_KEYS.forEach(k => { const v = p.s[k] || 0; if (!v) return; put('season', k, v, p, g.season, DY.T(p.t).abbr); tot[k] = (tot[k] || 0) + v; (yrs[k] = yrs[k] || []).push(g.season); last.t = DY.T(p.t).abbr; });
+      NAT_KEYS.forEach(k => { if (tot[k]) put('career', k, tot[k], p, Math.min(...yrs[k]) + '–' + Math.max(...yrs[k]), last.t); });
+      (p.gl || []).forEach(x => { if (x.real || x.y < y0) return; NAT_KEYS.forEach(k => { const v = (x.l || {})[k] || 0; if (v) put('game', k, v, p, x.y, p.car[x.y] ? p.car[x.y].t : DY.userT().abbr, (x.h ? 'vs. ' : 'at ') + x.o); }); });
+    });
+    g.nat = N; return N;
   };
-  DY.NAT_LABEL = { py: 'Passing yards', ptd: 'Passing TDs', ry: 'Rushing yards', rtd: 'Rushing TDs', rc: 'Receptions', rcy: 'Receiving yards', rctd: 'Receiving TDs', sck: 'Sacks', int: 'Interceptions' };
-  DY.nat = () => {
-    const g = G(); if (g.nat) return g.nat;
-    const yr = g.startSeason || g.season; g.nat = { game: {}, season: {}, career: {} };
-    for (const sc in NAT) for (const k in NAT[sc]) { const e = NAT[sc][k].filter(r => r[3] < yr).pop() || NAT[sc][k][0]; g.nat[sc][k] = { v: e[0], n: e[1], t: e[2], y: String(e[3]) }; }
-    return g.nat;
-  };
-  // any player in the dynasty breaking a national mark: the record changes hands and the news says so
-  DY.checkNat = (scope, k, v, p, note) => {
+  DY.nat = () => { const g = G(); if (g.nat && g.nat.v === 2) return g.nat; return DY.natBuild(); };
+  DY.checkNat = (scope, k, v, p, note, y) => {
     const g = G(), N = DY.nat(), cur = N[scope][k]; if (!cur || !(v > cur.v) || !p) return;
     const t = p.t != null && DY.T(p.t) ? DY.T(p.t).name : '';
-    N[scope][k] = { v, n: p.n, t, y: String(g.season), pid: p.id, prev: cur.n, note: note || '' };
-    DY.news('record', `NATIONAL RECORD: ${p.n} (${t}) sets the ${scope === 'game' ? 'single-game' : scope} FBS mark in ${DY.NAT_LABEL[k].toLowerCase()}`, `${v}, passing ${cur.n} (${cur.v}, ${cur.y}).`, { pid: p.id });
+    N[scope][k] = { v, n: p.n, t, y: String(y || g.season), pid: p.id, prev: cur.v ? cur.n : undefined, note: note || '' };
+    if (cur.v) DY.news('record', `NATIONAL RECORD: ${p.n} (${t}) sets the ${scope === 'game' ? 'single-game' : scope} FBS mark in ${DY.NAT_LABEL[k].toLowerCase()}`, `${v}, passing ${cur.n} (${cur.v}, ${cur.y}).`, { pid: p.id });
+  };
+  // every game played, by any two teams
+  DY.natGame = (GM, x) => {
+    for (const id in GM.ps) { const p = DY.P(+id), l = GM.ps[id]; if (!p || +id < 0 || p.t == null) continue; const opp = DY.T(p.t === x.h ? x.a : x.h);
+      NAT_KEYS.forEach(k => { if (l[k]) DY.checkNat('game', k, l[k], p, (p.t === x.h ? 'vs. ' : 'at ') + (opp ? opp.abbr : '')); }); }
   };
   DY.natSeason = () => {
     const g = G();
-    g.teams.filter(t => t.fbs).forEach(t => t.roster.forEach(id => { const p = DY.P(id); if (!p || !p.s) return; for (const k in NAT.season) if (p.s[k]) DY.checkNat('season', k, p.s[k], p); }));
+    g.teams.filter(t => t.fbs).forEach(t => t.roster.forEach(id => { const p = DY.P(id); if (!p) return; NAT_KEYS.forEach(k => { if (p.s && p.s[k]) DY.checkNat('season', k, p.s[k], p); const cv = DY.careerTotal(p, k, true); if (cv) DY.checkNat('career', k, cv, p, '', (p.firstY || g.season) + '–' + g.season); }); }));
   };
   DY.careerTotal = (p, k, incl) => { let v = 0; for (const y in p.car) v += p.car[y][k] || 0; if (incl && p.s) v += p.s[k] || 0; return v; };
 
