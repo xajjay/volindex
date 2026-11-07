@@ -1074,6 +1074,33 @@
     if (p.s && p.t === G().user) { s += (p.s.rttd || 0) * 14 + ((p.s.kry || 0) + (p.s.pry || 0)) / 70 + ((p.s.kr || 0) + (p.s.pr || 0)) * 0.15; n += (p.s.kr || 0) + (p.s.pr || 0); td += p.s.rttd || 0; }
     s += (p.aw || []).filter(a => a.a === 'JET').length * 30; return n >= 10 || td ? Math.round(s) : 0; };
   DY.returnerBoard = n => Object.values(G().P).filter(p => p && p.car).map(p => ({ p, v: DY.returnerScore(p) })).filter(x => x.v > 0).sort((a, b) => b.v - a.v).slice(0, n || 10);
+  // national legacy: the same formula, over every season a player had anywhere in the dynasty (team wins and titles come from the team he played for)
+  DY.legacyScoreAny = p => {
+    const g = G(), y0 = g.startSeason || g.season; let s = 0, yrs = 0;
+    const peak = Math.max(p.ovr, ...Object.values(p.peakO || {})); s += Math.max(0, peak - 70) * 2.2;
+    (p.aw || []).forEach(a => { s += { HEIS: 70, HEISF: 18, AA1: 30, AA2: 18, FRAA: 8, SEC1: 12, SEC2: 6, SECO: 16, SECD: 16, SECF: 8, OBRIEN: 20, WALKER: 20, BILET: 20, MACKEY: 16, OUTLAND: 20, BEDNARIK: 22, BUTKUS: 18, THORPE: 18, GROZA: 10, GUY: 8, JET: 14 }[a.a] || 0; });
+    for (const y in p.car) { const c = p.car[y]; if (c.real || +y < y0) continue; if ((c.gp || 0) >= 5) yrs++;
+      s += (c.py || 0) / 400 + (c.ptd || 0) * 0.8 + (c.ry || 0) / 120 + (c.rtd || 0) * 1.2 + (c.rcy || 0) / 100 + (c.rctd || 0) * 1.2 + (c.sck || 0) * 2 + (c.int || 0) * 3 + (c.tk || 0) / 12 + (c.fgm || 0) * 0.5 + (c.rttd || 0) * 3 + ((c.kry || 0) + (c.pry || 0)) / 250 + (c.gp || 0) * 0.4;
+      const T = g.teams.find(t => t.abbr === c.t), h = T && (T.hist || []).find(z => z.y === +y); if (h && (c.gp || 0) >= 5) s += Math.max(0, (h.w || 0) - 8) * 0.9 + (h.conf ? 4 : 0) + (h.natl ? 25 : h.cfp ? 5 : 0); }
+    s += Math.max(0, yrs - 1) * 5;
+    if (p.draft) s += { 1: 30, 2: 18, 3: 11, 4: 8, 5: 5, 6: 4, 7: 3 }[p.draft.rd] || 0;
+    return Math.round(s);
+  };
+  DY.natLegacyBoard = (n, f) => { const y0 = G().startSeason || G().season;
+    return Object.values(G().P).filter(p => p && p.car && (!f || f(p)) && Object.keys(p.car).some(y => !p.car[y].real && +y >= y0 && ((p.car[y].gp || 0) > 0 || (p.car[y].kr || 0) + (p.car[y].pr || 0) > 0))).map(p => ({ p, v: DY.legacyScoreAny(p) })).filter(x => x.v > 0).sort((a, b) => b.v - a.v).slice(0, n || 10); };
+  DY.returnerScoreAny = p => { const y0 = G().startSeason || G().season; let s = 0, n = 0, td = 0; for (const y in p.car) { const c = p.car[y]; if (c.real || +y < y0) continue; s += (c.rttd || 0) * 14 + ((c.kry || 0) + (c.pry || 0)) / 70 + ((c.kr || 0) + (c.pr || 0)) * 0.15; n += (c.kr || 0) + (c.pr || 0); td += c.rttd || 0; }
+    s += (p.aw || []).filter(a => a.a === 'JET').length * 30; return n >= 10 || td ? Math.round(s) : 0; };
+  DY.natReturnerBoard = n => Object.values(G().P).filter(p => p && p.car).map(p => ({ p, v: DY.returnerScoreAny(p) })).filter(x => x.v > 0).sort((a, b) => b.v - a.v).slice(0, n || 10);
+  // coaches: the best careers in the dynasty (titles, conference crowns, playoff runs, wins, honors and recruiting)
+  DY.coachLegacy = n => {
+    const g = G(); if (!g.cst) DY.coachInit();
+    const last = {}; g.teams.forEach(t => (t.hist || []).forEach(h => { if (h.coach) { const o = last[h.coach]; if (!o || h.y >= o.y) last[h.coach] = { y: h.y, t: t.name, tid: t.id }; } }));
+    const first = {}; g.teams.forEach(t => (t.hist || []).forEach(h => { if (h.coach && (first[h.coach] == null || h.y < first[h.coach])) first[h.coach] = h.y; }));
+    return Object.entries(g.cst).map(([name, c]) => { const L = last[name] || {}; const w = c.w || 0, l = c.l || 0, pct = w + l ? w / (w + l) : 0;
+      const v = Math.round((c.nt || 0) * 30 + (c.ct || 0) * 8 + (c.pw || 0) * 3 + (c.po || 0) * 2 + (c.bw || 0) * 1 + (w - l) * 0.6 + pct * 20 * Math.min(1, (c.yrs || 0) / 8) + (c.heis || 0) * 3 + (c.aa || 0) * 0.4 + (c.c5 || 0) * 1.5 + (c.c25 || 0) * 0.4);
+      return { n: name, t: L.t || '', tid: L.tid, y0: first[name], y1: L.y, c, v, me: name === g.coach.name || (g.coach.stints || []).some(s => s.name === name) }; })
+      .filter(x => x.c.yrs > 0 && x.v > 0).sort((a, b) => b.v - a.v).slice(0, n || 10);
+  };
   DY.legacyBoard = n => Object.entries(G().legacy).map(([id, v]) => ({ p: DY.P(+id), v })).filter(x => x.p).sort((a, b) => b.v - a.v).slice(0, n || 10);
 
   /* ---------- captains and preseason camp ---------- */
