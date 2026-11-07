@@ -894,8 +894,8 @@
   };
   /* ---------- national (FBS) record book: the real marks as of the year you are in, updated when anyone in the dynasty breaks one ---------- */
   // national records: who holds each FBS mark among every player on every team in this dynasty (game, season, career)
-  const NAT_KEYS = ['py', 'ptd', 'ry', 'rtd', 'rc', 'rcy', 'rctd', 'sck', 'int', 'tk', 'rttd'];
-  DY.NAT_LABEL = { py: 'Passing yards', ptd: 'Passing TDs', ry: 'Rushing yards', rtd: 'Rushing TDs', rc: 'Receptions', rcy: 'Receiving yards', rctd: 'Receiving TDs', sck: 'Sacks', int: 'Interceptions', tk: 'Tackles', rttd: 'Return TDs' };
+  const NAT_KEYS = ['py', 'pc', 'ptd', 'ry', 'rtd', 'rc', 'rcy', 'rctd', 'tk', 'tfl', 'sck', 'int', 'pd', 'ff', 'dtd', 'fgm', 'kry', 'pry', 'rttd'];
+  DY.NAT_LABEL = { py: 'Passing yards', ptd: 'Passing TDs', ry: 'Rushing yards', rtd: 'Rushing TDs', rc: 'Receptions', rcy: 'Receiving yards', rctd: 'Receiving TDs', sck: 'Sacks', int: 'Interceptions', tk: 'Tackles', rttd: 'Return TDs', pc: 'Completions', tfl: 'Tackles for loss', pd: 'Passes defended', ff: 'Forced fumbles', dtd: 'Defensive TDs', fgm: 'Field goals made', kry: 'Kick return yards', pry: 'Punt return yards' };
   const teamName = (g, ab) => { const t = g.teams.find(q => q.abbr === ab); return t ? t.name : ab || ''; };
   // built from every player's season rows and game logs, then kept current as games and seasons are played
   DY.natBuild = () => {
