@@ -233,7 +233,7 @@
     if (GM.q === 2 && GM.clock <= 30 && GM.ball < 40 && GM.down < 4 && lead >= 0) return { k: 'kneel' };
     // end of half / game: kick it
     if ((GM.q === 2 || (GM.q === 4 && lead >= -3 && lead <= 0)) && GM.clock <= 8 && fgDist <= range + 3) return { k: 'fg' };
-    if (GM.q >= 5 && GM.down === 4 && fgDist <= range && (GM.ot && GM.ot.needTD !== true)) return { k: 'fg' };
+    if (GM.q >= 5 && GM.down === 4 && fgDist <= range && lead >= -3 && (GM.ot && GM.ot.needTD !== true)) return { k: 'fg' };
     // the last play of the half or game: do not check it down. Trailing and out of field-goal range (or needing a touchdown) means everything goes deep
     const distGoal = 100 - GM.ball, needTD = lead < -3 || fgDist > range + 3;
     if (GM.q === 4 && GM.clock <= 8 && lead < 0 && needTD) return distGoal >= 25 ? { k: 'pass', t: 'deep', hm: true } : { k: 'pass', t: 'deep' };
