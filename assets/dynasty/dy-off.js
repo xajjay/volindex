@@ -533,6 +533,8 @@
     let score = 0, vsLine = null, vsTier = null;
     const regW = g.sched.filter(x => (x.h === ut.id || x.a === ut.id) && x.res && ((x.h === ut.id) === (x.res.h > x.res.a))).length;
     if (pv) { vsLine = regW - pv.line; vsTier = tierDone - pv.tier; score = vsLine * 0.6 + vsTier * 1.2; } else score = (ut.w - 7) * 0.5 + tierDone - 2;
+    // winning a national title is never a letdown, and reaching the finish that was expected shouldn't be graded down for a couple of regular-season losses
+    if (tierDone >= 5) score = Math.max(score, 2.2); else if (vsTier != null && vsTier >= 0) score = Math.max(score, 0);
     const grade = score >= 3 ? 'A+' : score >= 2 ? 'A' : score >= 1 ? 'B+' : score >= 0 ? 'B' : score >= -1 ? 'C+' : score >= -2 ? 'C' : score >= -3 ? 'D' : 'F';
     const verdict = score >= 2 ? 'Blew past expectations' : score >= 0.6 ? 'Beat expectations' : score >= -0.6 ? 'Right about where we expected' : score >= -2 ? 'Fell short of expectations' : 'A disappointing year';
     return { pv, w: ut.w, l: ut.l, regW, fin, grade, verdict, vsLine, stars: stars.map(p => p.id), breakouts: breakouts.map(p => p.id) };
