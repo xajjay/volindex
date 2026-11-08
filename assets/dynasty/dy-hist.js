@@ -90,10 +90,10 @@
   DY.histUtNonconf = season => {
     const g = G(); if (!g.hx || !DY.isHistSeason(g, season)) return null;
     const S = root.DY_HSCHED[season]; if (!S || !S.g || !S.g.length) return null;
-    const rows = S.g.filter(r => !r[3] && !r[4] && (r[1] === 'Tennessee' || r[2] === 'Tennessee')).sort((x, y) => x[0] < y[0] ? -1 : 1);
+    const rows = S.g.filter(r => !r[3] && !r[4] && (r[1] === DY.userT().name || r[2] === DY.userT().name)).sort((x, y) => x[0] < y[0] ? -1 : 1);
     const mon = DY.firstSat(season).getTime() - 4 * 864e5, out = [];
-    rows.forEach(r => { const o = DY.byName(r[1] === 'Tennessee' ? r[2] : r[1]); if (!o) return;
-      out.push({ o: o.id, home: r[1] === 'Tennessee', wk: clamp(Math.floor((Date.parse(season + '-' + r[0] + 'T12:00:00Z') - mon) / (7 * 864e5)) + 1, 1, 5) }); });
+    rows.forEach(r => { const un = DY.userT().name, o = DY.byName(r[1] === un ? r[2] : r[1]); if (!o) return;
+      out.push({ o: o.id, home: r[1] === un, wk: clamp(Math.floor((Date.parse(season + '-' + r[0] + 'T12:00:00Z') - mon) / (7 * 864e5)) + 1, 1, 5) }); });
     return out.length ? out : null;
   };
   // Tennessee-Vanderbilt is the in-state rivalry and closes Tennessee's regular season, whatever the real calendar of a given year did.
@@ -174,7 +174,7 @@
     // the coach's own non-conference picks replace the real slate's non-conference games (only once he has touched them)
     const picks = g.nonconfPick && g.nonconfPick[season];
     if (picks && g.ncTouched && g.ncTouched[season]) {
-      const UT = DY.UT_ID;
+      const UT = g.user;
       for (let i = games.length - 1; i >= 0; i--) { const x = games[i]; if ((x.h === UT || x.a === UT) && !x.conf && !x.neutral) { if (x.h < 1000) delete busy[x.h + '|' + x.wk]; if (x.a < 1000) delete busy[x.a + '|' + x.wk]; games.splice(i, 1); } }
       const off = (g.hx.wk && g.hx.wk[season] && g.hx.wk[season].off) || 0;
       picks.forEach(pk => { if (pk.o == null || pk.o === UT) return;
@@ -238,7 +238,7 @@
     }
     edges.forEach(([a, b]) => { cnt[a] = (cnt[a] || 0) + 1; cnt[b] = (cnt[b] || 0) + 1; });
     // the coach's own non-conference picks go in first (opponent, home or away, preferred week)
-    const pickMap = {}, picks = (g.nonconfPick && g.nonconfPick[season]) || [], UTID = DY.UT_ID;
+    const pickMap = {}, picks = (g.nonconfPick && g.nonconfPick[season]) || [], UTID = g.user;
     picks.forEach(pk => { const o = pk.o != null && DY.T(pk.o); if (!o || o.dorm || pk.o === UTID || have.has(key(UTID, pk.o))) return;
       addE(UTID, pk.o, false); cnt[UTID] = (cnt[UTID] || 0) + 1; cnt[pk.o] = (cnt[pk.o] || 0) + 1; pickMap[key(UTID, pk.o)] = pk; });
     // non-conference: fill to eleven against other I-A teams, then I-AA

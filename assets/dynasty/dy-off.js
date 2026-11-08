@@ -600,7 +600,7 @@
     o.leaving = t.roster.filter(x => DY.P(x).leave).map(x => ({ id: x, why: DY.P(x).leave })); o.pitched = {};
     if (g.recruit) g.recruit.board = DY.myCommits().map(p => p.id);
     o.jobs.taken = id; o.jobs.offers = [];
-    DY.initRecords();
+    DY.initRecords(); DY.seedRecords();
     DY.news('league', `${g.coach.name} takes the ${t.name} job`, `Leaving ${old.name} after ${g.season - ((g.coach.stints[g.coach.stints.length - 1] || {}).from || g.startSeason) + 1} season${g.season > ((g.coach.stints[g.coach.stints.length - 1] || {}).from || g.startSeason) ? 's' : ''}.`);
     return null;
   };
@@ -691,7 +691,7 @@
     if (st === 'draft') DY.runDraft();
     if (st === 'progress') DY.progressAll();
     if (st === 'cuts') DY.autoCuts(false);
-    if (st === 'schedule') { g.nonconfPick = g.nonconfPick || {}; if (!g.nonconfPick[g.season + 1]) g.nonconfPick[g.season + 1] = (g.hx && DY.histUtNonconf && DY.histUtNonconf(g.season + 1)) || (DY.UT_NONCONF_REAL[g.season + 1] ? DY.UT_NONCONF_REAL[g.season + 1].map(x => ({ o: DY.byName(x[0]).id, home: x[1] === 'H', wk: DY.weekOfDate(g.season + 1, x[2]) })) : DY.autoNonconf(g.season + 1)); }
+    if (st === 'schedule') { g.nonconfPick = g.nonconfPick || {}; if (!g.nonconfPick[g.season + 1]) g.nonconfPick[g.season + 1] = (g.hx && DY.histUtNonconf && DY.histUtNonconf(g.season + 1)) || (DY.isTN() && DY.UT_NONCONF_REAL[g.season + 1] ? DY.UT_NONCONF_REAL[g.season + 1].map(x => ({ o: DY.byName(x[0]).id, home: x[1] === 'H', wk: DY.weekOfDate(g.season + 1, x[2]) })) : DY.autoNonconf(g.season + 1)); }
   }
 
   /* NIL: market values move with performance; players who outgrew their deal ask for a raise */
@@ -1151,7 +1151,7 @@
   DY.cleanNonconf = y => {
     const g = G(), arr = g.nonconfPick && g.nonconfPick[y]; if (!arr) return;
     const seen = new Set(), wks = new Set();
-    arr.forEach(x => { if (seen.has(x.o) || x.o === g.user || (DY.T(x.o) && DY.T(x.o).conf === 'SEC')) x.o = null; else seen.add(x.o); });
+    arr.forEach(x => { if (seen.has(x.o) || x.o === g.user || x.o === DY.UT_ID || (DY.T(x.o) && DY.T(x.o).conf === DY.userT().conf && DY.userT().conf !== 'IND')) x.o = null; else seen.add(x.o); });
     const auto = DY.autoNonconf(y);
     arr.forEach((x, i) => { if (x.o == null) { x.o = auto.find(a => !seen.has(a.o)).o; seen.add(x.o); } if (wks.has(x.wk) || x.wk < 0 || x.wk > 5) { x.wk = [0, 1, 2, 3, 4, 5].find(w => !wks.has(w) && w >= 1) ; } wks.add(x.wk); });
   };

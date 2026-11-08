@@ -195,6 +195,12 @@ Sacramento State|SAC|42|#043927|#C4B581|CA`;
     return { id: 1000 + i, name, abbr, conf: 'FCS', prestige: +pr, c1, c2, cap: 15, st, fbs: false };
   });
   DY.CONF_NAME = CONF_NAME; DY.P4 = P4; DY.CONF_GAMES = CONF_GAMES;
+  DY.NEAR = { AL: ['GA', 'FL', 'MS', 'TN'], AK: ['WA'], AZ: ['NM', 'NV', 'UT', 'CA', 'CO'], AR: ['MO', 'TN', 'MS', 'LA', 'TX', 'OK'], CA: ['NV', 'OR', 'AZ'], CO: ['WY', 'UT', 'NM', 'KS', 'NE'], CT: ['MA', 'NY', 'RI'], DE: ['MD', 'PA', 'NJ'], FL: ['GA', 'AL'],
+    GA: ['FL', 'AL', 'SC', 'NC', 'TN'], HI: ['CA'], ID: ['UT', 'WA', 'OR', 'MT', 'NV'], IL: ['IN', 'WI', 'IA', 'MO', 'KY'], IN: ['IL', 'OH', 'MI', 'KY'], IA: ['IL', 'MN', 'NE', 'MO', 'SD', 'WI'], KS: ['MO', 'NE', 'OK', 'CO'], KY: ['TN', 'OH', 'IN', 'WV', 'VA', 'IL', 'MO'],
+    LA: ['TX', 'MS', 'AR'], ME: ['NH'], MD: ['VA', 'PA', 'DE', 'WV'], MA: ['CT', 'RI', 'NH', 'NY', 'VT'], MI: ['OH', 'IN', 'WI'], MN: ['WI', 'IA', 'SD', 'ND'], MS: ['AL', 'LA', 'TN', 'AR'], MO: ['KS', 'IA', 'IL', 'AR', 'KY', 'TN', 'OK', 'NE'],
+    MT: ['ID', 'WY', 'ND', 'SD'], NE: ['IA', 'KS', 'MO', 'CO', 'SD', 'WY'], NV: ['CA', 'UT', 'AZ', 'OR', 'ID'], NH: ['ME', 'MA', 'VT'], NJ: ['NY', 'PA', 'DE'], NM: ['AZ', 'TX', 'CO', 'OK'], NY: ['NJ', 'PA', 'CT', 'VT', 'MA'], NC: ['SC', 'VA', 'TN', 'GA'],
+    ND: ['MN', 'SD', 'MT'], OH: ['MI', 'IN', 'KY', 'WV', 'PA'], OK: ['TX', 'KS', 'AR', 'MO', 'NM', 'CO'], OR: ['WA', 'CA', 'ID', 'NV'], PA: ['NJ', 'NY', 'OH', 'MD', 'WV', 'DE'], RI: ['CT', 'MA'], SC: ['NC', 'GA'], SD: ['ND', 'NE', 'IA', 'MN', 'MT', 'WY'],
+    TN: ['KY', 'VA', 'NC', 'GA', 'AL', 'MS', 'AR', 'MO'], TX: ['OK', 'LA', 'AR', 'NM'], UT: ['ID', 'NV', 'AZ', 'CO', 'WY'], VT: ['NH', 'NY', 'MA'], VA: ['NC', 'MD', 'WV', 'KY', 'TN'], WA: ['OR', 'ID'], WV: ['VA', 'KY', 'OH', 'PA', 'MD'], WI: ['MN', 'IL', 'IA', 'MI'], WY: ['MT', 'CO', 'ID', 'UT', 'NE', 'SD'], DC: ['MD', 'VA'] };
   DY.UT_ID = DY.TEAMS.find(t => t.abbr === 'TENN').id;
 
   // SEC permanent opponents (2026 format)

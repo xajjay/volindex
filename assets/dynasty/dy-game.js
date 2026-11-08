@@ -216,7 +216,7 @@
           if (tot > rec.v && !S.recSeen[key]) {
             S.recSeen[key] = 1;
             banner('RECORD!', GM.user);
-            const c = S.el.querySelector('#dygCap'); c.insertAdjacentHTML('beforeend', `<div class="dyg-recb">🏆 ${esc(p.n)} passes ${esc(rec.n)} (${rec.v}) for Tennessee's ${scope === 'career' ? 'all-time career' : 'single-season'} ${esc(name.toLowerCase())} record: ${tot}.</div>`);
+            const c = S.el.querySelector('#dygCap'); c.insertAdjacentHTML('beforeend', `<div class="dyg-recb">🏆 ${esc(p.n)} passes ${esc(rec.n)} (${rec.v}) for ${esc(DY.isTN() ? 'Tennessee' : DY.UN())}'s ${scope === 'career' ? 'all-time career' : 'single-season'} ${esc(name.toLowerCase())} record: ${tot}.</div>`);
             shake(1);
           }
         }

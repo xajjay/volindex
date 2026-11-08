@@ -12,6 +12,7 @@
   DY.isTN = () => G().user === DY.UT_ID;
   DY.UN = () => DY.userT().name;
   DY.nick = () => DY.isTN() ? 'the Vols' : DY.UN();
+  DY.ab = () => DY.isTN() ? 'UT' : DY.userT().abbr;
   const tname = id => DY.T(id).name;
 
   /* ---------- dates ---------- */
@@ -126,8 +127,8 @@
       (root.SITE && root.SITE.football && root.SITE.football.schedule || []).forEach(s0 => { const o = DY.byName(s0.opp); if (!o) return; utGames.push({ wk: DY.weekOfDate(season, s0.date), o: o.id, home: s0.site === 'H', conf: s0.sec }); });
     }
     if (!utGames.length) {
-      let non = (g.nonconfPick && g.nonconfPick[season]) || (DY.UT_NONCONF_REAL[season] ? DY.UT_NONCONF_REAL[season].map(x => ({ o: DY.byName(x[0]).id, home: x[1] === 'H', wk: DY.weekOfDate(season, x[2]) })) : null);
-      if (!non) non = DY.autoNonconf(season);
+      let non = (DY.isTN() && g.nonconfPick && g.nonconfPick[season]) || (DY.UT_NONCONF_REAL[season] ? DY.UT_NONCONF_REAL[season].map(x => ({ o: DY.byName(x[0]).id, home: x[1] === 'H', wk: DY.weekOfDate(season, x[2]) })) : null);
+      if (!non) non = DY.autoNonconf(season, G().teams[UT]);
       non = non.map(x => Object.assign({ conf: false }, x));
       const sec = cyc.H.map(n => ({ o: DY.byName(n).id, home: true, conf: true })).concat(cyc.A.map(n => ({ o: DY.byName(n).id, home: false, conf: true })));
       const used = new Set(non.map(x => x.wk));
@@ -186,6 +187,18 @@
     }
     // 3. non-conference: fill everyone to 12 (FBS vs FBS early, then FCS)
     const count = {}; G().teams.forEach(t => count[t.id] = 0); games.forEach(x => { if (count[x.h] != null) count[x.h]++; if (count[x.a] != null) count[x.a]++; });
+    // another school: the coach's own non-conference picks (opponent, home or away, week) go in first
+    if (!DY.isTN()) {
+      const U = g.user; g.nonconfPick = g.nonconfPick || {};
+      const picks = g.nonconfPick[season] || (g.nonconfPick[season] = DY.autoNonconf(season));
+      const ncWeeks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      picks.forEach(pk => {
+        const o = pk.o; if (o == null || o === U || o === UT || (o < 1000 && (!G().teams[o] || count[o] >= 12)) || count[U] >= 12 || games.some(x => (x.h === U && x.a === o) || (x.h === o && x.a === U))) return;
+        const first = clamp(pk.wk == null ? 1 : pk.wk, 0, 5), order = [first].concat(ncWeeks.filter(w => w !== first));
+        const w = order.find(w => w <= DY.LAST_WK && !isBusy(U, w) && (o >= 1000 || !isBusy(o, w))); if (w == null) return;
+        add(w, pk.home ? U : o, pk.home ? o : U, false); mark(U, w); count[U]++; if (o < 1000) { mark(o, w); count[o]++; }
+      });
+    }
     const fbs = G().teams.map(t => t.id).filter(t => t !== UT);
     for (let w = 1; w <= 12; w++) {
       if (w > 5 && w !== 12) continue;
@@ -228,15 +241,16 @@
     g.sched = games;
     return games;
   };
-  // auto-generated non-conference slate for Tennessee: a Power 4 or ACC opponent, a Group of Six team, an FCS team in weeks 1-4
-  DY.autoNonconf = season => {
-    const ut = DY.userT();
-    const p4 = G().teams.filter(t => t.conf !== 'SEC' && DY.P4.includes(t.conf) || t.abbr === 'ND');
-    const g6 = G().teams.filter(t => !DY.P4.includes(t.conf) && t.conf !== 'IND');
-    const fcs = DY.FCS.filter(f => ['TN', 'GA', 'AL', 'SC', 'KY', 'NC'].includes(f.st));
-    const a = wpick(p4, t => t.st === 'NC' || t.st === 'GA' || t.st === 'VA' || t.st === 'KY' ? 3 : 1), b = wpick(g6, t => t.st === 'TN' || t.prestige > 60 ? 3 : 1), c = pick(fcs);
+  // auto-generated non-conference slate for the user's school: a Power 4 or ACC opponent from another league, a Group of Six team, an FCS team in weeks 1-4
+  DY.autoNonconf = (season, team) => {
+    const ut = team || DY.userT(), isP4 = DY.P4.includes(ut.conf) || ut.abbr === 'ND';
+    const p4 = G().teams.filter(t => t.id !== ut.id && t.conf !== ut.conf && (DY.P4.includes(t.conf) || t.abbr === 'ND') && !(ut.id === DY.UT_ID && t.conf === 'SEC'));
+    const g6 = G().teams.filter(t => t.id !== ut.id && t.conf !== ut.conf && !DY.P4.includes(t.conf) && t.conf !== 'IND' && t.abbr !== 'ND');
+    const near = new Set([ut.st, ...((DY.NEAR && DY.NEAR[ut.st]) || [])]);
+    const fcsAll = DY.FCS.filter(f => near.has(f.st)), fcs = fcsAll.length ? fcsAll : DY.FCS;
+    const a = wpick(p4, t => near.has(t.st) ? 3 : 1), b = wpick(g6, t => t.st === ut.st || t.prestige > 60 ? 3 : 1), c = pick(fcs);
     const wks = [1, 2, pick([3, 3, 4, 5])];
-    return shuffle([{ o: a.id, home: season % 2 === 0 }, { o: b.id, home: true }, { o: c.id, home: true }]).map((x, i) => Object.assign(x, { wk: wks[i] }));
+    return shuffle([{ o: a.id, home: isP4 ? season % 2 === 0 : false }, { o: b.id, home: true }, { o: c.id, home: true }]).map((x, i) => Object.assign(x, { wk: wks[i] }));
   };
   DY.weekGames = w => G().sched.filter(x => x.wk === w);
   DY.userGames = w => G().sched.filter(x => (w == null || x.wk === w) && (x.h === G().user || x.a === G().user));
@@ -838,6 +852,21 @@
     if (!DY.isTN()) { for (const scope of ['game', 'season', 'career']) for (const name in REC_MAP) g.rec[scope][REC_MAP[name]] = { v: 0, n: '—', y: '', note: '', real: true, blank: true }; return; }
     for (const scope of ['game', 'season', 'career']) (R && R[scope] || []).forEach(r => { const k = REC_MAP[r[0]]; if (k) g.rec[scope][k] = { v: r[2], n: r[1], y: r[3], note: r[4] || '', real: true }; });
     DY.fillRecords();
+  };
+  // a new job mid-dynasty: the new school's book is rebuilt from everything this dynasty has recorded for it since the start (its own players, whoever coached them)
+  DY.seedRecords = () => {
+    const g = G(); if (!g.rec) return; DY.fillRecords();
+    const ab = DY.userT().abbr, y0 = g.startSeason, players = Object.values(g.P).filter(p => p && p.car);
+    for (const scope of ['game', 'season', 'career']) for (const name in REC_MAP) {
+      const k = REC_MAP[name], cur = g.rec[scope][k]; let best = null;
+      players.forEach(p => {
+        const rows = Object.entries(p.car).filter(([y, c]) => +y >= y0 && c.t === ab && !c.real);
+        if (scope === 'season') { rows.forEach(([y, c]) => { if ((c[k] || 0) > (best ? best.v : 0)) best = { v: c[k], n: p.n, y: String(y), pid: p.id }; }); if (p.s && p.t === g.user && (p.s[k] || 0) > (best ? best.v : 0)) best = { v: p.s[k], n: p.n, y: String(g.season), pid: p.id }; }
+        else if (scope === 'career') { let v = 0, ys = []; rows.forEach(([y, c]) => { v += c[k] || 0; ys.push(+y); }); if (p.s && p.t === g.user) { v += p.s[k] || 0; ys.push(g.season); } if (v > (best ? best.v : 0)) best = { v, n: p.n, y: Math.min(...ys) + '–' + Math.max(...ys), pid: p.id }; }
+        else (p.gl || []).forEach(x => { const l = x.l || {}; if (x.y >= y0 && !x.real && p.car[x.y] && p.car[x.y].t === ab && (l[k] || 0) > (best ? best.v : 0)) best = { v: l[k], n: p.n, y: String(x.y), pid: p.id, note: (x.h ? 'vs. ' : 'at ') + x.o }; });
+      });
+      if (best && (!cur || best.v > cur.v)) g.rec[scope][k] = Object.assign({ note: '' }, best);
+    }
   };
   // records with no real mark (return TDs) start at zero; also upgrades older saves
   // historical dynasties: marks set before 1990 (Spiva's 547 tackles, say) can never be reached, so once a season has been played they are replaced by the best from a player in this dynasty
