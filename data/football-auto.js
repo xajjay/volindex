@@ -1,33 +1,33 @@
-/* Written by tools/update_data.py on 2026-11-08. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-09. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-08",
+ "updated": "2026-11-09",
  "team": {
   "record": "7-2",
   "sec": "4-2",
-  "pollWeek": "Week 10",
-  "coaches": 16,
-  "ap": 16,
+  "pollWeek": "Week 11",
+  "coaches": 9,
+  "ap": 9,
   "apTop25": [
    [
     1,
-    "Miami"
-   ],
-   [
-    2,
     "Georgia"
    ],
    [
-    3,
+    2,
     "Utah"
    ],
    [
-    4,
+    3,
     "Notre Dame"
    ],
    [
-    5,
+    4,
     "UCLA"
+   ],
+   [
+    5,
+    "Miami"
    ],
    [
     6,
@@ -35,79 +35,79 @@ window.SITE_AUTO.football = {
    ],
    [
     7,
-    "BYU"
-   ],
-   [
-    8,
-    "Kentucky"
-   ],
-   [
-    9,
     "Alabama"
    ],
    [
-    10,
+    8,
     "Texas"
    ],
    [
-    11,
-    "Ohio State"
-   ],
-   [
-    12,
-    "Ole Miss"
-   ],
-   [
-    13,
-    "Texas Tech"
-   ],
-   [
-    14,
-    "Wake Forest"
-   ],
-   [
-    15,
-    "LSU"
-   ],
-   [
-    16,
+    9,
     "Tennessee"
    ],
    [
-    17,
+    10,
+    "Texas Tech"
+   ],
+   [
+    11,
+    "Wake Forest"
+   ],
+   [
+    12,
+    "BYU"
+   ],
+   [
+    13,
+    "Kentucky"
+   ],
+   [
+    14,
     "Houston"
    ],
    [
-    18,
+    15,
     "USC"
    ],
    [
-    19,
-    "Missouri"
-   ],
-   [
-    20,
-    "Boise State"
-   ],
-   [
-    21,
+    16,
     "Iowa"
    ],
    [
-    22,
-    "New Mexico"
+    17,
+    "Boise State"
    ],
    [
-    23,
+    18,
+    "Oregon"
+   ],
+   [
+    19,
+    "Ole Miss"
+   ],
+   [
+    20,
     "South Carolina"
    ],
    [
-    24,
+    21,
+    "Ohio State"
+   ],
+   [
+    22,
     "Arizona"
    ],
    [
+    23,
+    "New Mexico"
+   ],
+   [
+    24,
+    "LSU"
+   ],
+   [
     25,
-    "Florida"
+    "SMU"
    ]
   ],
   "ranks": {
@@ -1511,17 +1511,17 @@ window.SITE_AUTO.football = {
    "kick": "2026-11-07T23:15Z"
   },
   "Texas A&M": {
-   "tv": null,
-   "kick": "2026-11-14T05:00Z",
-   "line": "TENN -3",
-   "ou": 43.5,
-   "ml": "-155",
+   "tv": "ESPN",
+   "kick": "2026-11-14T20:00Z",
+   "line": "TENN -2.5",
+   "ou": 42.5,
+   "ml": "-135",
    "book": "DraftKings",
    "win": 58.6
   },
   "LSU": {
    "tv": null,
-   "kick": "2026-11-21T05:00Z",
+   "kick": "2026-11-21T20:30Z",
    "win": 45.1
   },
   "Vanderbilt": {
@@ -14767,96 +14767,96 @@ window.SITE_AUTO.football = {
   }
  },
  "pear": {
-  "week": 10,
+  "week": 11,
   "ratings": [
    [
     "TSR",
-    "17.0",
-    12
+    "19.1",
+    11
    ],
    [
     "SP+",
-    "17.6",
-    11
+    "20.5",
+    10
    ],
    [
     "FPI",
-    "16.7",
-    14
+    "18.5",
+    11
    ],
    [
     "FEI",
-    "0.87",
-    11
+    "0.88",
+    12
    ],
    [
     "Massey",
-    "8.61",
-    15
+    "8.68",
+    10
    ],
    [
     "Dokter",
-    "67.33",
-    13
+    "68.40",
+    10
    ],
    [
     "Sagarin",
-    "86.67",
-    11
+    "89.19",
+    9
    ],
    [
     "RQI",
-    "0.206",
-    19
+    "0.501",
+    12
    ],
    [
     "SOS",
-    "10.53",
+    "10.42",
     25
    ]
   ],
   "offense": [
    [
     "Rating",
-    "38.40",
+    "39.50",
     15
    ],
    [
     "Success rate",
-    "0.04",
-    35
+    "0.05",
+    31
    ],
    [
     "EPA/play (PPA)",
-    "0.02",
-    73
-   ],
-   [
-    "Rush PPA",
-    "0.10",
+    "0.11",
     29
    ],
    [
+    "Rush PPA",
+    "0.18",
+    7
+   ],
+   [
     "Pass PPA",
-    "-0.06",
-    97
+    "0.04",
+    65
    ],
    [
     "Points per opportunity",
-    "0.47",
-    55
+    "0.69",
+    41
    ],
    [
     "Drive quality",
-    "15.90",
-    21
+    "17.30",
+    15
    ]
   ],
   "defense": [
    [
     "Rating",
-    "21.40",
-    16
+    "20.40",
+    11
    ],
    [
     "Success rate",
@@ -14865,68 +14865,61 @@ window.SITE_AUTO.football = {
    ],
    [
     "EPA/play (PPA)",
-    "-0.20",
-    8
+    "-0.21",
+    4
    ],
    [
     "Rush PPA",
-    "-0.14",
-    31
+    "-0.15",
+    20
    ],
    [
     "Pass PPA",
-    "-0.24",
-    16
+    "-0.26",
+    7
    ],
    [
     "Points per opportunity",
-    "-1.27",
-    6
+    "-1.40",
+    4
    ],
    [
     "Drive quality",
-    "-18.90",
-    12
+    "-16.50",
+    16
    ]
   ],
   "games": [
    [
-    "Kentucky",
-    22,
-    "Tennessee -6.6",
-    "33.9-27.4",
-    67.7
-   ],
-   [
     "Texas A&M",
-    24,
-    "Tennessee -0.9",
-    "29.6-28.8",
-    52.5
+    26,
+    "Tennessee -3.6",
+    "30.6-27.0",
+    60.0
    ],
    [
     "LSU",
-    5,
-    "LSU -3.3",
-    "29.2-32.6",
-    40.8
+    7,
+    "Tennessee -0.2",
+    "31.0-30.8",
+    50.6
    ],
    [
     "Vanderbilt",
-    70,
-    "Tennessee -13.2",
-    "35.4-22.2",
-    81.5
+    67,
+    "Tennessee -14.6",
+    "36.0-21.4",
+    83.8
    ]
   ],
   "played": [
    [
     "Furman",
-    58
+    50
    ],
    [
     "Georgia Tech",
-    79
+    88
    ],
    [
     "Kennesaw State",
@@ -14938,166 +14931,170 @@ window.SITE_AUTO.football = {
    ],
    [
     "Auburn",
-    37
+    38
    ],
    [
     "Arkansas",
-    67
+    65
    ],
    [
     "Alabama",
-    6
+    3
    ],
    [
     "South Carolina",
-    21
+    18
+   ],
+   [
+    "Kentucky",
+    29
    ]
   ],
-  "record": "6-2",
+  "record": "7-2",
   "sec": {
    "Georgia": [
-    25.0,
+    27.8,
     1,
-    44.0,
-    5,
-    19.0,
-    5,
-    32
-   ],
-   "LSU": [
-    23.3,
-    5,
-    43.6,
-    7,
-    20.2,
-    9,
-    22
+    46.3,
+    3,
+    18.5,
+    3,
+    20
    ],
    "Alabama": [
-    22.7,
-    6,
-    45.2,
+    24.8,
+    3,
+    46.6,
     2,
-    22.5,
-    29,
-    8
+    21.7,
+    18,
+    2
    ],
    "Texas": [
-    22.7,
-    7,
-    42.2,
-    8,
-    19.5,
+    23.4,
     6,
-    10
+    42.7,
+    7,
+    19.4,
+    5,
+    13
    ],
-   "Ole Miss": [
-    20.0,
-    9,
-    44.6,
-    4,
-    24.7,
-    49,
-    7
+   "LSU": [
+    21.9,
+    7,
+    42.9,
+    6,
+    21.0,
+    13,
+    24
    ],
    "Tennessee": [
-    17.0,
-    12,
-    38.4,
+    19.1,
+    11,
+    39.5,
     15,
-    21.4,
-    16,
+    20.4,
+    11,
     25
    ],
-   "Missouri": [
-    14.9,
-    16,
-    36.3,
-    22,
-    21.4,
-    17,
-    33
-   ],
-   "Florida": [
-    13.9,
-    20,
-    39.6,
+   "Ole Miss": [
+    17.6,
     12,
-    25.7,
-    60,
+    42.6,
+    8,
+    25.0,
+    53,
     3
    ],
    "South Carolina": [
-    13.7,
-    21,
-    38.0,
+    14.7,
     18,
-    24.2,
-    44,
-    15
+    37.9,
+    18,
+    23.2,
+    35,
+    14
    ],
-   "Kentucky": [
-    13.4,
-    22,
-    38.1,
-    17,
-    24.7,
-    50,
-    13
-   ],
-   "Texas A&M": [
-    13.1,
-    24,
-    35.1,
+   "Missouri": [
+    13.8,
+    21,
+    35.8,
     27,
     22.0,
     22,
-    9
+    29
    ],
    "Oklahoma": [
-    11.8,
+    13.4,
+    23,
+    33.7,
+    33,
+    20.2,
+    8,
+    6
+   ],
+   "Florida": [
+    12.5,
+    26,
+    37.7,
+    19,
+    25.2,
+    55,
+    5
+   ],
+   "Texas A&M": [
+    12.5,
+    27,
+    33.9,
+    31,
+    21.4,
+    17,
+    11
+   ],
+   "Kentucky": [
+    12.1,
     29,
-    32.9,
-    35,
-    21.1,
-    14,
-    4
+    37.0,
+    21,
+    24.9,
+    51,
+    8
    ],
    "Auburn": [
-    9.2,
-    37,
-    33.6,
-    32,
-    24.4,
-    48,
-    2
+    8.8,
+    38,
+    32.8,
+    40,
+    24.0,
+    42,
+    4
    ],
    "Mississippi State": [
-    8.3,
-    40,
-    34.9,
-    28,
-    26.6,
-    70,
+    7.5,
+    44,
+    33.7,
+    34,
+    26.2,
+    64,
     1
    ],
    "Arkansas": [
-    1.0,
-    68,
-    27.8,
-    64,
-    26.8,
-    75,
-    12
-   ],
-   "Vanderbilt": [
-    0.8,
-    70,
+    1.8,
+    65,
     28.1,
     62,
-    27.2,
-    80,
-    17
+    26.3,
+    67,
+    10
+   ],
+   "Vanderbilt": [
+    1.5,
+    67,
+    28.2,
+    61,
+    26.6,
+    74,
+    19
    ]
   }
  },
@@ -15180,7 +15177,7 @@ window.SITE_AUTO.football = {
   "OK   box scores for finished games (ESPN)",
   "OK   matchup previews for remaining games (CFBD)",
   "OK   season-by-season schedules and team leaders (cached after the first run)",
-  "OK   PEAR ratings (week 10)",
+  "OK   PEAR ratings (week 11)",
   "OK   FPI ratings and ranks for the SEC (CFBD)"
  ]
 };
