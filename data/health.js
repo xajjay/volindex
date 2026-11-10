@@ -59,8 +59,8 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 5,
-   "edited": "2026-11-05",
+   "ageDays": 0,
+   "edited": "2026-11-10",
    "file": "data/mbb-lineup.js",
    "label": "Men's basketball lineup",
    "maxDays": 21
