@@ -18,7 +18,7 @@ window.EXTRAS = {
     ratings: [
       ['SEC media preseason poll', 'No. 4', 'Predicted order, released Oct. 12, 2026. Florida 1st, Texas 2nd, Arkansas 3rd.', 'https://utsports.com/news/2026/10/12/mens-basketball-vols-voted-fourth-in-sec-by-media-harris-named-first-team-all-sec'],
       ['KenPom preseason', 'No. 18', 'Net rating +24.47 · offense No. 16 · defense No. 19 · tempo No. 297', 'https://kenpom.com/'],
-      ['Bart Torvik T-Rank', 'No. 17', 'Nov. 5, after 1 game (1-0) · Barthag .9197 · adj. offense 118.9 (No. 9) · adj. defense 96.2 (No. 22). Early-season numbers lean on preseason projections.', 'https://barttorvik.com/team.php?team=Tennessee&year=2027'],
+      ['Bart Torvik T-Rank', 'No. 19', 'Nov. 10, after 2 games (2-0) · Barthag .9160 · adj. offense 118.1 (No. 20) · adj. defense 95.9 (No. 20) · tempo 69.3 (No. 290). Early-season numbers lean on preseason projections.', 'https://barttorvik.com/team.php?team=Tennessee&year=2027'],
       ['EvanMiya preseason', 'No. 18', 'No. 13 excluding players with pending eligibility · offense No. 30 · defense No. 14 · roster rank No. 31', 'https://evanmiya.com/?team_ratings'],
       ['Blue Ribbon Yearbook preseason top 25', 'No. 6', 'Preseason magazine ranking', 'https://www.rockytopinsider.com/'],
       ['CBS Sports Preseason Top 25 And 1', 'No. 15', 'Gary Parrish', 'https://www.cbssports.com/college-basketball/'],
@@ -32,7 +32,7 @@ window.EXTRAS = {
       intro: 'Preseason computer ratings from the three most-used college basketball models, plus EvanMiya player ratings and T-Rank player projections. These switch to in-season numbers once games start.',
       teams: [
         { src: 'KenPom', url: 'https://kenpom.com/', rank: 18, rating: '+24.47', off: ['119.8', 16], def: ['95.3', 19], extra: 'Adj. tempo 70.0 (No. 297)', date: 'Preseason' },
-        { src: 'Bart Torvik (T-Rank)', url: 'https://barttorvik.com/team.php?team=Tennessee&year=2027', rank: 17, rating: '.9197 Barthag', off: ['118.9', 9], def: ['96.2', 22], extra: 'In-season, after 1 game (1-0); still weighted toward preseason projections', date: 'Nov. 5' },
+        { src: 'Bart Torvik (T-Rank)', url: 'https://barttorvik.com/team.php?team=Tennessee&year=2027', rank: 19, rating: '.9160 Barthag', off: ['118.1', 20], def: ['95.9', 20], extra: 'Adj. tempo 69.3 (No. 290) · after 2 games (2-0); still weighted toward preseason projections', date: 'Nov. 10' },
         { src: 'EvanMiya', url: 'https://evanmiya.com/?team_ratings', rank: 18, rating: '+20.1', off: ['+10.6', 30], def: ['+9.5', 14], extra: 'Roster rank No. 31 · No. 13 if pending-eligibility players are excluded', date: 'Preseason (May 29)' },
       ],
       confTitle: 'SEC by KenPom preseason rating',
@@ -44,7 +44,7 @@ window.EXTRAS = {
         ['Oklahoma', 29, '+21.87', '118.6 (26)', '96.7 (34)'], ['Ole Miss', 38, '+19.25', '113.1 (64)', '93.9 (12)'], ['Georgia', 46, '+18.03', '117.5 (32)', '99.5 (63)'],
         ['Missouri', 48, '+17.04', '117.2 (33)', '100.2 (72)'], ['LSU', 62, '+13.37', '113.8 (60)', '100.4 (75)'], ['Mississippi State', 69, '+12.37', '112.8 (66)', '100.4 (76)'], ['South Carolina', 93, '+8.59', '111.2 (84)', '102.7 (95)'],
       ],
-      playersTitle: 'Player ratings (Jalen Washington left out: ineligible)',
+      playersTitle: 'Player ratings',
       playerCols: ['EvanMiya BPR', 'OBPR', 'DBPR', 'BPR nat\'l rank', 'T-Rank proj. PPG', 'Proj. RPG', 'Proj. APG', 'Proj. min %'],
       players: [
         ['Juke Harris', 4.83, 3.18, 1.65, 158, 15.1, 5.0, 1.8, 80],
@@ -58,7 +58,7 @@ window.EXTRAS = {
         ['Christian Fermin', null, null, null, null, 1.7, 2.0, 0.0, 11],
         ['Chris Washington Jr.', 1.95, 1.01, 0.94, 775, null, null, null, null],
       ],
-      playersNote: 'BPR (Bayesian Performance Rating) is EvanMiya\'s estimate of a player\'s value per 100 possessions on offense (OBPR) and defense (DBPR). T-Rank projections are Bart Torvik\'s preseason per-game projections. EvanMiya also lists Tyler Lundblade among the nation\'s best 3-point shooters by projected accuracy.',
+      playersNote: 'Jalen Washington is not listed (ruled ineligible this season). BPR (Bayesian Performance Rating) is EvanMiya\'s estimate of a player\'s value per 100 possessions on offense (OBPR) and defense (DBPR). T-Rank projections are Bart Torvik\'s preseason per-game projections. EvanMiya also lists Tyler Lundblade among the nation\'s best 3-point shooters by projected accuracy.',
       glossary: [
         ['KenPom net rating', 'Points per 100 possessions better than an average D-I team, adjusted for opponent and venue.'],
         ['Adj. offense / defense', 'Points scored / allowed per 100 possessions against an average opponent. Lower defense numbers are better.'],

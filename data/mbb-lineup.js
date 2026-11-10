@@ -8,12 +8,12 @@
 window.LINEUP = window.LINEUP || {};
 window.LINEUP.mbb = {
   "label": "2026-27 projected starting five",
-  "updated": "2026-11-05",
-  "rev": 7,
+  "updated": "2026-11-10",
+  "rev": 8,
   "basedOn": "The Vol Index projected starting five (unofficial); adjusted after the 90-59 opener vs. Wofford (Nov. 3). Starters are who started; Juke Harris (26 min) and Terrence Hill Jr. (22 min, 17 pts) led the bench",
   "chart": {
     "Starting five": [
-      ["PG", ["Dai Dai Ames","Terrence Hill Jr.","Troy Henderson"]],
+      ["PG", ["Terrence Hill Jr.","Dai Dai Ames","Troy Henderson"]],
       ["SG", ["Tyler Lundblade","Juke Harris","Marquis Clark"]],
       ["SF", ["Jalen Haralson","Juke Harris","Manny Green"]],
       ["PF", ["DeWayne Brown II","Braedan Lue","Chris Washington Jr."]],
@@ -21,7 +21,7 @@ window.LINEUP.mbb = {
     ],
     "Rotation": [
       ["6th man", ["Juke Harris"]],
-      ["Next off the bench", ["Terrence Hill Jr.","Braedan Lue","Troy Henderson"]],
+      ["Next off the bench", ["Dai Dai Ames","Braedan Lue","Troy Henderson"]],
       ["Developing", ["Manny Green","Marquis Clark","Christian Fermin","Chris Washington Jr.","Ralph Scott"]],
       ["Ruled ineligible (appeal pending)", ["Jalen Washington"]]
     ]
