@@ -475,7 +475,7 @@
   function recruitMini() {
     const g = G(), R = g.recruit; if (!R) return '';
     const c = DY.myCommits().sort((a, b) => b.rec.c - a.rec.c);
-    return `<div class="box"><div class="glabel">Class of ${R.year} <button class="glink" data-goto="recruit">Recruiting</button></div><p>${R.signed ? 'Final rank' : 'Current rank'} <b>No. ${R.classRank || '—'}</b> · ${c.length} commits${R.locked ? ' · locked' : g.settings.recruiting === 'manual' && !R.signed ? ` · ${DY.HOURS() - DY.hoursUsed()} hours left` : ''}</p><ul class="dy-mini">${c.slice(0, 4).map(p => `<li><span class="dy-stars">${stars(p.rec.stars)}</span> <a href="#" class="dy-pl" data-rid="${p.id}">${esc(p.n)}</a>${p.realUT ? ' <small class="chip ut" title="A real-life ${esc(DY.UN())} commit">Real ${DY.ab()}</small>' : ''} <small>${p.pos}</small></li>`).join('')}</ul></div>`;
+    return `<div class="box"><div class="glabel">Class of ${R.year} <button class="glink" data-goto="recruit">Recruiting</button></div><p>${R.signed ? 'Final rank' : 'Current rank'} <b>No. ${R.classRank || '—'}</b> · ${c.length} commits${R.locked ? ' · locked' : g.settings.recruiting === 'manual' && !R.signed ? ` · ${DY.HOURS() - DY.hoursUsed()} hours left` : ''}</p><ul class="dy-mini">${c.slice(0, 4).map(p => `<li><span class="dy-stars">${stars(p.rec.stars)}</span> <a href="#" class="dy-pl" data-rid="${p.id}">${esc(p.n)}</a>${p.realUT ? ` <small class="chip ut" title="A real-life ${esc(DY.UN())} commit">Real ${DY.ab()}</small>` : ''} <small>${p.pos}</small></li>`).join('')}</ul></div>`;
   }
   function leadersMini() {
     const ut = DY.userT(), ps = ut.roster.map(DY.P).filter(p => sStats(p));
