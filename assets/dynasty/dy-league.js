@@ -453,7 +453,7 @@
     // every other team: real 2026 season stats so far (Sports-Reference), matched by name
     const RS = root.DY_TODAY_STATS;
     if (RS) {
-      const nk = s0 => String(s0 || '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
+      const nk = s0 => String(s0 || '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z]/g, '');
       g.teams.forEach(t => { if (t.id === ut.id) return; const T0 = RS[t.name]; if (!T0) return; t.roster.map(DY.P).forEach(p => { const st = T0[nk(p.n)]; p.s = st ? Object.assign({}, st) : null; }); });
     }
     // Tennessee players who are out for the year in real life (injuries setting on)
