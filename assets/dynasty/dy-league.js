@@ -460,6 +460,9 @@
     // records and news start clean: the real record book, then the first headline of your tenure
     DY.initRecords();
     g.news = [];
+    // the 2027 class as it stands today: every real commit is with his school, everyone else is open
+    const tc = DY.todayClass && DY.todayClass();
+    if (tc) DY.news('commit', `The 2027 class: ${tc.committed} real commits, ${tc.open} still uncommitted`, `${tc.mine ? 'Your class starts with ' + tc.mine + ' real commits. ' : ''}Recruiting is open: the uncommitted players can go anywhere, and commits can still flip.`);
     g.startToday = { asOf: TD.asOf, week: lastWk, src: TD.source };
     if (out.length && DY.isTN()) DY.news('injury', `${out.length} Vols are out for the season`, out.map(p => `${p.n} (${p.pos}, ${p.inj.what})`).join(', ') + '.');
     DY.news('poll', `You take over ${me.name} at ${me.w}-${me.l} (${me.cw}-${me.cl} ${me.conf})`, `${DY.isTN() ? 'The Vols are' : me.name + ' is'} ${me.ap ? 'No. ' + me.ap + ' in the AP poll' : 'unranked'} with ${DY.userGames().filter(x => !x.res && x.wk > lastWk).length} regular-season games left. Records, scores and Tennessee's stats are real through ${DY.dateStr(new Date(played[played.length - 1].date + 'T12:00:00Z'))}.`);

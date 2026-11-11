@@ -166,6 +166,45 @@
     list.filter(p => p.commit === g.user).forEach(p => { g.recruit.board.push(p.id); if (DY.nilOn()) { p.nilOffer = DY.recruitNil(p); p.nilLocked = true; } });
     DY.rankClasses();
   };
+  /* Start Today: the class of 2027 as it stands right now. Every real prospect (247Sports Composite) is in the pool; the ones already committed in real life are committed
+     to that school, and everyone still open is uncommitted. Recruiting is open (nothing is locked): real commits can still flip, and the open players can go anywhere. */
+  DY.todayClass = () => {
+    const g = G(), C = root.DY_C27, old = g.recruit; if (!C || !C.rows || !old) return false;
+    const year = old.year, F = root.SITE && root.SITE.football;
+    _needs = {}; g.teams.forEach(t => { _needs[t.id] = DY.teamNeeds(t); });
+    const nk = s => String(s || '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z]/g, '');
+    const list = [], byKey = {};
+    C.rows.forEach((r, i) => {
+      const [name, p0, school, home, hs, ht, wt, sc, stars] = r;
+      const pos = p0 === 'Edge' ? 'EDGE' : p0 === 'DL' ? 'DT' : p0 === 'ATH' ? 'WR' : p0 === 'PK' ? 'K' : DY.W[p0] ? p0 : 'WR';
+      const hm = /,\s*([A-Za-z.]+)$/.exec(home || '');
+      const p = prospect(pos, sc / 1e4, { n: name, home, st: hm ? DY.stAbbr(hm[1]) : 'TN', hs, ht: htIn(ht) || undefined, wt: wt || undefined });
+      p.realName = true; p.realNat = i + 1;
+      const sch = school ? DY.byName(school) : null;
+      if (sch && sch.fbs && g.teams.includes(sch)) { p.commit = sch.id; p.realSchool = sch.id; p.interest[sch.id] = 150; p.offer = sch.id === g.user; p.firm = sch.id === g.user; }
+      list.push(p); byKey[nk(name)] = p;
+    });
+    // Tennessee's own real commits carry the site's fuller profile (any who are not in the ranked list are added)
+    ((F && F.recruits) || []).forEach(r => {
+      let p = byKey[nk(r.name)];
+      if (!p) {
+        const pos = r.pos === 'LS' ? 'LS' : realPos(r), hm = /,\s*([A-Za-z.]+)$/.exec(r.home || '');
+        let c = clamp(0.70 + (r.grade - 70) * 0.01, 0.75, 0.9999); if (r.stars >= 5) c = Math.max(c, 0.9845); else if (r.stars === 4) c = clamp(c, 0.8905, 0.9833); else if (r.stars === 3) c = clamp(c, 0.80, 0.8899);
+        p = prospect(pos, Math.round(c * 1e4) / 1e4, { n: r.name, home: r.home, st: hm ? DY.stAbbr(hm[1]) : 'TN', hs: r.hs, ht: htIn(r.ht) || undefined, wt: r.wt || undefined });
+        p.realName = true; list.push(p);
+      }
+      p.real = true; p.realUT = true; p.commit = DY.UT_ID; p.realSchool = DY.UT_ID; p.interest[DY.UT_ID] = 150; p.offer = DY.UT_ID === g.user; p.firm = DY.UT_ID === g.user; p.realNat = r.nat ? +r.nat : p.realNat;
+    });
+    list.sort((a, b) => b.rec.c - a.rec.c);
+    const posN = {}, stN = {};
+    list.forEach((p, i) => { p.rec.nat = i + 1; posN[p.pos] = (posN[p.pos] || 0) + 1; p.rec.posRank = posN[p.pos]; stN[p.st] = (stN[p.st] || 0) + 1; p.rec.stRank = stN[p.st]; });
+    list.forEach(p => seedInterest(p));     // who else is in on each player (a committed player keeps his school as the clear leader)
+    const pool = {}; list.forEach(p => { pool[p.id] = p; });
+    g.recruit = { year, pool, board: [], hours: DY.HOURS(), log: [], classRank: null, signed: false, locked: false, real: true, _need: _needs };
+    list.filter(p => p.commit === g.user).forEach(p => { g.recruit.board.push(p.id); if (DY.nilOn()) { p.nilOffer = DY.recruitNil(p); p.nilLocked = true; } });
+    DY.rankClasses();
+    return { total: list.length, committed: list.filter(p => p.commit != null).length, open: list.filter(p => p.commit == null).length, mine: g.recruit.board.length };
+  };
   DY.boardAdd = id => { const R = G().recruit; if (R.locked) return 'Recruiting is locked in year one: the real 2027 class.'; if (R.board.includes(id)) return null; if (R.board.length >= DY.BOARD_MAX) return 'Your board is full (30). Remove someone first.'; R.board.push(id); const p = DY.RP(id); if (p.interest[G().user] == null) p.interest[G().user] = 0; return null; };
   DY.boardRemove = id => { const R = G().recruit; R.board = R.board.filter(x => x !== id); };
   // Remove a commit (the CPU assistant took someone you do not want, or you changed your mind). He is released, off your board and stays away from your class
