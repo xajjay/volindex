@@ -404,10 +404,12 @@
     }
     // match every team's record to the real one: flip simulated CPU results where it helps, then set the records
     const done = g.sched.filter(x => x.res && x.wk <= lastWk && !x.post);
+    // the standings are only used if they cover every week that was just played; stale standings would stamp old records over newer results
+    const stale = DY.weekOfDate(g.season, TD.asOf) < lastWk;
     const tgt = {}, cur = {};
-    g.teams.forEach(t => { const r = TD.rec[t.name]; if (!r) return; const [o, c] = r.split('|'); const [w, l] = o.split('-').map(Number), [cw, cl] = c.split('-').map(Number); tgt[t.id] = { w, l, cw, cl }; cur[t.id] = 0; sim0[t.id] = t.w; });
+    g.teams.forEach(t => { const r = stale ? null : TD.rec[t.name]; if (!r) return; const [o, c] = r.split('|'); const [w, l] = o.split('-').map(Number), [cw, cl] = c.split('-').map(Number); tgt[t.id] = { w, l, cw, cl }; cur[t.id] = 0; sim0[t.id] = t.w; });
     done.forEach(x => { const w = x.res.h > x.res.a ? x.h : x.a; if (cur[w] != null) cur[w]++; });
-    for (let pass = 0; pass < 6; pass++) {
+    for (let pass = 0; pass < 40; pass++) {
       DY.shuffle(done.slice()).forEach(x => {
         if (x.real || x.h === ut.id || x.a === ut.id) return;
         const w = x.res.h > x.res.a ? x.h : x.a, l = w === x.h ? x.a : x.h;
@@ -420,6 +422,9 @@
       // strength follows the real season: a team that really won more than we simulated gets stronger
       t.elo += (r.w - sim0[t.id]) * 28;
       Object.assign(t, r);
+      // the record shown must agree with the results on the schedule: the real record is the target, but if the generated schedule has a different number of games (byes fall differently) the schedule wins
+      let sw = 0, sl = 0; done.forEach(x => { if (x.h !== t.id && x.a !== t.id) return; ((x.res.h > x.res.a) === (x.h === t.id)) ? sw++ : sl++; });
+      if (sw !== r.w || sw + sl !== r.w + r.l) { t.w = sw; t.l = sl; t.cw = Math.min(r.cw, sw); t.cl = Math.min(r.cl, sl); }
       t.pf = 0; t.pa = 0;
     });
     done.forEach(x => { const H = DY.T(x.h), A = DY.T(x.a); if (H && H.pf != null) { H.pf += x.res.h; H.pa += x.res.a; } if (A && A.pf != null) { A.pf += x.res.a; A.pa += x.res.h; } });

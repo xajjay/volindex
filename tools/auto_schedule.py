@@ -179,6 +179,10 @@ def run_gameday():
         try:
             import update_standings; update_standings.main()
         except Exception as e: print(f"!! standings failed: {e}")
+        if "football" in ran:
+            try:
+                import update_today; update_today.main()      # Start Today: every team's real record
+            except Exception as e: print(f"!! start-today data failed: {e}")
         save_stamps(stamps)
     print("updated:", ", ".join(ran) or "nothing")
 
@@ -206,6 +210,14 @@ def main():
         import update_standings; update_standings.main()
     except Exception as e:
         print(f"!! standings failed: {e}")
+    try:
+        import update_today; update_today.main()      # Start Today: every team's real record, every morning
+    except Exception as e:
+        print(f"!! start-today data failed: {e}")
+    try:
+        import update_class27; update_class27.main()   # Start Today: the real 2027 class and who is committed where
+    except Exception as e:
+        print(f"!! 2027 class failed: {e}")
     try:
         import transfer_stats; transfer_stats.main()
     except Exception as e:
