@@ -1620,12 +1620,16 @@ window.SITE_AUTO.football = {
    "line": "TENN -2.5",
    "ou": 43.5,
    "ml": "-135",
-   "book": "Draft Kings",
+   "book": "DraftKings",
    "win": 58.6
   },
   "LSU": {
    "tv": null,
    "kick": "2026-11-21T20:30Z",
+   "line": "LSU -1.5",
+   "ou": 48.5,
+   "ml": "+100",
+   "book": "DraftKings",
    "win": 45.2
   },
   "Vanderbilt": {

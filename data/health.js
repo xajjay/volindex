@@ -19,11 +19,6 @@ window.SITE_HEALTH = {
   {
    "area": "manual",
    "level": "warn",
-   "msg": "Football depth chart last edited 22 days ago (check every 14). Re-check the depth chart after the latest game/injury news."
-  },
-  {
-   "area": "manual",
-   "level": "warn",
    "msg": "Volleyball lineup last edited 30 days ago (check every 21). Re-check the projected lineup."
   },
   {
@@ -51,8 +46,8 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 22,
-   "edited": "2026-10-20",
+   "ageDays": 0,
+   "edited": "2026-11-11",
    "file": "data/football-depth.js",
    "label": "Football depth chart",
    "maxDays": 14
@@ -165,5 +160,5 @@ window.SITE_HEALTH = {
    "updated": "2026-11-11"
   }
  ],
- "warnings": 4
+ "warnings": 3
 };
