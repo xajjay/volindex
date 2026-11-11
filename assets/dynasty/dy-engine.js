@@ -476,7 +476,7 @@
       GM.ball = 97; GM.down = 1; GM.togo = 3;
       const r = resolve(GM, s, call, DY.aiDef(GM, other(s)), true);
       ok = r.yards >= 3 && !r.turnover;
-      text = `Two-point try: ${r.short} ${ok ? '— GOOD!' : '— no good.'}`;
+      text = `Two-point try: ${r.short || String(r.text || 'the play').replace(/\s*TOUCHDOWN.*$/, '').replace(/[.!]+$/, '')} ${ok ? '— GOOD!' : '— no good.'}`;
       anim = r.anim; anim.pat = true;
       Object.assign(GM, keep);
       if (ok) { score(GM, s, 2); if (r.passer) add(GM, r.passer, 'p2'); if (r.carrier) add(GM, r.carrier, 'x2'); }
