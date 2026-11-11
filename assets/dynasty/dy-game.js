@@ -814,7 +814,7 @@
   function endPop(r, pre) {
     const y = r.anim && r.anim.yards != null ? r.anim.yards : 0;
     if (r.anim && r.anim.wiped) return pop('PLAY WIPED OUT', 'flag');
-    if (r.td) { pop('TOUCHDOWN', 'good'); return; }
+    if (r.td) return;   // the big team-color banner announces touchdowns
     if (r.turnover && r.tag === 'FUMBLE') return pop('FUMBLE', 'bad');
     if (r.tag === 'TURNOVER ON DOWNS') return pop('TURNOVER ON DOWNS', 'bad');
     if (r.r && (r.r.kind === 'inc' || r.r.kind === 'int' || r.r.kind === 'dpi')) return;

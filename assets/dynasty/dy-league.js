@@ -372,6 +372,8 @@
     return s;
   }
   DY.canStartToday = () => { const F = root.SITE_AUTO && root.SITE_AUTO.football; return !!(root.DY_TODAY && F && (F.schedule || []).some(x => x.result)); };
+  // real-life season-ending injuries, applied to Start Today dynasties when injuries are on
+  DY.TODAY_OUT = [['Tyree Weathersby', 'left knee'], ['Wendell Moe Jr.', 'lower leg'], ['Dylan Lewis', 'foot'], ['Edrees Farooq', 'knee'], ['Ethan Davis', 'knee'], ['Joakim Dodson', 'leg'], ['Jaedon Harmon', 'knee'], ['Jadais Richard', 'upper body']];
   DY.startToday = () => {
     const g = G(), TD = root.DY_TODAY, F = root.SITE_AUTO && root.SITE_AUTO.football;
     if (!DY.canStartToday()) return 'The current-season data is not available.';
@@ -449,10 +451,17 @@
       const nk = s0 => String(s0 || '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
       g.teams.forEach(t => { if (t.id === ut.id) return; const T0 = RS[t.name]; if (!T0) return; t.roster.map(DY.P).forEach(p => { const st = T0[nk(p.n)]; p.s = st ? Object.assign({}, st) : null; }); });
     }
+    // Tennessee players who are out for the year in real life (injuries setting on)
+    const out = [];
+    if (g.settings.injuries !== false) {
+      const nk2 = s0 => String(s0 || '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
+      (DY.TODAY_OUT || []).forEach(([n, what]) => { const p = ut.roster.map(DY.P).find(q => nk2(q.n) === nk2(n)); if (p) { p.inj = { wks: 30, what, season: true }; out.push(p); } });
+    }
     // records and news start clean: the real record book, then the first headline of your tenure
     DY.initRecords();
     g.news = [];
     g.startToday = { asOf: TD.asOf, week: lastWk, src: TD.source };
+    if (out.length && DY.isTN()) DY.news('injury', `${out.length} Vols are out for the season`, out.map(p => `${p.n} (${p.pos}, ${p.inj.what})`).join(', ') + '.');
     DY.news('poll', `You take over ${me.name} at ${me.w}-${me.l} (${me.cw}-${me.cl} ${me.conf})`, `${DY.isTN() ? 'The Vols are' : me.name + ' is'} ${me.ap ? 'No. ' + me.ap + ' in the AP poll' : 'unranked'} with ${DY.userGames().filter(x => !x.res && x.wk > lastWk).length} regular-season games left. Records, scores and Tennessee's stats are real through ${DY.dateStr(new Date(played[played.length - 1].date + 'T12:00:00Z'))}.`);
     return null;
   };

@@ -469,7 +469,7 @@
         if (p.s) { p.car[g.season] = Object.assign({ t: t.abbr }, p.s); }
         p.lastGp = s.gp || 0; p.lastScore = DY.awardScore(p, t);
         p.el--;
-        p.s = null; p.inj = p.inj && p.inj.wks >= 12 ? { wks: 3, what: p.inj.what } : null;
+        p.s = null; p.inj = p.inj && p.inj.wks >= 12 && !p.inj.season ? { wks: 3, what: p.inj.what } : null;
         if (p.el <= 0) p.leave = 'grad';
         else if (p.yr >= 3) {
           const dg = DY.draftGrade(p);
