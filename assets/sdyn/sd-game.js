@@ -168,7 +168,7 @@
   // make / miss popups at the end of every shot; threes, dunks and blocks get a bigger one with a screen shake
   function shotFx(r) {
     const p = S.el.querySelector('#sdgPop'), w = S.el.querySelector('.sdg-fieldwrap'); if (!p) return;
-    const who = r.shooter && r.shooter.n ? r.shooter.n.split(' ').slice(-1)[0] : '', made = r.pts > 0;
+    const who = r.shooter && r.shooter.n ? r.shooter.n.replace(/\s+(Jr\.?|Sr\.?|II|III|IV|V)$/i, '').split(' ').slice(-1)[0] : '', made = r.pts > 0;
     let txt, cls, shake = 0; const V = a => a[Math.floor(Math.random() * a.length)], nm = who ? ' ' + who : '';
     if (r.blk) { txt = V(['Blocked!', 'Rejected!', 'Not in my house!']) + (r.blk && r.blk.n ? ' ' + r.blk.n.split(' ').slice(-1)[0] : ''); cls = 'bad big'; shake = 1; }
     else if (made && r.dunk) { txt = V(['Slam!', 'Dunk!', 'Throws it down!', 'Posterized!']) + nm; cls = 'good big dunk'; shake = 2; }
