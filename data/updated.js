@@ -3,8 +3,8 @@ window.SITE_UPDATED = {
  "baseball": "2026-11-10",
  "football": "2026-11-10",
  "mbb": "2026-11-10",
- "soccer": "2026-11-10",
- "softball": "2026-11-10",
+ "soccer": "2026-11-11",
+ "softball": "2026-11-11",
  "volleyball": "2026-11-10",
- "wbb": "2026-11-10"
+ "wbb": "2026-11-11"
 };
