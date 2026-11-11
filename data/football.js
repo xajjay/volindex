@@ -10,6 +10,9 @@ window.SITE.football = {
   "ap": 14,
   "coaches": 14,
   "pollWeek": "Week 7",
+  "cfp": 8,
+  "cfpWeek": "Nov. 10",
+  "cfpTop25": [[1, "Georgia"], [2, "Utah"], [3, "Alabama"], [4, "UCLA"], [5, "Notre Dame"], [6, "Texas"], [7, "Miami"], [8, "Tennessee"], [9, "Indiana"], [10, "BYU"], [11, "Kentucky"], [12, "Texas Tech"], [13, "Wake Forest"], [14, "Houston"], [15, "Iowa"], [16, "Oregon"], [17, "South Carolina"], [18, "USC"], [19, "Ole Miss"], [20, "Ohio State"], [21, "LSU"], [22, "Missouri"], [23, "Arizona"], [24, "Boise State"], [25, "Oklahoma State"]],
   "coach": "Josh Heupel",
   "staff": [
    [

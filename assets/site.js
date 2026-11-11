@@ -99,6 +99,7 @@
     softball:   { rank: 'TBA', poll: 'NFCA preseason poll', when: 'Due in January', last: '2026 final NFCA: No. 4' },
   };
   function pollFor(key, F) {
+    if (key === 'football' && F && F.team.cfp) return { rank: F.team.cfp, poll: 'CFP Rankings', when: F.team.cfpWeek || '' };
     if (key === 'football') return F && F.team.ap ? { rank: F.team.ap, poll: 'AP Top 25', when: F.team.pollWeek || '' } : { rank: 'NR', poll: 'AP Top 25', when: F && F.team.pollWeek || '' };
     const D = window.sportData ? window.sportData(key) : null;
     const P = D && D.pollAuto;
@@ -250,7 +251,7 @@
     if (!A) return;
     try {
       const t = A.team || {};
-      ['record', 'sec', 'ap', 'coaches', 'pollWeek'].forEach(k => { if (t[k] != null) F.team[k] = t[k]; });
+      ['record', 'sec', 'ap', 'coaches', 'pollWeek', 'cfp', 'cfpWeek'].forEach(k => { if (t[k] != null) F.team[k] = t[k]; });
       if (t.ranks) F.team.ranks = Object.assign({}, F.team.ranks, t.ranks);
       (A.schedule || []).forEach(g => {
         const s = F.schedule.find(x => x.opp === g.opp); if (!s) return;
@@ -293,6 +294,7 @@
       if (A.recruits && A.recruits['2028'] && A.recruits['2028'].length) F.recruits2028 = mergeRec(F.recruits2028, A.recruits['2028']);
       { const out = new Set(((window.EXTRAS || {}).football || {}).decommits || []); F.recruits = F.recruits.filter(r => !out.has(r.name)); if (F.recruits2028) F.recruits2028 = F.recruits2028.filter(r => !out.has(r.name)); }
       if (t.apTop25) F.team.apTop25 = t.apTop25;
+      if (t.cfpTop25) F.team.cfpTop25 = t.cfpTop25;
       if (A.box) F.box = A.box;
       if (A.previews) F.previews = A.previews;
       // PEAR Ratings and FPI from the data update (tools/pear.py, CFBD)
@@ -332,7 +334,7 @@
       <div class="scoreline" aria-label="Season snapshot">
         <div><b>${t.record}</b><small>Overall</small></div>
         <div><b>${t.sec}</b><small>SEC</small></div>
-        <div><b>${t.ap}</b><small>AP poll</small></div>
+        <div><b>${t.cfp || t.ap}</b><small>${t.cfp ? 'CFP rank' : 'AP poll'}</small></div>
         <div class="hide-sm"><b>${F.advanced.fpi.rank}</b><small>${tip('FPI')}</small></div>
       </div>
       <nav class="tabs" aria-label="Football sections">${TABS.map(([k, l]) => `<a href="#football-${k}" aria-current="${k === tab ? 'page' : 'false'}">${l}</a>`).join('')}<a href="#games-football">Games</a></nav>
@@ -414,7 +416,7 @@
     ${quickHits()}
     <div class="grid g2">
       ${next ? `<div class="box nextgame matchup click" data-game="${esc(next.opp)}" tabindex="0" role="button" aria-label="Open ${esc(next.opp)} matchup preview"><div class="eyebrow">Next game · ${fmtDate(next.date, { weekday: 'long', month: 'long', day: 'numeric' })} · ${esc(kick(next))}${E.tv ? ' · ' + esc(E.tv) : ''}</div>
-        <div class="mrow"><div><span class="team">Tennessee</span><span class="dim">${t.record} · AP ${t.ap}</span></div><span class="vsmark">${next.site === 'H' ? 'VS' : 'AT'}</span><div class="r"><span class="team">${esc(next.opp)}</span><span class="dim">${esc(next.loc)}</span></div></div>
+        <div class="mrow"><div><span class="team">Tennessee</span><span class="dim">${t.record} · ${t.cfp ? 'CFP ' + t.cfp + ' · ' : ''}AP ${t.ap}</span></div><span class="vsmark">${next.site === 'H' ? 'VS' : 'AT'}</span><div class="r"><span class="team">${esc(next.opp)}</span><span class="dim">${esc(next.loc)}</span></div></div>
         ${E.win != null ? `<div class="wp"><div class="wp-l"><span>ESPN win chance</span><span>${E.line ? 'Line: <b>' + esc(E.line) + '</b>' : 'Line not posted yet'}${E.ou ? ' · O/U ' + E.ou : ''}</span></div>
           <div class="wp-bar" role="img" aria-label="Tennessee ${E.win}% chance to win"><i style="width:${E.win}%"></i></div>
           <div class="wp-l mono"><b class="ut">UT ${E.win.toFixed(1)}%</b><b>${esc(abbr(next.opp))} ${(100 - E.win).toFixed(1)}%</b></div></div>` : ''}
@@ -422,7 +424,7 @@
       ${window.resultsBox({ games: played.map(g => ({ date: g.date, opp: g.opp, site: g.site, result: g.result, us: g.us, them: g.them, attr: `data-game="${esc(g.opp)}"` })), record: t.record,
         sub: (sp => sp && sp.conf && !sp.final ? sp.conf + ' SEC' : '')(window.secPlace && window.secPlace('football')),
         more: played.length > 5 ? [window.VI_ROUTER ? window.VI_ROUTER.href('football-schedule') : '#football-schedule', 'Full schedule and results'] : null,
-        meta: `AP No. ${t.ap} · Coaches No. ${t.coaches} (${t.pollWeek}) · ${tip('FPI')} No. ${F.advanced.fpi.rank} · projected ${F.advanced.fpi.proj}` })}
+        meta: `${t.cfp ? 'CFP No. ' + t.cfp + ' · ' : ''}AP No. ${t.ap} · Coaches No. ${t.coaches} (${t.pollWeek}) · ${tip('FPI')} No. ${F.advanced.fpi.rank} · projected ${F.advanced.fpi.proj}` })}
     </div>
     <div class="section"><h3>Team numbers <small>per game through ${played.length} games, with national (FBS) and SEC rank</small></h3>
       <div class="tiles four">
@@ -1103,6 +1105,7 @@ ${part('next')}
     ['rushYpg', 'Rushing yards', 0], ['oRushYpg', 'Rush yards allowed', 1], ['passYpg', 'Passing yards', 0], ['oPassYpg', 'Pass yards allowed', 1],
     ['ypp', 'Yards per play', 0], ['oypp', 'Yards per play allowed', 1], ['thirdPct', '3rd down %', 0], ['othirdPct', 'Opp. 3rd down %', 1],
     ['sacks', 'Sacks', 0], ['sacksAllowed', 'Sacks allowed', 1], ['takeaways', 'Takeaways', 0], ['toLost', 'Turnovers lost', 1], ['toMargin', 'Turnover margin', 0], ['penYpg', 'Penalty yards per game', 1]];
+  function cfpRank(team) { const r = (F.team.cfpTop25 || []).find(x => x[1] === team); return r ? r[0] : null; }
   function apRank(team) { const r = (F.team.apTop25 || []).find(x => x[1] === team); return r ? r[0] : null; }
   function previewText(g, P, E) {
     const opp = g.opp, rk = apRank(opp);
@@ -1156,6 +1159,7 @@ ${part('next')}
       ${P && P.sp ? `<tr><td>${tip('SP+')} rating (nat'l rank)</td><td class="n">${n1(P.sp.ut[0])} (${P.sp.ut[1] || '—'})</td><td class="n">${n1(P.sp.opp[0])} (${P.sp.opp[1] || '—'})</td></tr>
         <tr><td>SP+ offense rank</td><td class="n">${P.sp.ut[2] || '—'}</td><td class="n">${P.sp.opp[2] || '—'}</td></tr><tr><td>SP+ defense rank</td><td class="n">${P.sp.ut[3] || '—'}</td><td class="n">${P.sp.opp[3] || '—'}</td></tr>` : ''}
       ${P && P.fpi ? `<tr><td>${tip('FPI')} (nat'l rank)</td><td class="n">${n1(P.fpi.ut[0])} (${P.fpi.ut[1] || '—'})</td><td class="n">${n1(P.fpi.opp[0])} (${P.fpi.opp[1] || '—'})</td></tr>` : ''}
+      ${F.team.cfp ? `<tr><td>CFP ranking</td><td class="n">${F.team.cfp}</td><td class="n">${cfpRank(g.opp) || 'NR'}</td></tr>` : ''}
       ${apRank(g.opp) || F.team.ap ? `<tr><td>AP poll</td><td class="n">${F.team.ap}</td><td class="n">${apRank(g.opp) || 'NR'}</td></tr>` : ''}
       </tbody></table></div>
       ${pear ? `<p class="small" style="margin-top:10px"><b>${tip('PEAR')} projection:</b> ${esc(pear[2])}, projected score ${esc(pear[3])} (UT–${esc(g.opp)}), Tennessee win chance ${pear[4]}%.</p>` : ''}`;

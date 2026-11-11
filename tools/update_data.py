@@ -139,6 +139,10 @@ def polls():
             out["ap"] = r if r else "NR"
             out["apTop25"] = [[x.get("rank"), x.get("school")] for x in sorted(p.get("ranks", []), key=lambda x: x.get("rank") or 99)]
         if p.get("poll") in ("Coaches Poll", "AFCA Coaches Poll"): out["coaches"] = r if r else "NR"
+        if p.get("poll") in ("Playoff Committee Rankings", "College Football Playoff"):
+            out["cfp"] = r if r else "NR"
+            out["cfpWeek"] = f"Week {latest.get('week')}"
+            out["cfpTop25"] = [[x.get("rank"), x.get("school")] for x in sorted(p.get("ranks", []), key=lambda x: x.get("rank") or 99)]
     return out
 
 # ---------------------------------------------------------------- team per-game ranks
