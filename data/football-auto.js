@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-10. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-11. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-10",
+ "updated": "2026-11-11",
  "team": {
   "record": "7-2",
   "sec": "4-2",
@@ -110,6 +110,110 @@ window.SITE_AUTO.football = {
     "SMU"
    ]
   ],
+  "cfp": 8,
+  "cfpWeek": "Week 11",
+  "cfpTop25": [
+   [
+    1,
+    "Georgia"
+   ],
+   [
+    2,
+    "Utah"
+   ],
+   [
+    3,
+    "Alabama"
+   ],
+   [
+    4,
+    "UCLA"
+   ],
+   [
+    5,
+    "Notre Dame"
+   ],
+   [
+    6,
+    "Texas"
+   ],
+   [
+    7,
+    "Miami"
+   ],
+   [
+    8,
+    "Tennessee"
+   ],
+   [
+    9,
+    "Indiana"
+   ],
+   [
+    10,
+    "BYU"
+   ],
+   [
+    11,
+    "Kentucky"
+   ],
+   [
+    12,
+    "Texas Tech"
+   ],
+   [
+    13,
+    "Wake Forest"
+   ],
+   [
+    14,
+    "Houston"
+   ],
+   [
+    15,
+    "Iowa"
+   ],
+   [
+    16,
+    "Oregon"
+   ],
+   [
+    17,
+    "South Carolina"
+   ],
+   [
+    18,
+    "USC"
+   ],
+   [
+    19,
+    "Ole Miss"
+   ],
+   [
+    20,
+    "Ohio State"
+   ],
+   [
+    21,
+    "LSU"
+   ],
+   [
+    22,
+    "Missouri"
+   ],
+   [
+    23,
+    "Arizona"
+   ],
+   [
+    24,
+    "Boise State"
+   ],
+   [
+    25,
+    "Oklahoma State"
+   ]
+  ],
   "ranks": {
    "ppg": [
     32.4,
@@ -133,7 +237,7 @@ window.SITE_AUTO.football = {
    ],
    "passYpg": [
     177.9,
-    120,
+    121,
     16
    ],
    "oypg": [
@@ -148,7 +252,7 @@ window.SITE_AUTO.football = {
    ],
    "oPassYpg": [
     172.1,
-    14,
+    13,
     2
    ]
   }
@@ -1191,17 +1295,17 @@ window.SITE_AUTO.football = {
    "Arion Carter": [
     {
      "stat": "Tackles for loss",
-     "rank": 44
+     "rank": 46
     },
     {
      "stat": "Sacks",
-     "rank": 96
+     "rank": 99
     }
    ],
    "Amare Campbell": [
     {
      "stat": "Tackles for loss",
-     "rank": 74
+     "rank": 76
     }
    ],
    "Tyree Weathersby": [
@@ -1211,29 +1315,29 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Tackles for loss",
-     "rank": 62
+     "rank": 64
     }
    ],
    "Xavier Gilliam": [
     {
      "stat": "Tackles for loss",
-     "rank": 14
+     "rank": 15
     },
     {
      "stat": "Sacks",
-     "rank": 29
+     "rank": 31
     }
    ],
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 52
+     "rank": 54
     }
    ],
    "Ty Redmond": [
     {
      "stat": "Passes defended",
-     "rank": 3
+     "rank": 4
     }
    ],
    "Kayin Lee": [
@@ -1251,11 +1355,11 @@ window.SITE_AUTO.football = {
    "Mike Matthews": [
     {
      "stat": "Receiving yards",
-     "rank": 67
+     "rank": 68
     },
     {
      "stat": "Receiving TD",
-     "rank": 87
+     "rank": 88
     }
    ],
    "DeSean Bishop": [
@@ -1516,13 +1620,13 @@ window.SITE_AUTO.football = {
    "line": "TENN -2.5",
    "ou": 43.5,
    "ml": "-135",
-   "book": "DraftKings",
+   "book": "Draft Kings",
    "win": 58.6
   },
   "LSU": {
    "tv": null,
    "kick": "2026-11-21T20:30Z",
-   "win": 45.1
+   "win": 45.2
   },
   "Vanderbilt": {
    "tv": null,
@@ -1566,7 +1670,7 @@ window.SITE_AUTO.football = {
     "Passing yards per game",
     "Passing",
     177.9,
-    120,
+    121,
     16,
     false
    ],
@@ -1575,7 +1679,7 @@ window.SITE_AUTO.football = {
     "Completion %",
     "Passing",
     64.4,
-    54,
+    55,
     10,
     false
    ],
@@ -1584,7 +1688,7 @@ window.SITE_AUTO.football = {
     "Yards per pass attempt",
     "Passing",
     7.21,
-    82,
+    83,
     11,
     false
    ],
@@ -1593,7 +1697,7 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     10.0,
-    107,
+    108,
     13,
     false
    ],
@@ -1602,7 +1706,7 @@ window.SITE_AUTO.football = {
     "Interceptions thrown",
     "Passing",
     4.0,
-    27,
+    26,
     3,
     true
    ],
@@ -1611,7 +1715,7 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     21.0,
-    96,
+    95,
     10,
     true
    ],
@@ -1629,7 +1733,7 @@ window.SITE_AUTO.football = {
     "Yards per carry",
     "Rushing",
     5.0,
-    32,
+    31,
     3,
     false
    ],
@@ -1692,7 +1796,7 @@ window.SITE_AUTO.football = {
     "Penalty yards per game",
     "Downs",
     61.9,
-    94,
+    96,
     10,
     true
    ],
@@ -1755,7 +1859,7 @@ window.SITE_AUTO.football = {
     "Passing yards allowed per game",
     "Pass defense",
     172.1,
-    14,
+    13,
     2,
     true
    ],
@@ -1764,7 +1868,7 @@ window.SITE_AUTO.football = {
     "Opponent completion %",
     "Pass defense",
     64.1,
-    102,
+    103,
     11,
     true
    ],

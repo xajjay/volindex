@@ -109,20 +109,20 @@ window.SITE_HEALTH = {
  "ok": false,
  "sports": [
   {
-   "ageDays": 1,
+   "ageDays": 0,
    "games": 12,
    "key": "football",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-10"
+   "updated": "2026-11-11"
   },
   {
-   "ageDays": 1,
+   "ageDays": 0,
    "games": 34,
    "key": "mbb",
    "poll": "AP Top 25",
    "pollDate": "2026-11-09",
-   "updated": "2026-11-10"
+   "updated": "2026-11-11"
   },
   {
    "ageDays": 0,
@@ -133,12 +133,12 @@ window.SITE_HEALTH = {
    "updated": "2026-11-11"
   },
   {
-   "ageDays": 1,
+   "ageDays": 0,
    "games": 57,
    "key": "baseball",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-10"
+   "updated": "2026-11-11"
   },
   {
    "ageDays": 0,
@@ -149,12 +149,12 @@ window.SITE_HEALTH = {
    "updated": "2026-11-11"
   },
   {
-   "ageDays": 1,
+   "ageDays": 0,
    "games": 27,
    "key": "volleyball",
    "poll": "AVCA Coaches Poll",
    "pollDate": "2026-11-08",
-   "updated": "2026-11-10"
+   "updated": "2026-11-11"
   },
   {
    "ageDays": 0,
