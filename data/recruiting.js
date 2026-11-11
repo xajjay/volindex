@@ -64,13 +64,13 @@ window.RECRUITING = {
     year: 2027,
     intro: "Karen Weekly's recruiting: the next two classes, this year's freshmen and where to follow along. Ratings are On3's.",
     classes: [
-      { year: 2027, rank: 'On3 class rank No. 25 (No. 4 in the SEC)', commits: [
+      { year: 2027, rank: 'On3 class rank No. 25 (No. 4 in the SEC) · signing period opened Nov. 11; Hodges not yet reported signed', commits: [
         { name: 'Kaylee Hodges', pos: 'P', from: 'Matoaca (Chesterfield, Va.)', rank: '5-star · 99 · No. 2 nationally · No. 1 pitcher', date: 'Oct. 2, 2025' },
-        { name: 'Gracyn Needle', pos: 'MI', from: "The King's Academy (Royal Palm Beach, Fla.)", rank: '4-star · 95 · No. 37', date: 'Sept. 8, 2025' },
-        { name: 'Evelynn Swartzlander', pos: 'MI', from: 'Birdville (North Richland Hills, Texas)', rank: '4-star · 94 · No. 60', date: 'Sept. 7, 2025' },
-        { name: 'Emma Pynes', pos: 'OF', from: 'Cornerstone Charter (Orlando, Fla.)', rank: '4-star · 94 · No. 57', date: 'Sept. 27, 2025' },
-        { name: 'Mia Roland', pos: 'MI', from: 'Charles D. Owen (Black Mountain, N.C.)', rank: '4-star · 93 · No. 67', date: 'July 28, 2026' },
-        { name: 'Kamryn Potts', pos: 'C', from: 'Viera (Rockledge, Fla.)', rank: '4-star · 93 · No. 74', date: 'Sept. 8, 2025' },
+        { name: 'Gracyn Needle', pos: 'MI', from: "The King's Academy (Royal Palm Beach, Fla.)", rank: '4-star · 95 · No. 37', date: 'Sept. 8, 2025 · signed Nov. 11, 2026' },
+        { name: 'Evelynn Swartzlander', pos: 'MI', from: 'Birdville (North Richland Hills, Texas)', rank: '4-star · 94 · No. 60', date: 'Sept. 7, 2025 · signed Nov. 11, 2026' },
+        { name: 'Emma Pynes', pos: 'OF', from: 'Cornerstone Charter (Orlando, Fla.)', rank: '4-star · 94 · No. 57', date: 'Sept. 27, 2025 · signed Nov. 11, 2026' },
+        { name: 'Mia Roland', pos: 'MI', from: 'Charles D. Owen (Black Mountain, N.C.)', rank: '4-star · 93 · No. 67', date: 'July 28, 2026 · signed Nov. 11, 2026' },
+        { name: 'Kamryn Potts', pos: 'C', from: 'Viera (Rockledge, Fla.)', rank: '4-star · 93 · No. 74 (On3); No. 79 overall, No. 12 C per SI', date: 'Sept. 8, 2025 · signed Nov. 11, 2026' },
       ], src: 'https://www.on3.com/college/tennessee-volunteers/softball/2027/industry-comparison-commits/' },
       { year: 2028, rank: 'On3 class rank No. 2 (Sept. 22 update; six commits now)', commits: [
         { name: 'Caelyn Campos', pos: 'OF', from: 'Del Oro (Rocklin, Calif.)', rank: '5-star · 99 · No. 4 nationally · No. 1 outfielder', date: 'Sept. 22, 2026' },
@@ -100,8 +100,12 @@ window.RECRUITING = {
   volleyball: {
     year: 2027,
     intro: "Eve Rackham Watt's recruiting: the next class, this year's freshmen and where to follow along.",
-    commits: [],
-    none: 'The 2027 class is announced at signing in November. Volleyball commitments are rarely public before then.',
+    commits: [
+      { name: 'Mara Sandberg', pos: 'OH', from: 'Gonzaga Prep (Spokane, Wash.)', rank: 'Signed Nov. 11, 2026 · described as one of the top outside hitters on Tennessee\'s board', date: 'Committed 2025', src: 'https://www.si.com/college/tennessee/recruiting/mara-sandberg-signs-with-tennessee-volleyball-01m6s6vyky1t' },
+      { name: 'Lola Peters', pos: '—', from: 'Texas', rank: 'Verbal commit · signing not yet reported', date: '—' },
+      { name: 'Eva Jeffries', pos: '—', from: 'California', rank: 'Verbal commit · signing not yet reported', date: '—' },
+    ],
+    note: 'Early signing period runs Nov. 11-18. More signees may be announced by utsports.com. Positions and ratings for Peters and Jeffries were not available.',
     lastClass: {
       title: '2026 signing class (now freshmen)',
       rows: [
