@@ -1514,7 +1514,7 @@ window.SITE.football = {
    "home": "Smyrna, Tenn.",
    "hs": "Smyrna",
    "prev": null,
-   "honors": ["Butkus Award semifinalist (Nov. 1)", "Jason Witten Collegiate Man of the Year semifinalist (one of 20; Oct. 21)", "William V. Campbell Trophy semifinalist (NFF; Sept. 23)", "Butkus Award preseason watch list", "Lott IMPACT Trophy watch list", "No. 6 on Bruce Feldman's Freaks List (The Athletic)", "Preseason Coaches All-SEC 3rd team"],
+   "honors": ["Walter Camp Player of the Year semifinalist (Nov. 11)", "Butkus Award semifinalist (Nov. 1)", "Jason Witten Collegiate Man of the Year semifinalist (one of 20; Oct. 21)", "William V. Campbell Trophy semifinalist (NFF; Sept. 23)", "Butkus Award preseason watch list", "Lott IMPACT Trophy watch list", "No. 6 on Bruce Feldman's Freaks List (The Athletic)", "Preseason Coaches All-SEC 3rd team"],
    "stats": {
     "def": {
      "gp": 5,
@@ -2510,7 +2510,7 @@ window.SITE.football = {
    "home": "Knoxville, Tenn.",
    "hs": "Karns",
    "prev": null,
-   "honors": ["Maxwell Award semifinalist (one of 18; Nov. 10)", "Burlsworth Trophy semifinalist, second straight year (one of 10; finalists Nov. 17)", "Maxwell Award, Walter Camp and Burlsworth preseason watch lists", "SEC Co-Offensive Player of the Week: Auburn", "Preseason Coaches All-SEC 3rd team"],
+   "honors": ["Walter Camp Player of the Year semifinalist (Nov. 11)", "Maxwell Award semifinalist (one of 18; Nov. 10)", "Burlsworth Trophy semifinalist, second straight year (one of 10; finalists Nov. 17)", "Maxwell Award, Walter Camp and Burlsworth preseason watch lists", "SEC Co-Offensive Player of the Week: Auburn", "Preseason Coaches All-SEC 3rd team"],
    "stats": {
     "rush": [
      107,
