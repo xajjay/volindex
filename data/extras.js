@@ -80,7 +80,7 @@ window.EXTRAS = {
       ],
     },
     honors: {
-      'Juke Harris': ['Preseason First Team All-SEC (SEC media, Oct. 12, 2026), the only newcomer on the first team', 'Second Team All-ACC and ACC Most Improved Player, 2025-26 (Wake Forest)', 'Averaged 21.4 points and 6.5 rebounds at Wake Forest in 2025-26; 750 points ranked sixth nationally'],
+      'Juke Harris': ['Naismith Trophy preseason watch list (one of 50; Nov. 2)', 'NABC Player of the Year preseason watch list (top 20; Oct. 29)', 'Julius Erving Small Forward of the Year top-20 preseason watch list (Oct. 28)', 'Blue Ribbon Yearbook preseason Third Team All-American', 'Preseason First Team All-SEC (SEC media, Oct. 12, 2026), the only newcomer on the first team', 'Second Team All-ACC and ACC Most Improved Player, 2025-26 (Wake Forest)', 'Averaged 21.4 points and 6.5 rebounds at Wake Forest in 2025-26; 750 points ranked sixth nationally'],
     },
     draft: {
       'Juke Harris': { level: 'High', note: 'ESPN 2027 mock draft: No. 29 overall (first round), June 25, 2026', src: 'https://www.on3.com/teams/tennessee-volunteers/news/juke-harris-nba-mock-draft-first-round-espn-tennessee-vols-basketball/' },
@@ -129,6 +129,10 @@ window.EXTRAS = {
       conf: [['South Carolina', 1, 2, 2], ['Texas', 2, 5, 3], ['LSU', 3, 1, 7], ['Oklahoma', 7, 4, 42], ['Kentucky', 10, 20, 13], ['Vanderbilt', 13, 7, 33], ['Tennessee', 16, 8, 37], ['Ole Miss', 21, 25, 11], ['Alabama', 24, 26, 19], ['Mississippi State', 37, 28, 49], ['Florida', 42, 34, 71], ['Georgia', 44, 48, 30], ['Missouri', 57, 38, 111], ['Auburn', 59, 99, 22], ['Texas A&M', 62, 73, 56], ['Arkansas', 64, 40, 141]],
       glossary: [['Massey rating', 'Margin-based computer rating; higher is better.'], ['Power', 'Massey\'s blend of rating and schedule strength.'], ['Offense / defense rank', 'Where Tennessee\'s projected scoring and scoring prevention rank nationally.']],
     },
+    honors: {
+      'Kaylene Smikle': ['TSWA Women\'s Basketball Player of the Week (Nov. 10): 24.5 points per game in wins over Duquesne (31 points) and Coppin State (18)', 'Cheryl Miller Award preseason watch list (Oct. 28)'],
+      'Fatmata Janneh': ['Katrina McClain Award preseason top-20 watch list (Oct. 29)'],
+    },
     recruit: { 'Gabby Minus': 'On3: 4-star, 95 rating, No. 36 nationally (2026)' },
     departures: [
       ['Talaysia Cooper', 'Transferred to Ole Miss · preseason Second Team All-SEC there'], ['Jaida Civil', 'Transferred to Ole Miss'], ['Mia Pauldo', 'Transferred to Rutgers'],
@@ -158,9 +162,11 @@ window.EXTRAS = {
       glossary: [['RPI', 'Rating Percentage Index: 25% your winning percentage, 50% your opponents\', 25% your opponents\' opponents\'. The selection committee uses it for NCAA Tournament bids.'], ['Massey', 'Computer rating that accounts for set and point margins and schedule.'], ['Hitting percentage', '(Kills − errors) ÷ attempts. Above .300 is excellent.']],
     },
     honors: {
-      'Caroline Kerr': ['2026 Preseason All-SEC', 'Three-time All-American', '2025 First Team All-SEC', 'SEC Co-Setter of the Week (Sept. 7, 2026), her ninth career Setter of the Week'],
-      'Kennedi Rogers': ['SEC Co-Offensive Player of the Week (Sept. 7, 2026)'],
-      'Jolene Oddo': ['SEC Freshman of the Week (Sept. 7, 2026)'],
+      'Caroline Kerr': ['AVCA Player of the Year watch list (Oct. 8)', '2026 Preseason All-SEC', 'Three-time All-American', '2025 First Team All-SEC', 'SEC Co-Setter of the Week (Sept. 7, 2026), her ninth career Setter of the Week'],
+      'Kennedi Rogers': ['AVCA Player of the Year watch list (Oct. 8)', 'SEC Co-Offensive Player of the Week (Sept. 7, 2026)'],
+      'Jalyn Stout': ['AVCA Player of the Year watch list (Oct. 8)'],
+      'Chelsea Sutton': ['SEC Co-Offensive Player of the Week (Oct. 26): .419 hitting, 21 kills and 7 blocks in wins over Kentucky and Vanderbilt'],
+      'Jolene Oddo': ['SEC Freshman of the Week, third time this season (latest Nov. 9; first on Sept. 7)'],
     },
     recruit: {
       'Emma Frietch': 'Prep Dig: No. 43 overall, No. 5 in Ohio (2026)',
