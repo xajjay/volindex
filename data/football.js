@@ -5645,19 +5645,19 @@ window.SITE.football = {
    "committed": "2026-05-18"
   },
   {
-   "id": "dylan-haley",
-   "name": "Dylan Haley",
+   "id": "preston-glasco",
+   "name": "Preston Glasco",
    "pos": "CB",
-   "hs": "Cherokee Bluff",
-   "home": "Flowery Branch, GA",
-   "ht": "6-1",
-   "wt": 180,
-   "grade": 88,
+   "hs": "Grayson",
+   "home": "Loganville, GA",
+   "ht": "6-2",
+   "wt": 190,
+   "grade": 86,
    "stars": 3,
-   "nat": null,
-   "posRank": "54",
-   "stateRank": "82",
-   "committed": "2026-06-07"
+   "nat": "883",
+   "posRank": "88",
+   "stateRank": "104",
+   "committed": "2026-10-28"
   },
   {
    "id": "dayon-cooper",

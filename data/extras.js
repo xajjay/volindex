@@ -12,7 +12,7 @@ window.EXTRAS = {
     // always listed in Tennessee's "Impact players" on every matchup preview (the starting QB comes from the depth chart)
     impactPins: ['Xavier Gilliam'],
     // decommitted: kept off the commit list even if a data source still shows them
-    decommits: ['Christian Mays'],
+    decommits: ['Christian Mays', 'Dylan Haley'],
   },
   mbb: {
     ratings: [

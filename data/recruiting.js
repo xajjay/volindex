@@ -6,13 +6,12 @@ window.RECRUITING = {
     year: 2027,
     intro: "Rick Barnes' recruiting: the class of 2027, this year's freshmen and where to follow along.",
     commits: [],
-    none: 'No 2027 commitments yet, per 247Sports (October 2026).',
+    none: 'No 2027 commitments yet (checked Nov. 11, 2026). Four-star wing Dylan Jones, a Tennessee target, picked Texas A&M on Oct. 26.',
     targets: {
       title: 'Top 2027 targets',
-      note: 'Uncommitted prospects Tennessee is recruiting, in The Vol Index priority order. Ratings from 247Sports (Oct. 2026).',
+      note: 'Uncommitted prospects Tennessee is recruiting, in The Vol Index priority order. Ratings from 247Sports (Oct. 2026). Dylan Jones, a former target, committed to Texas A&M on Oct. 26.',
       rows: [
         { name: 'Malachi Jordan', pos: 'SF', ht: "6-7, 225", from: 'Prolific Prep · Nashville, Tenn. native', rank: '247: 97, No. 23 · Composite: .9928 (5-star), No. 19', src: 'https://247sports.com/player/malachi-jordan-46146933/' },
-        { name: 'Dylan Jones', pos: 'SF', ht: "6-6, 210", from: 'Bartlett (Bartlett, Tenn.)', rank: '247: 92, No. 40 · Composite: .9875 (5-star), No. 35 · No. 1 in Tennessee', src: 'https://247sports.com/player/dylan-jones-46158933/' },
         { name: 'Chris Brown', pos: 'C', ht: "6-9, 210", from: 'Dream City Christian (Glendale, Ariz.)', rank: '247: 90, No. 124 · Composite: .9424 (4-star), No. 110', src: 'https://247sports.com/player/chris-brown-46153130/' },
         { name: 'Reese Alston', pos: 'PG', ht: "6-2, 175", from: 'Houston Second Baptist (Houston, Texas)', rank: '247: 98, No. 9 · Composite: .9973 (5-star), No. 8 · No. 1 in Texas', src: 'https://247sports.com/player/reese-alston-46151465/' },
       ],
@@ -36,10 +35,11 @@ window.RECRUITING = {
     year: 2027,
     intro: "Kim Caldwell's recruiting: the class of 2027, this year's freshmen and where to follow along.",
     commits: [
+      { name: 'Amaya Manuel', pos: 'PG', from: 'Lift For Life Academy (St. Louis, Mo.)', rank: '4-star · 5-8 · No. 25 (ESPN) · No. 35 (Rivals) · No. 5 PG (Rivals)', date: 'Nov. 10, 2026', src: 'https://www.rockytopinsider.com/2026/11/10/lady-vols-basketball-land-commitment-from-four-star-point-guard-recruit-amaya-manuel/' },
       { name: 'Maci Pringle', pos: 'Wing', from: 'Flower Mound HS (Flower Mound, Texas)', rank: '4-star (ESPN) · 6-1', date: 'Oct. 20, 2026', src: 'https://www.rockytopinsider.com/2026/10/20/lady-vols-basketball-land-commitment-of-four-star-wing-maci-pringle-after-recent-visit/' },
     ],
-    none: 'No 2027 commitments confirmed by a current source yet. Earlier pledges from before the 2024 coaching change are not counted.',
-    note: 'Lady Vol Hoops signed a top-10 class for the second straight year in November 2025.',
+    none: 'No 2027 commitments confirmed by a current source yet.',
+    note: 'Commitments are verbal until signed. The early signing period runs Nov. 11-18, 2026; Manuel and Pringle are expected to sign. Lady Vol Hoops signed a top-10 class for the second straight year in November 2025.',
     trackers: [
       ['2026 signing class announcement', 'utsports.com', 'https://utsports.com/news/2025/11/14/womens-basketball-lady-vol-hoops-nets-second-straight-top-10-signing-class'],
       ['Class rankings (HoopGurlz)', 'ESPN', 'https://www.espn.com/womens-college-basketball/'],
@@ -51,6 +51,7 @@ window.RECRUITING = {
     intro: "Josh Elander's first recruiting classes: 2027 commitments, this year's freshmen and where to follow along.",
     commits: [
       { name: 'Kaiden McCarthy', pos: 'RHP', from: 'Vermont', rank: 'Perfect Game No. 59 (2027)', date: 'Nov. 1, 2025', src: 'https://www.rockytopinsider.com/2025/11/01/tennessee-baseball-lands-first-commitment-of-josh-elander-era-kaiden-mccarthy/' },
+      { name: 'Hudson Oliver', pos: 'OF', from: 'Hoover HS (Hoover, Ala.)', rank: 'Class of 2028 · Perfect Game No. 45 · No. 16 OF · No. 2 in Alabama', date: 'Oct. 4, 2026', src: 'https://www.yardbarker.com/nhl/articles/tennessee_baseball_lands_commitment_from_top_50_2028_outfielder/s1_16553_44387092' },
       { name: 'Gaven French', pos: 'SS', from: 'Heritage HS (Maryville, Tenn.)', rank: 'Perfect Game No. 337 · No. 13 in Tennessee', date: 'Nov. 5, 2025', src: 'https://www.on3.com/teams/tennessee-volunteers/news/local-standout-commits-to-josh-elander-vols/' },
     ],
     note: 'Public commitments found in news reports. Baseball classes are large; Perfect Game lists the full class.',
@@ -71,12 +72,13 @@ window.RECRUITING = {
         { name: 'Mia Roland', pos: 'MI', from: 'Charles D. Owen (Black Mountain, N.C.)', rank: '4-star · 93 · No. 67', date: 'July 28, 2026' },
         { name: 'Kamryn Potts', pos: 'C', from: 'Viera (Rockledge, Fla.)', rank: '4-star · 93 · No. 74', date: 'Sept. 8, 2025' },
       ], src: 'https://www.on3.com/college/tennessee-volunteers/softball/2027/industry-comparison-commits/' },
-      { year: 2028, rank: 'On3 class rank No. 2 (Sept. 22, 2026 update)', commits: [
+      { year: 2028, rank: 'On3 class rank No. 2 (Sept. 22 update; six commits now)', commits: [
         { name: 'Caelyn Campos', pos: 'OF', from: 'Del Oro (Rocklin, Calif.)', rank: '5-star · 99 · No. 4 nationally · No. 1 outfielder', date: 'Sept. 22, 2026' },
         { name: 'Reagan Eldred', pos: 'P', from: 'Klein Oak (Spring, Texas)', rank: '5-star · 98 · No. 14 nationally', date: 'Sept. 20, 2026' },
         { name: 'Nevaeh Wilson', pos: 'MI', from: 'Ganesha (Corona, Calif.)', rank: '4-star · 95 · No. 32', date: 'Sept. 7, 2026' },
         { name: 'Kenzie White', pos: 'CI', from: 'Clarksville (Clarksville, Tenn.)', rank: '4-star · 90 · No. 119', date: 'Sept. 7, 2026' },
         { name: 'Sophia Galindo', pos: 'CI', from: 'Hollister (Hollister, Calif.)', rank: '3-star · 88', date: 'Sept. 7, 2026' },
+        { name: 'Megan Kuiper', pos: 'P', from: 'Woodstock, Ill.', rank: '4-star · No. 40 in the 2028 class (Softball America)', date: 'Oct. 18, 2026' },
       ], src: 'https://www.on3.com/college/tennessee-volunteers/softball/2028/industry-comparison-commits/' },
     ],
     lastClass: {
