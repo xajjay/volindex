@@ -1514,7 +1514,7 @@ window.SITE.football = {
    "home": "Smyrna, Tenn.",
    "hs": "Smyrna",
    "prev": null,
-   "honors": ["Walter Camp Player of the Year semifinalist (Nov. 11)", "Butkus Award semifinalist (Nov. 1)", "Jason Witten Collegiate Man of the Year semifinalist (one of 20; Oct. 21)", "William V. Campbell Trophy semifinalist (NFF; Sept. 23)", "Butkus Award preseason watch list", "Lott IMPACT Trophy watch list", "No. 6 on Bruce Feldman's Freaks List (The Athletic)", "Preseason Coaches All-SEC 3rd team"],
+   "honors": ["SEC Defensive Player of the Week: Kentucky (13 tkl, 2 sacks, 4 TFL)", "Walter Camp National Defensive Player of the Week, Bednarik and Nagurski Defensive Player of the Week: Kentucky", "Walter Camp Player of the Year semifinalist (Nov. 11)", "Butkus Award semifinalist (Nov. 1)", "Jason Witten Collegiate Man of the Year semifinalist (one of 20; Oct. 21)", "William V. Campbell Trophy semifinalist (NFF; Sept. 23)", "Butkus Award preseason watch list", "Lott IMPACT Trophy watch list", "No. 6 on Bruce Feldman's Freaks List (The Athletic)", "Preseason Coaches All-SEC 3rd team"],
    "stats": {
     "def": {
      "gp": 5,
