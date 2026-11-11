@@ -3,7 +3,7 @@ window.SITE = window.SITE || {};
 window.SITE.football = {
  "sport": "football",
  "season": 2026,
- "updated": "2026-11-05",
+ "updated": "2026-11-11",
  "team": {
   "record": "5-1",
   "sec": "2-1",
@@ -666,10 +666,7 @@ window.SITE.football = {
    "home": "Manassas, Va.",
    "hs": "Unity Reed",
    "prev": "North Carolina/Penn State",
-   "honors": [
-    "Butkus Award preseason watch list",
-    "Preseason All-SEC 2nd team (Athlon, Phil Steele)"
-   ],
+   "honors": ["Butkus Award preseason watch list", "Bednarik Award preseason watch list", "Preseason All-SEC 2nd team (Athlon, Phil Steele)"],
    "stats": {
     "def": {
      "gp": 6,
@@ -953,7 +950,7 @@ window.SITE.football = {
    "home": "Montgomery Village, Md.",
    "hs": "Quince Orchard",
    "prev": "Penn State",
-   "honors": [],
+   "honors": ["Bednarik Award semifinalist (one of 18; Nov. 10)", "Lombardi Award semifinalist (one of 12; Nov. 4)"],
    "stats": {
     "def": {
      "gp": 6,
@@ -1144,7 +1141,7 @@ window.SITE.football = {
    "home": "Lilburn, Ga.",
    "hs": "Parkview",
    "prev": null,
-   "honors": [],
+   "honors": ["Biletnikoff Award preseason watch list"],
    "stats": {
     "rush": [
      2,
@@ -1225,9 +1222,7 @@ window.SITE.football = {
    "home": "Duluth, Ga.",
    "hs": "Milton",
    "prev": null,
-   "honors": [
-    "Preseason Coaches All-SEC 3rd team"
-   ],
+   "honors": ["Bednarik Award preseason watch list", "Nagurski Trophy preseason watch list", "Preseason Coaches All-SEC 3rd team"],
    "stats": {
     "def": {
      "gp": 6,
@@ -1519,12 +1514,7 @@ window.SITE.football = {
    "home": "Smyrna, Tenn.",
    "hs": "Smyrna",
    "prev": null,
-   "honors": [
-    "Butkus Award preseason watch list",
-    "Lott IMPACT Trophy watch list",
-    "No. 6 on Bruce Feldman's Freaks List (The Athletic)",
-    "Preseason Coaches All-SEC 3rd team"
-   ],
+   "honors": ["Butkus Award semifinalist (Nov. 1)", "Jason Witten Collegiate Man of the Year semifinalist (one of 20; Oct. 21)", "William V. Campbell Trophy semifinalist (NFF; Sept. 23)", "Butkus Award preseason watch list", "Lott IMPACT Trophy watch list", "No. 6 on Bruce Feldman's Freaks List (The Athletic)", "Preseason Coaches All-SEC 3rd team"],
    "stats": {
     "def": {
      "gp": 5,
@@ -2131,7 +2121,7 @@ window.SITE.football = {
    "home": "Nashville, Tenn.",
    "hs": "Lipscomb Academy",
    "prev": null,
-   "honors": [],
+   "honors": ["Allstate Wuerffel Trophy preseason watch list"],
    "stats": {
     "def": {
      "gp": 6,
@@ -2227,7 +2217,7 @@ window.SITE.football = {
    "home": "Aiken, S.C.",
    "hs": "Strom Thurmond",
    "prev": null,
-   "honors": [],
+   "honors": ["Biletnikoff Award preseason watch list"],
    "stats": {
     "rec": [
      24,
@@ -2520,10 +2510,7 @@ window.SITE.football = {
    "home": "Knoxville, Tenn.",
    "hs": "Karns",
    "prev": null,
-   "honors": [
-    "SEC Co-Offensive Player of the Week — Auburn",
-    "Preseason Coaches All-SEC 3rd team"
-   ],
+   "honors": ["Maxwell Award semifinalist (one of 18; Nov. 10)", "Burlsworth Trophy semifinalist, second straight year (one of 10; finalists Nov. 17)", "Maxwell Award, Walter Camp and Burlsworth preseason watch lists", "SEC Co-Offensive Player of the Week: Auburn", "Preseason Coaches All-SEC 3rd team"],
    "stats": {
     "rush": [
      107,
@@ -3367,9 +3354,7 @@ window.SITE.football = {
    "home": "Lexington, Ky.",
    "hs": "Frederick Douglass",
    "prev": "Louisville",
-   "honors": [
-    "SEC Special Teams Player of the Week — Alabama"
-   ],
+   "honors": ["Lou Groza Award preseason watch list", "SEC Special Teams Player of the Week: Alabama"],
    "stats": {
     "kick": [
      6,
@@ -4228,7 +4213,7 @@ window.SITE.football = {
    "home": "Memphis, Tenn.",
    "hs": "Evangelical Christian",
    "prev": null,
-   "honors": [],
+   "honors": ["Mannelly Award preseason watch list (long snapper)"],
    "stats": {},
    "rating": null,
    "elig": "RS SR",
@@ -4866,9 +4851,7 @@ window.SITE.football = {
    "home": "Long Beach, Calif.",
    "hs": "Long Beach Poly",
    "prev": "Arizona",
-   "honors": [
-    "Preseason Coaches All-SEC 3rd team"
-   ],
+   "honors": ["Preseason Walter Camp 2nd team All-America", "Lombardi Award preseason watch list", "Outland Trophy preseason watch list", "Preseason Coaches All-SEC 3rd team"],
    "stats": {},
    "rating": {
     "src": "247",
@@ -5380,9 +5363,7 @@ window.SITE.football = {
    "home": "Melbourne, Australia",
    "hs": "Haileybury College",
    "prev": null,
-   "honors": [
-    "SEC Co-Special Teams Player of the Week — Auburn"
-   ],
+   "honors": ["Ray Guy Award preseason watch list", "SEC Co-Special Teams Player of the Week: Auburn"],
    "stats": {
     "punt": [
      24,
