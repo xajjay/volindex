@@ -4,6 +4,7 @@ window.SITE.football = {
  "sport": "football",
  "season": 2026,
  "updated": "2026-11-11",
+ "injuries": {"asOf": "2026-11-11", "source": "https://www.rockytopinsider.com/2026/11/11/eight-tennessee-football-players-are-now-ruled-out-with-season-ending-injuries/", "rows": [{"name": "Tyree Weathersby", "pos": "DE", "cls": "Sr.", "when": "Week 10 vs. Kentucky", "note": "Knee injury; the team's sack leader."}, {"name": "Wendell Moe Jr.", "pos": "OL", "cls": "5th year", "when": "Week 4 vs. Texas", "note": "Starting left guard and preseason All-American."}, {"name": "Ethan Davis", "pos": "TE", "cls": "Sr.", "when": "Week 2 at Georgia Tech", "note": "Reported ACL injury. He has announced he'll return in 2027."}, {"name": "Edrees Farooq", "pos": "S", "cls": "Jr.", "when": "Preseason", "note": "Projected starting safety."}, {"name": "Joakim Dodson", "pos": "WR", "cls": "So.", "when": "Week 1 vs. Furman", "note": "Kick returner and backup slot receiver."}, {"name": "Dylan Lewis", "pos": "S", "cls": "So.", "when": "Week 3 vs. Kennesaw State", "note": "Backup safety."}, {"name": "Jadias Richard", "pos": "CB", "cls": "Sr.", "when": "Preseason", "note": "Backup cornerback; Miami transfer."}, {"name": "Jaedon Harmon", "pos": "LB", "cls": "So.", "when": "Preseason", "note": "Reserve linebacker."}]},
  "team": {
   "record": "5-1",
   "sec": "2-1",

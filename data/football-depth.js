@@ -9,10 +9,10 @@
    ============================================================ */
 window.DEPTH = window.DEPTH || {};
 window.DEPTH.football = {
-  "rev": 8,
+  "rev": 9,
   "current": {
     "label": "2026 depth chart",
-    "updated": "2026-10-20",
+    "updated": "2026-11-11",
     "basedOn": "The Vol Index depth chart (unofficial)",
     "chart": {
     "Backfield": [
@@ -33,7 +33,7 @@ window.DEPTH.football = {
       ["RT", ["Jesse Perry","Ory Williams","Kamari Blair"]]
     ],
     "Defensive Line": [
-      ["DE", ["Tyree Weathersby","Mariyon Dye","Hezekiah Harris"]],
+      ["DE", ["Mariyon Dye","Hezekiah Harris","Mike Bethea II"]],
       ["DT", ["Xavier Gilliam","Carson Gentle","Ethan Utley"]],
       ["DT", ["Daevin Hobbs","Nathan Robinson","JJ Finch"]],
       ["DE", ["Jeremiah Telander","Jordan Norman","Mariyon Dye"]]
@@ -45,7 +45,7 @@ window.DEPTH.football = {
     "Secondary": [
       ["CB", ["Ty Redmond","Tim Merritt","Jamyan Theodore"]],
       ["CB", ["Kayin Lee","Tre Poteat III"]],
-      ["NICKEL", ["Qua Moss","Tevis Metcalf","Isaiah Hardge"]],
+      ["NICKEL", ["Qua Moss","Tevis Metcalf"]],
       ["S", ["TJ Metcalf","DJ Burks"]],
       ["S", ["Dejuan Lane","Sidney Walton"]]
     ],
@@ -62,7 +62,7 @@ window.DEPTH.football = {
   },
   "next": {
     "label": "2027 projected depth chart",
-    "updated": "2026-10-20",
+    "updated": "2026-11-11",
     "basedOn": "The Vol Index 2027 projected depth chart (unofficial). Projection: 2026 chart minus 5th-year players and High NFL draft risks, plus 2027 commits. Seniors are shown returning for their 5th year",
     "chart": {
     "Backfield": [
@@ -94,7 +94,7 @@ window.DEPTH.football = {
     ],
     "Secondary": [
       ["CB", ["Ty Redmond","Tim Merritt","Jamyan Theodore","Brandon Leavell"]],
-      ["CB", ["Kayin Lee","Tre Poteat III","Dylan Haley"]],
+      ["CB", ["Kayin Lee","Tre Poteat III","Preston Glasco"]],
       ["NICKEL", ["Qua Moss","Tevis Metcalf","Isaiah Hardge","Carter Jamison"]],
       ["S", ["TJ Metcalf","Joel Wyatt","Marcus Jones"]],
       ["S", ["Dejuan Lane","Edrees Farooq","Sidney Walton","Jaden Butler"]]

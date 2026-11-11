@@ -451,7 +451,13 @@
       <div class="tablewrap"><table><thead><tr>
         <th class="n"><button data-s="num">#</button></th><th><button data-s="name">Name</button></th><th>Pos</th>
         <th><button data-s="rating">Rating</button></th><th>Class</th><th class="hide-sm">Ht / Wt</th><th class="hide-sm">Hometown / Last school</th><th>2027</th>
-      </tr></thead><tbody id="rosterBody"></tbody></table></div>`;
+      </tr></thead><tbody id="rosterBody"></tbody></table></div>
+      ${injuryList()}`;
+  }
+  function injuryList() {
+    const I = F.injuries; if (!I || !I.rows || !I.rows.length) return '';
+    const known = new Set(F.players.map(p => p.name));
+    return `<div class="section"><h3>Season-ending injuries <small>${I.rows.length} players · as of ${esc(I.asOf)}</small></h3><div class="tablewrap"><table><thead><tr><th>Player</th><th>Pos</th><th>Class</th><th>Injured</th><th class="hide-sm">Notes</th></tr></thead><tbody>${I.rows.map(r => `<tr${known.has(r.name) ? ` class="click" data-player="${esc(r.name)}" tabindex="0"` : ''}><td><b>${esc(r.name)}</b> <span class="chip leave">Out</span></td><td>${esc(r.pos)}</td><td>${esc(r.cls)}</td><td>${esc(r.when)}</td><td class="hide-sm">${esc(r.note)}</td></tr>`).join('')}</tbody></table></div>${I.source ? `<p class="dim small">Source: <a href="${esc(I.source)}" target="_blank" rel="noopener">Rocky Top Insider</a>. Ethan Davis's injury per Vols Wire.</p>` : ''}</div>`;
   }
   function status27(p) {
     if (p.leaving) return '<span class="chip leave">Out of eligibility</span>';
