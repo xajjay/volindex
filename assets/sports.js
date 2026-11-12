@@ -516,7 +516,7 @@
   }
 
   /* ---------- men's basketball advanced stats (data/mbb-cbbd.js, from CollegeBasketballData.com) ---------- */
-  function cbbdSection() {
+  function cbbdSectionInner() {
     const C = window.SITE_CBBD; if (!C || !C.players || !C.players.length) return '';
     const f = (v, d = 1) => v == null ? '—' : (+v).toFixed(d);
     const T = C.team || {}, us = T.us || {}, op = T.opp || {};
@@ -546,7 +546,7 @@
   }
 
   /* ---------- women's basketball box-score analytics (data/wbb-analytics.js, built from SportsDataverse/wehoop box scores) ---------- */
-  function wbbBoxSection() {
+  function wbbBoxSectionInner() {
     const C = window.SITE_WBBBOX; if (!C || !C.players || !C.players.length) return '';
     const f = (v, d = 1) => v == null ? '—' : (+v).toFixed(d);
     const T = C.team || {}, us = T.us || {}, op = T.opp || {};
@@ -612,6 +612,10 @@
       });
     });
   }
+
+  // If the optional advanced-stats data is ever malformed, hide that section instead of breaking the whole tab.
+  function cbbdSection() { try { return cbbdSectionInner(); } catch (e) { return ''; } }
+  function wbbBoxSection() { try { return wbbBoxSectionInner(); } catch (e) { return ''; } }
 
   /* ---------- recruiting ---------- */
   function recruiting(D) {
