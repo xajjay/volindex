@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-11. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-12. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-11",
+ "updated": "2026-11-12",
  "team": {
   "record": "7-2",
   "sec": "4-2",
