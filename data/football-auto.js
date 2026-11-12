@@ -1369,7 +1369,7 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Rushing yards",
-     "rank": 10
+     "rank": 11
     }
    ]
   }
@@ -1665,7 +1665,7 @@ window.SITE_AUTO.football = {
     "Yards per play",
     "Total offense",
     5.8,
-    70,
+    69,
     10,
     false
    ],
@@ -1683,7 +1683,7 @@ window.SITE_AUTO.football = {
     "Completion %",
     "Passing",
     64.4,
-    55,
+    54,
     10,
     false
    ],
@@ -1710,7 +1710,7 @@ window.SITE_AUTO.football = {
     "Interceptions thrown",
     "Passing",
     4.0,
-    26,
+    25,
     3,
     true
    ],
@@ -1719,7 +1719,7 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     21.0,
-    95,
+    93,
     10,
     true
    ],
@@ -1755,7 +1755,7 @@ window.SITE_AUTO.football = {
     "Receptions per game",
     "Receiving",
     15.9,
-    110,
+    109,
     16,
     false
    ],
@@ -1773,7 +1773,7 @@ window.SITE_AUTO.football = {
     "First downs per game",
     "Downs",
     21.4,
-    44,
+    43,
     5,
     false
    ],
@@ -1782,7 +1782,7 @@ window.SITE_AUTO.football = {
     "3rd down conversion %",
     "Downs",
     37.5,
-    91,
+    92,
     15,
     false
    ],
@@ -1809,7 +1809,7 @@ window.SITE_AUTO.football = {
     "Time of possession per game (min)",
     "Downs",
     30.6,
-    52,
+    53,
     8,
     false
    ],
@@ -1854,7 +1854,7 @@ window.SITE_AUTO.football = {
     "Opponent 3rd down %",
     "Yards allowed",
     33.1,
-    27,
+    28,
     5,
     true
    ],
@@ -1944,7 +1944,7 @@ window.SITE_AUTO.football = {
     "Kick return average",
     "Returning",
     16.2,
-    124,
+    123,
     14,
     false
    ],
