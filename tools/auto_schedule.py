@@ -219,6 +219,10 @@ def main():
     except Exception as e:
         print(f"!! 2027 class failed: {e}")
     try:
+        import update_sched26; update_sched26.main()   # Start Today: the real 2026 schedule and final scores for every team
+    except Exception as e:
+        print(f"!! 2026 schedule failed: {e}")
+    try:
         import transfer_stats; transfer_stats.main()
     except Exception as e:
         print(f"!! transfer stats failed: {e}")

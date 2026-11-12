@@ -18,7 +18,7 @@
     if (loaded[src]) return loaded[src];
     return (loaded[src] = new Promise((res, rej) => { const s = document.createElement('script'); s.src = src + '?v=' + (root.VI_BUILD || '1'); s.onload = res; s.onerror = () => { delete loaded[src]; rej(new Error('Could not load ' + src)); }; document.head.appendChild(s); }));
   }
-  DY.loadHist = year => year >= 2026 ? Promise.all([script('data/hist/fb-2026.js').catch(() => null), script('data/hist/fb-classes.js').catch(() => null), script('data/hist/fb-class27.js').catch(() => null)]) : Promise.all([script('data/hist/fb-sched.js'), script('data/hist/fb-classes.js'), script('data/hist/fb-tnclasses.js').catch(() => null), year ? script('data/hist/fb-' + year + '.js') : null]);
+  DY.loadHist = year => year >= 2026 ? Promise.all([script('data/hist/fb-2026.js').catch(() => null), script('data/hist/fb-classes.js').catch(() => null), script('data/hist/fb-class27.js').catch(() => null), script('data/hist/fb-sched26.js').catch(() => null)]) : Promise.all([script('data/hist/fb-sched.js'), script('data/hist/fb-classes.js'), script('data/hist/fb-tnclasses.js').catch(() => null), year ? script('data/hist/fb-' + year + '.js') : null]);
   // a saved historical dynasty: the schedules and classes must be loaded before it runs
   DY.histReady = g => g && g.hx ? DY.loadHist(null).then(() => { DY.applyEra(g); try { DY.dedupePool(g); } catch (e) { } try { DY.lcMigrate(g); } catch (e) { } try { DY.jetBackfill(g); } catch (e) { } try { DY.fixHistSched(g); } catch (e) { } try { if (g.sched && g.sched.length && g.sched.every(x => !x.res && !x.real)) DY.balanceHome(g.sched); } catch (e) { } return g; }) : Promise.resolve(g);   // (a saved generated slate that has not started gets the home/away fix too)
 
@@ -84,7 +84,7 @@
   const hash = s => { let h = 7; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
   function fcsId(name) {
     const n = name.slice(2), f = DY.FCS.find(x => x.name === n);
-    return (f || DY.FCS[hash(n) % DY.FCS.length]).id;
+    return (f || DY.FCS[hash(n) % DY.FCS_N]).id;
   }
   // Tennessee's real non-conference slate for a historical season, as editable picks (weeks counted from the opener)
   DY.histUtNonconf = season => {
@@ -197,7 +197,7 @@
     g.teams.filter(t => !t.dorm).forEach(t => {
       for (let w = Math.max(0, from || 0) || 1; w <= DY.LAST_WK && (cnt[t.id] || 0) < want; w++) {
         if (busy[t.id + '|' + w]) continue;
-        const f = DY.FCS[(hash(t.name + season) + w) % DY.FCS.length];
+        const f = DY.FCS[(hash(t.name + season) + w) % DY.FCS_N];
         games.push({ id: season + '-' + games.length + (from ? 'f' : ''), wk: w, h: t.id, a: f.id, conf: false, neutral: false, tag: null, res: null });
         busy[t.id + '|' + w] = 1; cnt[t.id] = (cnt[t.id] || 0) + 1;
       }

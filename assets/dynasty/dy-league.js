@@ -113,8 +113,33 @@
     2026: [['Furman', 'H', '2026-09-05'], ['Georgia Tech', 'A', '2026-09-12'], ['Kennesaw State', 'H', '2026-09-19']],
     2027: [['Georgia Tech', 'H', '2027-08-28'], ['Tennessee State', 'H', '2027-09-04'], ['Western Michigan', 'H', '2027-09-18']],
   };
+  // the real 2026 slate (ESPN): every FBS team's real opponents, dates and, for games already played, the real final score
+  DY.real26 = season => {
+    const R = root.DY_REAL26; if (season !== 2026 || !R || !R.rows || !R.rows.length) return null;
+    const al = R.alias || {}, miss = [];
+    const id = n => { const t = DY.byName(al[n] || n); if (!t) miss.push(n); return t ? t.id : null; };
+    const mon = DY.firstSat(season).getTime() - 4 * 864e5, last = DY.LAST_WK || 13;
+    const rows = R.rows.map(r => ({ d: r[0], h: id(r[1]), a: id(r[2]), n: !!r[3], c: !!r[4], s: r.length > 6 ? [r[5], r[6]] : null }))
+      .filter(r => r.h != null && r.a != null && r.h !== r.a).sort((x, y) => x.d < y.d ? -1 : x.d > y.d ? 1 : 0);
+    const busy = {}, games = [], dropped = [];
+    rows.forEach(r => {
+      let w = Math.max(0, Math.floor((Date.parse(season + '-' + r.d + 'T12:00:00Z') - mon) / (7 * 864e5)) + 1);
+      if (w > last) { dropped.push(r); return; }                                    // (Army-Navy on the second Saturday of December is after the regular season)
+      const free = k => k >= 0 && k <= last && !(r.h < 1000 && busy[r.h + '|' + k]) && !(r.a < 1000 && busy[r.a + '|' + k]);
+      if (!free(w)) { let k = 1; while (k <= last && !free(w + k) && !free(w - k)) k++; w = free(w + k) ? w + k : free(w - k) ? w - k : -1; }
+      if (w < 0) { dropped.push(r); return; }
+      if (r.h < 1000) busy[r.h + '|' + w] = 1; if (r.a < 1000) busy[r.a + '|' + w] = 1;
+      const hn = DY.T(r.h).name, an = DY.T(r.a).name, ut = [hn, an].includes('Tennessee');
+      const tag = ut && [hn, an].includes('Alabama') ? 'Third Saturday in October' : ut && [hn, an].includes('Vanderbilt') ? 'Rivalry Week' : null;
+      games.push({ id: season + '-' + games.length, wk: w, h: r.h, a: r.a, conf: r.c, neutral: r.n, tag, res: null, rr: r.s });
+    });
+    games.sort((x, y) => x.wk - y.wk);
+    DY.real26Info = { miss: Array.from(new Set(miss)), dropped: dropped.length, games: games.length };
+    return games;
+  };
   DY.buildSchedule = season => {
     const hs = DY.histSchedule && DY.histSchedule(season); if (hs) return hs;     // a historical season: the real slate
+    const r26 = DY.real26(season); if (r26) { G().sched = r26; return r26; }       // 2026: the real slate, every team
     const g = G(), UT = DY.UT_ID;
     const games = [];
     const add = (wk, h, a, conf, neutral, tag) => { games.push({ id: season + '-' + games.length, wk, h, a, conf: !!conf, neutral: !!neutral, tag: tag || null, res: null }); };
@@ -233,7 +258,7 @@
     fbs.forEach(a => {
       for (let w = 1; w <= DY.LAST_WK && count[a] < 12; w++) {
         if (isBusy(a, w)) continue;
-        const f = wpick(DY.FCS, f => DY.T(a).st === f.st ? 4 : 1);
+        const f = wpick(DY.FCS.slice(0, DY.FCS_N), f => DY.T(a).st === f.st ? 4 : 1);
         add(w, a, f.id, false); mark(a, w); count[a]++;
       }
     });
@@ -247,7 +272,7 @@
     const p4 = G().teams.filter(t => t.id !== ut.id && t.conf !== ut.conf && (DY.P4.includes(t.conf) || t.abbr === 'ND') && !(ut.id === DY.UT_ID && t.conf === 'SEC'));
     const g6 = G().teams.filter(t => t.id !== ut.id && t.conf !== ut.conf && !DY.P4.includes(t.conf) && t.conf !== 'IND' && t.abbr !== 'ND');
     const near = new Set([ut.st, ...((DY.NEAR && DY.NEAR[ut.st]) || [])]);
-    const fcsAll = DY.FCS.filter(f => near.has(f.st)), fcs = fcsAll.length ? fcsAll : DY.FCS;
+    const fcsBase = DY.FCS.slice(0, DY.FCS_N), fcsAll = fcsBase.filter(f => near.has(f.st)), fcs = fcsAll.length ? fcsAll : fcsBase;
     const a = wpick(p4, t => near.has(t.st) ? 3 : 1), b = wpick(g6, t => t.st === ut.st || t.prestige > 60 ? 3 : 1), c = pick(fcs);
     const wks = [1, 2, pick([3, 3, 4, 5])];
     return shuffle([{ o: a.id, home: isP4 ? season % 2 === 0 : false }, { o: b.id, home: true }, { o: c.id, home: true }]).map((x, i) => Object.assign(x, { wk: wks[i] }));
@@ -373,6 +398,36 @@
   }
   DY.canStartToday = () => { const F = root.SITE_AUTO && root.SITE_AUTO.football; return !!(root.DY_TODAY && F && (F.schedule || []).some(x => x.result)); };
   // real-life season-ending injuries, applied to Start Today dynasties when injuries are on
+  // game logs for the user's school from real season totals: the totals are real, the split across the real games is an estimate (flagged est)
+  DY.deriveLogs = (t, done) => {
+    const g = G(), hsh = str => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } h ^= h >>> 16; h = Math.imul(h, 2246822507); h ^= h >>> 13; h = Math.imul(h, 3266489909); h ^= h >>> 16; return h >>> 0; };
+    const mine = done.filter(x => x.h === t.id || x.a === t.id).sort((a, b) => a.wk - b.wk);
+    const SKIP = { gp: 1, sn: 1, rlg: 1, rclg: 1, fglg: 1, t: 1 };
+    const cap = { pc: 'pa', fgm: 'fga', xpm: 'xpa' };
+    t.roster.map(DY.P).forEach(p => {
+      p.gl = (p.gl || []).filter(x => x.y !== g.season);
+      const s = p.s; if (!s || !(s.gp > 0) || !mine.length) return;
+      const gp = Math.min(s.gp, mine.length);
+      let play = mine.map((x, i) => ({ x, i, k: hsh(p.n + '|' + x.wk) })).sort((a, b) => a.k - b.k).slice(0, gp).sort((a, b) => a.i - b.i);
+      const wt = play.map(q => 0.45 + (hsh(p.n + '#' + q.x.wk) % 1000) / 1000 * 1.1);
+      const lines = play.map(() => ({}));
+      const alloc = (key, capKey) => {
+        const tot = s[key] | 0; if (!tot) return;
+        const sum = wt.reduce((a, b) => a + b, 0), raw = wt.map(w => tot * w / sum), got = raw.map(Math.floor);
+        let rem = tot - got.reduce((a, b) => a + b, 0);
+        raw.map((v, i) => [v - got[i], i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (rem > 0) { got[i]++; rem--; } });
+        if (capKey) for (let i = 0; i < got.length; i++) { const c = lines[i][capKey] || 0; while (got[i] > c) { const j = got.findIndex((v, jj) => jj !== i && v < (lines[jj][capKey] || 0)); if (j < 0) break; got[i]--; got[j]++; } }
+        got.forEach((v, i) => { if (v) lines[i][key] = v; });
+      };
+      const keys = Object.keys(s).filter(k => !SKIP[k] && typeof s[k] === 'number');
+      keys.filter(k => !cap[k]).forEach(k => alloc(k, null));
+      Object.keys(cap).forEach(k => alloc(k, cap[k]));
+      play.forEach((q, i) => {
+        const x = q.x, home = x.h === t.id, o = DY.T(home ? x.a : x.h), won = home ? x.res.h > x.res.a : x.res.a > x.res.h;
+        p.gl.push({ y: g.season, w: x.wk, o: o ? o.abbr : '?', h: home, l: lines[i], r: won ? 'W' : 'L', sc: (home ? x.res.h : x.res.a) + '-' + (home ? x.res.a : x.res.h), real: true, est: true });
+      });
+    });
+  };
   DY.TODAY_OUT = [['Tyree Weathersby', 'left knee'], ['Wendell Moe Jr.', 'lower leg'], ['Dylan Lewis', 'foot'], ['Edrees Farooq', 'knee'], ['Ethan Davis', 'knee'], ['Joakim Dodson', 'leg'], ['Jaedon Harmon', 'knee'], ['Jadais Richard', 'upper body']];
   DY.startToday = () => {
     const g = G(), TD = root.DY_TODAY, F = root.SITE_AUTO && root.SITE_AUTO.football;
@@ -402,14 +457,26 @@
       }
       DY.finishWeek();
     }
+    // the real 2026 results: every game already played takes its real final score
+    const R26 = g.sched.some(x => x.rr);
+    if (R26) g.sched.forEach(x => { if (x.rr && x.res && x.wk <= lastWk && !x.post) { x.res = { h: x.rr[0], a: x.rr[1], ot: 0 }; x.real = true; x.box = null; } });
     // match every team's record to the real one: flip simulated CPU results where it helps, then set the records
     const done = g.sched.filter(x => x.res && x.wk <= lastWk && !x.post);
+    if (R26) {
+      // records come straight from the real results (the schedule is the real one now)
+      g.teams.forEach(t => {
+        let w = 0, l = 0, cw = 0, cl = 0, pf = 0, pa = 0;
+        done.forEach(x => { if (x.h !== t.id && x.a !== t.id) return; const home = x.h === t.id, won = home ? x.res.h > x.res.a : x.res.a > x.res.h; won ? w++ : l++; if (x.conf) won ? cw++ : cl++; pf += home ? x.res.h : x.res.a; pa += home ? x.res.a : x.res.h; });
+        t.elo += (w - t.w) * 28;                       // strength follows the real season: a team that really won more than we simulated gets stronger
+        Object.assign(t, { w, l, cw, cl, pf, pa });
+      });
+    }
     // the standings are only used if they cover every week that was just played; stale standings would stamp old records over newer results
-    const stale = DY.weekOfDate(g.season, TD.asOf) < lastWk;
+    const stale = R26 || DY.weekOfDate(g.season, TD.asOf) < lastWk;
     const tgt = {}, cur = {};
     g.teams.forEach(t => { const r = stale ? null : TD.rec[t.name]; if (!r) return; const [o, c] = r.split('|'); const [w, l] = o.split('-').map(Number), [cw, cl] = c.split('-').map(Number); tgt[t.id] = { w, l, cw, cl }; cur[t.id] = 0; sim0[t.id] = t.w; });
     done.forEach(x => { const w = x.res.h > x.res.a ? x.h : x.a; if (cur[w] != null) cur[w]++; });
-    for (let pass = 0; pass < 40; pass++) {
+    for (let pass = 0; pass < 40 && !R26; pass++) {
       DY.shuffle(done.slice()).forEach(x => {
         if (x.real || x.h === ut.id || x.a === ut.id) return;
         const w = x.res.h > x.res.a ? x.h : x.a, l = w === x.h ? x.a : x.h;
@@ -417,7 +484,7 @@
         if (ew > 0 && el < 0) { x.res = { h: x.res.a, a: x.res.h, ot: x.res.ot }; cur[w]--; cur[l]++; if (x.box) x.box = null; }
       });
     }
-    g.teams.forEach(t => {
+    if (!R26) g.teams.forEach(t => {
       const r = tgt[t.id]; if (!r) return;
       // strength follows the real season: a team that really won more than we simulated gets stronger
       t.elo += (r.w - sim0[t.id]) * 28;
@@ -427,7 +494,7 @@
       if (sw !== r.w || sw + sl !== r.w + r.l) { t.w = sw; t.l = sl; t.cw = Math.min(r.cw, sw); t.cl = Math.min(r.cl, sl); }
       t.pf = 0; t.pa = 0;
     });
-    done.forEach(x => { const H = DY.T(x.h), A = DY.T(x.a); if (H && H.pf != null) { H.pf += x.res.h; H.pa += x.res.a; } if (A && A.pf != null) { A.pf += x.res.a; A.pa += x.res.h; } });
+    if (!R26) done.forEach(x => { const H = DY.T(x.h), A = DY.T(x.a); if (H && H.pf != null) { H.pf += x.res.h; H.pa += x.res.a; } if (A && A.pf != null) { A.pf += x.res.a; A.pa += x.res.h; } });
     // the real AP poll
     const ap = (F.team && F.team.apTop25) || [];
     if (ap.length) {
@@ -456,6 +523,7 @@
       const nk = s0 => String(s0 || '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z]/g, '');
       g.teams.forEach(t => { if (t.id === ut.id) return; const T0 = RS[t.name]; if (!T0) return; t.roster.map(DY.P).forEach(p => { const st = T0[nk(p.n)]; p.s = st ? Object.assign({}, st) : null; }); });
     }
+    if (R26 && me.id !== ut.id) DY.deriveLogs(me, done);
     // Tennessee players who are out for the year in real life (injuries setting on)
     const out = [];
     if (g.settings.injuries !== false) {

@@ -180,7 +180,76 @@ Southeastern Louisiana|SELA|34|#006341|#EEB111|LA
 Nicholls|NICH|30|#C41230|#A2AAAD|LA
 UC Davis|UCD|40|#022851|#FFBF00|CA
 Idaho|IDHO|40|#B3A369|#000000|ID
-Sacramento State|SAC|42|#043927|#C4B581|CA`;
+Sacramento State|SAC|42|#043927|#C4B581|CA
+Alabama State|ALST|26|#C99700|#000000|AL
+Alcorn State|ALCN|24|#4F2D7F|#C99700|MS
+Arkansas-Pine Bluff|UAPB|22|#000000|#C99700|AR
+Bethune-Cookman|BCU|22|#7B2D26|#C99700|FL
+Bryant|BRY|28|#000000|#C99700|RI
+Bucknell|BUCK|26|#003865|#E87722|PA
+Cal Poly|CPOL|28|#154734|#C99700|CA
+Campbell|CAMP|30|#F47321|#000000|NC
+Central Arkansas|UCA|32|#4F2D7F|#808080|AR
+Central Connecticut|CCSU|24|#003DA5|#FFFFFF|CT
+Charleston Southern|CHSO|26|#003DA5|#C99700|SC
+Colgate|COLG|28|#821019|#FFFFFF|NY
+Delaware State|DSU|20|#C8102E|#003DA5|DE
+Duquesne|DUQ|26|#003DA5|#C8102E|PA
+East Texas A&M|ETAM|26|#003DA5|#C99700|TX
+Eastern Illinois|EIU|28|#003DA5|#808080|IL
+Eastern Washington|EWU|34|#C8102E|#000000|WA
+Elon|ELON|30|#7B1F2E|#C99700|NC
+Fordham|FORD|28|#7B1F2E|#FFFFFF|NY
+Gardner-Webb|GWEB|24|#C8102E|#000000|NC
+Grambling|GRAM|26|#000000|#C99700|LA
+Hampton|HAMP|24|#003DA5|#FFFFFF|VA
+Holy Cross|HC|28|#4F2D7F|#FFFFFF|MA
+Houston Christian|HCU|22|#003DA5|#F47321|TX
+Howard|HOW|26|#003A63|#C8102E|DC
+Idaho State|IDST|26|#F47321|#000000|ID
+Illinois State|ILST|32|#C8102E|#FFFFFF|IL
+Indiana State|INST|26|#003DA5|#FFFFFF|IN
+Lafayette|LAF|26|#7B1F2E|#FFFFFF|PA
+Lamar|LAM|24|#C8102E|#FFFFFF|TX
+Lindenwood|LIN|18|#000000|#C99700|MO
+Long Island University|LIU|22|#003DA5|#C99700|NY
+Maine|ME|28|#003DA5|#8BB8E8|ME
+Mercyhurst|MERC|16|#003DA5|#00843D|PA
+Merrimack|MRMK|22|#003DA5|#C99700|MA
+Mississippi Valley State|MVSU|18|#00843D|#FFFFFF|MS
+Monmouth|MONM|24|#003DA5|#FFFFFF|NJ
+Morgan State|MORG|22|#003DA5|#F47321|MD
+Murray State|MURR|26|#002D62|#C99700|KY
+New Hampshire|UNH|30|#003DA5|#FFFFFF|NH
+Norfolk State|NORF|22|#00843D|#C99700|VA
+North Carolina A&T|NCAT|30|#003DA5|#C99700|NC
+North Carolina Central|NCCU|22|#7B1F2E|#808080|NC
+North Dakota|UND|28|#00843D|#FFFFFF|ND
+Northern Arizona|NAU|28|#003DA5|#C99700|AZ
+Northern Colorado|UNCO|26|#003DA5|#C99700|CO
+Northwestern State|NWST|24|#4F2D7F|#F47321|LA
+Portland State|PSU|24|#00843D|#FFFFFF|OR
+Prairie View A&M|PVAM|22|#4F2D7F|#C99700|TX
+Rhode Island|URI|28|#003DA5|#8BB8E8|RI
+Robert Morris|RMU|24|#003DA5|#C8102E|PA
+Sacred Heart|SHU|24|#C8102E|#FFFFFF|CT
+South Dakota|SDAK|32|#C8102E|#FFFFFF|SD
+Southeast Missouri State|SEMO|26|#C8102E|#000000|MO
+Southern|SOU|24|#003DA5|#C99700|LA
+Southern Utah|SUU|28|#C8102E|#FFFFFF|UT
+Stonehill|STNH|16|#4F2D7F|#FFFFFF|MA
+Stony Brook|STBK|28|#C8102E|#808080|NY
+Tarleton State|TARL|30|#4F2D7F|#FFFFFF|TX
+Texas Southern|TXSO|22|#7B1F2E|#808080|TX
+Towson|TOW|30|#C99700|#000000|MD
+UAlbany|ALB|26|#4F2D7F|#C99700|NY
+UT Rio Grande Valley|UTRG|20|#F47321|#003DA5|TX
+Utah Tech|UTU|26|#C8102E|#003DA5|UT
+VMI|VMI|22|#C8102E|#C99700|VA
+Wagner|WAG|24|#00843D|#FFFFFF|NY
+Weber State|WEB|32|#4F2D7F|#FFFFFF|UT
+West Georgia|UWG|24|#003DA5|#C8102E|GA
+Western Illinois|WIU|26|#4F2D7F|#C99700|IL`;
 
   const CONF_NAME = { SEC: 'SEC', B1G: 'Big Ten', B12: 'Big 12', ACC: 'ACC', IND: 'Independent', P12: 'Pac-12', MWC: 'Mountain West', AAC: 'American', SBC: 'Sun Belt', MAC: 'MAC', CUSA: 'Conference USA', FCS: 'FCS' };
   const P4 = ['SEC', 'B1G', 'B12', 'ACC'];
@@ -194,6 +263,7 @@ Sacramento State|SAC|42|#043927|#C4B581|CA`;
     const [name, abbr, pr, c1, c2, st] = l.split('|');
     return { id: 1000 + i, name, abbr, conf: 'FCS', prestige: +pr, c1, c2, cap: 15, st, fbs: false };
   });
+  DY.FCS_N = 35;      // the original FCS list; the rest (real 2026 opponents) are only picked by the real 2026 slate
   DY.CONF_NAME = CONF_NAME; DY.P4 = P4; DY.CONF_GAMES = CONF_GAMES;
   DY.NEAR = { AL: ['GA', 'FL', 'MS', 'TN'], AK: ['WA'], AZ: ['NM', 'NV', 'UT', 'CA', 'CO'], AR: ['MO', 'TN', 'MS', 'LA', 'TX', 'OK'], CA: ['NV', 'OR', 'AZ'], CO: ['WY', 'UT', 'NM', 'KS', 'NE'], CT: ['MA', 'NY', 'RI'], DE: ['MD', 'PA', 'NJ'], FL: ['GA', 'AL'],
     GA: ['FL', 'AL', 'SC', 'NC', 'TN'], HI: ['CA'], ID: ['UT', 'WA', 'OR', 'MT', 'NV'], IL: ['IN', 'WI', 'IA', 'MO', 'KY'], IN: ['IL', 'OH', 'MI', 'KY'], IA: ['IL', 'MN', 'NE', 'MO', 'SD', 'WI'], KS: ['MO', 'NE', 'OK', 'CO'], KY: ['TN', 'OH', 'IN', 'WV', 'VA', 'IL', 'MO'],
