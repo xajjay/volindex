@@ -150,12 +150,43 @@
     const obs = t[k][1] / (t[k][0] + t[k][1]);
     return 0.45 * prior + 0.55 * obs;
   }
+  /* ---------- the staff's read: the scouting report, and what today's game is saying ---------- */
+  // how an offense matches up with the defense across from it, in rating points (positive = the offense has the edge). Refreshed each quarter.
+  function scout(GM, s) {
+    GM.scout = GM.scout || {};
+    if (GM.scout[s] && GM.scout[s].q === GM.q) return GM.scout[s];
+    const O = pers(GM, s), D = pers(GM, other(s)), a = (p, k) => (p && p.at && p.at[k]) || 62, ov = p => (p && p.ovr) || 65;
+    const olR = avg(O.OL.map(p => a(p, 'rbk'))), olP = avg(O.OL.map(p => a(p, 'pbk')));
+    const front = avg(D.DL.map(p => a(p, 'bsh') * 0.6 + a(p, 'tak') * 0.4)), lb = avg(D.LB.map(p => a(p, 'tak') * 0.5 + a(p, 'prc') * 0.5));
+    const rushers = avg(D.DL.map(p => Math.max(a(p, 'pmv'), a(p, 'fmv'))));
+    const wr = avg(O.WR.map(ov)), db = avg([D.CB[0], D.CB[1], D.NB, D.S[0], D.S[1]].filter(Boolean).map(ov));
+    const qb = O.QB ? (a(O.QB, 'sac') + a(O.QB, 'mac') + a(O.QB, 'awr')) / 3 : 60;
+    const side = {       // each side of the line against the men lined up across from it
+      L: avg([a(O.OL[0], 'rbk'), a(O.OL[1], 'rbk')]) - avg([a(D.DL[3], 'bsh'), a(D.DL[2], 'bsh')]),
+      M: avg([a(O.OL[1], 'rbk'), a(O.OL[2], 'rbk'), a(O.OL[3], 'rbk')]) - avg([a(D.DL[1], 'bsh'), a(D.DL[2], 'bsh')]),
+      R: avg([a(O.OL[3], 'rbk'), a(O.OL[4], 'rbk'), O.TE ? a(O.TE, 'rbk') : 55]) - avg([a(D.DL[1], 'bsh'), a(D.DL[0], 'bsh')]) };
+    const top = O.WR.filter(Boolean).slice().sort((x, y) => y.ovr - x.ovr)[0];
+    return GM.scout[s] = { q: GM.q, run: (olR * 0.6 + ov(O.RB) * 0.4) - (front * 0.6 + lb * 0.4), pass: (olP * 0.25 + qb * 0.4 + wr * 0.35) - (rushers * 0.3 + db * 0.7), pro: olP - rushers, side,
+      star: top && top.ovr >= 88 ? top : null, mobile: !!(O.QB && a(O.QB, 'spd') >= 82), deepSpd: Math.max(...O.WR.filter(Boolean).map(p => a(p, 'spd'))) - avg([D.CB[0], D.CB[1], D.S[0]].filter(Boolean).map(p => a(p, 'spd'))) };
+  }
+  // what has worked so far today, once there is enough to go on
+  function today(GM, s) {
+    const T = GM.ts[s], drop = T.pa + T.sk, L = GM.L[s], qb = L && L.QB && L.QB[0], ql = qb && GM.ps[qb.id];
+    let hot = null;      // a receiver who is having a day: 80 yards and five catches, or 110 yards
+    for (const id in GM.ps) { const l = GM.ps[id]; if (l.t === GM.T[s].id && (l.rcy || 0) >= 80 && ((l.rc || 0) >= 5 || l.rcy >= 110) && (!hot || l.rcy > hot.rcy)) hot = { id: +id, rcy: l.rcy }; }
+    return { ypc: T.ra >= 8 ? T.ry / T.ra : null, nypa: drop >= 10 ? T.py / drop : null, sackRate: drop >= 10 ? T.sk / drop : null, ints: (ql && ql.pi) || 0, hot };
+  }
+  DY.scout = scout; DY.today = today;
   DY.aiDef = (GM, defSide) => {
     const offSide = other(defSide), lead = GM.score[defSide] - GM.score[offSide];
     if ((GM.q === 4 || GM.q === 2) && GM.clock <= 40 && lead > 0 && lead <= 8 + (GM.q === 2 ? 99 : 0) && GM.ball < 60) return { d: 'prev', lean: 'M' };
     if (GM.q === 4 && GM.clock <= 12 && lead > 0 && lead <= 8 && GM.ball < 80) return { d: 'prev', lean: 'M' };     // last snap: protect the end zone
     if (GM.q === 4 && GM.clock <= 75 && lead >= 4 && lead <= 8) return { d: chance(0.6) ? 'prev' : 'c4', lean: 'M' };
     let pp = predPass(GM, offSide);
+    // what the offense has done today moves the guess: a run game that is rolling pulls the defense up, one that is stuffed frees it to play the pass
+    const sc = scout(GM, offSide), td = today(GM, offSide);
+    if (td.ypc != null) pp += td.ypc >= 5.6 ? -0.08 : td.ypc <= 3.1 ? 0.05 : 0;
+    if (td.nypa != null && td.nypa >= 9 && !(td.ypc >= 5.6)) pp += 0.05;
     // read the offense's habits (repeat calls get sniffed out)
     const lc = GM.lastCall[offSide];
     const repeat = lc.length >= 2 && lc[lc.length - 1] === lc[lc.length - 2];
@@ -167,12 +198,23 @@
     if (GM.ball >= 90) opts.push(['c0', 0.6], ['bear', 0.6], ['gl', GM.ball >= 96 ? 1.6 : 0.4]);
     if (pp > 0.55) opts.push(['zb', 0.45 * aggr * 2], ['ncb', 0.3 * aggr * 2], ['c2m', 0.6]);
     else opts.push(['sfb', 0.25 * aggr * 2]);
+    // adjustments a staff makes between series: back off when the quarterback is carving up pressure, keep coming when the rush is getting home,
+    // play more zone against a quarterback who runs (man coverage turns its back on him), two-high against real deep speed
+    const mul = (keys, k) => opts.forEach(o => { if (keys.includes(o[0])) o[1] *= k; });
+    const BLITZ = ['c0', 'c1f', 'zb', 'ncb', 'sfb', 'bear'], TWO = ['c2', 't2', 'c4', 'c6', 'c2m'], MAN = ['c0', 'c1', 'c1f', 'c2m', 'ncb', 'sfb'];
+    if (td.sackRate != null) { if (td.sackRate >= 0.11) mul(BLITZ, 1.3); else if (td.sackRate <= 0.03 && td.nypa >= 8.5) { mul(BLITZ, 0.65); mul(TWO, 1.3); } }
+    if (sc.pro <= -5 && GM.down >= 3 && GM.togo >= 6) mul(BLITZ, 1.35);          // a line that can't protect gets tested on third and long
+    if (sc.mobile) mul(MAN, 0.75);
+    if (sc.deepSpd >= 4 && pp > 0.5) mul(TWO, 1.25);
     const d = wpick(opts, x => x[1])[0];
+    // bracket the man who is beating them: today's hot receiver, or a star on the money downs
+    const star = td.hot ? td.hot.id : sc.star && ((GM.down >= 3 && GM.togo >= 5) || GM.ball >= 80) && chance(0.45) ? sc.star.id : null;
+    const brk = star != null && d !== 'c0' && d !== 'bear' && d !== 'gl' && chance(td.hot ? 0.6 : 1) ? star : null;
     const dirs = GM.tend[offSide].dir, tot = dirs.L + dirs.M + dirs.R;
     const lean = chance(0.55) ? wpick(['L', 'M', 'R'], x => dirs[x] / tot) : pick(['L', 'M', 'R']);
     // personnel: goal line inside the 3, dime on obvious passing downs
     const pkg = d === 'gl' || (GM.ball >= 97 && GM.togo <= 3) ? 'goal' : (GM.down >= 3 && GM.togo >= 9) || d === 'prev' || d === 'dman' ? 'dime' : null;
-    return { d, lean, pkg, read: repeat ? lc[lc.length - 1] : null };
+    return { d, lean, pkg, read: repeat ? lc[lc.length - 1] : null, brk };
   };
   // modifiers from the game plan and halftime adjustments for one side
   const NOMOD = {};
@@ -246,7 +288,7 @@
       if (dec !== 'go') return { k: dec };
     }
     // tempo
-    if ((GM.q === 4 && lead < 0 && GM.clock <= 420) || two && lead <= 7) out.tempo = 'hurry';
+    if ((GM.q === 4 && lead < 0 && GM.clock <= 420) || (GM.q === 4 && lead <= -9 && GM.clock <= 660) || two && lead <= 7) out.tempo = 'hurry';
     else if (GM.q === 4 && lead > 0 && GM.clock <= 600) out.tempo = 'chew';
     else if ((GM.q >= 3 && lead >= 24) || (GM.q === 4 && lead >= 17)) out.tempo = 'chew';     // a comfortable lead: run it and bleed the clock
     // run or pass
@@ -262,6 +304,16 @@
     if (two && lead <= 0) pp = Math.max(pp, 0.85);
     const qbv = P.QB ? (P.QB.at.sac + P.QB.at.mac + P.QB.at.awr) / 3 : 60, rbv = P.RB ? P.RB.ovr : 60;
     pp += clamp((qbv - rbv) / 80, -0.08, 0.08);
+    // call the game to the matchup, then to what is working: an offense leans on the side of the ball where it has the edge,
+    // rides a run game that is rolling, and stops throwing into a rush it can't block or after a couple of interceptions
+    const sc = scout(GM, s), td = today(GM, s), free = !(two && lead <= 0) && !(GM.q === 4 && lead < 0 && GM.clock <= 240) && GM.down <= 2;
+    if (free) {
+      pp += clamp((sc.pass - sc.run) / 70, -0.07, 0.07);
+      if (td.ypc != null && td.nypa != null) pp += clamp((td.nypa / 7 - td.ypc / 4.7) * 0.1, -0.07, 0.07);
+      else if (td.ypc != null) pp += td.ypc >= 5.8 ? -0.05 : td.ypc <= 2.8 ? 0.05 : 0;
+      if (td.ints >= 2) pp -= 0.05;
+      if (GM.ball <= 5) pp -= 0.14;                                   // backed up against the goal line: get room first
+    }
     const dt = GM.dtend[other(s)], dTot = Object.values(dt).reduce((a, b) => a + b, 0) || 1;
     const blitzy = ((dt.blitz || 0) + (dt.c0 || 0) + (dt.c1f || 0)) / dTot, boxy = ((dt.bear || 0) + (dt.c3b || 0)) / dTot;
     pp += boxy * 0.06;
@@ -281,6 +333,14 @@
       if (GM.ball >= 88) { w.deep = 0.08; w.screen = 0.04; w.pa += 0.05; }
       if (two) { w.screen = 0.03; w.pa = 0.03; w.med += 0.1; }
       if (lead > 14 && GM.q === 4) w.deep = 0.04;
+      // the matchup and the day shape what kind of pass: get the ball out against a rush that is winning, take shots with a speed edge
+      if (sc.pro <= -4 || (td.sackRate != null && td.sackRate >= 0.1)) { w.quick += 0.1; w.screen += 0.05; w.deep *= 0.6; }
+      if (sc.deepSpd >= 3 && GM.ball < 80) w.deep += 0.05;
+      if (td.ints >= 2) { w.deep *= 0.6; w.quick += 0.06; }
+      if (GM.ball <= 5) { w.screen = 0.01; w.deep *= 0.5; w.quick += 0.15; }
+      // free downs: second and short, or the first snap after a takeaway on their side of the field, is when a play-caller takes a shot
+      const shot = !two && GM.ball < 78 && ((GM.down === 2 && GM.togo <= 2) || (GM.drive && GM.drive.plays === 0 && (GM.drive.how === 'fumble' || GM.drive.how === 'interception') && GM.ball >= 45));
+      if (shot) { w.deep += 0.16; w.pa += 0.14; w.screen *= 0.4; }
       const t = wpick(Object.keys(w), k => w[k]);
       return Object.assign(out, { k: 'pass', t });
     }
@@ -288,7 +348,7 @@
     const t = wpick(['in', 'out', 'qb'], x => x === 'in' ? 0.56 : x === 'out' ? 0.30 : qbRun * (st === DY.STYLES.option ? 2.5 : 1) + (st === DY.STYLES.option ? 0.5 : 0));
     if (st === DY.STYLES.option) { const play = t === 'qb' ? pick(['Triple Option', 'Triple Option', 'Midline Option', 'Speed Option']) : t === 'in' ? pick(['Inside Zone', 'Trap', 'Counter']) : pick(['Rocket Toss', 'Toss Crack', 'Jet Sweep']); return Object.assign(out, { k: 'run', t, dir: pick(['L', 'R']), play }); }
     const ol = P.OL, side = { L: avg([ol[0].at.rbk, ol[1].at.rbk]), M: avg([ol[1].at.rbk, ol[2].at.rbk, ol[3].at.rbk]), R: avg([ol[3].at.rbk, ol[4].at.rbk, (P.TE ? P.TE.at.rbk : 50)]) };
-    let dir = wpick(['L', 'M', 'R'], d => Math.pow(1.08, side[d] - 70) * (t === 'out' && d === 'M' ? 0 : 1));
+    let dir = wpick(['L', 'M', 'R'], d => Math.pow(1.08, side[d] - 70) * Math.pow(1.05, clamp(sc.side[d], -12, 12)) * (t === 'out' && d === 'M' ? 0 : 1));     // run behind the best blockers, at the weakest part of their front
     if (GM.ball >= 97 && t !== 'out') dir = chance(0.5) ? 'M' : dir;
     return Object.assign(out, { k: 'run', t, dir });
   };
@@ -297,7 +357,7 @@
   DY.EP = b => clamp(-1.25 + b * 0.068 + Math.max(0, b - 80) * 0.035, -1.6, 6.3);
   DY.convProb = (GM, s, togo) => {
     const base = togo <= 10 ? [0, 0.73, 0.61, 0.54, 0.48, 0.43, 0.39, 0.35, 0.32, 0.29, 0.26][Math.max(1, togo)] : Math.max(0.1, 0.26 - (togo - 10) * 0.012);
-    const edge = (GM.ovr[s].off - GM.ovr[other(s)].def) * 0.008;
+    const td = togo <= 2 ? today(GM, s) : null, edge = (GM.ovr[s].off - GM.ovr[other(s)].def) * 0.008 + (td && td.ypc != null ? clamp((td.ypc - 4.6) * 0.02, -0.04, 0.04) : 0);     // short yardage: a run game that has moved people all day is a better bet
     return clamp(base + edge + (GM.ball >= 95 ? -0.04 : 0), 0.05, 0.9);
   };
   DY.fourthDown = (GM, s) => {
@@ -329,6 +389,7 @@
     if (GM.ot && GM.ot.n >= 3) return '2pt';
     if (GM.q === 4 && GM.clock <= 600 && [-2, -5, -10, -9, 1, 5, -16].includes(lead)) return '2pt';
     if (GM.q === 4 && GM.clock <= 120 && lead === -1) return chance(0.35) ? '2pt' : 'xp';
+    if (GM.q >= 3 && lead === -8 && chance(clamp((GM.aggr[s] - 0.4) * 1.2, 0.1, 0.6))) return '2pt';      // down 14, score: going for two now gives two chances to get the one conversion needed
     return 'xp';
   };
 
@@ -589,6 +650,8 @@
       // defense trying to get the ball back
       if (onD && GM.q === 4 && lead <= 0 && GM.clock <= 170 && GM.clock > 5) { if (callTO(side)) return; }
       if (onD && GM.q === 4 && lead < 0 && lead >= -16 && GM.clock <= 300 && GM.to[side] >= 2 && GM.down >= 2) { if (callTO(side)) return; }
+      // before the half: the offense is about to punt from its own end, so stop the clock and get the ball back with time to score
+      if (onD && GM.q === 2 && GM.clock <= 110 && GM.clock > 25 && GM.down >= 3 && GM.ball <= 45 && GM.to[side] >= 2) { if (callTO(side)) return; }
       // offense in a two-minute drill
       if (!onD && in2min(GM) && lead <= (GM.q === 2 ? 14 : 0) && GM.clock <= 75 && GM.ball >= 35 && GM.clock > 3) { if (callTO(side)) return; }
       if (!onD && GM.q === 2 && GM.clock <= 30 && GM.ball >= 55 && GM.clock > 2) { if (callTO(side)) return; }
@@ -679,7 +742,7 @@
     if (GM.live && DY.SIM && (call.k === 'run' || call.k === 'pass' || call.k === 'rpo')) {
       let pm0 = pl.beats.includes(dc.d) ? 1 : pl.weak.includes(dc.d) ? -1 : 0;
       if (pl.counter && dc.lean && dc.lean === call.dir) pm0 = 1.2;
-      const ctx0 = { F, fk, pl, pname: pl.n, pm: pm0, dp: DY.DPERS[dc.pkg || F.dpers] || DY.DPERS.nickel, mo: MOD(GM, s), md: MOD(GM, d) };
+      const ctx0 = { brk: dc.brk, F, fk, pl, pname: pl.n, pm: pm0, dp: DY.DPERS[dc.pkg || F.dpers] || DY.DPERS.nickel, mo: MOD(GM, s), md: MOD(GM, d) };
       if (call.k === 'rpo') call.run = pl.run || 'Inside Zone';
       const r = DY.SIM.play(GM, s, O, D, call, dc, def, ctx0);
       r.play = pl.n + (call.k === 'run' && call.dir ? ' ' + { L: 'Left', M: 'Middle', R: 'Right' }[call.dir] : ''); r.form = F.name; r.cov = def.name + ' · ' + ctx0.dp.name; r.call = call; r.dcall = dc; r.pm = pm0;
@@ -692,13 +755,14 @@
     if (call.k === 'rpo') { const heavy = def.box >= 0.8; call = Object.assign({}, call, heavy ? { k: 'pass', t: 'quick' } : { k: 'run', t: 'in', dir: call.dir || 'M' }); }
     let pm = pl.beats.includes(dc.d) ? 1 : pl.weak.includes(dc.d) ? -1 : 0;
     if (pl.counter && dc.lean && dc.lean === call.dir) pm = 1.2;
-    const ctx = { F, fk, pl, pm, dp: DY.DPERS[dc.pkg || F.dpers] || DY.DPERS.nickel, mo: MOD(GM, s), md: MOD(GM, d) };
+    const ctx = { brk: dc.brk, F, fk, pl, pm, dp: DY.DPERS[dc.pkg || F.dpers] || DY.DPERS.nickel, mo: MOD(GM, s), md: MOD(GM, d) };
     const playName = pl.n + (call.k === 'run' && call.dir ? ' ' + { L: 'Left', M: 'Middle', R: 'Right' }[call.dir] : '');
     const r = call.k === 'run' ? runPlay(GM, s, O, D, call, dc, def, read, ctx) : passPlay(GM, s, O, D, call, dc, def, read, ctx);
     r.play = playName; r.form = F.name; r.cov = def.name + ' · ' + ctx.dp.name; r.call = call; r.dcall = dc; r.pm = pm;
     r.anim = Object.assign(r.anim || {}, { f: fk });
     if (pm > 0 && chance(0.35)) r.events.push(`${pl.n} was the right call against ${def.name}.`);
     if (read && chance(0.5)) r.events.push(`${GM.T[d].abbr} saw it coming — they have been sitting on that call.`);
+    if (dc.brk != null && call.k === 'pass' && r.target && r.target.id !== dc.brk && chance(0.3)) { const st = DY.P ? DY.P(dc.brk) : null; if (st) r.events.push(`${GM.T[d].abbr} put two defenders on ${last(st)}, so the ball went elsewhere.`); }
     gradePlay(GM, s, r, O, D);
     return r;
   }
@@ -796,6 +860,7 @@
       sep += ctx.pm * 0.45 + F.sep + (ctx.mo.sep || 0) + (rt.depth === 's' ? (ctx.mo.sepS || 0) - (ctx.md.short || 0) * 0.4 : 0) + (rt.depth === 'd' ? (ctx.mo.sepD || 0) - (ctx.md.deep || 0) * 0.5 : 0) - ctx.dp.cov;
       if (t === 'pa') sep += (F.pa || 0) * 0.5 + (ctx.mo.pa || 0);
       if (red && rt.depth === 'd') sep -= 0.45; if (GM.ball >= 92) sep -= 0.3;
+      if (ctx.brk != null) sep += p.id === ctx.brk ? -0.75 : 0.13;      // two men on their best receiver leaves one fewer for everyone else
       const depthYds = rt.depth === 'd' ? 20 : rt.depth === 'm' ? 11 : 4;
       rt.sep = sep; rt.view = sep + gauss() * noise + Math.log(rt.w) + (sticks && depthYds >= sticks ? 0.6 : sticks ? -0.4 : 0);
     });
