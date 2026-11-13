@@ -523,6 +523,14 @@ def previews(schedule_rows):
         if opp in fpi:
             d["fpi"] = dict(opp=[fpi[opp].get("fpi"), fpi_rank.get(opp)], ut=[(fpi.get(TEAM) or {}).get("fpi"), fpi_rank.get(TEAM)])
         d["impact"] = leaders(opp); d["utImpact"] = leaders(TEAM)
+        try:      # the opponent's own results so far: the game predictor uses them for rest days and recent form
+            og = cfbd("/games", year=YEAR, team=opp, seasonType="regular")
+            d["games"] = [[(x.get("startDate") or "")[:10],
+                           x.get("homePoints") if x.get("homeTeam") == opp else x.get("awayPoints"),
+                           x.get("awayPoints") if x.get("homeTeam") == opp else x.get("homePoints")]
+                          for x in sorted(og, key=lambda x: x.get("startDate", "")) if x.get("homePoints") is not None and x.get("awayPoints") is not None and x.get("completed", True)]
+        except Exception as e:
+            note(f"     (results for {opp} skipped: {e})")
         try:
             m = cfbd("/teams/matchup", team1=TEAM, team2=opp)
             gs = sorted(m.get("games", []), key=lambda g: g.get("season", 0))
@@ -612,6 +620,10 @@ def run_football():
         pv = previews(g[0])
         if pv: auto["previews"] = pv
     history()
+    try:                                   # re-fit the game predictor's home-field and spread numbers from the cached game history
+        import calibrate_predictor; calibrate_predictor.main()
+        note("OK   predictor calibration (data/predict-cal.js)")
+    except Exception as e: note(f"SKIP predictor calibration: {e}")
     try:                                   # PEAR Ratings for the Advanced tab
         import pear
         try:

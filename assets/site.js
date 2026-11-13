@@ -1125,6 +1125,7 @@ ${part('next')}
       bits.push(c.ppg[1] > c.oppg[0] ? `${esc(opp)} scores ${c.ppg[1]} points a game, more than the ${c.oppg[0]} Tennessee's defense allows, so something has to give.` : `Tennessee's defense allows ${c.oppg[0]} points a game; ${esc(opp)} averages ${c.ppg[1]}.`);
     }
     if (P && P.impact && P.impact[0]) bits.push(`${esc(opp)}'s top playmaker: ${esc(P.impact[0].name)} (${esc(P.impact[0].line)}).`);
+    if (window.VP) { const ln = VP.line(g, P, vpCtx(g)); if (ln) bits.push(esc(ln)); }
     return bits.join(' ');
   }
   // Tennessee's impact players: the depth chart's starting QB (not just the passing leader) and the
@@ -1146,6 +1147,11 @@ ${part('next')}
       if (i >= 0) list[i] = row; else list.push(row);
     });
     return list;
+  }
+  // what the game predictor (assets/predict.js) needs from the site: ratings, Tennessee's schedule and record, the starting QB
+  function vpCtx(g) {
+    const qb = ((depthState.current.chart.Backfield || []).find(r => r[0] === 'QB') || [, []])[1][0];
+    return { pear: ((window.SITE_AUTO || {}).football || {}).pear || null, schedule: F.schedule, record: (F.team || {}).record, utQB: qb || null, espn: (g && g.espn) || null };
   }
   function openPreview(g) {
     const P = (F.previews || {})[g.opp]; const E = g.espn || {}; const w = howToWatch(E.tv);
@@ -1170,16 +1176,25 @@ ${part('next')}
       </tbody></table></div>
       ${pear ? `<p class="small" style="margin-top:10px"><b>${tip('PEAR')} projection:</b> ${esc(pear[2])}, projected score ${esc(pear[3])} (UT–${esc(g.opp)}), Tennessee win chance ${pear[4]}%.</p>` : ''}`;
     showDialog(head, `${watch}
-      <div class="seg" role="group" aria-label="Preview section" style="margin-bottom:12px">${[['pre', 'Preview'], ['imp', 'Impact players'], ['cmp', 'Team numbers'], ['adv', 'Advanced'], ['ser', 'Series']].map(([k, l], i) => `<button data-pv="${k}" aria-pressed="${i === 0}">${l}</button>`).join('')}</div>
+      <div class="seg" role="group" aria-label="Preview section" style="margin-bottom:12px">${[['pre', 'Preview'], ['sim', 'Prediction'], ['imp', 'Impact players'], ['cmp', 'Team numbers'], ['adv', 'Advanced'], ['ser', 'Series']].map(([k, l], i) => `<button data-pv="${k}" aria-pressed="${i === 0}">${l}</button>`).join('')}</div>
       <div data-pvp="pre"><p class="lede">${previewText(g, P, E)}</p></div>
+      <div data-pvp="sim" hidden><div id="vpMount"><p class="dim small">Simulating 1,000 games…</p></div></div>
       <div data-pvp="imp" hidden><div class="grid g2"><div><h5 class="subhead">${esc(g.opp)}</h5>${imp(P && P.impact)}</div><div><h5 class="subhead">Tennessee</h5>${imp(P && P.utImpact, 'ut')}</div></div></div>
       <div data-pvp="cmp" hidden>${cmp}</div>
       <div data-pvp="adv" hidden>${adv}</div>
       <div data-pvp="ser" hidden>${series || '<p class="dim small">Series history loads after the next data update.</p>'}</div>
       <p class="dim small" style="margin-top:12px">Sources: <a href="https://collegefootballdata.com" target="_blank" rel="noopener">CollegeFootballData.com</a> (stats, SP+, FPI, series), <a href="https://www.espn.com/college-football/team/schedule/_/id/2633" target="_blank" rel="noopener">ESPN</a> (TV, line, win chance), <a href="https://pearatings.com/cfb/fbs/team-profile?team=Tennessee&season=2026" target="_blank" rel="noopener">PEAR Ratings</a>.</p>`, true);
     wireDialogTabs('pv'); wirePlayers(dlg);
+    // the Prediction tab runs its 1,000 simulations the first time it is opened
+    const simBtn = dlg.querySelector('[data-pv="sim"]'), mount = dlg.querySelector('#vpMount');
+    if (simBtn && mount) simBtn.addEventListener('click', () => {
+      if (mount.dataset.done) return; mount.dataset.done = '1';
+      if (!window.VP) { mount.innerHTML = '<p class="dim small">The predictor did not load. Refresh the page and try again.</p>'; return; }
+      setTimeout(() => { try { VP.mount(mount, g, P, vpCtx(g)); } catch (err) { console.error(err); mount.innerHTML = '<p class="dim small">The prediction could not be built from the current data.</p>'; } }, 30);
+    });
   }
 
+  dlg.addEventListener('close', () => { if (window.VP && VP._player) VP._player.stop(); });
   dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
 
   route();

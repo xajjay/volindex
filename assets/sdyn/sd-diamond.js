@@ -48,12 +48,21 @@
     if (pc >= lim * (0.95 + (GM.soft ? 0.05 : 0)) ) pull = true;
     if (runs >= (GM.soft ? 5 : 6) && pc > 40) pull = true;
     if (L.innP >= 3 && GM.outs === 0 && !GM.bases.some(Boolean)) pull = pull || (pc > lim * 0.8);
+    // the third time through the order with the game on the line and men on: go to the pen before it gets away
+    if (!GM.soft && p.pos === 'SP' && GM.inn >= 6 && (line(GM, p).bf || 0) >= 18 && Math.abs(lead) <= 2 && GM.bases.some(Boolean) && pc > lim * 0.7) pull = true;
     // the closer for the save
     if (lastInn && GM.outs === 0 && lead > 0 && lead <= 3 && L.closer && L.pit !== L.closer && !L.used.includes(L.closer) && !GM.soft) pull = true;
     if (!pull && !force) return null;
     let next = null;
     if (lastInn && lead > 0 && lead <= 3 && L.closer && !L.used.includes(L.closer)) next = SD.P(L.closer);
-    if (!next) { const avail = L.pen.filter(id => !L.used.includes(id)).map(SD.P).filter(q => !(q.rest > 0)); next = avail.sort((a, b) => b.ovr - a.ovr)[lead > 3 || lead < -3 ? Math.min(avail.length - 1, 2) : 0] || null; }
+    if (!next) {
+      // who comes in: the best arm when it is close (with the platoon edge on the hitter due up), a lesser one in a blowout, and the closer is saved for the end
+      let avail = L.pen.filter(id => !L.used.includes(id)).map(SD.P).filter(q => q && !(q.rest > 0));
+      const keep = avail.filter(q => q.id !== L.closer || lastInn || GM.inn > GM.maxInn); if (keep.length) avail = keep;
+      const due = B.batter(GM), dh = (due.bt || 'R/R')[0], close = Math.abs(lead) <= 3 && GM.inn >= GM.maxInn - 3;
+      const val = q => q.ovr + (close && dh !== 'S' && ((q.bt || 'R/R').split('/')[1] || 'R')[0] === dh ? (dh === 'L' ? 6 : 3) : 0);
+      next = avail.sort((a, b) => val(b) - val(a))[lead > 3 || lead < -3 ? Math.min(avail.length - 1, 2) : 0] || null;
+    }
     if (!next) return null;
     return changePitcher(GM, s, next);
   }
@@ -107,8 +116,12 @@
     const pd = GM.diff && p.t !== GM.uid ? GM.diff : 0, bd = GM.diff && b.t !== GM.uid ? GM.diff : 0;
     const st = (p.at.stf + pd) * (1 - f * 0.22), ct = (p.at.ctl + pd) * (1 - f * 0.3), ve = p.at.vel * (1 - f * 0.08);
     const pat = GM.user === s && uc.approach === 'patient' ? 1 : GM.user === s && uc.approach === 'aggressive' ? -1 : 0;
-    const kP = clamp((GM.soft ? 0.165 : 0.205) + (st - (b.at.con + bd)) / 240 + (ve - 72) / 520 + pat * 0.02 - ((b.at.eye + bd) - 70) / 900, 0.05, 0.45);
-    const bbP = clamp((GM.soft ? 0.095 : 0.1) + ((b.at.eye + bd) - ct) / 330 + f * 0.04 + pat * 0.025, 0.02, 0.24);
+    // the platoon edge: a hitter sees the ball better from the opposite-handed pitcher (switch hitters always have it; lefty on lefty is the toughest)
+    const bh = (b.bt || 'R/R')[0], ph = ((p.bt || 'R/R').split('/')[1] || 'R')[0], plat = bh === 'S' || bh !== ph ? 1 : bh === 'L' ? -1.4 : -1;
+    // times through the order: each look at a starter helps the hitter, the third most of all
+    const seen = line(GM, p).bf || 0, tto = p.pos === 'SP' && !GM.soft ? (seen >= 18 ? 1 : seen >= 9 ? 0.4 : 0) : 0;
+    const kP = clamp((GM.soft ? 0.165 : 0.205) + (st - (b.at.con + bd)) / 240 + (ve - 72) / 520 + pat * 0.02 - ((b.at.eye + bd) - 70) / 900 - plat * 0.012 - tto * 0.015, 0.05, 0.45);
+    const bbP = clamp((GM.soft ? 0.095 : 0.1) + ((b.at.eye + bd) - ct) / 330 + f * 0.04 + pat * 0.025 + plat * 0.004, 0.02, 0.24);
     const hbpP = GM.soft ? 0.012 : 0.017;
     const u = SD.rnd();
     if (u < kP) { add(GM, b, 'ab'); add(GM, b, 'so'); add(GM, p, 'k'); pitches(GM, p, rr(4, 6.5) | 0); GM.outs++; r.result = 'k'; r.text = `${b.n} strikes out${chance(0.35) ? ' looking' : ' swinging'}.`; L.idx++; return finishPa(GM, r); }
@@ -118,8 +131,8 @@
     // the ball in play
     add(GM, b, 'ab');
     const def = avgFld(GM, d);
-    const hrP = clamp((GM.soft ? 0.05 : 0.048) + ((b.at.pow + bd) - 70) / 420 - (st - 70) / 1100 + f * 0.02 + (pat < 0 ? 0.006 : 0), 0.004, 0.2);
-    const babip = clamp((GM.soft ? 0.33 : 0.33) + ((b.at.con + bd) - st) / 520 + (b.at.spd - 70) / 1700 - (def - 70) / 900 + f * 0.03 + (call === 'hr' ? 0.02 : 0), 0.16, 0.48);
+    const hrP = clamp((GM.soft ? 0.05 : 0.048) + ((b.at.pow + bd) - 70) / 420 - (st - 70) / 1100 + f * 0.02 + (pat < 0 ? 0.006 : 0) + plat * 0.005 + tto * 0.005, 0.004, 0.2);
+    const babip = clamp((GM.soft ? 0.33 : 0.33) + ((b.at.con + bd) - st) / 520 + (b.at.spd - 70) / 1700 - (def - 70) / 900 + f * 0.03 + (call === 'hr' ? 0.02 : 0) + plat * 0.007 + tto * 0.006, 0.16, 0.48);
     const ang = clamp(gauss() * 22 + (b.bt && b.bt[0] === 'L' ? 10 : -10), -44, 44);
     if (chance(hrP)) {
       add(GM, b, 'h'); add(GM, b, 'hr'); add(GM, p, 'ha'); add(GM, p, 'hra');
