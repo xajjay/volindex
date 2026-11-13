@@ -306,10 +306,14 @@
         <div class="tile"><b style="font-size:22px">${S ? `${S.w}-${S.l}${S.t ? '-' + S.t : ''}` : '—'}</b><span>All-time vs. ${esc(g.opp)}</span><em>${S && S.first ? 'Since ' + esc(S.first) : ''}</em></div>
         <div class="tile"><b style="font-size:22px">${rec || '0-0'}</b><span>Tennessee record</span><em>${esc(g.loc || '')}</em></div></div>
       <p class="lede">${text}</p>
+      ${(D.key === 'mbb' || D.key === 'wbb') && window.VPB ? `<h5 class="subhead">Prediction <small class="dim">1,000 simulated games</small></h5><div id="vpbMount"><p class="dim small">Simulating 1,000 games…</p></div>` : ''}
       ${watch.length ? `<h5 class="subhead">Players to watch</h5><ul class="list">${watch.map(p => `<li><b class="namecol">${esc(p.name)}</b><span class="dim">${esc(p.pos)}</span><span class="grow small">${whyPlayer(D, p)}</span></li>`).join('')}</ul>` : ''}
       ${lead.length ? `<h5 class="subhead">Returning leaders <small class="dim">${lastYr ? esc(D.statsAuto.season) + ' stats, current roster only' : 'this season'}</small></h5><ul class="list">${lead.map(l => `<li><span class="chip">${esc(l.label)}</span><b class="grow">${esc(l.name)}</b><span class="num">${esc(l.val)} ${esc(l.unit)}</span></li>`).join('')}</ul>` : ''}
       ${S && S.last && S.last.length ? `<h5 class="subhead">Recent meetings</h5><ul class="list">${S.last.slice().reverse().map(x => `<li><b class="num">${esc(x[0].slice(0, 4))}</b><span class="grow">${x[4] === 'H' ? 'Home' : x[4] === 'A' ? 'Away' : 'Neutral'}</span><span class="num">${esc(x[2])}-${esc(x[3])}</span><span class="${x[1]}">${x[1]}</span></li>`).join('')}</ul>` : ''}
       <p class="small">${g.watch ? `<a href="${esc(g.watch)}" target="_blank" rel="noopener">Watch link</a> · ` : ''}${g.live ? `<a href="${esc(g.live)}" target="_blank" rel="noopener">Live stats</a> · ` : ''}<span class="dim">Data: utsports.com</span></p>`, true);
+    // basketball: the game predictor (assets/predict-bb.js) fills its box right after the dialog opens
+    const vm = document.getElementById('vpbMount');
+    if (vm && window.VPB) setTimeout(() => { try { window.VPB.mount(vm, D, g); } catch (err) { console.error(err); vm.innerHTML = '<p class="dim small">The prediction could not be built from the current data.</p>'; } }, 30);
   }
   function openGameSport(D, i) {
     const g = D.schedule[i]; if (!g) return;

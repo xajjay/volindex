@@ -424,6 +424,10 @@ def make_runner(key):
         del log[:]
         ok = run_sport(key)
         past_seasons(key, history_seasons(key))
+        if key in ("mbb", "wbb"):          # re-fit the basketball predictor's numbers from the refreshed history
+            try:
+                import calibrate_predictor_bb; calibrate_predictor_bb.main()
+            except Exception as e: note(f"SKIP basketball predictor calibration: {e}")
         return ok
     return run
 

@@ -703,4 +703,5 @@
   // one line for the written preview, from the ratings alone (no simulation needed)
   VP.line = (g, P, ctx) => { const m = VP.model(g, P, ctx); if (!m) return ''; const a = Math.round(m.ptsU), b = Math.round(m.ptsO); return `The Vol Index model makes it Tennessee ${a === b ? a + (m.margin >= 0 ? 1 : 0) : a}, ${g.opp} ${a === b ? b + (m.margin >= 0 ? 0 : 1) : b}, with the Vols winning about ${Math.round(m.ratingWin * 100)}% of the time. Open the Prediction tab to see 1,000 simulated games and watch the most likely one.`; };
   VP._sim = simGame; VP._profile = profile; VP._matchup = matchup;
+  VP.css = css; VP.teamOf = teamOf; VP.phi = phi; VP.rng = rng; VP.ease = ease; VP.pctl = pctl;      // shared with assets/predict-bb.js
 })(typeof window !== 'undefined' ? window : globalThis);
