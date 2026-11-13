@@ -215,7 +215,8 @@
         ${seg('pace', { label: 'Pace', o: [['slow', 'Slow'], ['normal', 'Normal'], ['fast', 'Push']] })}
         ${seg('focus', { label: 'Offense', o: [['bal', 'Balanced'], ['rim', 'Attack the rim'], ['three', 'Threes'], ['post', 'Post'], ['star', 'Ride the star']] })}
         ${seg('def', { label: 'Defense', o: [['man', 'Man'], ['zone', '2-3 zone'], ['press', 'Press']] })}
-        <div class="dyg-extra"><span class="dyg-lab">Late</span><button data-coach="endFoul|${c.endFoul === false ? 'true' : 'false'}" aria-pressed="${c.endFoul !== false}">Foul when trailing late</button>
+        ${seg('help', { label: 'Help D', o: [['auto', 'Read it'], ['dbl', 'Double their star'], ['stay', 'Stay home on shooters']] }).replace('data-coach="help|auto" aria-pressed="false"', `data-coach="help|auto" aria-pressed="${!c.help || c.help === 'auto'}"`)}
+        <div class="dyg-extra"><span class="dyg-lab">Late</span><button data-coach="endFoul|${c.endFoul === false ? 'true' : 'false'}" aria-pressed="${c.endFoul !== false}">Foul when trailing late</button><button data-coach="foulUp3|${c.foulUp3 === true ? 'false' : 'true'}" aria-pressed="${c.foulUp3 === true}">Foul when up 3 late</button>
           <button class="dyg-to-btn ${S.uc.timeout ? 'on' : ''}" data-g="timeout" ${GM.to[S.side] > 0 ? '' : 'disabled'}>Timeout (${GM.to[S.side]} left)</button></div>`, sims);
       return;
     }

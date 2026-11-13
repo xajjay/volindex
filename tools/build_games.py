@@ -214,10 +214,10 @@ out = []
 for n, rs in players.items():
     rs.sort(key=lambda r: (-r['ovr'], -r['y']))
     best = rs[0]
+    draft = list(draft_rd[n]) if n in draft_rd else None     # must be set before pool_ok reads it (was the previous player's pick)
     pool_ok = best['ovr'] >= 78 or (best['slot'] == 'TE' and best['ovr'] >= 70) or bool(best['hon']) or n in vfl or bool(draft and 1 <= draft[1] <= 3)   # notable: rated 80+, honored, or a VFL with an NFL career
     hon_all = sorted({h for r in rs for h in r['hon']})
     v = vfl.get(n)
-    draft = list(draft_rd[n]) if n in draft_rd else None
     yrs = sorted({r['y'] for r in rs})
     sts = [r['st'] for r in rs]
     fl = []   # career flags for Power T Grid

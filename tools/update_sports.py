@@ -364,19 +364,34 @@ def run_sport(key):
     if out.get("stats") and out["stats"].get("season") == cfg["season"]:
         career[cfg["season"]] = out["stats"]["tables"]
     if career: out["career"] = career; note(f"OK   career stats ({len(career)} seasons)")
-    out["log"] = list(log)
     path = os.path.join(DATA, f"{key}-auto.js")
     prev = {}
     try:
         t = open(path, encoding="utf-8").read()
         prev = json.loads(t.split(f"window.SITE_AUTO['{key}'] = ", 1)[1].rsplit(";", 1)[0])
     except Exception: pass
+    # Guard: a half-loaded source page must never replace a good schedule. Same season, and the new one
+    # lost a quarter of the games or lost final scores the site already had -> keep the old schedule.
+    fresh = bool(out.get("schedule"))
+    ps = prev.get("schedule") or []
+    if fresh and ps and prev.get("season") == out["season"]:
+        had = sum(1 for g in ps if g.get("result")); got = sum(1 for g in out["schedule"] if g.get("result"))
+        if len(out["schedule"]) < 0.75 * len(ps) or got < had:
+            note(f"SKIP schedule: source returned {len(out['schedule'])} games / {got} results, site has {len(ps)} / {had}; kept the old one")
+            del out["schedule"]; fresh = False
+    if not fresh:
+        if not any("SKIP schedule" in x for x in log): note("SKIP schedule: source returned nothing")
+        if prev.get("updated"): out["updated"] = prev["updated"]     # the site's "updated" date only moves when the schedule really refreshed
+    out["log"] = list(log)
     for k, v in prev.items():
         if k not in out: out[k] = v              # keep last run's data for anything that failed this time
-    with open(path, "w", encoding="utf-8") as f:
+    tmp = path + ".tmp"                           # write then rename: a crash mid-write can't leave half a file
+    with open(tmp, "w", encoding="utf-8") as f:
         f.write(f"/* Written by tools/update_sports.py on {out['updated']} from utsports.com and ESPN. Do not edit by hand. */\n")
         f.write(f"window.SITE_AUTO = window.SITE_AUTO || {{}};\nwindow.SITE_AUTO['{key}'] = " + json.dumps(out, separators=(",", ":"), ensure_ascii=False) + ";\n")
+    os.replace(tmp, path)
     note(f"Wrote {path}")
+    return fresh
 
 def past_seasons(key, seasons):
     """Schedules/results of earlier seasons for the History tab (cached forever)."""
@@ -407,8 +422,9 @@ def history_seasons(key):
 def make_runner(key):
     def run():
         del log[:]
-        run_sport(key)
+        ok = run_sport(key)
         past_seasons(key, history_seasons(key))
+        return ok
     return run
 
 if __name__ == "__main__":

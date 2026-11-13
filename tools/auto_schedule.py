@@ -25,7 +25,7 @@ final, or on days with no game, the run does nothing and costs nothing.
 Use --force to update everything regardless of the day.
 Writes data/updated.js with the date each sport was last refreshed (shown on the site).
 """
-import datetime, json, os, re, sys
+import datetime, json, os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "data")
@@ -172,7 +172,8 @@ def run_gameday():
     for sport, why in due:
         print(f"== {sport}: {why}")
         try:
-            ups[sport](); stamps[sport] = day.isoformat(); ran.append(sport)
+            if ups[sport]() is False: print(f"!! {sport}: source gave no usable schedule, kept the old data")
+            else: stamps[sport] = day.isoformat(); ran.append(sport)
         except SystemExit as e: print(f"!! {sport} stopped: {e}")
         except Exception as e: print(f"!! {sport} failed: {e}")
     if ran:
@@ -199,8 +200,8 @@ def main():
             print(f"skip {sport}: nothing new today"); continue
         print(f"== {sport}: {', '.join(why)}")
         try:
-            fn()
-            stamps[sport] = day.isoformat(); ran.append(sport)
+            if fn() is False: print(f"!! {sport}: source gave no usable schedule, kept the old data (not marked as updated)")
+            else: stamps[sport] = day.isoformat(); ran.append(sport)
         except SystemExit as e:
             print(f"!! {sport} stopped: {e}")
         except Exception as e:

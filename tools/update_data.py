@@ -579,6 +579,7 @@ def load_previous():
 def run_football():
     global KEY
     KEY = key()
+    del log[:]
     prev = load_previous()
     auto = dict(updated=datetime.date.today().isoformat(), team={})
     g = games()
@@ -620,15 +621,27 @@ def run_football():
     except Exception as e: note(f"SKIP PEAR: {e}")
     fs = fpi_sec()
     if fs: auto["fpi"] = fs
-    auto["log"] = log
+    # Guard: never let a partial CFBD answer replace a good schedule (fewer games, or final scores gone).
+    fresh = bool(auto.get("schedule"))
+    ps = prev.get("schedule") or []
+    if fresh and ps and str(ps[0].get("date", ""))[:4] == str(auto["schedule"][0].get("date", ""))[:4]:
+        had = sum(1 for x in ps if x.get("result")); got = sum(1 for x in auto["schedule"] if x.get("result"))
+        if len(auto["schedule"]) < 0.75 * len(ps) or got < had:
+            note(f"SKIP games: source returned {len(auto['schedule'])} games / {got} results, site has {len(ps)} / {had}; kept the old schedule")
+            del auto["schedule"]; auto["team"].pop("record", None); auto["team"].pop("sec", None); fresh = False
+    if not fresh and prev.get("updated"): auto["updated"] = prev["updated"]   # "updated" only moves when the schedule really refreshed
+    auto["log"] = list(log)
     for k, v in prev.items():            # keep last run's data for anything that failed this time
         if k not in auto: auto[k] = v
     if prev.get("team"):
         for k, v in prev["team"].items(): auto["team"].setdefault(k, v)
-    with open(OUT, "w", encoding="utf-8") as f:
+    tmp = OUT + ".tmp"                      # write then rename: a crash mid-write can't leave half a file
+    with open(tmp, "w", encoding="utf-8") as f:
         f.write("/* Written by tools/update_data.py on " + auto["updated"] + ". Do not edit by hand; rerun the updater. */\n")
         f.write("window.SITE_AUTO = window.SITE_AUTO || {};\nwindow.SITE_AUTO.football = " + json.dumps(auto, indent=1) + ";\n")
+    os.replace(tmp, OUT)
     print(f"\nWrote {OUT}")
+    return fresh
 
 if __name__ == "__main__":
     if "--auto" in sys.argv:

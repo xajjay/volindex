@@ -318,7 +318,7 @@
     function feed(x) { if (x != null && x !== H) { stay(H); pass(x); } }
     function drive(x, end, spd) {
       // an attack: the help steps in, the shooter's man sinks
-      const hd = helpD(); go(x, end, spd || 17);
+      const hd = r.dbl && A[id(r.dbl)] && id(r.dbl) !== defOf(x) ? id(r.dbl) : helpD(); go(x, end, spd || 17);   // the engine's help defender when it sent one
       run(0.35); if (hd != null) { go(hd, () => toward(A[x].p, rim, 2.2), 17); }
       run(1.3, () => dist(A[x].p, end) < 1.6);
     }
@@ -366,7 +366,9 @@
         go(pp, blk, 12); run(1.4, () => dist(A[pp].p, blk) < 1.3);
         pass(pp, { arc: 1.5 }); B.dr = true;
         const dp = defOf(pp); go(dp, () => toward(A[pp].p, rim, 2.0), 10);
-        go(pp, () => toward(A[pp].p, rim, 1.5), 3.5); run(1.3); free(dp, 14);
+        if (r.dbl && A[id(r.dbl)] && id(r.dbl) !== dp) { const dd = id(r.dbl); go(dd, () => toward(A[pp].p, P(14, 25), 2.6), 17); go(pp, () => toward(A[pp].p, rim, 1.5), 3.5); run(1.3); free(dd, 15); }   // the double comes down on the post
+        else { go(pp, () => toward(A[pp].p, rim, 1.5), 3.5); run(1.3); }
+        free(dp, 14);
         if (shooter !== pp) { go(pp, A[pp].p.slice(), 2); pass(shooter, { arc: 1.2 }); }
       }
     } else if (play === 'iso') {
@@ -376,7 +378,8 @@
       O.forEach(x => { if (x !== shooter) go(x, P(x === O[4] && !five ? 5 : slot[x] % 2 ? 2 : 22, 25 - side * (slot[x] === 0 ? 10 : 20) + rnd(-2, 2)), 12); });
       const top = P(22, 25 + side * 9); go(shooter, top, 9); run(1.2, () => dist(A[shooter].p, top) < 1.5);
       const p0 = A[shooter].p.slice();
-      go(shooter, () => P(dxOf(p0) + Math.sin(t * 5) * 1.3, p0[1] + Math.cos(t * 3.4) * 1.6), 9); run(1.2);
+      go(shooter, () => P(dxOf(p0) + Math.sin(t * 5) * 1.3, p0[1] + Math.cos(t * 3.4) * 1.6), 9);
+      if (r.dbl && A[id(r.dbl)] && id(r.dbl) !== defOf(shooter)) { const dd = id(r.dbl); go(dd, () => toward(A[shooter].p, P(30, 25), 2.6), 17); run(1.2); free(dd, 15); } else run(1.2);
     } else if (play === 'cut') {
       // the backdoor: a jab out, then hard to the rim behind the denial
       const fd = passer != null ? passer : H; feed(fd);

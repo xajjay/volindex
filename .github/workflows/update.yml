@@ -54,6 +54,8 @@ jobs:
         if: github.event.schedule != '7,22,37,52 16-23,0-7 * * *'
         id: health
         run: python tools/health_check.py --write --issue-body health-issue.md
+      - name: Validate the new data (a broken file is put back to the last good version)
+        run: python tools/validate_data.py
       - name: Save changes
         run: |
           git config user.name "vol-index-bot"
