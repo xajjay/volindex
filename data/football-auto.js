@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-12. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-14. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-12",
+ "updated": "2026-11-14",
  "team": {
   "record": "7-2",
   "sec": "4-2",
@@ -217,7 +217,7 @@ window.SITE_AUTO.football = {
   "ranks": {
    "ppg": [
     32.4,
-    39,
+    38,
     6
    ],
    "oppg": [
@@ -227,7 +227,7 @@ window.SITE_AUTO.football = {
    ],
    "ypg": [
     393.9,
-    57,
+    58,
     9
    ],
    "rushYpg": [
@@ -1295,27 +1295,23 @@ window.SITE_AUTO.football = {
    "Arion Carter": [
     {
      "stat": "Tackles for loss",
-     "rank": 46
-    },
-    {
-     "stat": "Sacks",
-     "rank": 99
+     "rank": 47
     }
    ],
    "Amare Campbell": [
     {
      "stat": "Tackles for loss",
-     "rank": 76
+     "rank": 78
     }
    ],
    "Tyree Weathersby": [
     {
      "stat": "Sacks",
-     "rank": 11
+     "rank": 12
     },
     {
      "stat": "Tackles for loss",
-     "rank": 64
+     "rank": 65
     }
    ],
    "Xavier Gilliam": [
@@ -1325,13 +1321,13 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Sacks",
-     "rank": 31
+     "rank": 32
     }
    ],
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 54
+     "rank": 55
     }
    ],
    "Ty Redmond": [
@@ -1349,13 +1345,13 @@ window.SITE_AUTO.football = {
    "Dejuan Lane": [
     {
      "stat": "Interceptions",
-     "rank": 6
+     "rank": 7
     }
    ],
    "Mike Matthews": [
     {
      "stat": "Receiving yards",
-     "rank": 68
+     "rank": 71
     },
     {
      "stat": "Receiving TD",
@@ -1617,10 +1613,10 @@ window.SITE_AUTO.football = {
   "Texas A&M": {
    "tv": "ESPN",
    "kick": "2026-11-14T20:00Z",
-   "line": "TENN -2.5",
+   "line": "TENN -1.5",
    "ou": 43.5,
-   "ml": "-135",
-   "book": "DraftKings",
+   "ml": "-112",
+   "book": "Draft Kings",
    "win": 58.6
   },
   "LSU": {
@@ -1629,7 +1625,7 @@ window.SITE_AUTO.football = {
    "line": "LSU -1.5",
    "ou": 48.5,
    "ml": "+100",
-   "book": "DraftKings",
+   "book": "Draft Kings",
    "win": 45.2
   },
   "Vanderbilt": {
@@ -1647,7 +1643,7 @@ window.SITE_AUTO.football = {
     "Points per game",
     "Total offense",
     32.4,
-    39,
+    38,
     6,
     false
    ],
@@ -1656,7 +1652,7 @@ window.SITE_AUTO.football = {
     "Total yards per game",
     "Total offense",
     393.9,
-    57,
+    58,
     9,
     false
    ],
@@ -1683,7 +1679,7 @@ window.SITE_AUTO.football = {
     "Completion %",
     "Passing",
     64.4,
-    54,
+    53,
     10,
     false
    ],
@@ -1701,7 +1697,7 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     10.0,
-    108,
+    109,
     13,
     false
    ],
@@ -1719,7 +1715,7 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     21.0,
-    93,
+    92,
     10,
     true
    ],
@@ -1737,7 +1733,7 @@ window.SITE_AUTO.football = {
     "Yards per carry",
     "Rushing",
     5.0,
-    31,
+    32,
     3,
     false
    ],
@@ -1782,7 +1778,7 @@ window.SITE_AUTO.football = {
     "3rd down conversion %",
     "Downs",
     37.5,
-    92,
+    93,
     15,
     false
    ],
@@ -1809,7 +1805,7 @@ window.SITE_AUTO.football = {
     "Time of possession per game (min)",
     "Downs",
     30.6,
-    53,
+    54,
     8,
     false
    ],
@@ -1908,7 +1904,7 @@ window.SITE_AUTO.football = {
     "Yards per carry allowed",
     "Run defense",
     3.82,
-    53,
+    51,
     9,
     true
    ],
@@ -1926,7 +1922,7 @@ window.SITE_AUTO.football = {
     "Takeaways",
     "Run defense",
     17.0,
-    10,
+    11,
     3,
     false
    ],
