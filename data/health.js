@@ -1,6 +1,6 @@
 /* Written by tools/health_check.py. Do not edit by hand. */
 window.SITE_HEALTH = {
- "checked": "2026-11-14",
+ "checked": "2026-11-15",
  "counts": {
   "baseball": 57,
   "football": 12,
@@ -12,25 +12,30 @@ window.SITE_HEALTH = {
  },
  "findings": [
   {
-   "area": "manual",
-   "level": "warn",
-   "msg": "KenPom / Torvik / EvanMiya ratings last edited 32 days ago (check every 14). Refresh the basketball ratings."
+   "area": "football",
+   "level": "note",
+   "msg": "Update step skipped: PEAR ratings: HTTP Error 502: Bad Gateway"
   },
   {
    "area": "manual",
    "level": "warn",
-   "msg": "Volleyball lineup last edited 33 days ago (check every 21). Re-check the projected lineup."
+   "msg": "KenPom / Torvik / EvanMiya ratings last edited 33 days ago (check every 14). Refresh the basketball ratings."
   },
   {
    "area": "manual",
    "level": "warn",
-   "msg": "Soccer lineup last edited 33 days ago (check every 21). Re-check the projected lineup."
+   "msg": "Volleyball lineup last edited 34 days ago (check every 21). Re-check the projected lineup."
+  },
+  {
+   "area": "manual",
+   "level": "warn",
+   "msg": "Soccer lineup last edited 34 days ago (check every 21). Re-check the projected lineup."
   }
  ],
  "manual": [
   {
    "active": true,
-   "ageDays": 3,
+   "ageDays": 4,
    "edited": "2026-11-11",
    "file": "data/recruiting.js",
    "label": "On3 / recruiting rankings",
@@ -38,7 +43,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 32,
+   "ageDays": 33,
    "edited": "2026-10-13",
    "file": "data/ratings-bb.js",
    "label": "KenPom / Torvik / EvanMiya ratings",
@@ -46,7 +51,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 3,
+   "ageDays": 4,
    "edited": "2026-11-11",
    "file": "data/football-depth.js",
    "label": "Football depth chart",
@@ -54,7 +59,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 4,
+   "ageDays": 5,
    "edited": "2026-11-10",
    "file": "data/mbb-lineup.js",
    "label": "Men's basketball lineup",
@@ -62,7 +67,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 9,
+   "ageDays": 10,
    "edited": "2026-11-05",
    "file": "data/wbb-lineup.js",
    "label": "Women's basketball lineup",
@@ -70,7 +75,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 33,
+   "ageDays": 34,
    "edited": "2026-10-12",
    "file": "data/volleyball-lineup.js",
    "label": "Volleyball lineup",
@@ -78,7 +83,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 33,
+   "ageDays": 34,
    "edited": "2026-10-12",
    "file": "data/soccer-lineup.js",
    "label": "Soccer lineup",
@@ -86,7 +91,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": false,
-   "ageDays": 29,
+   "ageDays": 30,
    "edited": "2026-10-16",
    "file": "data/baseball-lineup.js",
    "label": "Baseball lineup",
@@ -94,7 +99,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": false,
-   "ageDays": 33,
+   "ageDays": 34,
    "edited": "2026-10-12",
    "file": "data/softball-lineup.js",
    "label": "Softball lineup",
@@ -109,10 +114,10 @@ window.SITE_HEALTH = {
    "key": "football",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-14"
+   "updated": "2026-11-15"
   },
   {
-   "ageDays": 0,
+   "ageDays": 1,
    "games": 34,
    "key": "mbb",
    "poll": "AP Top 25",
@@ -120,7 +125,7 @@ window.SITE_HEALTH = {
    "updated": "2026-11-14"
   },
   {
-   "ageDays": 1,
+   "ageDays": 2,
    "games": 33,
    "key": "wbb",
    "poll": "AP Top 25",
@@ -128,7 +133,7 @@ window.SITE_HEALTH = {
    "updated": "2026-11-13"
   },
   {
-   "ageDays": 2,
+   "ageDays": 3,
    "games": 57,
    "key": "baseball",
    "poll": null,
@@ -136,7 +141,7 @@ window.SITE_HEALTH = {
    "updated": "2026-11-12"
   },
   {
-   "ageDays": 2,
+   "ageDays": 3,
    "games": 33,
    "key": "softball",
    "poll": null,
@@ -149,10 +154,10 @@ window.SITE_HEALTH = {
    "key": "volleyball",
    "poll": "AVCA Coaches Poll",
    "pollDate": "2026-11-08",
-   "updated": "2026-11-14"
+   "updated": "2026-11-15"
   },
   {
-   "ageDays": 2,
+   "ageDays": 3,
    "games": 18,
    "key": "soccer",
    "poll": "United Soccer Coaches",
