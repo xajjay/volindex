@@ -1,11 +1,11 @@
-/* Written by tools/update_data.py on 2026-11-15. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-16. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-15",
+ "updated": "2026-11-16",
  "team": {
   "record": "8-2",
   "sec": "5-2",
-  "pollWeek": "Week 11",
+  "pollWeek": "Week 12",
   "coaches": 9,
   "ap": 9,
   "apTop25": [
@@ -47,11 +47,11 @@ window.SITE_AUTO.football = {
    ],
    [
     10,
-    "Texas Tech"
+    "Wake Forest"
    ],
    [
     11,
-    "Wake Forest"
+    "Texas Tech"
    ],
    [
     12,
@@ -59,57 +59,99 @@ window.SITE_AUTO.football = {
    ],
    [
     13,
-    "Kentucky"
-   ],
-   [
-    14,
-    "Houston"
-   ],
-   [
-    15,
-    "USC"
-   ],
-   [
-    16,
     "Iowa"
    ],
    [
-    17,
-    "Boise State"
-   ],
-   [
-    18,
+    14,
     "Oregon"
    ],
    [
-    19,
-    "Ole Miss"
+    15,
+    "Boise State"
    ],
    [
-    20,
-    "South Carolina"
-   ],
-   [
-    21,
+    16,
     "Ohio State"
    ],
    [
-    22,
+    17,
+    "Kentucky"
+   ],
+   [
+    18,
+    "USC"
+   ],
+   [
+    19,
     "Arizona"
    ],
    [
+    20,
+    "Houston"
+   ],
+   [
+    21,
+    "Louisville"
+   ],
+   [
+    22,
+    "Liberty"
+   ],
+   [
     23,
-    "New Mexico"
+    "Florida"
    ],
    [
     24,
-    "LSU"
+    "Memphis"
    ],
    [
     25,
-    "SMU"
+    "Ole Miss"
    ]
   ],
+  "ranks": {
+   "ppg": [
+    31.4,
+    41,
+    6
+   ],
+   "oppg": [
+    14.3,
+    7,
+    1
+   ],
+   "ypg": [
+    385.5,
+    65,
+    8
+   ],
+   "rushYpg": [
+    214.0,
+    13,
+    1
+   ],
+   "passYpg": [
+    171.5,
+    123,
+    16
+   ],
+   "oypg": [
+    284.8,
+    12,
+    3
+   ],
+   "oRushYpg": [
+    120.6,
+    33,
+    6
+   ],
+   "oPassYpg": [
+    164.2,
+    8,
+    1
+   ]
+  },
   "cfp": 8,
   "cfpWeek": "Week 11",
   "cfpTop25": [
@@ -213,49 +255,7 @@ window.SITE_AUTO.football = {
     25,
     "Oklahoma State"
    ]
-  ],
-  "ranks": {
-   "ppg": [
-    31.4,
-    41,
-    6
-   ],
-   "oppg": [
-    14.3,
-    7,
-    1
-   ],
-   "ypg": [
-    385.5,
-    65,
-    8
-   ],
-   "rushYpg": [
-    214.0,
-    13,
-    1
-   ],
-   "passYpg": [
-    171.5,
-    123,
-    16
-   ],
-   "oypg": [
-    284.8,
-    12,
-    3
-   ],
-   "oRushYpg": [
-    120.6,
-    33,
-    6
-   ],
-   "oPassYpg": [
-    164.2,
-    8,
-    1
-   ]
-  }
+  ]
  },
  "schedule": [
   {
@@ -1634,16 +1634,16 @@ window.SITE_AUTO.football = {
   "LSU": {
    "tv": "ABC",
    "kick": "2026-11-21T20:30Z",
-   "line": "TENN -1.5",
+   "line": "LSU -1.5",
    "ou": 46.5,
-   "ml": "-125",
+   "ml": "-105",
    "book": "DraftKings",
-   "win": 49.8
+   "win": 49.9
   },
   "Vanderbilt": {
    "tv": null,
    "kick": "2026-11-28T05:00Z",
-   "win": 88.2
+   "win": 88.3
   }
  },
  "teamSheet": {
@@ -1700,8 +1700,8 @@ window.SITE_AUTO.football = {
     "Yards per pass attempt",
     "Passing",
     7.15,
-    81,
-    11,
+    80,
+    10,
     false
    ],
    [
@@ -1727,8 +1727,8 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     23.0,
-    92,
-    10,
+    91,
+    9,
     true
    ],
    [
@@ -1808,8 +1808,8 @@ window.SITE_AUTO.football = {
     "Penalty yards per game",
     "Downs",
     58.2,
-    84,
-    7,
+    85,
+    8,
     true
    ],
    [
@@ -15225,16 +15225,16 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     22.9,
-     7,
-     12,
-     9
+     22.1,
+     9,
+     15,
+     10
     ],
     "ut": [
-     20.5,
-     10,
-     22,
-     10
+     21.5,
+     11,
+     23,
+     6
     ]
    },
    "fpi": {
@@ -15532,16 +15532,16 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     -1.5,
-     79,
-     78,
-     81
+     -2.1,
+     81,
+     86,
+     79
     ],
     "ut": [
-     20.5,
-     10,
-     22,
-     10
+     21.5,
+     11,
+     23,
+     6
     ]
    },
    "fpi": {
@@ -15767,7 +15767,7 @@ window.SITE_AUTO.football = {
   "OK   box scores for finished games (ESPN)",
   "OK   matchup previews for remaining games (CFBD)",
   "OK   season-by-season schedules and team leaders (cached after the first run)",
-  "SKIP PEAR ratings: HTTP Error 502: Bad Gateway",
+  "SKIP PEAR ratings: HTTP Error 403: Forbidden",
   "     PEAR probe saved to tools/cache/pear-probe.json",
   "OK   FPI ratings and ranks for the SEC (CFBD)"
  ],
