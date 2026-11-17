@@ -36,6 +36,11 @@ jobs:
       - name: Rebuild the play-level tables (current season only)
         continue-on-error: true
         run: python tools/model/fb_build.py ${{ github.event_name == 'workflow_dispatch' && '2014 2026' || '2026 2026' }}
+      - name: Ourlads depth charts (UT, LSU, Vanderbilt) and availability adjustment
+        continue-on-error: true
+        run: |
+          python tools/model/fb_depth.py Tennessee LSU Vanderbilt
+          python tools/model/fb_avail.py
       - name: Save changes
         run: |
           git config user.name "vol-index-bot"
