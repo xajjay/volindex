@@ -7,7 +7,8 @@ import re, sys, os, json, time, urllib.request, html as H
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "cache", "fbm", "depth.json")
 BASE = "https://www.ourlads.com/ncaa-football-depth-charts/"
 UA = {"User-Agent": "Mozilla/5.0 (VolIndex research; contact github.com/xajjay/volindex)"}
-PLAYER = re.compile(r"^\s*(\d{1,2})\s+([^,()]+),\s*([^()]+?)\s*(?:\(([^)]*)\))?\s*$")
+CLS = r"(?:RS\s+)?(?:FR|SO|JR|SR|GR)(?:/TR)?"
+PLAYER = re.compile(r"^\s*(\d{1,2})\s+([^,()]+),\s*(.+?)\s*(?:\(\s*(" + CLS + r")\s*\)|\s(" + CLS + r"))?\s*$")
 
 
 def get(url):
@@ -36,7 +37,7 @@ def parse(page):
                 if pend and not PLAYER.match(x): x = f"{pend} {x}"
                 pend = None
                 m = PLAYER.match(x)
-                if m: plist.append({"no": int(m.group(1)), "name": f"{m.group(3).strip()} {m.group(2).strip()}", "cls": (m.group(4) or "").strip(), "rank": len(plist) + 1})
+                if m: plist.append({"no": int(m.group(1)), "name": f"{m.group(3).strip()} {m.group(2).strip()}", "cls": (m.group(4) or m.group(5) or "").strip(), "rank": len(plist) + 1})
             if plist: out.setdefault(unit, {})[pos] = plist
     return out
 
