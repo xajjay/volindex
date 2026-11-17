@@ -3,23 +3,23 @@
   "2026": "2814 rows"
  },
  "season_adv": {
-  "2026": "138 rows"
+  "2026": "skipped: quota"
  },
  "ppa_teams": {
-  "2026": "138 rows"
+  "2026": "skipped: quota"
  },
  "talent": {
-  "2026": "138 rows",
+  "2026": "skipped: quota",
   "2014": "skipped: quota"
  },
  "returning": {
-  "2026": "136 rows"
+  "2026": "skipped: quota"
  },
  "recruiting": {
-  "2026": "221 rows"
+  "2026": "skipped: quota"
  },
  "portal": {
-  "2026": "4484 rows",
+  "2026": "skipped: quota",
   "2020": "skipped: quota",
   "2019": "skipped: quota",
   "2018": "skipped: quota",
@@ -29,19 +29,19 @@
   "2014": "skipped: quota"
  },
  "lines": {
-  "2026": "2231 rows"
+  "2026": "skipped: quota"
  },
  "pregame_wp": {
-  "2026": "1000 rows"
+  "2026": "skipped: quota"
  },
  "sp": {
-  "2026": "139 rows"
+  "2026": "skipped: quota"
  },
  "fpi": {
-  "2026": "138 rows"
+  "2026": "skipped: quota"
  },
  "elo": {
-  "2026": "138 rows"
+  "2026": "skipped: quota"
  },
  "rankings": {
   "2026": "skipped: quota"
@@ -58,6 +58,6 @@
  "usage": {
   "2026": "skipped: quota"
  },
- "_calls_remaining": 119,
- "_ran": "2026-11-17T23:36:31+00:00"
+ "_calls_remaining": 118,
+ "_ran": "2026-11-17T23:43:02+00:00"
 }
