@@ -3,7 +3,7 @@
  "game": "Vanderbilt at Tennessee",
  "teams": {
   "Tennessee": {
-   "total": -1.05,
+   "total": -3.93,
    "rows": [
     {
      "name": "Mike Matthews",
@@ -19,43 +19,43 @@
      "pos": "RB",
      "status": "out",
      "in_rating": false,
-     "depth": "RES4",
-     "pts": 0.0,
-     "basis": "n/a"
+     "depth": "RB2",
+     "pts": -1.65,
+     "basis": "measured, slot set by hand"
     },
     {
      "name": "Nic Moore",
      "pos": "OL",
      "status": "out",
      "in_rating": false,
-     "depth": "RES5",
-     "pts": 0.0,
-     "basis": "n/a"
+     "depth": "not on depth chart (assumed starter)",
+     "pts": -0.9,
+     "basis": "prior"
     },
     {
      "name": "Tyree Weathersby",
      "pos": "DE",
      "status": "out",
      "in_rating": false,
-     "depth": "RES3",
-     "pts": 0.0,
-     "basis": "n/a"
+     "depth": "not on depth chart (assumed starter)",
+     "pts": -0.33,
+     "basis": "measured, weak"
     },
     {
      "name": "Wendell Moe Jr.",
      "pos": "OL",
      "status": "out",
      "in_rating": true,
-     "depth": "RES2",
-     "pts": 0.0,
-     "basis": "n/a"
+     "depth": "not on depth chart (assumed starter)",
+     "pts": -0.0,
+     "basis": "prior"
     },
     {
      "name": "Ethan Davis",
      "pos": "TE",
      "status": "out",
      "in_rating": true,
-     "depth": "unmatched (assumed starter)",
+     "depth": "not on depth chart (assumed starter)",
      "pts": -0.0,
      "basis": "prior"
     },
@@ -64,7 +64,7 @@
      "pos": "S",
      "status": "out",
      "in_rating": true,
-     "depth": "unmatched (assumed starter)",
+     "depth": "not on depth chart (assumed starter)",
      "pts": -0.0,
      "basis": "measured, weak"
     }

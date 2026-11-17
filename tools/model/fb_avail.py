@@ -52,10 +52,14 @@ def main():
         for r in rows:
             w = W.get(r["status"].lower(), 0.0)
             hit = rank_of(chart, r["name"], r["pos"]) if chart else None
+            if hit and hit[0] in ("RES", "INJ"): hit = None   # Ourlads moves injured players to a reserve row, so the row says nothing about his role
+            m = re.match(r"^([A-Z]+)(\d)$", r.get("slot", ""))
+            if m: hit = (m.group(1), int(m.group(2)))             # slot set by hand in availability.json (e.g. "RB2")
             slot_pos, rk = hit if hit else (r["pos"], 1)       # no depth chart or not found: assume starter
             c, kind = cost(slot_pos if hit else r["pos"], rk, vals)
+            if m: kind += ", slot set by hand"
             if r.get("in_rating"): w = 0.0            # long-term absence: games without him are already in the team rating
-            res.append({"name": r["name"], "pos": r["pos"], "status": r["status"], "in_rating": bool(r.get("in_rating")), "depth": f"{slot_pos}{rk}" if hit else "unmatched (assumed starter)", "pts": round(w * c, 2), "basis": kind})
+            res.append({"name": r["name"], "pos": r["pos"], "status": r["status"], "in_rating": bool(r.get("in_rating")), "depth": f"{slot_pos}{rk}" if hit else "not on depth chart (assumed starter)", "pts": round(w * c, 2), "basis": kind})
             tot += w * c
         out[team] = {"total": round(tot, 2), "rows": res}
     json.dump({"asOf": av["asOf"], "game": av.get("game"), "teams": out}, open(os.path.join(ROOT, "tools", "cache", "fbm", "availability_adj.json"), "w"), indent=1)
