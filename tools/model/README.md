@@ -70,3 +70,9 @@ production, transfer portal, recruiting, coaches, SP+/FPI/PEAR history, venues, 
 * cfbfastR: the free data used above.
 * gameonpaper.com: its robots.txt disallows automated access, so it is not used.
 * fourthandshort.com: the page is rendered by JavaScript (no data in the HTML); skipped for now.
+
+## Round 22 results so far (football)
+- Extra efficiency metrics (havoc, line yards, splits, tempo, special teams) add no walk-forward lift over the six base metrics.
+- Player absence costs, points per game (offense): QB1 -2.2, RB1 -1.1, RB2 -1.7, WR1 -1.1, WR2 -1.1, WR3 -0.3. Defensive absences are not distinguishable from zero with ESPN participation data (+0.33, se 0.27).
+- Availability feature improves walk-forward MAE by 0.02 pts; rest by 0.005. The market (MAE 12.20) still beats the model (13.03). Blending: market 0.95, model 0.07.
+- CFBD data (talent, returning production, portal, recruiting, lines, SP+, FPI, PPA, coaches, rankings, venues) is pulled by model.yml into tools/cache/fbm/cfbd. Next: preseason priors, market-difference model, matchup report, site wiring.
