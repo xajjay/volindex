@@ -1,0 +1,47 @@
+# Football model data: pulls CollegeFootballData (needs the CFBD_API_KEY secret) and the open play-by-play data,
+# then rebuilds the model tables. Run it by hand any time: Actions tab -> "Football model data" -> Run workflow.
+name: Football model data
+
+on:
+  schedule:
+    - cron: "41 9 * * 2"      # Tuesdays, after the weekend's games are final everywhere
+  push:
+    branches: [main]
+    paths: ["tools/model/**", ".github/workflows/model.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: model-data
+  cancel-in-progress: false
+
+jobs:
+  model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install pandas pyarrow numpy scipy scikit-learn
+      - name: Pull CollegeFootballData
+        continue-on-error: true
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: python tools/model/fb_cfbd.py
+      - name: Rebuild the play-level tables (current season only)
+        continue-on-error: true
+        run: python tools/model/fb_build.py ${{ github.event_name == 'workflow_dispatch' && '2014 2026' || '2026 2026' }}
+      - name: Save changes
+        run: |
+          git config user.name "vol-index-bot"
+          git config user.email "vol-index-bot@users.noreply.github.com"
+          git add tools/cache/fbm
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git commit -m "Football model data $(date -u +%Y-%m-%d)"
+          for i in 1 2 3 4; do git push && exit 0; sleep $((i * 5)); git pull --rebase -X theirs origin main || { git rebase --abort; git pull --no-rebase -X ours origin main; }; done
+          exit 1
