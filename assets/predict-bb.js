@@ -31,7 +31,7 @@
   /* ---------- 1. the model ---------- */
   VPB.model = (D, g, adj) => {
     const key = D.key, cal = CAL(key); if (!cal) return null;
-    if (!g.opp || /TBD|TBA|\/| or /i.test(g.opp)) return { pending: true };          // the opponent is not set yet (a bracket game)
+    if (!g.opp || /TBD|TBA|\/| or /i.test(cleanOpp(g.opp).name)) return { pending: true };          // the opponent is not set yet (a bracket game)
     adj = adj || {};
     const rankOf = name => { const A = (root.SITE_AUTO || {})[key] || {}, top = (A.poll && A.poll.top) || (D.poll && D.poll.top) || []; const r = top.find(x => x[1] === name); return r ? r[0] : null; };
     const edge = (opp, site) => {         // what the opponent and the building are worth, in points, against an average Tennessee team
