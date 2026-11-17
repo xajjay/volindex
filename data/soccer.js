@@ -5,9 +5,8 @@ window.SITE.soccer = {
  "name": "Soccer",
  "short": "Lady Vols Soccer",
  "season": "2026",
- "updated": "2026-11-04",
- "concluded": true,
- "concludedNote": "Season concluded",
+ "updated": "2026-11-16",
+ "concludedNote": "NCAA Tournament · No. 8 seed · vs. Liberty Fri., Nov. 20",
  "venue": "Regal Soccer Stadium",
  "prevLabel": "2025",
  "inSeason": true,
@@ -22,6 +21,10 @@ window.SITE.soccer = {
    "SEC"
   ],
   [
+   "No. 8 seed",
+   "NCAA Tournament"
+  ],
+  [
    "No. 24",
    "Preseason (United Soccer Coaches)"
   ],
@@ -31,17 +34,17 @@ window.SITE.soccer = {
   ]
  ],
  "quick": [
-  "Tennessee finished <b>7-5-4</b> (2-5-3 SEC). The season is over.",
-  "<b>Head coach Joe Kirt has been fired.</b>",
-  "Tennessee <b>did not qualify for the SEC Tournament</b>.",
-  "Final game: a <b>3-1 home win over Oklahoma</b> (Nov. 1), the regular-season finale.",
+  "Tennessee is in the <b>NCAA Tournament</b> as a <b>No. 8 national seed</b> (18th bid in program history) and hosts <b>Liberty</b> in the first round <b>Friday, Nov. 20 at 6 p.m. ET</b> at Regal Soccer Stadium. A win sets up a second-round match on Nov. 27 against the Lipscomb / No. 1 Ohio State winner.",
+  "Regular season: <b>7-5-4</b> (2-5-3 SEC). Tennessee <b>did not qualify for the SEC Tournament</b> and closed with a No. 40 RPI.",
+  "<b>Head coach Joe Kirt was fired</b> at the end of the regular season; the team still earned an at-large bid.",
+  "Regular-season finale: a <b>3-1 home win over Oklahoma</b> (Nov. 1).",
   "<b>Kylee Simmons</b> led the team with 4 goals; <b>Ines Derrien</b> had 3 goals and a team-high 4 assists, and <b>Shae O'Rourke</b> had 3 goals and 3 assists.",
   "Preseason: <b>No. 24</b> in the United Soccer Coaches poll with TopDrawerSoccer's <b>No. 5</b> newcomer class; the Vols finished unranked."
  ],
  "staff": [
   [
    "Joe Kirt",
-   "Head Coach (fired after the 2026 season)"
+   "Head Coach (fired Nov. 2026; coached the regular season)"
   ],
   [
    "Jonathan Morgan",
@@ -552,6 +555,17 @@ window.SITE.soccer = {
    "tv": "SECN+",
    "kind": "conf",
    "time": "1 PM"
+  },
+  {
+   "date": "2026-11-20",
+   "opp": "Liberty",
+   "site": "H",
+   "loc": "Regal Soccer Stadium",
+   "tv": null,
+   "kind": "nonconf",
+   "event": "NCAA Tournament, first round (No. 8 seed)",
+   "time": "6 PM",
+   "manual": true
   }
  ],
  "stats": {

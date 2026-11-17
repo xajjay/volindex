@@ -1,0 +1,25 @@
+{
+ "pages": {
+  "/cfb/fbs": [
+   "error",
+   "HTTP Error 403: Forbidden"
+  ],
+  "/cfb/fbs/teams": [
+   "error",
+   "HTTP Error 403: Forbidden"
+  ],
+  "/cfb/fbs/team-profile?team=Tennessee&season=2026": [
+   "error",
+   "HTTP Error 403: Forbidden"
+  ]
+ },
+ "scripts": [],
+ "urls": [],
+ "tries": {
+  "/api/cfb/fbs/ratings?season=2026": "HTTP Error 403: Forbidden",
+  "/api/cfb/ratings?season=2026": "HTTP Error 403: Forbidden",
+  "/api/cfb/fbs/teams?season=2026": "HTTP Error 403: Forbidden",
+  "/api/cfb/fbs/team-profile?team=Tennessee&season=2026": "HTTP Error 403: Forbidden",
+  "/api/ratings?sport=cfb&season=2026": "HTTP Error 403: Forbidden"
+ }
+}

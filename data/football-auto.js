@@ -1,11 +1,11 @@
-/* Written by tools/update_data.py on 2026-11-12. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-16. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-12",
+ "updated": "2026-11-16",
  "team": {
-  "record": "7-2",
-  "sec": "4-2",
-  "pollWeek": "Week 11",
+  "record": "8-2",
+  "sec": "5-2",
+  "pollWeek": "Week 12",
   "coaches": 9,
   "ap": 9,
   "apTop25": [
@@ -47,11 +47,11 @@ window.SITE_AUTO.football = {
    ],
    [
     10,
-    "Texas Tech"
+    "Wake Forest"
    ],
    [
     11,
-    "Wake Forest"
+    "Texas Tech"
    ],
    [
     12,
@@ -59,57 +59,99 @@ window.SITE_AUTO.football = {
    ],
    [
     13,
-    "Kentucky"
-   ],
-   [
-    14,
-    "Houston"
-   ],
-   [
-    15,
-    "USC"
-   ],
-   [
-    16,
     "Iowa"
    ],
    [
-    17,
-    "Boise State"
-   ],
-   [
-    18,
+    14,
     "Oregon"
    ],
    [
-    19,
-    "Ole Miss"
+    15,
+    "Boise State"
    ],
    [
-    20,
-    "South Carolina"
-   ],
-   [
-    21,
+    16,
     "Ohio State"
    ],
    [
-    22,
+    17,
+    "Kentucky"
+   ],
+   [
+    18,
+    "USC"
+   ],
+   [
+    19,
     "Arizona"
    ],
    [
+    20,
+    "Houston"
+   ],
+   [
+    21,
+    "Louisville"
+   ],
+   [
+    22,
+    "Liberty"
+   ],
+   [
     23,
-    "New Mexico"
+    "Florida"
    ],
    [
     24,
-    "LSU"
+    "Memphis"
    ],
    [
     25,
-    "SMU"
+    "Ole Miss"
    ]
   ],
+  "ranks": {
+   "ppg": [
+    31.4,
+    41,
+    6
+   ],
+   "oppg": [
+    14.3,
+    7,
+    1
+   ],
+   "ypg": [
+    385.5,
+    65,
+    8
+   ],
+   "rushYpg": [
+    214.0,
+    13,
+    1
+   ],
+   "passYpg": [
+    171.5,
+    123,
+    16
+   ],
+   "oypg": [
+    284.8,
+    12,
+    3
+   ],
+   "oRushYpg": [
+    120.6,
+    33,
+    6
+   ],
+   "oPassYpg": [
+    164.2,
+    8,
+    1
+   ]
+  },
   "cfp": 8,
   "cfpWeek": "Week 11",
   "cfpTop25": [
@@ -213,49 +255,7 @@ window.SITE_AUTO.football = {
     25,
     "Oklahoma State"
    ]
-  ],
-  "ranks": {
-   "ppg": [
-    32.4,
-    39,
-    6
-   ],
-   "oppg": [
-    15.1,
-    10,
-    2
-   ],
-   "ypg": [
-    393.9,
-    57,
-    9
-   ],
-   "rushYpg": [
-    216.0,
-    11,
-    1
-   ],
-   "passYpg": [
-    177.9,
-    121,
-    16
-   ],
-   "oypg": [
-    296.6,
-    18,
-    5
-   ],
-   "oRushYpg": [
-    124.4,
-    39,
-    8
-   ],
-   "oPassYpg": [
-    172.1,
-    13,
-    2
-   ]
-  }
+  ]
  },
  "schedule": [
   {
@@ -333,7 +333,10 @@ window.SITE_AUTO.football = {
   {
    "opp": "Texas A&M",
    "date": "2026-11-14",
-   "site": "A"
+   "site": "A",
+   "result": "W",
+   "us": 22,
+   "them": 7
   },
   {
    "opp": "LSU",
@@ -347,11 +350,34 @@ window.SITE_AUTO.football = {
   }
  ],
  "playerStats": {
-  "DJ Burks": {
+  "Mike Matthews": {
+   "rush": [
+    4,
+    12,
+    3.0,
+    10,
+    1
+   ],
+   "rec": [
+    39,
+    608,
+    15.6,
+    57,
+    4
+   ]
+  },
+  "Trent Thomas": {
+   "rec": [
+    6,
+    45,
+    7.5,
+    17,
+    1
+   ],
    "def": {
-    "solo": 2,
-    "ast": 1,
-    "tot": 3,
+    "solo": 1,
+    "ast": 0,
+    "tot": 1,
     "tfl": 0.0,
     "sacks": 0.0,
     "int": 0,
@@ -433,6 +459,15 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
+  "Cooper Ranvier": {
+   "kick": [
+    18,
+    19,
+    35,
+    35,
+    49
+   ]
+  },
   "Xavier Gilliam": {
    "def": {
     "solo": 12,
@@ -441,7 +476,7 @@ window.SITE_AUTO.football = {
     "tfl": 11.5,
     "sacks": 6.0,
     "int": 0,
-    "pbu": 2,
+    "pbu": 3,
     "qbh": 11,
     "fr": 2,
     "ff": 0
@@ -461,23 +496,19 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "Faizon Brandon": {
-   "pass": [
-    62,
-    102,
-    721,
-    8,
-    1,
-    null,
-    null
-   ],
-   "rush": [
-    54,
-    159,
-    2.9,
-    29,
-    3
-   ]
+  "DJ Burks": {
+   "def": {
+    "solo": 2,
+    "ast": 2,
+    "tot": 4,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
   },
   "Braylon Staley": {
    "rush": [
@@ -488,44 +519,30 @@ window.SITE_AUTO.football = {
     0
    ],
    "rec": [
-    36,
-    309,
+    40,
+    343,
     8.6,
     35,
     2
    ]
   },
-  "TJ Metcalf": {
-   "def": {
-    "solo": 26,
-    "ast": 27,
-    "tot": 53,
-    "tfl": 0.5,
-    "sacks": 0.5,
-    "int": 1,
-    "pbu": 0,
-    "qbh": 1,
-    "fr": 0,
-    "ff": 0
-   }
-  },
   "Mar'Quavious Moss": {
    "def": {
-    "solo": 27,
+    "solo": 28,
     "ast": 8,
-    "tot": 35,
+    "tot": 36,
     "tfl": 4.5,
     "sacks": 2.0,
     "int": 0,
     "pbu": 3,
-    "qbh": 5,
+    "qbh": 6,
     "fr": 0,
     "ff": 1
    },
    "pr": [
-    9,
-    115,
-    12.8,
+    11,
+    148,
+    13.5,
     1,
     57
    ]
@@ -544,20 +561,6 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "Dejuan Lane": {
-   "def": {
-    "solo": 28,
-    "ast": 12,
-    "tot": 40,
-    "tfl": 6.0,
-    "sacks": 2.0,
-    "int": 4,
-    "pbu": 4,
-    "qbh": 1,
-    "fr": 1,
-    "ff": 0
-   }
-  },
   "Nathan Robinson": {
    "def": {
     "solo": 3,
@@ -572,11 +575,25 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
+  "Dejuan Lane": {
+   "def": {
+    "solo": 30,
+    "ast": 13,
+    "tot": 43,
+    "tfl": 6.0,
+    "sacks": 2.0,
+    "int": 5,
+    "pbu": 4,
+    "qbh": 1,
+    "fr": 1,
+    "ff": 0
+   }
+  },
   "Josh Turbyville": {
    "def": {
     "solo": 1,
-    "ast": 0,
-    "tot": 1,
+    "ast": 1,
+    "tot": 2,
     "tfl": 0.0,
     "sacks": 0.0,
     "int": 0,
@@ -595,14 +612,14 @@ window.SITE_AUTO.football = {
   },
   "Jordan Norman": {
    "def": {
-    "solo": 5,
-    "ast": 12,
-    "tot": 17,
+    "solo": 6,
+    "ast": 13,
+    "tot": 19,
     "tfl": 4.5,
     "sacks": 2.5,
     "int": 0,
     "pbu": 0,
-    "qbh": 3,
+    "qbh": 5,
     "fr": 0,
     "ff": 0
    }
@@ -618,14 +635,56 @@ window.SITE_AUTO.football = {
     null
    ]
   },
-  "Trent Thomas": {
+  "George MacIntyre": {
+   "pass": [
+    91,
+    134,
+    962,
+    2,
+    3,
+    null,
+    null
+   ],
+   "rush": [
+    18,
+    -16,
+    -0.9,
+    12,
+    0
+   ],
+   "def": {
+    "solo": 0,
+    "ast": 1,
+    "tot": 1,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 3
+   }
+  },
+  "Radarious Jackson": {
    "rec": [
-    6,
+    14,
+    196,
+    14.0,
     45,
-    7.5,
-    17,
-    1
-   ]
+    0
+   ],
+   "def": {
+    "solo": 0,
+    "ast": 1,
+    "tot": 1,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
   },
   "Hunter Barnes": {
    "rush": [
@@ -636,32 +695,27 @@ window.SITE_AUTO.football = {
     1
    ]
   },
+  "DeSean Bishop": {
+   "rush": [
+    230,
+    1163,
+    5.1,
+    59,
+    13
+   ],
+   "rec": [
+    11,
+    61,
+    5.5,
+    15,
+    0
+   ]
+  },
   "Sidney Walton": {
    "def": {
     "solo": 1,
     "ast": 1,
     "tot": 2,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Radarious Jackson": {
-   "rec": [
-    13,
-    181,
-    13.9,
-    45,
-    0
-   ],
-   "def": {
-    "solo": 0,
-    "ast": 1,
-    "tot": 1,
     "tfl": 0.0,
     "sacks": 0.0,
     "int": 0,
@@ -749,16 +803,16 @@ window.SITE_AUTO.football = {
   },
   "Javin Gordon": {
    "rush": [
-    28,
-    129,
-    4.6,
+    39,
+    207,
+    5.3,
     24,
     0
    ],
    "rec": [
-    3,
-    30,
-    10.0,
+    4,
+    35,
+    8.8,
     18,
     0
    ]
@@ -777,11 +831,25 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
+  "Jeremiah Telander": {
+   "def": {
+    "solo": 18,
+    "ast": 30,
+    "tot": 48,
+    "tfl": 6.0,
+    "sacks": 3.0,
+    "int": 1,
+    "pbu": 3,
+    "qbh": 4,
+    "fr": 0,
+    "ff": 0
+   }
+  },
   "Brayden Rouse": {
    "def": {
-    "solo": 2,
+    "solo": 3,
     "ast": 2,
-    "tot": 4,
+    "tot": 5,
     "tfl": 0.0,
     "sacks": 0.0,
     "int": 0,
@@ -791,50 +859,18 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "Mike Matthews": {
-   "rush": [
-    4,
-    12,
-    3.0,
-    10,
-    1
-   ],
-   "rec": [
-    37,
-    566,
-    15.3,
-    57,
-    4
-   ]
-  },
-  "George MacIntyre": {
-   "pass": [
-    78,
-    117,
-    853,
-    2,
-    3,
-    null,
-    null
-   ],
-   "rush": [
-    15,
-    0,
-    0.0,
-    12,
-    0
-   ],
+  "TJ Metcalf": {
    "def": {
-    "solo": 0,
-    "ast": 1,
-    "tot": 1,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
+    "solo": 31,
+    "ast": 30,
+    "tot": 61,
+    "tfl": 0.5,
+    "sacks": 0.5,
+    "int": 2,
     "pbu": 0,
-    "qbh": 0,
+    "qbh": 1,
     "fr": 0,
-    "ff": 3
+    "ff": 0
    }
   },
   "JJ Finch": {
@@ -853,57 +889,29 @@ window.SITE_AUTO.football = {
   },
   "Jackson Ross": {
    "punt": [
-    36,
-    1597,
-    44.4,
+    41,
+    1835,
+    44.8,
     57,
     null,
     17,
     null
    ]
   },
-  "Carson Gentle": {
-   "def": {
-    "solo": 5,
-    "ast": 4,
-    "tot": 9,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 0,
-    "qbh": 1,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Mariyon Dye": {
-   "def": {
-    "solo": 8,
-    "ast": 3,
-    "tot": 11,
-    "tfl": 6.0,
-    "sacks": 5.0,
-    "int": 0,
-    "pbu": 1,
-    "qbh": 1,
-    "fr": 1,
-    "ff": 0
-   }
-  },
   "Dasaahn Brame": {
    "rush": [
+    3,
+    4,
+    1.3,
     2,
-    2,
-    1.0,
-    1,
     2
    ],
    "rec": [
-    15,
-    184,
-    12.3,
+    18,
+    199,
+    11.1,
     68,
-    0
+    1
    ],
    "def": {
     "solo": 1,
@@ -915,6 +923,20 @@ window.SITE_AUTO.football = {
     "pbu": 0,
     "qbh": 0,
     "fr": 0,
+    "ff": 0
+   }
+  },
+  "Mariyon Dye": {
+   "def": {
+    "solo": 8,
+    "ast": 4,
+    "tot": 12,
+    "tfl": 6.0,
+    "sacks": 5.0,
+    "int": 0,
+    "pbu": 1,
+    "qbh": 1,
+    "fr": 1,
     "ff": 0
    }
   },
@@ -944,8 +966,8 @@ window.SITE_AUTO.football = {
   "Daevin Hobbs": {
    "def": {
     "solo": 5,
-    "ast": 7,
-    "tot": 12,
+    "ast": 10,
+    "tot": 15,
     "tfl": 2.5,
     "sacks": 0.0,
     "int": 0,
@@ -969,6 +991,24 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
+  "Faizon Brandon": {
+   "pass": [
+    63,
+    103,
+    726,
+    9,
+    1,
+    null,
+    null
+   ],
+   "rush": [
+    60,
+    195,
+    3.2,
+    29,
+    3
+   ]
+  },
   "Timothy Merritt": {
    "def": {
     "solo": 3,
@@ -983,39 +1023,25 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "Jeremiah Telander": {
-   "def": {
-    "solo": 15,
-    "ast": 29,
-    "tot": 44,
-    "tfl": 5.0,
-    "sacks": 3.0,
-    "int": 1,
-    "pbu": 3,
-    "qbh": 3,
-    "fr": 0,
-    "ff": 0
-   }
-  },
   "Arion Carter": {
    "def": {
-    "solo": 35,
-    "ast": 24,
-    "tot": 59,
+    "solo": 37,
+    "ast": 29,
+    "tot": 66,
     "tfl": 9.0,
     "sacks": 4.0,
     "int": 0,
     "pbu": 1,
-    "qbh": 4,
+    "qbh": 5,
     "fr": 2,
     "ff": 0
    }
   },
   "TK Keys": {
    "rec": [
-    6,
-    54,
-    9.0,
+    7,
+    60,
+    8.6,
     22,
     1
    ]
@@ -1023,8 +1049,8 @@ window.SITE_AUTO.football = {
   "Ryan Scott": {
    "def": {
     "solo": 3,
-    "ast": 1,
-    "tot": 4,
+    "ast": 2,
+    "tot": 5,
     "tfl": 0.0,
     "sacks": 0.0,
     "int": 0,
@@ -1057,20 +1083,6 @@ window.SITE_AUTO.football = {
     2
    ]
   },
-  "Edwin Spillman": {
-   "def": {
-    "solo": 18,
-    "ast": 16,
-    "tot": 34,
-    "tfl": 3.0,
-    "sacks": 2.5,
-    "int": 0,
-    "pbu": 2,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
   "Dylan Lewis": {
    "def": {
     "solo": 2,
@@ -1081,6 +1093,20 @@ window.SITE_AUTO.football = {
     "int": 0,
     "pbu": 0,
     "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Amare Campbell": {
+   "def": {
+    "solo": 38,
+    "ast": 25,
+    "tot": 63,
+    "tfl": 8.0,
+    "sacks": 3.0,
+    "int": 0,
+    "pbu": 4,
+    "qbh": 1,
     "fr": 0,
     "ff": 0
    }
@@ -1116,13 +1142,41 @@ window.SITE_AUTO.football = {
   "Ethan Utley": {
    "def": {
     "solo": 1,
-    "ast": 1,
-    "tot": 2,
+    "ast": 2,
+    "tot": 3,
     "tfl": 0.0,
     "sacks": 0.0,
     "int": 0,
     "pbu": 1,
     "qbh": 2,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Carson Gentle": {
+   "def": {
+    "solo": 5,
+    "ast": 4,
+    "tot": 9,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 0,
+    "qbh": 2,
+    "fr": 0,
+    "ff": 0
+   }
+  },
+  "Edwin Spillman": {
+   "def": {
+    "solo": 18,
+    "ast": 18,
+    "tot": 36,
+    "tfl": 3.0,
+    "sacks": 2.5,
+    "int": 0,
+    "pbu": 2,
+    "qbh": 0,
     "fr": 0,
     "ff": 0
    }
@@ -1135,20 +1189,6 @@ window.SITE_AUTO.football = {
     11,
     0
    ]
-  },
-  "Amare Campbell": {
-   "def": {
-    "solo": 35,
-    "ast": 23,
-    "tot": 58,
-    "tfl": 8.0,
-    "sacks": 3.0,
-    "int": 0,
-    "pbu": 4,
-    "qbh": 1,
-    "fr": 0,
-    "ff": 0
-   }
   },
   "Breeze Carter": {
    "def": {
@@ -1204,8 +1244,8 @@ window.SITE_AUTO.football = {
   "TJ White": {
    "def": {
     "solo": 2,
-    "ast": 3,
-    "tot": 5,
+    "ast": 4,
+    "tot": 6,
     "tfl": 0.0,
     "sacks": 0.0,
     "int": 0,
@@ -1215,21 +1255,19 @@ window.SITE_AUTO.football = {
     "ff": 0
    }
   },
-  "DeSean Bishop": {
-   "rush": [
-    196,
-    1066,
-    5.4,
-    59,
-    13
-   ],
-   "rec": [
-    9,
-    64,
-    7.1,
-    15,
-    0
-   ]
+  "Ty Redmond": {
+   "def": {
+    "solo": 26,
+    "ast": 19,
+    "tot": 45,
+    "tfl": 0.0,
+    "sacks": 0.0,
+    "int": 0,
+    "pbu": 11,
+    "qbh": 0,
+    "fr": 0,
+    "ff": 0
+   }
   },
   "Travis Smith Jr.": {
    "rec": [
@@ -1251,29 +1289,6 @@ window.SITE_AUTO.football = {
     "fr": 0,
     "ff": 0
    }
-  },
-  "Ty Redmond": {
-   "def": {
-    "solo": 25,
-    "ast": 17,
-    "tot": 42,
-    "tfl": 0.0,
-    "sacks": 0.0,
-    "int": 0,
-    "pbu": 10,
-    "qbh": 0,
-    "fr": 0,
-    "ff": 0
-   }
-  },
-  "Cooper Ranvier": {
-   "kick": [
-    13,
-    14,
-    34,
-    34,
-    49
-   ]
   }
  },
  "natRanks": {
@@ -1295,81 +1310,79 @@ window.SITE_AUTO.football = {
    "Arion Carter": [
     {
      "stat": "Tackles for loss",
-     "rank": 46
-    },
-    {
-     "stat": "Sacks",
-     "rank": 99
-    }
-   ],
-   "Amare Campbell": [
-    {
-     "stat": "Tackles for loss",
-     "rank": 76
+     "rank": 60
     }
    ],
    "Tyree Weathersby": [
     {
      "stat": "Sacks",
-     "rank": 11
+     "rank": 17
     },
     {
      "stat": "Tackles for loss",
-     "rank": 64
+     "rank": 88
     }
    ],
    "Xavier Gilliam": [
     {
      "stat": "Tackles for loss",
-     "rank": 15
+     "rank": 20
     },
     {
      "stat": "Sacks",
-     "rank": 31
+     "rank": 39
     }
    ],
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 54
+     "rank": 67
     }
    ],
    "Ty Redmond": [
     {
      "stat": "Passes defended",
-     "rank": 4
-    }
-   ],
-   "Kayin Lee": [
-    {
-     "stat": "Interceptions",
-     "rank": 56
+     "rank": 2
     }
    ],
    "Dejuan Lane": [
     {
      "stat": "Interceptions",
-     "rank": 6
+     "rank": 2
+    }
+   ],
+   "TJ Metcalf": [
+    {
+     "stat": "Interceptions",
+     "rank": 64
+    }
+   ],
+   "Kayin Lee": [
+    {
+     "stat": "Interceptions",
+     "rank": 64
+    }
+   ],
+   "Faizon Brandon": [
+    {
+     "stat": "Passing TD",
+     "rank": 97
     }
    ],
    "Mike Matthews": [
     {
      "stat": "Receiving yards",
-     "rank": 68
-    },
-    {
-     "stat": "Receiving TD",
-     "rank": 88
+     "rank": 73
     }
    ],
    "DeSean Bishop": [
     {
-     "stat": "Rushing TD",
+     "stat": "Rushing yards",
      "rank": 7
     },
     {
-     "stat": "Rushing yards",
-     "rank": 11
+     "stat": "Rushing TD",
+     "rank": 9
     }
    ]
   }
@@ -1616,26 +1629,21 @@ window.SITE_AUTO.football = {
   },
   "Texas A&M": {
    "tv": "ESPN",
-   "kick": "2026-11-14T20:00Z",
-   "line": "TENN -2.5",
-   "ou": 43.5,
-   "ml": "-135",
-   "book": "DraftKings",
-   "win": 58.6
+   "kick": "2026-11-14T20:00Z"
   },
   "LSU": {
-   "tv": null,
+   "tv": "ABC",
    "kick": "2026-11-21T20:30Z",
    "line": "LSU -1.5",
-   "ou": 48.5,
-   "ml": "+100",
+   "ou": 46.5,
+   "ml": "-105",
    "book": "DraftKings",
-   "win": 45.2
+   "win": 49.9
   },
   "Vanderbilt": {
    "tv": null,
    "kick": "2026-11-28T05:00Z",
-   "win": 87.6
+   "win": 88.3
   }
  },
  "teamSheet": {
@@ -1646,8 +1654,8 @@ window.SITE_AUTO.football = {
     "ppg",
     "Points per game",
     "Total offense",
-    32.4,
-    39,
+    31.4,
+    41,
     6,
     false
    ],
@@ -1655,26 +1663,26 @@ window.SITE_AUTO.football = {
     "ypg",
     "Total yards per game",
     "Total offense",
-    393.9,
-    57,
-    9,
+    385.5,
+    65,
+    8,
     false
    ],
    [
     "ypp",
     "Yards per play",
     "Total offense",
-    5.8,
-    69,
-    10,
+    5.63,
+    79,
+    9,
     false
    ],
    [
     "passYpg",
     "Passing yards per game",
     "Passing",
-    177.9,
-    121,
+    171.5,
+    123,
     16,
     false
    ],
@@ -1682,26 +1690,26 @@ window.SITE_AUTO.football = {
     "cmpPct",
     "Completion %",
     "Passing",
-    64.4,
-    54,
-    10,
+    65.4,
+    37,
+    7,
     false
    ],
    [
     "ypa",
     "Yards per pass attempt",
     "Passing",
-    7.21,
-    83,
-    11,
+    7.15,
+    80,
+    10,
     false
    ],
    [
     "passTD",
     "Passing TDs",
     "Passing",
-    10.0,
-    108,
+    11.0,
+    106,
     13,
     false
    ],
@@ -1710,7 +1718,7 @@ window.SITE_AUTO.football = {
     "Interceptions thrown",
     "Passing",
     4.0,
-    25,
+    21,
     3,
     true
    ],
@@ -1718,17 +1726,17 @@ window.SITE_AUTO.football = {
     "sacksAllowed",
     "Sacks allowed",
     "Passing",
-    21.0,
-    93,
-    10,
+    23.0,
+    91,
+    9,
     true
    ],
    [
     "rushYpg",
     "Rushing yards per game",
     "Rushing",
-    216.0,
-    11,
+    214.0,
+    13,
     1,
     false
    ],
@@ -1736,8 +1744,8 @@ window.SITE_AUTO.football = {
     "ypc",
     "Yards per carry",
     "Rushing",
-    5.0,
-    31,
+    4.81,
+    42,
     3,
     false
    ],
@@ -1746,16 +1754,16 @@ window.SITE_AUTO.football = {
     "Rushing TDs",
     "Rushing",
     24.0,
-    10,
-    1,
+    19,
+    2,
     false
    ],
    [
     "recPg",
     "Receptions per game",
     "Receiving",
-    15.9,
-    109,
+    15.7,
+    110,
     16,
     false
    ],
@@ -1763,35 +1771,35 @@ window.SITE_AUTO.football = {
     "ypr",
     "Yards per reception",
     "Receiving",
-    11.2,
-    99,
-    11,
+    10.92,
+    105,
+    13,
     false
    ],
    [
     "fdPg",
     "First downs per game",
     "Downs",
-    21.4,
-    43,
-    5,
+    21.1,
+    45,
+    6,
     false
    ],
    [
     "thirdPct",
     "3rd down conversion %",
     "Downs",
-    37.5,
-    92,
-    15,
+    36.5,
+    98,
+    14,
     false
    ],
    [
     "fourthPct",
     "4th down conversion %",
     "Downs",
-    75.0,
-    8,
+    77.8,
+    3,
     1,
     false
    ],
@@ -1799,18 +1807,18 @@ window.SITE_AUTO.football = {
     "penYpg",
     "Penalty yards per game",
     "Downs",
-    61.9,
-    96,
-    10,
+    58.2,
+    85,
+    8,
     true
    ],
    [
     "top",
     "Time of possession per game (min)",
     "Downs",
-    30.6,
-    53,
-    8,
+    31.8,
+    27,
+    2,
     false
    ],
    [
@@ -1818,7 +1826,7 @@ window.SITE_AUTO.football = {
     "Turnovers lost",
     "Downs",
     11.0,
-    58,
+    46,
     4,
     true
    ],
@@ -1826,26 +1834,26 @@ window.SITE_AUTO.football = {
     "oppg",
     "Points allowed per game",
     "Points allowed",
-    15.1,
-    10,
-    2,
+    14.3,
+    7,
+    1,
     true
    ],
    [
     "oypg",
     "Yards allowed per game",
     "Yards allowed",
-    296.6,
-    18,
-    5,
+    284.8,
+    12,
+    3,
     true
    ],
    [
     "oypp",
     "Yards per play allowed",
     "Yards allowed",
-    4.74,
-    18,
+    4.69,
+    17,
     4,
     true
    ],
@@ -1853,8 +1861,8 @@ window.SITE_AUTO.football = {
     "othirdPct",
     "Opponent 3rd down %",
     "Yards allowed",
-    33.1,
-    28,
+    31.8,
+    19,
     5,
     true
    ],
@@ -1862,27 +1870,27 @@ window.SITE_AUTO.football = {
     "oPassYpg",
     "Passing yards allowed per game",
     "Pass defense",
-    172.1,
-    13,
-    2,
+    164.2,
+    8,
+    1,
     true
    ],
    [
     "oCmpPct",
     "Opponent completion %",
     "Pass defense",
-    64.1,
-    103,
-    11,
+    62.4,
+    82,
+    10,
     true
    ],
    [
     "defInt",
     "Interceptions",
     "Pass defense",
-    9.0,
-    23,
-    4,
+    11.0,
+    12,
+    3,
     false
    ],
    [
@@ -1898,25 +1906,25 @@ window.SITE_AUTO.football = {
     "oRushYpg",
     "Rushing yards allowed per game",
     "Run defense",
-    124.4,
-    39,
-    8,
+    120.6,
+    33,
+    6,
     true
    ],
    [
     "oYpc",
     "Yards per carry allowed",
     "Run defense",
-    3.82,
+    3.87,
     53,
-    9,
+    11,
     true
    ],
    [
     "tfl",
     "Tackles for loss",
     "Run defense",
-    73.0,
+    74.0,
     9,
     1,
     false
@@ -1925,18 +1933,18 @@ window.SITE_AUTO.football = {
     "takeaways",
     "Takeaways",
     "Run defense",
-    17.0,
-    10,
-    3,
+    19.0,
+    8,
+    2,
     false
    ],
    [
     "toMargin",
     "Turnover margin",
     "Run defense",
-    6.0,
-    16,
-    5,
+    8.0,
+    10,
+    3,
     false
    ],
    [
@@ -1952,9 +1960,9 @@ window.SITE_AUTO.football = {
     "prAvg",
     "Punt return average",
     "Returning",
-    10.5,
-    56,
-    7,
+    11.4,
+    44,
+    6,
     false
    ],
    [
@@ -1962,7 +1970,7 @@ window.SITE_AUTO.football = {
     "Return TDs",
     "Returning",
     1.0,
-    18,
+    19,
     5,
     false
    ]
@@ -1971,15 +1979,15 @@ window.SITE_AUTO.football = {
    "kicking": [
     [
      "Field Goal Made",
-     "13"
+     "18"
     ],
     [
      "Field Goal Attempts",
-     "14"
+     "19"
     ],
     [
      "Field Goal Percentage",
-     "92.9"
+     "94.7"
     ],
     [
      "Long Field Goal Made",
@@ -1991,15 +1999,15 @@ window.SITE_AUTO.football = {
     ],
     [
      "Field Goal Attempts 20-29",
-     "1"
+     "3"
     ],
     [
      "Field Goal Attempts 30-39",
-     "7"
+     "9"
     ],
     [
      "Field Goal Attempts 40-49",
-     "5"
+     "6"
     ],
     [
      "Field Goal Attempts 50+",
@@ -2007,11 +2015,11 @@ window.SITE_AUTO.football = {
     ],
     [
      "Extra Points Made",
-     "35"
+     "36"
     ],
     [
      "Extra Point Attempts",
-     "35"
+     "36"
     ],
     [
      "Extra Point Percentage",
@@ -2023,15 +2031,15 @@ window.SITE_AUTO.football = {
     ],
     [
      "Field Goals Made 20-29",
-     "1"
+     "3"
     ],
     [
      "Field Goals Made 30-39",
-     "7"
+     "9"
     ],
     [
      "Field Goals Made 40-49",
-     "5"
+     "6"
     ],
     [
      "Field Goals Made 50+",
@@ -2039,15 +2047,15 @@ window.SITE_AUTO.football = {
     ],
     [
      "Total Kicking Points",
-     "74"
+     "90"
     ],
     [
      "Team Games Played",
-     "9"
+     "10"
     ],
     [
      "Touchback Percentage",
-     "81"
+     "78"
     ],
     [
      "Average Kickoff Return Yards",
@@ -2067,17 +2075,17 @@ window.SITE_AUTO.football = {
     ],
     [
      "FG: Good-Attempts",
-     "13-14"
+     "18-19"
     ]
    ],
    "punting": [
     [
      "Punts",
-     "37"
+     "42"
     ],
     [
      "Punt Yards",
-     "1,597"
+     "1,835"
     ],
     [
      "Long Punt",
@@ -2085,11 +2093,11 @@ window.SITE_AUTO.football = {
     ],
     [
      "Gross Average Punt Yards",
-     "43.2"
+     "43.7"
     ],
     [
      "Net Average Punt Yards",
-     "43.2"
+     "43.7"
     ],
     [
      "Punts Blocked",
@@ -2105,11 +2113,11 @@ window.SITE_AUTO.football = {
     ],
     [
      "Fair Catches",
-     "21"
+     "22"
     ],
     [
      "Punt Returns",
-     "8"
+     "10"
     ],
     [
      "Punt Return Yards",
@@ -2121,11 +2129,11 @@ window.SITE_AUTO.football = {
     ],
     [
      "Team Games Played",
-     "9"
+     "10"
     ],
     [
      "Punt: Total Yards",
-     "37-1,597"
+     "42-1,835"
     ]
    ]
   }
@@ -13957,451 +13965,1257 @@ window.SITE_AUTO.football = {
      34
     ]
    ]
+  },
+  "Texas A&M": {
+   "id": "401856888",
+   "venue": "Kyle Field",
+   "attendance": 108504,
+   "teams": [
+    {
+     "abbr": "TA&M",
+     "name": "Texas A&M",
+     "home": true,
+     "score": "7",
+     "lines": [
+      "0",
+      "7",
+      "0",
+      "0"
+     ]
+    },
+    {
+     "abbr": "TENN",
+     "name": "Tennessee",
+     "home": false,
+     "score": "22",
+     "lines": [
+      "3",
+      "3",
+      "3",
+      "13"
+     ]
+    }
+   ],
+   "stats": {
+    "TENN": [
+     [
+      "1st Downs",
+      "18"
+     ],
+     [
+      "3rd down efficiency",
+      "5-17"
+     ],
+     [
+      "4th down efficiency",
+      "2-2"
+     ],
+     [
+      "Total Yards",
+      "310"
+     ],
+     [
+      "Passing",
+      "114"
+     ],
+     [
+      "Comp/Att",
+      "14/18"
+     ],
+     [
+      "Yards per pass",
+      "6.3"
+     ],
+     [
+      "Rushing",
+      "196"
+     ],
+     [
+      "Rushing Attempts",
+      "56"
+     ],
+     [
+      "Yards per rush",
+      "3.5"
+     ],
+     [
+      "Penalties",
+      "3-25"
+     ],
+     [
+      "Turnovers",
+      "0"
+     ],
+     [
+      "Fumbles lost",
+      "0"
+     ],
+     [
+      "Interceptions thrown",
+      "0"
+     ],
+     [
+      "Possession",
+      "42:11"
+     ]
+    ],
+    "TA&M": [
+     [
+      "1st Downs",
+      "8"
+     ],
+     [
+      "3rd down efficiency",
+      "2-11"
+     ],
+     [
+      "4th down efficiency",
+      "0-1"
+     ],
+     [
+      "Total Yards",
+      "179"
+     ],
+     [
+      "Passing",
+      "93"
+     ],
+     [
+      "Comp/Att",
+      "11/25"
+     ],
+     [
+      "Yards per pass",
+      "3.7"
+     ],
+     [
+      "Rushing",
+      "86"
+     ],
+     [
+      "Rushing Attempts",
+      "19"
+     ],
+     [
+      "Yards per rush",
+      "4.5"
+     ],
+     [
+      "Penalties",
+      "4-39"
+     ],
+     [
+      "Turnovers",
+      "2"
+     ],
+     [
+      "Fumbles lost",
+      "0"
+     ],
+     [
+      "Interceptions thrown",
+      "2"
+     ],
+     [
+      "Possession",
+      "17:49"
+     ]
+    ]
+   },
+   "players": {
+    "TENN": {
+     "passing": {
+      "labels": [
+       "C/ATT",
+       "YDS",
+       "AVG",
+       "TD",
+       "INT",
+       "QBR"
+      ],
+      "rows": [
+       [
+        "George MacIntyre",
+        "13/17",
+        "109",
+        "6.4",
+        "0",
+        "0",
+        "38.2"
+       ],
+       [
+        "Faizon Brandon",
+        "1/1",
+        "5",
+        "5.0",
+        "1",
+        "0",
+        "--"
+       ]
+      ]
+     },
+     "rushing": {
+      "labels": [
+       "CAR",
+       "YDS",
+       "AVG",
+       "TD",
+       "LONG"
+      ],
+      "rows": [
+       [
+        "DeSean Bishop",
+        "34",
+        "97",
+        "2.9",
+        "0",
+        "9"
+       ],
+       [
+        "Javin Gordon",
+        "11",
+        "78",
+        "7.1",
+        "0",
+        "21"
+       ],
+       [
+        "Faizon Brandon",
+        "6",
+        "36",
+        "6.0",
+        "0",
+        "18"
+       ],
+       [
+        "DaSaahn Brame",
+        "1",
+        "2",
+        "2.0",
+        "0",
+        "2"
+       ],
+       [
+        " Team",
+        "1",
+        "-1",
+        "-1.0",
+        "0",
+        "0"
+       ],
+       [
+        "George MacIntyre",
+        "3",
+        "-16",
+        "-5.3",
+        "0",
+        "0"
+       ]
+      ]
+     },
+     "receiving": {
+      "labels": [
+       "REC",
+       "YDS",
+       "AVG",
+       "TD",
+       "LONG"
+      ],
+      "rows": [
+       [
+        "Mike Matthews",
+        "2",
+        "42",
+        "21.0",
+        "0",
+        "25"
+       ],
+       [
+        "Braylon Staley",
+        "4",
+        "34",
+        "8.5",
+        "0",
+        "16"
+       ],
+       [
+        "DaSaahn Brame",
+        "3",
+        "15",
+        "5.0",
+        "1",
+        "6"
+       ],
+       [
+        "Radarious Jackson",
+        "1",
+        "15",
+        "15.0",
+        "0",
+        "15"
+       ],
+       [
+        "TK Keys",
+        "1",
+        "6",
+        "6.0",
+        "0",
+        "6"
+       ],
+       [
+        "Javin Gordon",
+        "1",
+        "5",
+        "5.0",
+        "0",
+        "5"
+       ],
+       [
+        "DeSean Bishop",
+        "2",
+        "-3",
+        "-1.5",
+        "0",
+        "1"
+       ]
+      ]
+     },
+     "defensive": {
+      "labels": [
+       "TOT",
+       "SOLO",
+       "SACKS",
+       "TFL",
+       "PD",
+       "QB HUR",
+       "TD"
+      ],
+      "rows": [
+       [
+        "TJ Metcalf",
+        "8",
+        "5",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Arion Carter",
+        "7",
+        "2",
+        "0",
+        "0",
+        "0",
+        "1",
+        "0"
+       ],
+       [
+        "Amare Campbell",
+        "5",
+        "3",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Jeremiah Telander",
+        "4",
+        "3",
+        "0",
+        "1",
+        "0",
+        "1",
+        "0"
+       ],
+       [
+        "Dejuan Lane",
+        "3",
+        "2",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Ty Redmond",
+        "3",
+        "1",
+        "0",
+        "0",
+        "1",
+        "0",
+        "0"
+       ],
+       [
+        "Daevin Hobbs",
+        "3",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Jordan Norman",
+        "2",
+        "1",
+        "0",
+        "0",
+        "0",
+        "2",
+        "0"
+       ],
+       [
+        "Edwin Spillman",
+        "2",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Trent Thomas",
+        "1",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Qua Moss",
+        "1",
+        "1",
+        "0",
+        "0",
+        "0",
+        "1",
+        "0"
+       ],
+       [
+        "Brayden Rouse",
+        "1",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "DJ Burks",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Josh Turbyville",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Ethan Utley",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Mariyon Dye",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "TJ White",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Ryan Scott",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Carson Gentle",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "1",
+        "0"
+       ],
+       [
+        "Xavier Gilliam",
+        "0",
+        "0",
+        "0",
+        "0",
+        "1",
+        "0",
+        "0"
+       ]
+      ]
+     },
+     "interceptions": {
+      "labels": [
+       "INT",
+       "YDS",
+       "TD"
+      ],
+      "rows": [
+       [
+        "TJ Metcalf",
+        "1",
+        "37",
+        "0"
+       ],
+       [
+        "Dejuan Lane",
+        "1",
+        "21",
+        "0"
+       ]
+      ]
+     },
+     "puntReturns": {
+      "labels": [
+       "NO",
+       "YDS",
+       "AVG",
+       "LONG",
+       "TD"
+      ],
+      "rows": [
+       [
+        "Qua Moss",
+        "2",
+        "33",
+        "16.5",
+        "33",
+        "0"
+       ]
+      ]
+     },
+     "kicking": {
+      "labels": [
+       "FG",
+       "PCT",
+       "LONG",
+       "XP",
+       "PTS"
+      ],
+      "rows": [
+       [
+        "Cooper Ranvier",
+        "5/5",
+        "100.0",
+        "44",
+        "1/1",
+        "16"
+       ]
+      ]
+     },
+     "punting": {
+      "labels": [
+       "NO",
+       "YDS",
+       "AVG",
+       "TB",
+       "In 20",
+       "LONG"
+      ],
+      "rows": [
+       [
+        "Jackson Ross",
+        "5",
+        "238",
+        "47.6",
+        "0",
+        "0",
+        "51"
+       ]
+      ]
+     }
+    },
+    "TA&M": {
+     "passing": {
+      "labels": [
+       "C/ATT",
+       "YDS",
+       "AVG",
+       "TD",
+       "INT",
+       "QBR"
+      ],
+      "rows": [
+       [
+        "Marcel Reed",
+        "9/22",
+        "71",
+        "3.2",
+        "0",
+        "1",
+        "5.0"
+       ],
+       [
+        "Brady Hart",
+        "2/3",
+        "22",
+        "7.3",
+        "0",
+        "1",
+        "--"
+       ]
+      ]
+     },
+     "rushing": {
+      "labels": [
+       "CAR",
+       "YDS",
+       "AVG",
+       "TD",
+       "LONG"
+      ],
+      "rows": [
+       [
+        "KJ Edwards",
+        "7",
+        "44",
+        "6.3",
+        "1",
+        "25"
+       ],
+       [
+        "Rueben Owens II",
+        "10",
+        "39",
+        "3.9",
+        "0",
+        "10"
+       ],
+       [
+        "Jamarion Morrow",
+        "2",
+        "3",
+        "1.5",
+        "0",
+        "2"
+       ]
+      ]
+     },
+     "receiving": {
+      "labels": [
+       "REC",
+       "YDS",
+       "AVG",
+       "TD",
+       "LONG"
+      ],
+      "rows": [
+       [
+        "Mario Craver",
+        "5",
+        "49",
+        "9.8",
+        "0",
+        "19"
+       ],
+       [
+        "Aaron Gregory",
+        "1",
+        "23",
+        "23.0",
+        "0",
+        "23"
+       ],
+       [
+        "Houston Thomas",
+        "2",
+        "13",
+        "6.5",
+        "0",
+        "10"
+       ],
+       [
+        "Isaiah Horton",
+        "2",
+        "5",
+        "2.5",
+        "0",
+        "5"
+       ],
+       [
+        "Richie Anderson III",
+        "1",
+        "3",
+        "3.0",
+        "0",
+        "3"
+       ]
+      ]
+     },
+     "defensive": {
+      "labels": [
+       "TOT",
+       "SOLO",
+       "SACKS",
+       "TFL",
+       "PD",
+       "QB HUR",
+       "TD"
+      ],
+      "rows": [
+       [
+        "Dalton Brooks",
+        "11",
+        "3",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Tawfiq Byard",
+        "11",
+        "3",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Ray Coney",
+        "9",
+        "3",
+        "0",
+        "1.5",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Marcus Ratcliffe",
+        "8",
+        "4",
+        "0",
+        "0.5",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Noah Mikhail",
+        "8",
+        "4",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Marco Jones",
+        "7",
+        "3",
+        "0",
+        "0",
+        "0",
+        "1",
+        "0"
+       ],
+       [
+        "Daymion Sanford",
+        "7",
+        "1",
+        "1",
+        "2",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "CJ Mims",
+        "5",
+        "2",
+        "0",
+        "0.5",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Angelo McCullom",
+        "5",
+        "2",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "T.J. Searcy",
+        "5",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Jordan Shaw",
+        "4",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "DJ Hicks",
+        "4",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Brandon Davis-Swain",
+        "3",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Bryce Perry-Wright",
+        "3",
+        "0",
+        "0",
+        "0",
+        "0",
+        "1",
+        "0"
+       ],
+       [
+        "Dezz Ricks",
+        "2",
+        "2",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Sam M'Pemba",
+        "2",
+        "1",
+        "1",
+        "1",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Julio Humphrey",
+        "2",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Landon Rink",
+        "2",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Chance Collins",
+        "2",
+        "1",
+        "0",
+        "0",
+        "1",
+        "0",
+        "0"
+       ],
+       [
+        "DJ Sanders",
+        "2",
+        "0",
+        "0",
+        "0.5",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Lamont Rogers",
+        "1",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ],
+       [
+        "Anto Saka",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+       ]
+      ]
+     },
+     "kickReturns": {
+      "labels": [
+       "NO",
+       "YDS",
+       "AVG",
+       "LONG",
+       "TD"
+      ],
+      "rows": [
+       [
+        "Jamarion Morrow",
+        "3",
+        "59",
+        "19.7",
+        "22",
+        "0"
+       ]
+      ]
+     },
+     "puntReturns": {
+      "labels": [
+       "NO",
+       "YDS",
+       "AVG",
+       "LONG",
+       "TD"
+      ],
+      "rows": [
+       [
+        "Bravion Rogers",
+        "1",
+        "18",
+        "18.0",
+        "18",
+        "0"
+       ],
+       [
+        "Mario Craver",
+        "1",
+        "2",
+        "2.0",
+        "2",
+        "0"
+       ]
+      ]
+     },
+     "kicking": {
+      "labels": [
+       "FG",
+       "PCT",
+       "LONG",
+       "XP",
+       "PTS"
+      ],
+      "rows": [
+       [
+        "David Olano",
+        "0/1",
+        "0.0",
+        "0",
+        "1/1",
+        "1"
+       ]
+      ]
+     },
+     "punting": {
+      "labels": [
+       "NO",
+       "YDS",
+       "AVG",
+       "TB",
+       "In 20",
+       "LONG"
+      ],
+      "rows": [
+       [
+        "Tyler White",
+        "7",
+        "356",
+        "50.9",
+        "0",
+        "4",
+        "62"
+       ]
+      ]
+     }
+    }
+   },
+   "scoring": [
+    [
+     1,
+     "5:32",
+     "TENN",
+     "Cooper Ranvier 23 Yd Field Goal  ",
+     3,
+     0
+    ],
+    [
+     2,
+     "12:36",
+     "TA&M",
+     "KJ Edwards 25 Yd Run (David Olano Kick)",
+     3,
+     7
+    ],
+    [
+     2,
+     "6:01",
+     "TENN",
+     "Cooper Ranvier 30 Yd Field Goal  ",
+     6,
+     7
+    ],
+    [
+     3,
+     "1:21",
+     "TENN",
+     "Cooper Ranvier 32 Yd Field Goal  ",
+     9,
+     7
+    ],
+    [
+     4,
+     "9:38",
+     "TENN",
+     "DaSaahn Brame 5 Yd pass from Faizon Brandon (Cooper Ranvier Kick)",
+     16,
+     7
+    ],
+    [
+     4,
+     "6:18",
+     "TENN",
+     "Cooper Ranvier 44 Yd Field Goal  ",
+     19,
+     7
+    ],
+    [
+     4,
+     "2:44",
+     "TENN",
+     "Cooper Ranvier 27 Yd Field Goal  ",
+     22,
+     7
+    ]
+   ]
   }
  },
  "previews": {
-  "Texas A&M": {
-   "record": "4-5",
+  "LSU": {
+   "record": "6-4",
    "conf": "SEC",
-   "confRecord": "1-5",
+   "confRecord": "3-4",
    "compare": {
     "ppg": [
-     32.4,
-     26.1
+     31.4,
+     35.5
     ],
     "ypg": [
-     393.9,
-     359.2
+     385.5,
+     490.3
     ],
     "ypp": [
-     5.8,
-     5.12
+     5.63,
+     6.25
     ],
     "passYpg": [
-     177.9,
-     198.0
+     171.5,
+     316.6
     ],
     "cmpPct": [
-     64.4,
-     57.0
+     65.4,
+     68.8
     ],
     "ypa": [
-     7.21,
-     6.23
+     7.15,
+     8.24
     ],
     "passTD": [
-     10.0,
-     10.0
+     11.0,
+     21.0
     ],
     "intThrown": [
      4.0,
-     9.0
-    ],
-    "sacksAllowed": [
-     21.0,
-     17.0
-    ],
-    "rushYpg": [
-     216.0,
-     161.2
-    ],
-    "ypc": [
-     5.0,
-     4.21
-    ],
-    "rushTD": [
-     24.0,
-     14.0
-    ],
-    "recPg": [
-     15.9,
-     18.1
-    ],
-    "ypr": [
-     11.2,
-     10.93
-    ],
-    "fdPg": [
-     21.4,
-     20.7
-    ],
-    "thirdPct": [
-     37.5,
-     42.9
-    ],
-    "fourthPct": [
-     75.0,
-     42.1
-    ],
-    "penYpg": [
-     61.9,
-     49.0
-    ],
-    "top": [
-     30.6,
-     32.6
-    ],
-    "toLost": [
-     11.0,
-     11.0
-    ],
-    "oppg": [
-     15.1,
-     18.7
-    ],
-    "oypg": [
-     296.6,
-     320.6
-    ],
-    "oypp": [
-     4.74,
-     5.6
-    ],
-    "othirdPct": [
-     33.1,
-     31.5
-    ],
-    "oPassYpg": [
-     172.1,
-     190.1
-    ],
-    "oCmpPct": [
-     64.1,
-     58.4
-    ],
-    "defInt": [
-     9.0,
-     6.0
-    ],
-    "sacks": [
-     38.0,
-     9.0
-    ],
-    "oRushYpg": [
-     124.4,
-     130.4
-    ],
-    "oYpc": [
-     3.82,
-     3.99
-    ],
-    "tfl": [
-     73.0,
-     39.0
-    ],
-    "takeaways": [
-     17.0,
      12.0
     ],
-    "toMargin": [
-     6.0,
-     1.0
-    ],
-    "krAvg": [
-     16.2,
-     17.9
-    ],
-    "prAvg": [
-     10.5,
-     9.5
-    ],
-    "retTD": [
-     1.0,
-     0.0
-    ]
-   },
-   "sp": {
-    "opp": [
-     8.3,
-     42,
-     63,
-     32
-    ],
-    "ut": [
-     20.5,
-     10,
-     22,
-     10
-    ]
-   },
-   "fpi": {
-    "opp": [
-     13.027,
-     24
-    ],
-    "ut": [
-     18.513,
-     11
-    ]
-   },
-   "impact": [
-    {
-     "name": "Marcel Reed",
-     "pos": "QB",
-     "what": "passing",
-     "line": "1639 pass yds, 8 TD, 8 INT"
-    },
-    {
-     "name": "Rueben Owens",
-     "pos": "RB",
-     "what": "rushing",
-     "line": "469 rush yds, 1 TD"
-    },
-    {
-     "name": "Isaiah Horton",
-     "pos": "WR",
-     "what": "receiving",
-     "line": "392 rec yds, 28 rec, 3 TD"
-    },
-    {
-     "name": "Ray Coney",
-     "pos": "LB",
-     "what": "defensive",
-     "line": "46 tackles, 2.5 TFL"
-    },
-    {
-     "name": "Marco Jones",
-     "pos": "DE",
-     "what": "defensive",
-     "line": "3.5 sacks"
-    },
-    {
-     "name": "Dalton Brooks",
-     "pos": "S",
-     "what": "interceptions",
-     "line": "1 INT"
-    }
-   ],
-   "utImpact": [
-    {
-     "name": "George MacIntyre",
-     "pos": "QB",
-     "what": "passing",
-     "line": "853 pass yds, 2 TD, 3 INT"
-    },
-    {
-     "name": "DeSean Bishop",
-     "pos": "RB",
-     "what": "rushing",
-     "line": "1066 rush yds, 13 TD"
-    },
-    {
-     "name": "Mike Matthews",
-     "pos": "WR",
-     "what": "receiving",
-     "line": "566 rec yds, 37 rec, 4 TD"
-    },
-    {
-     "name": "Arion Carter",
-     "pos": "LB",
-     "what": "defensive",
-     "line": "59 tackles, 9 TFL"
-    },
-    {
-     "name": "Tyree Weathersby",
-     "pos": "DL",
-     "what": "defensive",
-     "line": "7 sacks"
-    },
-    {
-     "name": "Dejuan Lane",
-     "pos": "DB",
-     "what": "interceptions",
-     "line": "4 INT"
-    }
-   ],
-   "series": {
-    "w": 3,
-    "l": 2,
-    "t": 0,
-    "first": 1957,
-    "last": [
-     [
-      1957,
-      "Tennessee",
-      "Tennessee",
-      3,
-      "Texas A&M",
-      0
-     ],
-     [
-      2004,
-      "Tennessee",
-      "Texas A&M",
-      7,
-      "Tennessee",
-      38
-     ],
-     [
-      2016,
-      "Texas A&M",
-      "Texas A&M",
-      45,
-      "Tennessee",
-      38
-     ],
-     [
-      2020,
-      "Texas A&M",
-      "Tennessee",
-      13,
-      "Texas A&M",
-      34
-     ],
-     [
-      2023,
-      "Tennessee",
-      "Tennessee",
-      20,
-      "Texas A&M",
-      13
-     ]
-    ]
-   }
-  },
-  "LSU": {
-   "record": "6-3",
-   "conf": "SEC",
-   "confRecord": "3-3",
-   "compare": {
-    "ppg": [
-     32.4,
-     37.1
-    ],
-    "ypg": [
-     393.9,
-     504.1
-    ],
-    "ypp": [
-     5.8,
-     6.33
-    ],
-    "passYpg": [
-     177.9,
-     324.7
-    ],
-    "cmpPct": [
-     64.4,
-     68.3
-    ],
-    "ypa": [
-     7.21,
-     8.42
-    ],
-    "passTD": [
-     10.0,
-     19.0
-    ],
-    "intThrown": [
-     4.0,
-     9.0
-    ],
     "sacksAllowed": [
-     21.0,
-     17.0
+     23.0,
+     20.0
     ],
     "rushYpg": [
-     216.0,
-     179.4
+     214.0,
+     173.7
     ],
     "ypc": [
-     5.0,
-     4.36
+     4.81,
+     4.34
     ],
     "rushTD": [
      24.0,
-     23.0
+     24.0
     ],
     "recPg": [
-     15.9,
-     26.3
+     15.7,
+     26.4
     ],
     "ypr": [
-     11.2,
-     12.33
+     10.92,
+     11.99
     ],
     "fdPg": [
-     21.4,
-     27.9
+     21.1,
+     27.0
     ],
     "thirdPct": [
-     37.5,
+     36.5,
      50.0
     ],
     "fourthPct": [
-     75.0,
-     65.0
+     77.8,
+     68.2
     ],
     "penYpg": [
-     61.9,
-     47.3
+     58.2,
+     51.9
     ],
     "top": [
-     30.6,
-     33.0
+     31.8,
+     32.7
     ],
     "toLost": [
      11.0,
-     13.0
+     16.0
     ],
     "oppg": [
-     15.1,
-     17.7
+     14.3,
+     18.1
     ],
     "oypg": [
-     296.6,
-     261.3
+     284.8,
+     262.5
     ],
     "oypp": [
-     4.74,
-     4.38
+     4.69,
+     4.35
     ],
     "othirdPct": [
-     33.1,
-     30.4
+     31.8,
+     31.7
     ],
     "oPassYpg": [
-     172.1,
-     176.4
+     164.2,
+     176.2
     ],
     "oCmpPct": [
-     64.1,
-     61.0
+     62.4,
+     60.2
     ],
     "defInt": [
-     9.0,
-     7.0
+     11.0,
+     10.0
     ],
     "sacks": [
      38.0,
-     33.0
+     37.0
     ],
     "oRushYpg": [
-     124.4,
-     84.9
+     120.6,
+     86.3
     ],
     "oYpc": [
-     3.82,
-     2.7
+     3.87,
+     2.74
     ],
     "tfl": [
-     73.0,
-     64.0
+     74.0,
+     72.0
     ],
     "takeaways": [
-     17.0,
-     9.0
+     19.0,
+     12.0
     ],
     "toMargin": [
-     6.0,
+     8.0,
      -4.0
     ],
     "krAvg": [
      16.2,
-     18.8
+     16.4
     ],
     "prAvg": [
-     10.5,
+     11.4,
      7.2
     ],
     "retTD": [
@@ -14411,25 +15225,25 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     22.9,
-     7,
-     12,
-     9
+     22.1,
+     9,
+     15,
+     10
     ],
     "ut": [
-     20.5,
-     10,
-     22,
-     10
+     21.5,
+     11,
+     23,
+     6
     ]
    },
    "fpi": {
     "opp": [
-     22.509,
+     22.089,
      7
     ],
     "ut": [
-     18.513,
+     19.594,
      11
     ]
    },
@@ -14438,37 +15252,37 @@ window.SITE_AUTO.football = {
      "name": "Sam Leavitt",
      "pos": "QB",
      "what": "passing",
-     "line": "2551 pass yds, 17 TD, 9 INT"
+     "line": "2795 pass yds, 19 TD, 12 INT"
     },
     {
      "name": "Dilin Jones",
      "pos": "RB",
      "what": "rushing",
-     "line": "715 rush yds, 7 TD"
+     "line": "840 rush yds, 8 TD"
     },
     {
      "name": "Jackson Harris",
      "pos": "WR",
      "what": "receiving",
-     "line": "800 rec yds, 47 rec, 7 TD"
+     "line": "864 rec yds, 55 rec, 9 TD"
     },
     {
      "name": "TJ Dottery",
      "pos": "LB",
      "what": "defensive",
-     "line": "69 tackles, 3 TFL"
+     "line": "74 tackles, 3 TFL"
     },
     {
      "name": "Princewill Umanmielen",
      "pos": "DE",
      "what": "defensive",
-     "line": "9 sacks"
+     "line": "10 sacks"
     },
     {
-     "name": "Tamarcus Cooley",
+     "name": "Ty Benefield",
      "pos": "S",
      "what": "interceptions",
-     "line": "2 INT"
+     "line": "3 INT"
     }
    ],
    "utImpact": [
@@ -14476,25 +15290,25 @@ window.SITE_AUTO.football = {
      "name": "George MacIntyre",
      "pos": "QB",
      "what": "passing",
-     "line": "853 pass yds, 2 TD, 3 INT"
+     "line": "962 pass yds, 2 TD, 3 INT"
     },
     {
      "name": "DeSean Bishop",
      "pos": "RB",
      "what": "rushing",
-     "line": "1066 rush yds, 13 TD"
+     "line": "1163 rush yds, 13 TD"
     },
     {
      "name": "Mike Matthews",
      "pos": "WR",
      "what": "receiving",
-     "line": "566 rec yds, 37 rec, 4 TD"
+     "line": "608 rec yds, 39 rec, 4 TD"
     },
     {
      "name": "Arion Carter",
      "pos": "LB",
      "what": "defensive",
-     "line": "59 tackles, 9 TFL"
+     "line": "66 tackles, 9 TFL"
     },
     {
      "name": "Tyree Weathersby",
@@ -14506,7 +15320,7 @@ window.SITE_AUTO.football = {
      "name": "Dejuan Lane",
      "pos": "DB",
      "what": "interceptions",
-     "line": "4 INT"
+     "line": "5 INT"
     }
    ],
    "series": {
@@ -14567,36 +15381,36 @@ window.SITE_AUTO.football = {
    }
   },
   "Vanderbilt": {
-   "record": "4-5",
+   "record": "4-6",
    "conf": "SEC",
-   "confRecord": "1-5",
+   "confRecord": "1-6",
    "compare": {
     "ppg": [
-     32.4,
-     23.0
+     31.4,
+     21.3
     ],
     "ypg": [
-     393.9,
-     341.2
+     385.5,
+     330.6
     ],
     "ypp": [
-     5.8,
-     5.28
+     5.63,
+     5.13
     ],
     "passYpg": [
-     177.9,
-     229.0
+     171.5,
+     228.4
     ],
     "cmpPct": [
-     64.4,
+     65.4,
      62.5
     ],
     "ypa": [
-     7.21,
-     7.36
+     7.15,
+     7.14
     ],
     "passTD": [
-     10.0,
+     11.0,
      9.0
     ],
     "intThrown": [
@@ -14604,112 +15418,112 @@ window.SITE_AUTO.football = {
      9.0
     ],
     "sacksAllowed": [
-     21.0,
-     18.0
+     23.0,
+     23.0
     ],
     "rushYpg": [
-     216.0,
-     112.2
+     214.0,
+     102.2
     ],
     "ypc": [
-     5.0,
-     3.34
+     4.81,
+     3.14
     ],
     "rushTD": [
      24.0,
      12.0
     ],
     "recPg": [
-     15.9,
-     19.4
+     15.7,
+     20.0
     ],
     "ypr": [
-     11.2,
-     11.78
+     10.92,
+     11.42
     ],
     "fdPg": [
-     21.4,
-     18.4
+     21.1,
+     17.6
     ],
     "thirdPct": [
-     37.5,
-     38.4
+     36.5,
+     35.7
     ],
     "fourthPct": [
-     75.0,
-     66.7
+     77.8,
+     60.0
     ],
     "penYpg": [
-     61.9,
-     61.7
+     58.2,
+     64.7
     ],
     "top": [
-     30.6,
-     31.4
+     31.8,
+     31.0
     ],
     "toLost": [
      11.0,
      15.0
     ],
     "oppg": [
-     15.1,
-     29.4
+     14.3,
+     28.6
     ],
     "oypg": [
-     296.6,
-     359.1
+     284.8,
+     354.1
     ],
     "oypp": [
-     4.74,
-     5.63
+     4.69,
+     5.52
     ],
     "othirdPct": [
-     33.1,
-     42.5
+     31.8,
+     42.2
     ],
     "oPassYpg": [
-     172.1,
-     221.3
+     164.2,
+     220.9
     ],
     "oCmpPct": [
-     64.1,
-     65.6
+     62.4,
+     65.7
     ],
     "defInt": [
-     9.0,
-     6.0
+     11.0,
+     7.0
     ],
     "sacks": [
      38.0,
-     19.0
+     22.0
     ],
     "oRushYpg": [
-     124.4,
-     137.8
+     120.6,
+     133.2
     ],
     "oYpc": [
-     3.82,
-     4.12
+     3.87,
+     3.96
     ],
     "tfl": [
-     73.0,
-     37.0
+     74.0,
+     43.0
     ],
     "takeaways": [
-     17.0,
-     8.0
+     19.0,
+     10.0
     ],
     "toMargin": [
-     6.0,
-     -7.0
+     8.0,
+     -5.0
     ],
     "krAvg": [
      16.2,
      17.6
     ],
     "prAvg": [
-     10.5,
-     16.1
+     11.4,
+     15.4
     ],
     "retTD": [
      1.0,
@@ -14718,25 +15532,25 @@ window.SITE_AUTO.football = {
    },
    "sp": {
     "opp": [
-     -1.5,
-     79,
-     78,
-     81
+     -2.1,
+     81,
+     86,
+     79
     ],
     "ut": [
-     20.5,
-     10,
-     22,
-     10
+     21.5,
+     11,
+     23,
+     6
     ]
    },
    "fpi": {
     "opp": [
-     0.714,
-     69
+     1.328,
+     65
     ],
     "ut": [
-     18.513,
+     19.594,
      11
     ]
    },
@@ -14745,25 +15559,25 @@ window.SITE_AUTO.football = {
      "name": "Jared Curtis",
      "pos": "QB",
      "what": "passing",
-     "line": "1657 pass yds, 8 TD, 8 INT"
+     "line": "1880 pass yds, 8 TD, 8 INT"
     },
     {
      "name": "Sedrick Alexander",
      "pos": "RB",
      "what": "rushing",
-     "line": "333 rush yds, 6 TD"
+     "line": "360 rush yds, 6 TD"
     },
     {
      "name": "Junior Sherrill",
      "pos": "WR",
      "what": "receiving",
-     "line": "747 rec yds, 56 rec, 4 TD"
+     "line": "847 rec yds, 63 rec, 4 TD"
     },
     {
      "name": "C.J. Heard",
      "pos": "S",
      "what": "defensive",
-     "line": "65 tackles, 4 TFL"
+     "line": "74 tackles, 4.5 TFL"
     },
     {
      "name": "Yilanan Ouattara",
@@ -14783,25 +15597,25 @@ window.SITE_AUTO.football = {
      "name": "George MacIntyre",
      "pos": "QB",
      "what": "passing",
-     "line": "853 pass yds, 2 TD, 3 INT"
+     "line": "962 pass yds, 2 TD, 3 INT"
     },
     {
      "name": "DeSean Bishop",
      "pos": "RB",
      "what": "rushing",
-     "line": "1066 rush yds, 13 TD"
+     "line": "1163 rush yds, 13 TD"
     },
     {
      "name": "Mike Matthews",
      "pos": "WR",
      "what": "receiving",
-     "line": "566 rec yds, 37 rec, 4 TD"
+     "line": "608 rec yds, 39 rec, 4 TD"
     },
     {
      "name": "Arion Carter",
      "pos": "LB",
      "what": "defensive",
-     "line": "59 tackles, 9 TFL"
+     "line": "66 tackles, 9 TFL"
     },
     {
      "name": "Tyree Weathersby",
@@ -14813,7 +15627,7 @@ window.SITE_AUTO.football = {
      "name": "Dejuan Lane",
      "pos": "DB",
      "what": "interceptions",
-     "line": "4 INT"
+     "line": "5 INT"
     }
    ],
    "series": {
@@ -14874,6 +15688,89 @@ window.SITE_AUTO.football = {
    }
   }
  },
+ "fpi": {
+  "Arkansas": [
+   3.8,
+   51
+  ],
+  "Georgia": [
+   28.1,
+   1
+  ],
+  "Ole Miss": [
+   18.4,
+   13
+  ],
+  "Vanderbilt": [
+   1.3,
+   65
+  ],
+  "Alabama": [
+   24.8,
+   4
+  ],
+  "South Carolina": [
+   10.7,
+   33
+  ],
+  "Tennessee": [
+   19.6,
+   11
+  ],
+  "LSU": [
+   22.1,
+   7
+  ],
+  "Kentucky": [
+   10.3,
+   34
+  ],
+  "Oklahoma": [
+   12.9,
+   23
+  ],
+  "Florida": [
+   12.7,
+   26
+  ],
+  "Texas": [
+   24.0,
+   6
+  ],
+  "Missouri": [
+   11.9,
+   28
+  ],
+  "Texas A&M": [
+   11.8,
+   29
+  ],
+  "Mississippi State": [
+   4.0,
+   50
+  ],
+  "Auburn": [
+   10.1,
+   35
+  ]
+ },
+ "log": [
+  "OK   games, results and record",
+  "OK   AP and Coaches polls",
+  "OK   team per-game numbers and national/SEC ranks",
+  "OK   player season stats",
+  "OK   national (FBS) ranks for Tennessee players",
+  "OK   recruiting classes",
+  "OK   ESPN lines, TV and win chances",
+  "OK   full team stat sheet with national and SEC ranks",
+  "OK   247 ratings for the full roster (HS composite + transfer) and team talent",
+  "OK   box scores for finished games (ESPN)",
+  "OK   matchup previews for remaining games (CFBD)",
+  "OK   season-by-season schedules and team leaders (cached after the first run)",
+  "SKIP PEAR ratings: HTTP Error 403: Forbidden",
+  "     PEAR probe saved to tools/cache/pear-probe.json",
+  "OK   FPI ratings and ranks for the SEC (CFBD)"
+ ],
  "pear": {
   "week": 11,
   "ratings": [
@@ -15205,87 +16102,5 @@ window.SITE_AUTO.football = {
     19
    ]
   }
- },
- "fpi": {
-  "Arkansas": [
-   1.6,
-   63
-  ],
-  "Georgia": [
-   27.2,
-   2
-  ],
-  "Ole Miss": [
-   18.3,
-   12
-  ],
-  "Vanderbilt": [
-   0.7,
-   69
-  ],
-  "Alabama": [
-   26.1,
-   3
-  ],
-  "South Carolina": [
-   14.1,
-   19
-  ],
-  "Tennessee": [
-   18.5,
-   11
-  ],
-  "LSU": [
-   22.5,
-   7
-  ],
-  "Kentucky": [
-   11.3,
-   35
-  ],
-  "Oklahoma": [
-   13.6,
-   22
-  ],
-  "Florida": [
-   12.5,
-   28
-  ],
-  "Texas": [
-   23.9,
-   6
-  ],
-  "Missouri": [
-   12.9,
-   25
-  ],
-  "Texas A&M": [
-   13.0,
-   24
-  ],
-  "Mississippi State": [
-   7.0,
-   46
-  ],
-  "Auburn": [
-   8.7,
-   39
-  ]
- },
- "log": [
-  "OK   games, results and record",
-  "OK   AP and Coaches polls",
-  "OK   team per-game numbers and national/SEC ranks",
-  "OK   player season stats",
-  "OK   national (FBS) ranks for Tennessee players",
-  "OK   recruiting classes",
-  "OK   ESPN lines, TV and win chances",
-  "OK   full team stat sheet with national and SEC ranks",
-  "OK   247 ratings for the full roster (HS composite + transfer) and team talent",
-  "OK   box scores for finished games (ESPN)",
-  "OK   matchup previews for remaining games (CFBD)",
-  "OK   season-by-season schedules and team leaders (cached after the first run)",
-  "OK   PEAR ratings (week 11)",
-  "OK   FPI ratings and ranks for the SEC (CFBD)"
- ]
+ }
 };

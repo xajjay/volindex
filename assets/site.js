@@ -6,9 +6,9 @@
     { key: 'volleyball', name: 'Volleyball', ready: true },
     { key: 'mbb', name: "Men's Basketball", ready: false },
     { key: 'wbb', name: "Women's Basketball", ready: false },
+    { key: 'soccer', name: 'Soccer', ready: true },   // in the NCAA Tournament: ahead of baseball and softball
     { key: 'baseball', name: 'Baseball', ready: false },
     { key: 'softball', name: 'Softball', ready: false },
-    { key: 'soccer', name: 'Soccer', ready: true },   // season over: last on the Home screen
   ];
   const TABS = [
     ['overview', 'Overview'], ['schedule', 'Schedule & Standings'], ['roster', 'Roster'], ['depth', 'Depth Chart'],
@@ -164,7 +164,7 @@
         <div class="eyebrow">${s.key === 'football' ? '2026 season' : window.SITE && window.SITE[s.key] ? window.SITE[s.key].season + ' season' : 'Coming soon'}</div>
         <h2>${esc(s.name)} ${rankBlock(pollFor(s.key, F))}</h2></div>
         ${pollLine(pollFor(s.key, F))}
-        ${(d => d && d.concluded ? `<div class="concl" style="margin:6px 0 2px;font-weight:700;color:var(--smokey,#4B4B4B)">${esc(d.concludedNote || 'Season concluded')}</div>` : '')(window.SITE && window.SITE[s.key])}
+        ${(d => d && (d.concluded || d.concludedNote) ? `<div class="concl" style="margin:6px 0 2px;font-weight:700;color:var(--smokey,#4B4B4B)">${esc(d.concludedNote || 'Season concluded')}</div>` : '')(window.SITE && window.SITE[s.key])}
         ${(d => d ? `<div class="upd">Updated ${fmtDate(d, { month: 'short', day: 'numeric' })}</div>` : '')(lastUpdated(s.key))}
         ${(r => r ? `<div class="bigrec"><b>${esc(r.rec)}</b>${r.sec ? `<span>${esc(r.sec)} <em>SEC</em></span>` : ''}<small>${esc(r.season)} record</small></div>` : '')(s.key === 'football' && F ? (F.schedule.some(g => g.result) ? { season: F.season, rec: F.team.record, sec: F.team.sec } : null) : window.sportRecord && window.sportRecord(s.key))}
         <div class="status">${(s.key === 'football' && F && F.schedule.some(g => g.result)) || (window.sportRecord && window.sportRecord(s.key)) ? '' : s.key === 'football' && F ? `${F.season}: ${F.team.record} (${F.team.sec} SEC)` : window.sportStatus && window.sportStatus(s.key) ? esc(window.sportStatus(s.key).split(' · Next')[0]) : 'Page in progress.'}</div>
@@ -457,7 +457,7 @@
   function injuryList() {
     const I = F.injuries; if (!I || !I.rows || !I.rows.length) return '';
     const known = new Set(F.players.map(p => p.name));
-    return `<div class="section"><h3>Season-ending injuries <small>${I.rows.length} players · as of ${esc(I.asOf)}</small></h3><div class="tablewrap"><table><thead><tr><th>Player</th><th>Pos</th><th>Class</th><th>Injured</th><th class="hide-sm">Notes</th></tr></thead><tbody>${I.rows.map(r => `<tr${known.has(r.name) ? ` class="click" data-player="${esc(r.name)}" tabindex="0"` : ''}><td><b>${esc(r.name)}</b> <span class="chip leave">Out</span></td><td>${esc(r.pos)}</td><td>${esc(r.cls)}</td><td>${esc(r.when)}</td><td class="hide-sm">${esc(r.note)}</td></tr>`).join('')}</tbody></table></div>${I.source ? `<p class="dim small">Source: <a href="${esc(I.source)}" target="_blank" rel="noopener">Rocky Top Insider</a>. Ethan Davis's injury per Vols Wire.</p>` : ''}</div>`;
+    return `<div class="section"><h3>Injuries &amp; absences <small>${I.rows.length} players · as of ${esc(I.asOf)}</small></h3><div class="tablewrap"><table><thead><tr><th>Player</th><th>Pos</th><th>Class</th><th>When</th><th class="hide-sm">Notes</th></tr></thead><tbody>${I.rows.map(r => `<tr${known.has(r.name) ? ` class="click" data-player="${esc(r.name)}" tabindex="0"` : ''}><td><b>${esc(r.name)}</b> <span class="chip leave">${esc(r.status || "Out for season")}</span></td><td>${esc(r.pos)}</td><td>${esc(r.cls)}</td><td>${esc(r.when)}</td><td class="hide-sm">${esc(r.note)}</td></tr>`).join('')}</tbody></table></div>${I.source ? `<p class="dim small">Source: <a href="${esc(I.source)}" target="_blank" rel="noopener">Rocky Top Insider</a>. Ethan Davis's injury per Vols Wire. Matthews, Morris and Moore per ESPN and Knox TN Today.</p>` : ''}</div>`;
   }
   function status27(p) {
     if (p.leaving) return '<span class="chip leave">Out of eligibility</span>';
