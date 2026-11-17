@@ -530,6 +530,15 @@
       ball.push([tKick - 0.25, -7, 0, 0]); ball.push([tKick, -7, 0, 0]); ball.push([(tKick + tEnd) / 2, (dist - 7 - 7) / 2, vEnd / 2, 11]); ball.push([tEnd, dist - 7 + 3, vEnd, 3]);
       for (let i = 0; i < 4; i++) key(def[i], tKick, -1.5, D[i][1] * 0.7);
       T = tEnd + 0.4;
+    } else if (p.type === 'ko') {
+      // the kicking team across its 35, the return team spread deep; the ball hangs, the returner brings it out (or takes a knee)
+      const land = p.tb ? 68 : Math.max(52, Math.min(64, (p.end || 75) - 35 + 8)), stop = p.td6 ? 68 : (p.end != null ? p.end : 75) - 35, tKick = t0 + 0.5, tLand = tKick + 1.9, tEnd = p.tb ? tLand + 0.3 : tLand + Math.min(2.4, Math.abs(land - stop) * 0.08 + 0.3), vL = rr(-8, 8);
+      off.forEach((a, i) => { const v = -24 + i * 4.8; a[0] = [0, i === 5 ? -7 : -1, v]; a[1] = [t0, i === 5 ? -7 : -1, v]; key(a, tKick, i === 5 ? -0.5 : 2, v); key(a, tEnd, Math.min(stop + rr(-2, 6), 58), v * 0.6 + vL * 0.4 + rr(-3, 3)); });
+      def.forEach((a, i) => { const u = i === 10 ? 63 : i < 5 ? 12 + rr(0, 4) : 28 + (i - 5) * 4, v = i === 10 ? 0 : -22 + (i % 5) * 11; a[0] = [0, u, v]; a[1] = [t0, u, v]; if (i !== 10) key(a, tEnd, Math.max(stop - rr(3, 10), 6), v * 0.5 + vL * 0.5); });
+      key(def[10], tLand, land, vL); if (!p.tb) key(def[10], tEnd, p.td6 ? -2 : stop, vL + rr(-6, 6));
+      ball.length = 0; ball.push([0, -0.5, 0, 0], [tKick, -0.5, 0, 0], [(tKick + tLand) / 2, land / 2, vL / 2, 17], [tLand, land, vL, 0]);
+      if (!p.tb) ball.push([tEnd, p.td6 ? -2 : stop, def[10][def[10].length - 1][2], 0]);
+      T = tEnd + 0.4;
     } else if (p.type === 'pen') { flag = [rr(-1, 3), rr(-8, 8)]; T = 1.3; }
     else T = 1.2;
     settle(off, T); settle(def, T); const lb = ball[ball.length - 1]; if (lb[0] < T) ball.push([T, lb[1], lb[2], 0]);
@@ -542,7 +551,7 @@
     host.innerHTML = `<div class="vp-stage"><div class="vp-bug"><div class="t" id="vpTu"><i style="background:${tU.col}"></i><span>TENN</span><b id="vpSu">0</b><em></em></div><div class="c"><span id="vpQ">1st 15:00</span><small>${esc(label)}</small></div><div class="t r" id="vpTo"><i style="background:${tO.col}"></i><span>${esc(tO.abbr)}</span><b id="vpSo">0</b><em></em></div></div>
       <div class="vp-dd"><span id="vpDd">Kickoff</span><span id="vpWpT">Tennessee win chance ${pc(res.win)}</span></div>
       <canvas class="vp-cv" id="vpCv" aria-label="Animated field showing the simulated game"></canvas><div class="vp-call" id="vpCall" aria-live="polite">Press play to watch.</div><canvas class="vp-wp" id="vpWp" aria-label="Tennessee win probability through the game"></canvas>
-      <div class="vp-ctl"><button class="vp-btn pri" data-vpc="play">▶ Play</button><button class="vp-btn" data-vpc="mode" aria-pressed="true" title="Key plays in full, the rest in fast forward">Highlights</button><button class="vp-btn" data-vpc="speed">Speed 1×</button><button class="vp-btn" data-vpc="score">Next score ⏭</button><span class="sp"></span><button class="vp-btn" data-vpc="end">Skip to final</button></div>
+      <div class="vp-ctl"><button class="vp-btn pri" data-vpc="play">▶ Play</button><button class="vp-btn" data-vpc="mode" aria-pressed="true" title="Key plays at full speed, routine plays quicker">Highlights</button><button class="vp-btn" data-vpc="speed">Speed 1×</button><button class="vp-btn" data-vpc="score">Next score ⏭</button><span class="sp"></span><button class="vp-btn" data-vpc="end">Skip to final</button></div>
       <div class="vp-log" id="vpLog" tabindex="0" aria-label="Play-by-play"></div></div><div id="vpFinal"></div>`;
     const $ = s => host.querySelector(s), cv = $('#vpCv'), c = cv.getContext('2d'), wpc = $('#vpWp'), wc = wpc.getContext('2d');
     let W = 0, H = 0, dpr = 1;
@@ -567,6 +576,13 @@
       c.strokeStyle = '#FFD21F'; c.lineWidth = 2; [[1.2], [118.8]].forEach(([x]) => { c.beginPath(); c.moveTo(X(x), Y(-3.1)); c.lineTo(X(x), Y(3.1)); c.stroke(); });   // goal posts
     }
     const dot = (x, y, col, r, ring) => { c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.fillStyle = col; c.fill(); c.lineWidth = Math.max(1, r * 0.32); c.strokeStyle = ring || '#fff'; c.stroke(); };
+    // where everyone is, in field yards, at one moment of a staged play: [Tennessee's eleven, the opponent's eleven] and the ball
+    function world(p, stg, tt) {
+      const o = p.o, lx = fx(o, p.ball), dr = dir(o), lat = p.type === 'ko' ? 0 : (p.lat || 0);
+      const cv = a => { const q = at(a, tt); return [lx + dr * q[1], clamp(lat + q[2], -25.6, 25.6), q[3] || 0]; };
+      const tm = [null, null]; tm[o] = stg.off.map(cv); tm[1 - o] = stg.def.map(cv);
+      return { tm, ball: cv(stg.ball) };
+    }
     function draw() {
       field();
       const p = S.cur; if (!p) return;
@@ -576,20 +592,21 @@
         c.lineWidth = 2; c.strokeStyle = 'rgba(40,110,255,.9)'; c.beginPath(); c.moveTo(X(lx), 0); c.lineTo(X(lx), H); c.stroke();
         if (p.down && p.togo && p.ball + p.togo < 100) { c.strokeStyle = 'rgba(255,210,31,.95)'; c.beginPath(); c.moveTo(X(lx + dr * p.togo), 0); c.lineTo(X(lx + dr * p.togo), H); c.stroke(); }
       }
-      if (S.quick) {            // fast forward: just the ball moving to the new spot
-        const k = ease(clamp(S.t / S.quick, 0, 1)), bx = lx + dr * (p.end - p.ball) * k;
-        dot(X(bx), Y(lat), '#7A4A21', r * 1.25, '#fff'); return;
-      }
       const stg = S.st; if (!stg) return;
-      const pos = (path) => { const a = at(path, S.t); return [X(lx + dr * a[1]), Y(clamp(lat + a[2], -25.6, 25.6)), a[3] || 0]; };
-      stg.def.forEach(a => { const q = pos(a); dot(q[0], q[1], colD, r, d === 0 ? '#fff' : '#E8E8E8'); });
-      stg.off.forEach(a => { const q = pos(a); dot(q[0], q[1], colO, r, o === 0 ? '#fff' : '#E8E8E8'); });
+      // players jog from where the last play ended to the new formation, then the play runs (faster for routine plays in Highlights)
+      const tt = Math.max(0, S.t - S.trans) * S.rate, now = world(p, stg, tt), k = S.from && S.t < S.trans ? ease(S.t / S.trans) : 1;
+      const mix = (a, b0) => k >= 1 || !a ? b0 : [a[0] + (b0[0] - a[0]) * k, a[1] + (b0[1] - a[1]) * k, (b0[2] || 0) * k];
+      const W0 = { tm: now.tm.map((arr, ti) => arr.map((q, i) => mix(S.from && S.from.tm[ti][i], q))), ball: mix(S.from && S.from.ball, now.ball) };
+      S.now = W0;
+      const pos = path => { const idx = stg.off.indexOf(path); const q = idx >= 0 ? W0.tm[o][idx] : W0.tm[d][stg.def.indexOf(path)]; return [X(q[0]), Y(q[1]), q[2] || 0]; };
+      W0.tm[d].forEach(q => dot(X(q[0]), Y(q[1]), colD, r, d === 0 ? '#fff' : '#E8E8E8'));
+      W0.tm[o].forEach(q => dot(X(q[0]), Y(q[1]), colO, r, o === 0 ? '#fff' : '#E8E8E8'));
       if (stg.flag) { c.fillStyle = '#FFD21F'; c.fillRect(X(lx + dr * stg.flag[0]) - 4, Y(lat + stg.flag[1]) - 4, 8, 8); }
-      const b = pos(stg.ball), z = b[2];
+      const b = [X(W0.ball[0]), Y(W0.ball[1]), W0.ball[2] || 0], z = b[2];
       c.fillStyle = 'rgba(0,0,0,.28)'; c.beginPath(); c.ellipse(b[0], b[1] + 2, r * 0.9, r * 0.5, 0, 0, 6.2832); c.fill();
       c.fillStyle = '#7A4A21'; c.strokeStyle = '#fff'; c.lineWidth = 1; c.beginPath(); c.ellipse(b[0], b[1] - z * (H / 53.3) * 0.55, r * (0.85 + z * 0.05), r * (0.6 + z * 0.035), 0, 0, 6.2832); c.fill(); c.stroke();
-      const nm = p.type === 'run' || p.type === 'sack' ? p.who : p.type === 'pass' ? (S.t > stg.T * 0.45 ? p.tgt : p.who) : p.type === 'inc' || p.type === 'int' ? p.who : null;
-      if (nm && S.t > 0.5 && W >= 420) { c.font = `700 ${Math.max(10, W / 85)}px Archivo, system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'bottom'; c.lineWidth = 3; c.strokeStyle = 'rgba(0,0,0,.65)'; const hx = p.type === 'pass' && S.t <= stg.T * 0.45 || p.type === 'inc' || p.type === 'int' ? pos(stg.off[6]) : b; c.strokeText(nm, hx[0], hx[1] - r * 1.8); c.fillStyle = '#fff'; c.fillText(nm, hx[0], hx[1] - r * 1.8); }
+      const nm = p.type === 'run' || p.type === 'sack' ? p.who : p.type === 'pass' ? (tt > stg.T * 0.45 ? p.tgt : p.who) : p.type === 'inc' || p.type === 'int' ? p.who : null;
+      if (nm && tt > 0.5 && W >= 420) { c.font = `700 ${Math.max(10, W / 85)}px Archivo, system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'bottom'; c.lineWidth = 3; c.strokeStyle = 'rgba(0,0,0,.65)'; const hx = p.type === 'pass' && tt <= stg.T * 0.45 || p.type === 'inc' || p.type === 'int' ? pos(stg.off[6]) : b; c.strokeText(nm, hx[0], hx[1] - r * 1.8); c.fillStyle = '#fff'; c.fillText(nm, hx[0], hx[1] - r * 1.8); }
       if (S.banner && S.bt > 0) {
         const a = clamp(S.bt / 0.3, 0, 1) * clamp((1.6 - S.bt) / 0.3 + 1, 0, 1), col = S.bannerCol || '#FF8200';
         c.globalAlpha = Math.min(1, a); c.fillStyle = 'rgba(0,0,0,.6)'; c.fillRect(0, H * 0.36, W, H * 0.28); c.fillStyle = col; c.fillRect(0, H * 0.36, W, 3); c.fillRect(0, H * 0.64 - 3, W, 3);
@@ -624,14 +641,15 @@
     function begin(i) {
       S.i = i; const p = plays[i]; S.cur = p; S.t = 0; S.curDone = false; hud(p, false);
       const full = !S.hi || p.key || (p.q === 4 && p.clk < 120 && Math.abs(S.sc[0] - S.sc[1]) <= 8) || p.q > 4;
-      const skipAnim = S.until != null;
-      if (p.type === 'ko' || (p.type === 'pat' && S.hi) || !full || skipAnim) { S.quick = skipAnim ? 0.01 : p.type === 'ko' ? 0.5 : p.type === 'pat' ? 0.35 : 0.3; S.st = null; }
-      else { S.quick = null; S.st = stage(p, i * 31 + 7); }
-      $('#vpCall').innerHTML = full && !skipAnim && p.type !== 'ko' ? `<b>${p.o === 0 ? 'Tennessee' : esc(tO.name)}</b> · ${p.type === 'pat' ? 'the try' : ord(p.down) + ' & ' + (p.ball + p.togo >= 100 ? 'goal' : p.togo)}` : esc(p.text);
+      const skip = S.until != null;
+      S.full = full; S.st = stage(p, i * 31 + 7); S.from = S.now || null;
+      S.rate = skip ? 50 : full ? 1 : 2.4;                     // routine plays in Highlights still show all 22, just quicker
+      S.trans = skip || !S.from ? 0 : full ? 0.7 : 0.4;
+      $('#vpCall').innerHTML = !skip && p.type !== 'ko' ? `<b>${p.o === 0 ? 'Tennessee' : esc(tO.name)}</b> · ${p.type === 'pat' ? 'the try' : ord(p.down) + ' & ' + (p.ball + p.togo >= 100 ? 'goal' : p.togo)}` : esc(p.text);
     }
     function finish() {
       const p = S.cur; if (S.curDone) return; S.curDone = true; S.sc = p.sc.slice(); hud(p, true); $('#vpCall').textContent = p.text; logLine(p); wpDraw();
-      if (S.st && S.st.banner && S.until == null) { S.banner = S.st.banner; S.bt = 1.6; const sc = p.td6 || p.type === 'int' || p.to === 'fum' || p.safety ? 1 - p.o : p.o; S.bannerCol = sc === 0 ? '#FF8200' : tO.col; }
+      if (S.st && S.st.banner && S.until == null && S.full) { S.banner = S.st.banner; S.bt = 1.6; const sc = p.td6 || p.type === 'int' || p.to === 'fum' || p.safety ? 1 - p.o : p.o; S.bannerCol = sc === 0 ? '#FF8200' : tO.col; }
       if (S.until === 'score' && (p.td || p.td6 || (p.type === 'fg' && p.good) || p.safety)) { S.until = null; }
     }
     function frame(ts) {
@@ -640,13 +658,13 @@
       if (S.until != null) {      // skipping ahead: run the plays without animating them
         S.bt = 0; S.banner = null; if (S.cur && !S.curDone) finish(); let n = 0;
         while (S.until != null && n++ < 600) { if (S.i + 1 >= plays.length) return end(); begin(S.i + 1); finish(); }
-        S.t = S.quick || 0.01; S.hold = 0.9; draw(); S.raf = requestAnimationFrame(frame); return;
+        S.now = world(S.cur, S.st, S.st.T); S.from = null; S.trans = 0; S.rate = 1; S.t = S.st.T; S.hold = 0.9; draw(); S.raf = requestAnimationFrame(frame); return;
       }
       if (S.bt > 0) { S.bt -= dt / Math.max(1, S.speed * 0.6); draw(); S.raf = requestAnimationFrame(frame); return; }
       if (S.hold > 0) { S.hold -= dt; if (S.hold <= 0) { if (S.i + 1 >= plays.length) return end(); begin(S.i + 1); } draw(); S.raf = requestAnimationFrame(frame); return; }
       if (S.i < 0) begin(0);
-      S.t += dt; const T = S.quick != null ? S.quick : S.st.T;
-      if (S.t >= T) { S.t = T; draw(); finish(); S.hold = S.until != null ? 0.001 : S.quick != null ? 0.12 : 0.55; }
+      S.t += dt; const T = S.trans + S.st.T / S.rate;
+      if (S.t >= T) { S.t = T; draw(); finish(); S.hold = S.full ? 0.5 : 0.18; }
       else draw();
       S.raf = requestAnimationFrame(frame);
     }
@@ -660,7 +678,7 @@
         <p class="small"><b>Tennessee:</b> ${esc(ld(T, 0)) || '—'}<br><b>${esc(tO.name)}:</b> ${esc(ld(T, 1)) || '—'}</p><p class="vp-note">One simulated game out of ${res.N.toLocaleString()}, shown because it ${label.toLowerCase().includes('likely') ? 'sits closest to the middle of all of them' : 'shows that kind of outcome'}. Player lines are simulated, not predictions for individuals.</p>`;
       draw(); wpDraw();
     }
-    function reset() { S.i = -1; S.t = 0; S.sc = [0, 0]; S.done = false; S.hold = 0; S.cur = null; S.st = null; S.quick = null; S.bt = 0; S.until = null; $('#vpLog').innerHTML = ''; host.querySelector('#vpFinal').innerHTML = ''; $('#vpSu').textContent = 0; $('#vpSo').textContent = 0; }
+    function reset() { S.now = null; S.from = null; S.i = -1; S.t = 0; S.sc = [0, 0]; S.done = false; S.hold = 0; S.cur = null; S.st = null; S.quick = null; S.bt = 0; S.until = null; $('#vpLog').innerHTML = ''; host.querySelector('#vpFinal').innerHTML = ''; $('#vpSu').textContent = 0; $('#vpSo').textContent = 0; }
     function go() { if (S.done) reset(); S.playing = true; S.last = performance.now(); $('[data-vpc="play"]').textContent = '❚❚ Pause'; if (!S.raf) S.raf = requestAnimationFrame(frame); }
     function pause() { S.playing = false; $('[data-vpc="play"]').textContent = '▶ Play'; }
     host.querySelector('.vp-ctl').addEventListener('click', e => {
