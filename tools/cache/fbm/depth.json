@@ -10,570 +10,570 @@
      "WR-X": [
       {
        "no": 3,
-       "name": "Radarious SO Jackson",
-       "cls": "",
+       "name": "Radarious Jackson",
+       "cls": "SO",
        "rank": 1
       },
       {
        "no": 1,
-       "name": "Travis SO Smith Jr.",
-       "cls": "",
+       "name": "Travis Smith Jr.",
+       "cls": "SO",
        "rank": 2
       },
       {
        "no": 81,
-       "name": "Ian RS JR/TR Duarte",
-       "cls": "",
+       "name": "Ian Duarte",
+       "cls": "RS JR/TR",
        "rank": 3
       }
      ],
      "WR-Z": [
       {
        "no": 4,
-       "name": "Mike JR Matthews",
-       "cls": "",
+       "name": "Mike Matthews",
+       "cls": "JR",
        "rank": 1
       },
       {
        "no": 5,
-       "name": "TK FR Keys",
-       "cls": "",
+       "name": "TK Keys",
+       "cls": "FR",
        "rank": 2
       },
       {
        "no": 88,
-       "name": "Deon RS JR/TR Hardin",
-       "cls": "",
+       "name": "Deon Hardin",
+       "cls": "RS JR/TR",
        "rank": 3
       }
      ],
      "WR-SL": [
       {
        "no": 14,
-       "name": "Braylon RS SO Staley",
-       "cls": "",
+       "name": "Braylon Staley",
+       "cls": "RS SO",
        "rank": 1
       },
       {
        "no": 19,
-       "name": "Tyreek FR King",
-       "cls": "",
+       "name": "Tyreek King",
+       "cls": "FR",
        "rank": 2
       }
      ],
      "LT": [
       {
        "no": 70,
-       "name": "David SO Sanders Jr.",
-       "cls": "",
+       "name": "David Sanders Jr.",
+       "cls": "SO",
        "rank": 1
       },
       {
        "no": 51,
-       "name": "Jeremias RS SO Heard",
-       "cls": "",
+       "name": "Jeremias Heard",
+       "cls": "RS SO",
        "rank": 2
       },
       {
        "no": 66,
-       "name": "Kamari FR Blair",
-       "cls": "",
+       "name": "Kamari Blair",
+       "cls": "FR",
        "rank": 3
       }
      ],
      "LG": [
       {
        "no": 74,
-       "name": "Shamurad RS JR Umarov",
-       "cls": "",
+       "name": "Shamurad Umarov",
+       "cls": "RS JR",
        "rank": 1
       },
       {
        "no": 63,
-       "name": "Jeremy FR George-El",
-       "cls": "",
+       "name": "Jeremy George-El",
+       "cls": "FR",
        "rank": 2
       }
      ],
      "C": [
       {
        "no": 56,
-       "name": "Sam RS JR/TR Pendleton",
-       "cls": "",
+       "name": "Sam Pendleton",
+       "cls": "RS JR/TR",
        "rank": 1
       },
       {
        "no": 55,
-       "name": "Antoni SO Ogumoro",
-       "cls": "",
+       "name": "Antoni Ogumoro",
+       "cls": "SO",
        "rank": 2
       }
      ],
      "RG": [
       {
        "no": 69,
-       "name": "Donovan RS SR/TR Haslam",
-       "cls": "",
+       "name": "Donovan Haslam",
+       "cls": "RS SR/TR",
        "rank": 1
       },
       {
        "no": 71,
-       "name": "Ed FR Baker",
-       "cls": "",
+       "name": "Ed Baker",
+       "cls": "FR",
        "rank": 2
       }
      ],
      "RT": [
       {
        "no": 72,
-       "name": "Jesse RS SO Perry",
-       "cls": "",
+       "name": "Jesse Perry",
+       "cls": "RS SO",
        "rank": 1
       },
       {
        "no": 77,
-       "name": "Ory RS SO/TR Williams",
-       "cls": "",
+       "name": "Ory Williams",
+       "cls": "RS SO/TR",
        "rank": 2
       },
       {
        "no": 79,
-       "name": "Gabriel FR Osenda",
-       "cls": "",
+       "name": "Gabriel Osenda",
+       "cls": "FR",
        "rank": 3
       }
      ],
      "TE": [
       {
        "no": 7,
-       "name": "DaSaahn SO Brame",
-       "cls": "",
+       "name": "DaSaahn Brame",
+       "cls": "SO",
        "rank": 1
       },
       {
        "no": 82,
-       "name": "Trent RS JR/TR Thomas",
-       "cls": "",
+       "name": "Trent Thomas",
+       "cls": "RS JR/TR",
        "rank": 2
       },
       {
        "no": 87,
-       "name": "Luca FR Wolf",
-       "cls": "",
+       "name": "Luca Wolf",
+       "cls": "FR",
        "rank": 3
       },
       {
        "no": 80,
-       "name": "Cole RS SO Harrison",
-       "cls": "",
+       "name": "Cole Harrison",
+       "cls": "RS SO",
        "rank": 4
       }
      ],
      "QB": [
       {
        "no": 12,
-       "name": "George RS FR MacIntyre",
-       "cls": "",
+       "name": "George MacIntyre",
+       "cls": "RS FR",
        "rank": 1
       },
       {
        "no": 11,
-       "name": "Faizon FR Brandon",
-       "cls": "",
+       "name": "Faizon Brandon",
+       "cls": "FR",
        "rank": 2
       },
       {
        "no": 8,
-       "name": "Ryan RS JR/TR Staub",
-       "cls": "",
+       "name": "Ryan Staub",
+       "cls": "RS JR/TR",
        "rank": 3
       }
      ],
      "RB": [
       {
        "no": 18,
-       "name": "DeSean RS JR Bishop",
-       "cls": "",
+       "name": "DeSean Bishop",
+       "cls": "RS JR",
        "rank": 1
       },
       {
        "no": 6,
-       "name": "Javin SO/TR Gordon",
-       "cls": "",
+       "name": "Javin Gordon",
+       "cls": "SO/TR",
        "rank": 2
       },
       {
        "no": 2,
-       "name": "Justin SO Baker",
-       "cls": "",
+       "name": "Justin Baker",
+       "cls": "SO",
        "rank": 3
       },
       {
        "no": 24,
-       "name": "Hunter RS SR Barnes",
-       "cls": "",
+       "name": "Hunter Barnes",
+       "cls": "RS SR",
        "rank": 4
       }
      ],
      "DE": [
       {
        "no": 33,
-       "name": "Jordan RS JR/TR Norman",
-       "cls": "",
+       "name": "Jordan Norman",
+       "cls": "RS JR/TR",
        "rank": 1
       },
       {
        "no": 35,
-       "name": "Carson RS SO Gentle",
-       "cls": "",
+       "name": "Carson Gentle",
+       "cls": "RS SO",
        "rank": 2
       },
       {
        "no": 97,
-       "name": "Hezekiah FR Harris",
-       "cls": "",
+       "name": "Hezekiah Harris",
+       "cls": "FR",
        "rank": 3
       },
       {
        "no": 95,
-       "name": "Breeze FR Carter",
-       "cls": "",
+       "name": "Breeze Carter",
+       "cls": "FR",
        "rank": 4
       }
      ],
      "NT": [
       {
        "no": 2,
-       "name": "Xavier RS SO/TR Gilliam",
-       "cls": "",
+       "name": "Xavier Gilliam",
+       "cls": "RS SO/TR",
        "rank": 1
       },
       {
        "no": 17,
-       "name": "Ethan SO Utley",
-       "cls": "",
+       "name": "Ethan Utley",
+       "cls": "SO",
        "rank": 2
       },
       {
        "no": 26,
-       "name": "JJ FR Finch",
-       "cls": "",
+       "name": "JJ Finch",
+       "cls": "FR",
        "rank": 3
       }
      ],
      "DT": [
       {
        "no": 5,
-       "name": "Daevin SR Hobbs",
-       "cls": "",
+       "name": "Daevin Hobbs",
+       "cls": "SR",
        "rank": 1
       },
       {
        "no": 19,
-       "name": "Nathan RS JR Robinson",
-       "cls": "",
+       "name": "Nathan Robinson",
+       "cls": "RS JR",
        "rank": 2
       },
       {
        "no": 47,
-       "name": "Isaiah SO Campbell",
-       "cls": "",
+       "name": "Isaiah Campbell",
+       "cls": "SO",
        "rank": 3
       }
      ],
      "LEO": [
       {
        "no": 22,
-       "name": "Jeremiah SR Telander",
-       "cls": "",
+       "name": "Jeremiah Telander",
+       "cls": "SR",
        "rank": 1
       },
       {
        "no": 9,
-       "name": "Mariyon SO Dye",
-       "cls": "",
+       "name": "Mariyon Dye",
+       "cls": "SO",
        "rank": 2
       },
       {
        "no": 44,
-       "name": "Christian RS FR Gass",
-       "cls": "",
+       "name": "Christian Gass",
+       "cls": "RS FR",
        "rank": 3
       },
       {
        "no": 37,
-       "name": "Kedric FR Golston II",
-       "cls": "",
+       "name": "Kedric Golston II",
+       "cls": "FR",
        "rank": 4
       }
      ],
      "WLB": [
       {
        "no": 7,
-       "name": "Arion SR Carter",
-       "cls": "",
+       "name": "Arion Carter",
+       "cls": "SR",
        "rank": 1
       },
       {
        "no": 13,
-       "name": "Edwin RS SO Spillman",
-       "cls": "",
+       "name": "Edwin Spillman",
+       "cls": "RS SO",
        "rank": 2
       },
       {
        "no": 28,
-       "name": "Brayden FR Rouse",
-       "cls": "",
+       "name": "Brayden Rouse",
+       "cls": "FR",
        "rank": 3
       },
       {
        "no": 50,
-       "name": "Ryan RS SO Scott",
-       "cls": "",
+       "name": "Ryan Scott",
+       "cls": "RS SO",
        "rank": 4
       }
      ],
      "MLB": [
       {
        "no": 0,
-       "name": "Amare SR/TR Campbell",
-       "cls": "",
+       "name": "Amare Campbell",
+       "cls": "SR/TR",
        "rank": 1
       },
       {
        "no": 27,
-       "name": "Jadon SO Perlotte",
-       "cls": "",
+       "name": "Jadon Perlotte",
+       "cls": "SO",
        "rank": 2
       },
       {
        "no": 11,
-       "name": "Jordan RS SO Burns",
-       "cls": "",
+       "name": "Jordan Burns",
+       "cls": "RS SO",
        "rank": 3
       },
       {
        "no": 51,
-       "name": "TJ FR White",
-       "cls": "",
+       "name": "TJ White",
+       "cls": "FR",
        "rank": 4
       }
      ],
      "LCB": [
       {
        "no": 14,
-       "name": "Kayin SR/TR Lee",
-       "cls": "",
+       "name": "Kayin Lee",
+       "cls": "SR/TR",
        "rank": 1
       },
       {
        "no": 3,
-       "name": "Tre SO Poteat III",
-       "cls": "",
+       "name": "Tre Poteat III",
+       "cls": "SO",
        "rank": 2
       },
       {
        "no": 31,
-       "name": "Joel FR Wyatt",
-       "cls": "",
+       "name": "Joel Wyatt",
+       "cls": "FR",
        "rank": 3
       }
      ],
      "SS": [
       {
        "no": 10,
-       "name": "Dejuan JR/TR Lane",
-       "cls": "",
+       "name": "Dejuan Lane",
+       "cls": "JR/TR",
        "rank": 1
       },
       {
        "no": 23,
-       "name": "Sidney SO Walton",
-       "cls": "",
+       "name": "Sidney Walton",
+       "cls": "SO",
        "rank": 2
       },
       {
        "no": 40,
-       "name": "KJ FR McClain",
-       "cls": "",
+       "name": "KJ McClain",
+       "cls": "FR",
        "rank": 3
       }
      ],
      "FS": [
       {
        "no": 1,
-       "name": "TJ SR/TR Metcalf",
-       "cls": "",
+       "name": "TJ Metcalf",
+       "cls": "SR/TR",
        "rank": 1
       },
       {
        "no": 42,
-       "name": "DJ RS SR/TR Burks",
-       "cls": "",
+       "name": "DJ Burks",
+       "cls": "RS SR/TR",
        "rank": 2
       }
      ],
      "RCB": [
       {
        "no": 4,
-       "name": "Ty SO Redmond",
-       "cls": "",
+       "name": "Ty Redmond",
+       "cls": "SO",
        "rank": 1
       },
       {
        "no": 25,
-       "name": "Tim SO Merritt",
-       "cls": "",
+       "name": "Tim Merritt",
+       "cls": "SO",
        "rank": 2
       },
       {
        "no": 21,
-       "name": "Jamyan FR Theodore",
-       "cls": "",
+       "name": "Jamyan Theodore",
+       "cls": "FR",
        "rank": 3
       }
      ],
      "NB": [
       {
        "no": 6,
-       "name": "Qua SR/TR Moss",
-       "cls": "",
+       "name": "Qua Moss",
+       "cls": "SR/TR",
        "rank": 1
       },
       {
        "no": 20,
-       "name": "Tevis RS SO/TR Metcalf",
-       "cls": "",
+       "name": "Tevis Metcalf",
+       "cls": "RS SO/TR",
        "rank": 2
       },
       {
        "no": 29,
-       "name": "Isaiah RS JR/TR Hardge",
-       "cls": "",
+       "name": "Isaiah Hardge",
+       "cls": "RS JR/TR",
        "rank": 3
       }
      ],
      "PT": [
       {
        "no": 98,
-       "name": "Jackson RS SR Ross",
-       "cls": "",
+       "name": "Jackson Ross",
+       "cls": "RS SR",
        "rank": 1
       },
       {
        "no": 99,
-       "name": "Logan FR Foley",
-       "cls": "",
+       "name": "Logan Foley",
+       "cls": "FR",
        "rank": 2
       }
      ],
      "PK": [
       {
        "no": 28,
-       "name": "Cooper RS SO/TR Ranvier",
-       "cls": "",
+       "name": "Cooper Ranvier",
+       "cls": "RS SO/TR",
        "rank": 1
       },
       {
        "no": 94,
-       "name": "Josh RS SR Turbyville",
-       "cls": "",
+       "name": "Josh Turbyville",
+       "cls": "RS SR",
        "rank": 2
       },
       {
        "no": 93,
-       "name": "Grady RS FR Dangerfield",
-       "cls": "",
+       "name": "Grady Dangerfield",
+       "cls": "RS FR",
        "rank": 3
       }
      ],
      "KO": [
       {
        "no": 94,
-       "name": "Josh RS SR Turbyville",
-       "cls": "",
+       "name": "Josh Turbyville",
+       "cls": "RS SR",
        "rank": 1
       },
       {
        "no": 98,
-       "name": "Jackson RS SR Ross",
-       "cls": "",
+       "name": "Jackson Ross",
+       "cls": "RS SR",
        "rank": 2
       },
       {
        "no": 93,
-       "name": "Grady RS FR Dangerfield",
-       "cls": "",
+       "name": "Grady Dangerfield",
+       "cls": "RS FR",
        "rank": 3
       }
      ],
      "LS": [
       {
        "no": 48,
-       "name": "Bennett RS SR Brady",
-       "cls": "",
+       "name": "Bennett Brady",
+       "cls": "RS SR",
        "rank": 1
       },
       {
        "no": 53,
-       "name": "Blake RS JR/TR Howard",
-       "cls": "",
+       "name": "Blake Howard",
+       "cls": "RS JR/TR",
        "rank": 2
       }
      ],
      "H": [
       {
        "no": 98,
-       "name": "Jackson RS SR Ross",
-       "cls": "",
+       "name": "Jackson Ross",
+       "cls": "RS SR",
        "rank": 1
       }
      ],
      "PR": [
       {
        "no": 6,
-       "name": "Qua SR/TR Moss",
-       "cls": "",
+       "name": "Qua Moss",
+       "cls": "SR/TR",
        "rank": 1
       }
      ],
      "KR": [
       {
        "no": 6,
-       "name": "Qua SR/TR Moss",
-       "cls": "",
+       "name": "Qua Moss",
+       "cls": "SR/TR",
        "rank": 1
       }
      ],
      "RES": [
       {
        "no": 24,
-       "name": "Dylan SO Lewis",
-       "cls": "",
+       "name": "Dylan Lewis",
+       "cls": "SO",
        "rank": 1
       },
       {
        "no": 75,
-       "name": "Wendell RS SR/TR Moe Jr.",
-       "cls": "",
+       "name": "Wendell Moe Jr.",
+       "cls": "RS SR/TR",
        "rank": 2
       },
       {
        "no": 18,
-       "name": "Tyree RS JR Weathersby",
-       "cls": "",
+       "name": "Tyree Weathersby",
+       "cls": "RS JR",
        "rank": 3
       },
       {
        "no": 17,
-       "name": "Daune SO Morris",
-       "cls": "",
+       "name": "Daune Morris",
+       "cls": "SO",
        "rank": 4
       },
       {
        "no": 58,
-       "name": "Nic RS FR Moore",
-       "cls": "",
+       "name": "Nic Moore",
+       "cls": "RS FR",
        "rank": 5
       }
      ]
@@ -588,606 +588,606 @@
      "WR-X": [
       {
        "no": 3,
-       "name": "Eugene RS JR/TR Wilson III",
-       "cls": "",
+       "name": "Eugene Wilson III",
+       "cls": "RS JR/TR",
        "rank": 1
       },
       {
        "no": 2,
-       "name": "Tre' RS JR/TR Brown",
-       "cls": "",
+       "name": "Tre' Brown",
+       "cls": "RS JR/TR",
        "rank": 2
       },
       {
        "no": 86,
-       "name": "Jabari FR Mack",
-       "cls": "",
+       "name": "Jabari Mack",
+       "cls": "FR",
        "rank": 3
       },
       {
        "no": 85,
-       "name": "Josh RS SO/TR Jackson",
-       "cls": "",
+       "name": "Josh Jackson",
+       "cls": "RS SO/TR",
        "rank": 4
       }
      ],
      "WR-Z": [
       {
        "no": 4,
-       "name": "Jackson RS JR/TR Harris",
-       "cls": "",
+       "name": "Jackson Harris",
+       "cls": "RS JR/TR",
        "rank": 1
       },
       {
        "no": 88,
-       "name": "Malik RS JR/TR Elzy",
-       "cls": "",
+       "name": "Malik Elzy",
+       "cls": "RS JR/TR",
        "rank": 2
       },
       {
        "no": 80,
-       "name": "Brayden FR Allen",
-       "cls": "",
+       "name": "Brayden Allen",
+       "cls": "FR",
        "rank": 3
       },
       {
        "no": 1,
-       "name": "Jayce SR/TR Brown",
-       "cls": "",
+       "name": "Jayce Brown",
+       "cls": "SR/TR",
        "rank": 4
       }
      ],
      "WR-SL": [
       {
        "no": 6,
-       "name": "Winston SO/TR Watkins Jr.",
-       "cls": "",
+       "name": "Winston Watkins Jr.",
+       "cls": "SO/TR",
        "rank": 1
       },
       {
        "no": 83,
-       "name": "Corey FR Barber Jr.",
-       "cls": "",
+       "name": "Corey Barber Jr.",
+       "cls": "FR",
        "rank": 2
       },
       {
        "no": 84,
-       "name": "Tyree RS JR/TR Holloway",
-       "cls": "",
+       "name": "Tyree Holloway",
+       "cls": "RS JR/TR",
        "rank": 3
       },
       {
        "no": 26,
-       "name": "Nolon FR Buckels",
-       "cls": "",
+       "name": "Nolon Buckels",
+       "cls": "FR",
        "rank": 4
       }
      ],
      "LT": [
       {
        "no": 77,
-       "name": "Jordan JR/TR Seaton",
-       "cls": "",
+       "name": "Jordan Seaton",
+       "cls": "JR/TR",
        "rank": 1
       },
       {
        "no": 65,
-       "name": "Sean RS JR/TR Thompkins Jr.",
-       "cls": "",
+       "name": "Sean Thompkins Jr.",
+       "cls": "RS JR/TR",
        "rank": 2
       },
       {
        "no": 71,
-       "name": "Brysten FR Martinez",
-       "cls": "",
+       "name": "Brysten Martinez",
+       "cls": "FR",
        "rank": 3
       }
      ],
      "LG": [
       {
        "no": 50,
-       "name": "William RS SO/TR Satterwhite II",
-       "cls": "",
+       "name": "William Satterwhite II",
+       "cls": "RS SO/TR",
        "rank": 1
       },
       {
        "no": 67,
-       "name": "Bo RS SR Bordelon",
-       "cls": "",
+       "name": "Bo Bordelon",
+       "cls": "RS SR",
        "rank": 2
       },
       {
        "no": 52,
-       "name": "Ja'Quan RS JR/TR Sprinkle",
-       "cls": "",
+       "name": "Ja'Quan Sprinkle",
+       "cls": "RS JR/TR",
        "rank": 3
       },
       {
        "no": 54,
-       "name": "Ja'Mard SO/TR Jones Jr.",
-       "cls": "",
+       "name": "Ja'Mard Jones Jr.",
+       "cls": "SO/TR",
        "rank": 4
       }
      ],
      "C": [
       {
        "no": 61,
-       "name": "Braelin RS SR/TR Moore",
-       "cls": "",
+       "name": "Braelin Moore",
+       "cls": "RS SR/TR",
        "rank": 1
       },
       {
        "no": 51,
-       "name": "Ryan FR Miret",
-       "cls": "",
+       "name": "Ryan Miret",
+       "cls": "FR",
        "rank": 2
       },
       {
        "no": 74,
-       "name": "Braden RS JR Augustus",
-       "cls": "",
+       "name": "Braden Augustus",
+       "cls": "RS JR",
        "rank": 3
       }
      ],
      "RG": [
       {
        "no": 55,
-       "name": "Aliou RS SR/TR Bah",
-       "cls": "",
+       "name": "Aliou Bah",
+       "cls": "RS SR/TR",
        "rank": 1
       },
       {
        "no": 70,
-       "name": "Devin SO/TR Harper",
-       "cls": "",
+       "name": "Devin Harper",
+       "cls": "SO/TR",
        "rank": 2
       },
       {
        "no": 68,
-       "name": "Brett RS FR Bordelon",
-       "cls": "",
+       "name": "Brett Bordelon",
+       "cls": "RS FR",
        "rank": 3
       }
      ],
      "RT": [
       {
        "no": 75,
-       "name": "Weston RS SO Davis",
-       "cls": "",
+       "name": "Weston Davis",
+       "cls": "RS SO",
        "rank": 1
       },
       {
        "no": 69,
-       "name": "Darrin RS FR/TR Strey",
-       "cls": "",
+       "name": "Darrin Strey",
+       "cls": "RS FR/TR",
        "rank": 2
       },
       {
        "no": 53,
-       "name": "Hayes RS FR Fuqua",
-       "cls": "",
+       "name": "Hayes Fuqua",
+       "cls": "RS FR",
        "rank": 3
       }
      ],
      "TE": [
       {
        "no": 7,
-       "name": "Trey'Dez JR Green",
-       "cls": "",
+       "name": "Trey'Dez Green",
+       "cls": "JR",
        "rank": 1
       },
       {
        "no": 44,
-       "name": "Zach RS JR/TR Grace",
-       "cls": "",
+       "name": "Zach Grace",
+       "cls": "RS JR/TR",
        "rank": 2
       },
       {
        "no": 14,
-       "name": "Roman RS JR/TR Mothershed",
-       "cls": "",
+       "name": "Roman Mothershed",
+       "cls": "RS JR/TR",
        "rank": 3
       },
       {
        "no": 12,
-       "name": "Malachi JR/TR Thomas",
-       "cls": "",
+       "name": "Malachi Thomas",
+       "cls": "JR/TR",
        "rank": 4
       },
       {
        "no": 87,
-       "name": "JC FR Anderson",
-       "cls": "",
+       "name": "JC Anderson",
+       "cls": "FR",
        "rank": 5
       }
      ],
      "QB": [
       {
        "no": 10,
-       "name": "Sam RS JR/TR Leavitt",
-       "cls": "",
+       "name": "Sam Leavitt",
+       "cls": "RS JR/TR",
        "rank": 1
       },
       {
        "no": 11,
-       "name": "Landen RS SO/TR Clark",
-       "cls": "",
+       "name": "Landen Clark",
+       "cls": "RS SO/TR",
        "rank": 2
       },
       {
        "no": 8,
-       "name": "Husan RS FR/TR Longstreet",
-       "cls": "",
+       "name": "Husan Longstreet",
+       "cls": "RS FR/TR",
        "rank": 3
       },
       {
        "no": 19,
-       "name": "Kaden RS SR/TR Martin",
-       "cls": "",
+       "name": "Kaden Martin",
+       "cls": "RS SR/TR",
        "rank": 4
       }
      ],
      "RB": [
       {
        "no": 13,
-       "name": "Dilin RS SO/TR Jones",
-       "cls": "",
+       "name": "Dilin Jones",
+       "cls": "RS SO/TR",
        "rank": 1
       },
       {
        "no": 29,
-       "name": "Caden JR Durham",
-       "cls": "",
+       "name": "Caden Durham",
+       "cls": "JR",
        "rank": 2
       },
       {
        "no": 22,
-       "name": "Harlem SO Berry",
-       "cls": "",
+       "name": "Harlem Berry",
+       "cls": "SO",
        "rank": 3
       },
       {
        "no": 23,
-       "name": "Stacy RS SO/TR Gage",
-       "cls": "",
+       "name": "Stacy Gage",
+       "cls": "RS SO/TR",
        "rank": 4
       },
       {
        "no": 25,
-       "name": "Rod RS SO/TR Gainey Jr.",
-       "cls": "",
+       "name": "Rod Gainey Jr.",
+       "cls": "RS SO/TR",
        "rank": 5
       }
      ],
      "LDE": [
       {
        "no": 1,
-       "name": "Princewill SR/TR Umanmielen",
-       "cls": "",
+       "name": "Princewill Umanmielen",
+       "cls": "SR/TR",
        "rank": 1
       },
       {
        "no": 97,
-       "name": "Dylan RS JR Carpenter",
-       "cls": "",
+       "name": "Dylan Carpenter",
+       "cls": "RS JR",
        "rank": 2
       },
       {
        "no": 48,
-       "name": "Kolaj RS SO Cobbins",
-       "cls": "",
+       "name": "Kolaj Cobbins",
+       "cls": "RS SO",
        "rank": 3
       },
       {
        "no": 91,
-       "name": "Trenton FR Henderson",
-       "cls": "",
+       "name": "Trenton Henderson",
+       "cls": "FR",
        "rank": 4
       }
      ],
      "LDT": [
       {
        "no": 99,
-       "name": "Deuce FR Geralds",
-       "cls": "",
+       "name": "Deuce Geralds",
+       "cls": "FR",
        "rank": 1
       },
       {
        "no": 96,
-       "name": "Dominick JR McKinley",
-       "cls": "",
+       "name": "Dominick McKinley",
+       "cls": "JR",
        "rank": 2
       },
       {
        "no": 92,
-       "name": "Brandon RS FR Brown",
-       "cls": "",
+       "name": "Brandon Brown",
+       "cls": "RS FR",
        "rank": 3
       }
      ],
      "RDT": [
       {
        "no": 90,
-       "name": "Stephiylan RS JR/TR Green",
-       "cls": "",
+       "name": "Stephiylan Green",
+       "cls": "RS JR/TR",
        "rank": 1
       },
       {
        "no": 47,
-       "name": "Malik JR/TR Blocton",
-       "cls": "",
+       "name": "Malik Blocton",
+       "cls": "JR/TR",
        "rank": 2
       },
       {
        "no": 95,
-       "name": "Shone RS SR/TR Washington",
-       "cls": "",
+       "name": "Shone Washington",
+       "cls": "RS SR/TR",
        "rank": 3
       }
      ],
      "RDE": [
       {
        "no": 29,
-       "name": "Jordan JR/TR Ross",
-       "cls": "",
+       "name": "Jordan Ross",
+       "cls": "JR/TR",
        "rank": 1
       },
       {
        "no": 55,
-       "name": "Lamar FR Brown",
-       "cls": "",
+       "name": "Lamar Brown",
+       "cls": "FR",
        "rank": 2
       },
       {
        "no": 41,
-       "name": "Junior SR/TR Tuihalamaka",
-       "cls": "",
+       "name": "Junior Tuihalamaka",
+       "cls": "SR/TR",
        "rank": 3
       },
       {
        "no": 93,
-       "name": "Jaylen RS SO/TR Brown",
-       "cls": "",
+       "name": "Jaylen Brown",
+       "cls": "RS SO/TR",
        "rank": 4
       }
      ],
      "WLB": [
       {
        "no": 42,
-       "name": "Davhon JR Keys",
-       "cls": "",
+       "name": "Davhon Keys",
+       "cls": "JR",
        "rank": 1
       },
       {
        "no": 24,
-       "name": "Tylen RS SO Singleton",
-       "cls": "",
+       "name": "Tylen Singleton",
+       "cls": "RS SO",
        "rank": 2
       },
       {
        "no": 56,
-       "name": "Jake RS JR Ibieta",
-       "cls": "",
+       "name": "Jake Ibieta",
+       "cls": "RS JR",
        "rank": 3
       },
       {
        "no": 32,
-       "name": "Keylan RS FR Moses",
-       "cls": "",
+       "name": "Keylan Moses",
+       "cls": "RS FR",
        "rank": 4
       }
      ],
      "MLB": [
       {
        "no": 6,
-       "name": "TJ RS SR/TR Dottery",
-       "cls": "",
+       "name": "TJ Dottery",
+       "cls": "RS SR/TR",
        "rank": 1
       },
       {
        "no": 35,
-       "name": "Zach RS FR Weeks",
-       "cls": "",
+       "name": "Zach Weeks",
+       "cls": "RS FR",
        "rank": 2
       },
       {
        "no": 15,
-       "name": "Jaiden RS FR Braker",
-       "cls": "",
+       "name": "Jaiden Braker",
+       "cls": "RS FR",
        "rank": 3
       }
      ],
      "LCB": [
       {
        "no": 5,
-       "name": "DJ SO Pickett",
-       "cls": "",
+       "name": "DJ Pickett",
+       "cls": "SO",
        "rank": 1
       },
       {
        "no": 21,
-       "name": "Michael RS SO Turner Jr.",
-       "cls": "",
+       "name": "Michael Turner Jr.",
+       "cls": "RS SO",
        "rank": 2
       },
       {
        "no": 22,
-       "name": "Havon FR Finney Jr.",
-       "cls": "",
+       "name": "Havon Finney Jr.",
+       "cls": "FR",
        "rank": 3
       }
      ],
      "SS": [
       {
        "no": 0,
-       "name": "Tamarcus RS JR/TR Cooley",
-       "cls": "",
+       "name": "Tamarcus Cooley",
+       "cls": "RS JR/TR",
        "rank": 1
       },
       {
        "no": 13,
-       "name": "Faheem SO/TR Delane",
-       "cls": "",
+       "name": "Faheem Delane",
+       "cls": "SO/TR",
        "rank": 2
       },
       {
        "no": 30,
-       "name": "Treylan RS JR/TR James",
-       "cls": "",
+       "name": "Treylan James",
+       "cls": "RS JR/TR",
        "rank": 3
       }
      ],
      "FS": [
       {
        "no": 28,
-       "name": "Jhase RS FR Thomas",
-       "cls": "",
+       "name": "Jhase Thomas",
+       "cls": "RS FR",
        "rank": 1
       },
       {
        "no": 33,
-       "name": "Isaiah FR Washington",
-       "cls": "",
+       "name": "Isaiah Washington",
+       "cls": "FR",
        "rank": 2
       }
      ],
      "RCB": [
       {
        "no": 11,
-       "name": "PJ JR Woodland",
-       "cls": "",
+       "name": "PJ Woodland",
+       "cls": "JR",
        "rank": 1
       },
       {
        "no": 8,
-       "name": "Ja'Keem RS JR/TR Jackson",
-       "cls": "",
+       "name": "Ja'Keem Jackson",
+       "cls": "RS JR/TR",
        "rank": 2
       }
      ],
      "NB": [
       {
        "no": 2,
-       "name": "Ty SR/TR Benefield",
-       "cls": "",
+       "name": "Ty Benefield",
+       "cls": "SR/TR",
        "rank": 1
       },
       {
        "no": 31,
-       "name": "CJ SO Jimcoily",
-       "cls": "",
+       "name": "CJ Jimcoily",
+       "cls": "SO",
        "rank": 2
       }
      ],
      "PT": [
       {
        "no": 90,
-       "name": "Grant JR/TR Chadwick",
-       "cls": "",
+       "name": "Grant Chadwick",
+       "cls": "JR/TR",
        "rank": 1
       },
       {
        "no": 99,
-       "name": "Hayden RS FR/TR Craig",
-       "cls": "",
+       "name": "Hayden Craig",
+       "cls": "RS FR/TR",
        "rank": 2
       }
      ],
      "PK": [
       {
        "no": 80,
-       "name": "Scott SO/TR Starzyk",
-       "cls": "",
+       "name": "Scott Starzyk",
+       "cls": "SO/TR",
        "rank": 1
       },
       {
        "no": 32,
-       "name": "Gavin FR Higgins",
-       "cls": "",
+       "name": "Gavin Higgins",
+       "cls": "FR",
        "rank": 2
       }
      ],
      "KO": [
       {
        "no": 80,
-       "name": "Scott SO/TR Starzyk",
-       "cls": "",
+       "name": "Scott Starzyk",
+       "cls": "SO/TR",
        "rank": 1
       },
       {
        "no": 32,
-       "name": "Gavin FR Higgins",
-       "cls": "",
+       "name": "Gavin Higgins",
+       "cls": "FR",
        "rank": 2
       }
      ],
      "LS": [
       {
        "no": 43,
-       "name": "Silas SO Hall",
-       "cls": "",
+       "name": "Silas Hall",
+       "cls": "SO",
        "rank": 1
       },
       {
        "no": 39,
-       "name": "Mack RS FR/TR Mulhern",
-       "cls": "",
+       "name": "Mack Mulhern",
+       "cls": "RS FR/TR",
        "rank": 2
       }
      ],
      "H": [
       {
        "no": 90,
-       "name": "Grant JR/TR Chadwick",
-       "cls": "",
+       "name": "Grant Chadwick",
+       "cls": "JR/TR",
        "rank": 1
       },
       {
        "no": 99,
-       "name": "Hayden RS FR/TR Craig",
-       "cls": "",
+       "name": "Hayden Craig",
+       "cls": "RS FR/TR",
        "rank": 2
       }
      ],
      "PR": [
       {
        "no": 3,
-       "name": "Eugene RS JR/TR Wilson III",
-       "cls": "",
+       "name": "Eugene Wilson III",
+       "cls": "RS JR/TR",
        "rank": 1
       },
       {
        "no": 8,
-       "name": "Husan RS FR/TR Longstreet",
-       "cls": "",
+       "name": "Husan Longstreet",
+       "cls": "RS FR/TR",
        "rank": 2
       }
      ],
      "KR": [
       {
        "no": 22,
-       "name": "Harlem SO Berry",
-       "cls": "",
+       "name": "Harlem Berry",
+       "cls": "SO",
        "rank": 1
       },
       {
        "no": 3,
-       "name": "Eugene RS JR/TR Wilson III",
-       "cls": "",
+       "name": "Eugene Wilson III",
+       "cls": "RS JR/TR",
        "rank": 2
       }
      ],
      "RES": [
       {
        "no": 26,
-       "name": "Charles SO Ross II",
-       "cls": "",
+       "name": "Charles Ross II",
+       "cls": "SO",
        "rank": 1
       },
       {
        "no": 88,
-       "name": "Richard FR Anderson",
-       "cls": "",
+       "name": "Richard Anderson",
+       "cls": "FR",
        "rank": 2
       }
      ]
@@ -1202,526 +1202,526 @@
      "WR-X": [
       {
        "no": 0,
-       "name": "Junior SR Sherrill",
-       "cls": "",
+       "name": "Junior Sherrill",
+       "cls": "SR",
        "rank": 1
       },
       {
        "no": 15,
-       "name": "Joseph RS SO McVay",
-       "cls": "",
+       "name": "Joseph McVay",
+       "cls": "RS SO",
        "rank": 2
       }
      ],
      "WR-Z": [
       {
        "no": 6,
-       "name": "Ja'Cory SR/TR Thomas",
-       "cls": "",
+       "name": "Ja'Cory Thomas",
+       "cls": "SR/TR",
        "rank": 1
       },
       {
        "no": 9,
-       "name": "Brycen RS SO Coleman",
-       "cls": "",
+       "name": "Brycen Coleman",
+       "cls": "RS SO",
        "rank": 2
       },
       {
        "no": 80,
-       "name": "Claiborne RS JR/TR Richards",
-       "cls": "",
+       "name": "Claiborne Richards",
+       "cls": "RS JR/TR",
        "rank": 3
       }
      ],
      "WR-SL": [
       {
        "no": 5,
-       "name": "Tristen JR Brown",
-       "cls": "",
+       "name": "Tristen Brown",
+       "cls": "JR",
        "rank": 1
       },
       {
        "no": 7,
-       "name": "Cole GR/TR Adams",
-       "cls": "",
+       "name": "Cole Adams",
+       "cls": "GR/TR",
        "rank": 2
       }
      ],
      "QT": [
       {
        "no": 51,
-       "name": "Clinton RS SO/TR Azubuike",
-       "cls": "",
+       "name": "Clinton Azubuike",
+       "cls": "RS SO/TR",
        "rank": 1
       },
       {
        "no": 72,
-       "name": "Mitchell FR Smith",
-       "cls": "",
+       "name": "Mitchell Smith",
+       "cls": "FR",
        "rank": 2
       }
      ],
      "QG": [
       {
        "no": 70,
-       "name": "Cade GR/TR McConnell",
-       "cls": "",
+       "name": "Cade McConnell",
+       "cls": "GR/TR",
        "rank": 1
       },
       {
        "no": 52,
-       "name": "Kevo GR Wesley",
-       "cls": "",
+       "name": "Kevo Wesley",
+       "cls": "GR",
        "rank": 2
       }
      ],
      "C": [
       {
        "no": 56,
-       "name": "Lyndon GR/TR Cooper",
-       "cls": "",
+       "name": "Lyndon Cooper",
+       "cls": "GR/TR",
        "rank": 1
       },
       {
        "no": 78,
-       "name": "Keegan RS JR Wechsler",
-       "cls": "",
+       "name": "Keegan Wechsler",
+       "cls": "RS JR",
        "rank": 2
       }
      ],
      "SG": [
       {
        "no": 58,
-       "name": "Orion RS SR/TR Irving",
-       "cls": "",
+       "name": "Orion Irving",
+       "cls": "RS SR/TR",
        "rank": 1
       },
       {
        "no": 65,
-       "name": "Micah RS FR/TR DeBose",
-       "cls": "",
+       "name": "Micah DeBose",
+       "cls": "RS FR/TR",
        "rank": 2
       }
      ],
      "ST": [
       {
        "no": 62,
-       "name": "CJ RS SO Williams",
-       "cls": "",
+       "name": "CJ Williams",
+       "cls": "RS SO",
        "rank": 1
       },
       {
        "no": 75,
-       "name": "Beau RS JR/TR Johnson",
-       "cls": "",
+       "name": "Beau Johnson",
+       "cls": "RS JR/TR",
        "rank": 2
       }
      ],
      "TE": [
       {
        "no": 16,
-       "name": "Cole GR Spence",
-       "cls": "",
+       "name": "Cole Spence",
+       "cls": "GR",
        "rank": 1
       },
       {
        "no": 8,
-       "name": "Jayvontay RS JR/TR Conner",
-       "cls": "",
+       "name": "Jayvontay Conner",
+       "cls": "RS JR/TR",
        "rank": 2
       },
       {
        "no": 44,
-       "name": "Gabe RS JR Fisher",
-       "cls": "",
+       "name": "Gabe Fisher",
+       "cls": "RS JR",
        "rank": 3
       },
       {
        "no": 19,
-       "name": "Maurice RS JR/TR Veney",
-       "cls": "",
+       "name": "Maurice Veney",
+       "cls": "RS JR/TR",
        "rank": 4
       },
       {
        "no": 12,
-       "name": "Walter RS SR/TR Taylor",
-       "cls": "",
+       "name": "Walter Taylor",
+       "cls": "RS SR/TR",
        "rank": 5
       }
      ],
      "QB": [
       {
        "no": 2,
-       "name": "Jared FR Curtis",
-       "cls": "",
+       "name": "Jared Curtis",
+       "cls": "FR",
        "rank": 1
       },
       {
        "no": 10,
-       "name": "Whit RS SO Muschamp",
-       "cls": "",
+       "name": "Whit Muschamp",
+       "cls": "RS SO",
        "rank": 2
       },
       {
        "no": 11,
-       "name": "Jack RS FR Elliott",
-       "cls": "",
+       "name": "Jack Elliott",
+       "cls": "RS FR",
        "rank": 3
       },
       {
        "no": 14,
-       "name": "Drew RS FR/TR Cowart",
-       "cls": "",
+       "name": "Drew Cowart",
+       "cls": "RS FR/TR",
        "rank": 4
       }
      ],
      "RB": [
       {
        "no": 28,
-       "name": "Sedrick SR Alexander",
-       "cls": "",
+       "name": "Sedrick Alexander",
+       "cls": "SR",
        "rank": 1
       },
       {
        "no": 22,
-       "name": "Makhilyn RS JR/TR Young",
-       "cls": "",
+       "name": "Makhilyn Young",
+       "cls": "RS JR/TR",
        "rank": 2
       },
       {
        "no": 3,
-       "name": "Jamezell RS SO Lassiter",
-       "cls": "",
+       "name": "Jamezell Lassiter",
+       "cls": "RS SO",
        "rank": 3
       },
       {
        "no": 20,
-       "name": "Izayah FR Lee",
-       "cls": "",
+       "name": "Izayah Lee",
+       "cls": "FR",
        "rank": 4
       }
      ],
      "DE": [
       {
        "no": 10,
-       "name": "Brian GR/TR Allen Jr.",
-       "cls": "",
+       "name": "Brian Allen Jr.",
+       "cls": "GR/TR",
        "rank": 1
       },
       {
        "no": 96,
-       "name": "Khalil GR/TR Poteat",
-       "cls": "",
+       "name": "Khalil Poteat",
+       "cls": "GR/TR",
        "rank": 2
       },
       {
        "no": 97,
-       "name": "Hayden GR/TR Bray",
-       "cls": "",
+       "name": "Hayden Bray",
+       "cls": "GR/TR",
        "rank": 3
       }
      ],
      "NT": [
       {
        "no": 99,
-       "name": "Talan JR/TR Carter",
-       "cls": "",
+       "name": "Talan Carter",
+       "cls": "JR/TR",
        "rank": 1
       },
       {
        "no": 53,
-       "name": "Glenn JR Seabrooks III",
-       "cls": "",
+       "name": "Glenn Seabrooks III",
+       "cls": "JR",
        "rank": 2
       },
       {
        "no": 15,
-       "name": "Mike GR/TR Diatta",
-       "cls": "",
+       "name": "Mike Diatta",
+       "cls": "GR/TR",
        "rank": 3
       }
      ],
      "DT": [
       {
        "no": 5,
-       "name": "Issa GR Ouattara",
-       "cls": "",
+       "name": "Issa Ouattara",
+       "cls": "GR",
        "rank": 1
       },
       {
        "no": 92,
-       "name": "Jaylon RS JR/TR Stone",
-       "cls": "",
+       "name": "Jaylon Stone",
+       "cls": "RS JR/TR",
        "rank": 2
       },
       {
        "no": 94,
-       "name": "Bradley GR Mann",
-       "cls": "",
+       "name": "Bradley Mann",
+       "cls": "GR",
        "rank": 3
       }
      ],
      "WLB": [
       {
        "no": 24,
-       "name": "Nick GR Rinaldi",
-       "cls": "",
+       "name": "Nick Rinaldi",
+       "cls": "GR",
        "rank": 1
       },
       {
        "no": 30,
-       "name": "Austin SO Howard",
-       "cls": "",
+       "name": "Austin Howard",
+       "cls": "SO",
        "rank": 2
       }
      ],
      "MLB": [
       {
        "no": 11,
-       "name": "Bryan SR Longwell",
-       "cls": "",
+       "name": "Bryan Longwell",
+       "cls": "SR",
        "rank": 1
       },
       {
        "no": 22,
-       "name": "Bryce RS SR Cowan",
-       "cls": "",
+       "name": "Bryce Cowan",
+       "cls": "RS SR",
        "rank": 2
       },
       {
        "no": 20,
-       "name": "Jamison RS SO Curtis",
-       "cls": "",
+       "name": "Jamison Curtis",
+       "cls": "RS SO",
        "rank": 3
       }
      ],
      "LCB": [
       {
        "no": 26,
-       "name": "Cayden RS FR Daniels",
-       "cls": "",
+       "name": "Cayden Daniels",
+       "cls": "RS FR",
        "rank": 1
       },
       {
        "no": 6,
-       "name": "Jordan RS JR/TR Matthews",
-       "cls": "",
+       "name": "Jordan Matthews",
+       "cls": "RS JR/TR",
        "rank": 2
       },
       {
        "no": 0,
-       "name": "Cobey RS FR/TR Sellers",
-       "cls": "",
+       "name": "Cobey Sellers",
+       "cls": "RS FR/TR",
        "rank": 3
       },
       {
        "no": 23,
-       "name": "Bishop FR Starling",
-       "cls": "",
+       "name": "Bishop Starling",
+       "cls": "FR",
        "rank": 4
       }
      ],
      "SS": [
       {
        "no": 8,
-       "name": "CJ JR/TR Heard",
-       "cls": "",
+       "name": "CJ Heard",
+       "cls": "JR/TR",
        "rank": 1
       },
       {
        "no": 1,
-       "name": "Dontae JR Carter",
-       "cls": "",
+       "name": "Dontae Carter",
+       "cls": "JR",
        "rank": 2
       },
       {
        "no": 12,
-       "name": "Vanzale RS FR Hinton",
-       "cls": "",
+       "name": "Vanzale Hinton",
+       "cls": "RS FR",
        "rank": 3
       }
      ],
      "FS": [
       {
        "no": 7,
-       "name": "Ricardo JR/TR Jones",
-       "cls": "",
+       "name": "Ricardo Jones",
+       "cls": "JR/TR",
        "rank": 1
       },
       {
        "no": 9,
-       "name": "Jalen RS JR Gilbert",
-       "cls": "",
+       "name": "Jalen Gilbert",
+       "cls": "RS JR",
        "rank": 2
       },
       {
        "no": 35,
-       "name": "Payne RS JR Daniel",
-       "cls": "",
+       "name": "Payne Daniel",
+       "cls": "RS JR",
        "rank": 3
       }
      ],
      "RCB": [
       {
        "no": 4,
-       "name": "Martel SR Hight",
-       "cls": "",
+       "name": "Martel Hight",
+       "cls": "SR",
        "rank": 1
       },
       {
        "no": 21,
-       "name": "Davin RS FR Chandler",
-       "cls": "",
+       "name": "Davin Chandler",
+       "cls": "RS FR",
        "rank": 2
       },
       {
        "no": 2,
-       "name": "Jaylin JR Lackey",
-       "cls": "",
+       "name": "Jaylin Lackey",
+       "cls": "JR",
        "rank": 3
       },
       {
        "no": 16,
-       "name": "Jaylin GR/TR Davies",
-       "cls": "",
+       "name": "Jaylin Davies",
+       "cls": "GR/TR",
        "rank": 4
       }
      ],
      "NB": [
       {
        "no": 25,
-       "name": "Mason FR Lewis",
-       "cls": "",
+       "name": "Mason Lewis",
+       "cls": "FR",
        "rank": 1
       },
       {
        "no": 3,
-       "name": "Carson SO Lawrence",
-       "cls": "",
+       "name": "Carson Lawrence",
+       "cls": "SO",
        "rank": 2
       },
       {
        "no": 14,
-       "name": "Jailen RS JR Ruth",
-       "cls": "",
+       "name": "Jailen Ruth",
+       "cls": "RS JR",
        "rank": 3
       }
      ],
      "PT": [
       {
        "no": 37,
-       "name": "Tyler RS SR/TR Ebel",
-       "cls": "",
+       "name": "Tyler Ebel",
+       "cls": "RS SR/TR",
        "rank": 1
       },
       {
        "no": 79,
-       "name": "Conor RS JR Weasler",
-       "cls": "",
+       "name": "Conor Weasler",
+       "cls": "RS JR",
        "rank": 2
       }
      ],
      "PK": [
       {
        "no": 88,
-       "name": "Brock RS JR Taylor",
-       "cls": "",
+       "name": "Brock Taylor",
+       "cls": "RS JR",
        "rank": 1
       },
       {
        "no": 47,
-       "name": "Justin RS FR Dewers",
-       "cls": "",
+       "name": "Justin Dewers",
+       "cls": "RS FR",
        "rank": 2
       }
      ],
      "KO": [
       {
        "no": 88,
-       "name": "Brock RS JR Taylor",
-       "cls": "",
+       "name": "Brock Taylor",
+       "cls": "RS JR",
        "rank": 1
       },
       {
        "no": 47,
-       "name": "Justin RS FR Dewers",
-       "cls": "",
+       "name": "Justin Dewers",
+       "cls": "RS FR",
        "rank": 2
       }
      ],
      "LS": [
       {
        "no": 54,
-       "name": "Kaden GR/TR Schickel",
-       "cls": "",
+       "name": "Kaden Schickel",
+       "cls": "GR/TR",
        "rank": 1
       },
       {
        "no": 53,
-       "name": "Stone RS FR Owens",
-       "cls": "",
+       "name": "Stone Owens",
+       "cls": "RS FR",
        "rank": 2
       }
      ],
      "H": [
       {
        "no": 37,
-       "name": "Tyler RS SR/TR Ebel",
-       "cls": "",
+       "name": "Tyler Ebel",
+       "cls": "RS SR/TR",
        "rank": 1
       },
       {
        "no": 79,
-       "name": "Conor RS JR Weasler",
-       "cls": "",
+       "name": "Conor Weasler",
+       "cls": "RS JR",
        "rank": 2
       }
      ],
      "PR": [
       {
        "no": 4,
-       "name": "Martel SR Hight",
-       "cls": "",
+       "name": "Martel Hight",
+       "cls": "SR",
        "rank": 1
       },
       {
        "no": 7,
-       "name": "Cole GR/TR Adams",
-       "cls": "",
+       "name": "Cole Adams",
+       "cls": "GR/TR",
        "rank": 2
       }
      ],
      "KR": [
       {
        "no": 0,
-       "name": "Junior SR Sherrill",
-       "cls": "",
+       "name": "Junior Sherrill",
+       "cls": "SR",
        "rank": 1
       },
       {
        "no": 7,
-       "name": "Cole GR/TR Adams",
-       "cls": "",
+       "name": "Cole Adams",
+       "cls": "GR/TR",
        "rank": 2
       }
      ],
      "RES": [
       {
        "no": 50,
-       "name": "Gunner RS SR/TR Givens",
-       "cls": "",
+       "name": "Gunner Givens",
+       "cls": "RS SR/TR",
        "rank": 1
       },
       {
        "no": 23,
-       "name": "Evan FR Hampton",
-       "cls": "",
+       "name": "Evan Hampton",
+       "cls": "FR",
        "rank": 2
       },
       {
        "no": 34,
-       "name": "Daniel FR Vollmer Jr.",
-       "cls": "",
+       "name": "Daniel Vollmer Jr.",
+       "cls": "FR",
        "rank": 3
       }
      ]
