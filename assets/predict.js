@@ -73,7 +73,17 @@
     } else factors.push({ k: 'Rest and recent form', v: 0, note: ru ? `Tennessee has had ${ru.rest} days since its last game. ${opp}'s schedule arrives with the next data update, so neither side is adjusted yet` : 'Not available yet' });
     const hu = +adj.ut || 0, ho = +adj.opp || 0;
     if (hu || ho) factors.push({ k: 'Your what-if', v: hu - ho, note: `${hu ? 'Tennessee ' + hu : ''}${hu && ho ? ', ' : ''}${ho ? opp + ' ' + ho : ''} points` });
-    const margin = factors.reduce((s, f) => s + f.v, 0);
+    let margin = factors.reduce((s, f) => s + f.v, 0);
+    // the betting line already prices injuries, weather and money; walk-forward tests since 2015 put about 0.95 of the weight on it, so it leads
+    const E = ctx.espn || {}, lm = /^(.+?)\s+([+-]?\d+(?:\.\d+)?)$/.exec(String(E.line || '').trim());
+    let mkt = null;
+    if (lm && /^(even|pk)/i.test(String(E.line))) mkt = 0;
+    else if (lm) { const sp = parseFloat(lm[2]); mkt = lm[1].trim() === UT ? -sp : lm[1].trim() === opp ? sp : null; }
+    if (mkt != null && isFinite(mkt)) {
+      const W_MKT = 0.75, blended = W_MKT * mkt + (1 - W_MKT) * margin;
+      factors.push({ k: 'Betting market', v: blended - margin, note: `The line (${E.line}) implies Tennessee ${mkt >= 0 ? '+' : ''}${mkt.toFixed(1)}. Our model above says ${margin >= 0 ? '+' : ''}${margin.toFixed(1)}. The line already prices injuries and news, so it carries ${Math.round(W_MKT * 100)}% of the weight and the model ${Math.round((1 - W_MKT) * 100)}%` });
+      margin = blended;
+    }
     // total points: opponent-adjusted offense and defense ratings when the site has them, season scoring otherwise
     let total, totalNote;
     if (sec[UT] && sec[opp] && sec[UT][2] != null && sec[opp][4] != null) {
@@ -84,6 +94,7 @@
       totalNote = 'Each offense\'s points per game against the other defense\'s points allowed, pulled 30% toward the national average';
     } else { total = NAT.total; totalNote = 'National average (no team scoring data yet)'; }
     if (mg && mg.ptsU && mg.ptsO) { total = (total + mg.ptsU + mg.ptsO) / 2; totalNote += `; averaged with the drive model (${mg.drives} drives each, expected points per drive from play-by-play: ${(mg.ptsU + mg.ptsO).toFixed(0)} total)`; }
+    { const ou = parseFloat(E.ou); if (isFinite(ou) && ou > 30) { total = (total + ou) / 2; totalNote += `; averaged with the market total ${ou}`; } }
     total = clamp(total, 30, 86);
     const m = clamp(margin, -total + 8, total - 8);
     return { opp, site, mg, src, factors, margin, total, totalNote, ptsU: (total + m) / 2, ptsO: (total - m) / 2, ratingWin: phi(margin / cal.sd), rest: ru, restOpp: ro };
@@ -491,7 +502,7 @@
         ${bt ? `<p><b>Backtest.</b> The same margin formula, using Elo ratings, was fit on ${esc(bt.train)} and then asked to call ${esc(bt.test)} it had never seen: it picked the winner ${bt.accuracy}% of the time, missed the margin by ${bt.mae} points on average, and had a Brier score of ${bt.brier} (0.25 is a coin flip; lower is better).</p>
         <div class="tablewrap"><table class="vp-box"><thead><tr><th>Favorite's win chance</th><th>Games</th><th>Predicted</th><th>Actually won</th></tr></thead><tbody>${bt.calibration.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}%</td><td>${r[3]}%</td></tr>`).join('')}</tbody></table></div>
         <p class="vp-note">The live number uses SP+, FPI and PEAR instead of Elo, so the backtest checks the method, not this exact blend.</p>` : ''}
-        <p class="vp-note">A simulation is an estimate, not a pick. Availability comes from the SEC report (filled in Wednesday to Friday of game week) and Ourlads depth charts; anything not yet reported is not in the number, and the what-if menus add anything else.</p></details>`;
+        <p class="vp-note">A simulation is an estimate, not a pick. When a betting line is posted it carries 75% of the margin and half of the total, because it already prices injuries and news and beat every model we tested. Availability comes from the SEC report (filled in Wednesday to Friday of game week) and Ourlads depth charts; anything not yet reported is not in the number, and the what-if menus add anything else.</p></details>`;
   }
 
   /* ====================================================================================================

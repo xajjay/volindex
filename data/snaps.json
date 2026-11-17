@@ -1,0 +1,379 @@
+{
+ "Tennessee": {
+  "asOf": "2026-11-14",
+  "games": 10,
+  "source": "user-supplied season snap counts through the Nov 14 Texas A&M game (PFF-based, via screenshots); offense and defense only",
+  "players": [
+   {
+    "name": "Jesse Perry",
+    "pos": "OL",
+    "snaps": 673
+   },
+   {
+    "name": "David Sanders Jr.",
+    "pos": "OL",
+    "snaps": 639
+   },
+   {
+    "name": "Sam Pendleton",
+    "pos": "OL",
+    "snaps": 619
+   },
+   {
+    "name": "Braylon Staley",
+    "pos": "WR",
+    "snaps": 599
+   },
+   {
+    "name": "Mike Matthews",
+    "pos": "WR",
+    "snaps": 515
+   },
+   {
+    "name": "Donovan Haslam",
+    "pos": "OL",
+    "snaps": 510
+   },
+   {
+    "name": "DeSean Bishop",
+    "pos": "RB",
+    "snaps": 443
+   },
+   {
+    "name": "DaSaahn Brame",
+    "pos": "TE",
+    "snaps": 419
+   },
+   {
+    "name": "Trent Thomas",
+    "pos": "TE",
+    "snaps": 416
+   },
+   {
+    "name": "Nic Moore",
+    "pos": "OL",
+    "snaps": 409
+   },
+   {
+    "name": "Radarious Jackson",
+    "pos": "WR",
+    "snaps": 386
+   },
+   {
+    "name": "George MacIntyre",
+    "pos": "QB",
+    "snaps": 372
+   },
+   {
+    "name": "Shamurad Umarov",
+    "pos": "OL",
+    "snaps": 371
+   },
+   {
+    "name": "Faizon Brandon",
+    "pos": "QB",
+    "snaps": 294
+   },
+   {
+    "name": "Daune Morris",
+    "pos": "RB",
+    "snaps": 149
+   },
+   {
+    "name": "Wendell Moe Jr.",
+    "pos": "OL",
+    "snaps": 147
+   },
+   {
+    "name": "TK Keys",
+    "pos": "WR",
+    "snaps": 111
+   },
+   {
+    "name": "Ory Williams",
+    "pos": "OL",
+    "snaps": 101
+   },
+   {
+    "name": "Luca Wolf",
+    "pos": "TE",
+    "snaps": 93
+   },
+   {
+    "name": "Javin Gordon",
+    "pos": "RB",
+    "snaps": 85
+   },
+   {
+    "name": "Travis Smith Jr.",
+    "pos": "WR",
+    "snaps": 69
+   },
+   {
+    "name": "Ethan Davis",
+    "pos": "TE",
+    "snaps": 50
+   },
+   {
+    "name": "Jeremias Heard",
+    "pos": "OL",
+    "snaps": 27
+   },
+   {
+    "name": "Antoni Ogumoro",
+    "pos": "OL",
+    "snaps": 18
+   },
+   {
+    "name": "Hunter Barnes",
+    "pos": "RB",
+    "snaps": 17
+   },
+   {
+    "name": "Ed Baker",
+    "pos": "OL",
+    "snaps": 17
+   },
+   {
+    "name": "Joakim Dodson",
+    "pos": "WR",
+    "snaps": 15
+   },
+   {
+    "name": "Tyreek King",
+    "pos": "WR",
+    "snaps": 15
+   },
+   {
+    "name": "Cole Harrison",
+    "pos": "TE",
+    "snaps": 15
+   },
+   {
+    "name": "Ian Duarte",
+    "pos": "WR",
+    "snaps": 14
+   },
+   {
+    "name": "Justin Baker",
+    "pos": "RB",
+    "snaps": 12
+   },
+   {
+    "name": "Gabriel Osenda",
+    "pos": "OL",
+    "snaps": 11
+   },
+   {
+    "name": "Ryan Staub",
+    "pos": "QB",
+    "snaps": 7
+   },
+   {
+    "name": "Dejuan Lane",
+    "pos": "S",
+    "snaps": 595
+   },
+   {
+    "name": "TJ Metcalf",
+    "pos": "S",
+    "snaps": 582
+   },
+   {
+    "name": "Ty Redmond",
+    "pos": "CB",
+    "snaps": 580
+   },
+   {
+    "name": "Amare Campbell",
+    "pos": "LB",
+    "snaps": 578
+   },
+   {
+    "name": "Kayin Lee",
+    "pos": "CB",
+    "snaps": 574
+   },
+   {
+    "name": "Arion Carter",
+    "pos": "LB",
+    "snaps": 473
+   },
+   {
+    "name": "Qua Moss",
+    "pos": "NB",
+    "snaps": 460
+   },
+   {
+    "name": "Xavier Gilliam",
+    "pos": "DL",
+    "snaps": 416
+   },
+   {
+    "name": "Jeremiah Telander",
+    "pos": "LB",
+    "snaps": 395
+   },
+   {
+    "name": "Tyree Weathersby",
+    "pos": "DE",
+    "snaps": 330
+   },
+   {
+    "name": "Mariyon Dye",
+    "pos": "DL",
+    "snaps": 283
+   },
+   {
+    "name": "Jordan Norman",
+    "pos": "DE",
+    "snaps": 235
+   },
+   {
+    "name": "Edwin Spillman",
+    "pos": "LB",
+    "snaps": 209
+   },
+   {
+    "name": "Daevin Hobbs",
+    "pos": "DL",
+    "snaps": 202
+   },
+   {
+    "name": "Nathan Robinson",
+    "pos": "DL",
+    "snaps": 186
+   },
+   {
+    "name": "Tevis Metcalf",
+    "pos": "NB",
+    "snaps": 137
+   },
+   {
+    "name": "JJ Finch",
+    "pos": "DL",
+    "snaps": 130
+   },
+   {
+    "name": "Carson Gentle",
+    "pos": "DL",
+    "snaps": 129
+   },
+   {
+    "name": "Ethan Utley",
+    "pos": "DL",
+    "snaps": 108
+   },
+   {
+    "name": "Isaiah Campbell",
+    "pos": "DL",
+    "snaps": 63
+   },
+   {
+    "name": "Deylan Lewis",
+    "pos": "S",
+    "snaps": 54
+   },
+   {
+    "name": "Tre Poteat III",
+    "pos": "CB",
+    "snaps": 53
+   },
+   {
+    "name": "Tim Merritt",
+    "pos": "CB",
+    "snaps": 42
+   },
+   {
+    "name": "Kedric Golston II",
+    "pos": "DE",
+    "snaps": 25
+   },
+   {
+    "name": "Jamyan Theodore",
+    "pos": "CB",
+    "snaps": 24
+   },
+   {
+    "name": "Sidney Walton",
+    "pos": "S",
+    "snaps": 22
+   },
+   {
+    "name": "Jadon Perlotte",
+    "pos": "LB",
+    "snaps": 19
+   },
+   {
+    "name": "DJ Burks",
+    "pos": "S",
+    "snaps": 19
+   },
+   {
+    "name": "Ryan Scott",
+    "pos": "LB",
+    "snaps": 17
+   },
+   {
+    "name": "Hezekiah Harris",
+    "pos": "DE",
+    "snaps": 16
+   },
+   {
+    "name": "Darryl Rivers",
+    "pos": "DL",
+    "snaps": 14
+   },
+   {
+    "name": "Brayden Rouse",
+    "pos": "LB",
+    "snaps": 14
+   },
+   {
+    "name": "Breeze Carter",
+    "pos": "DE",
+    "snaps": 11
+   },
+   {
+    "name": "Carter Gooden",
+    "pos": "DE",
+    "snaps": 9
+   },
+   {
+    "name": "Jordan Burns",
+    "pos": "LB",
+    "snaps": 8
+   },
+   {
+    "name": "Dereon Albert",
+    "pos": "DL",
+    "snaps": 7
+   },
+   {
+    "name": "Joel Wyatt",
+    "pos": "CB",
+    "snaps": 6
+   },
+   {
+    "name": "KJ McClain",
+    "pos": "S",
+    "snaps": 5
+   },
+   {
+    "name": "TJ White",
+    "pos": "LB",
+    "snaps": 4
+   },
+   {
+    "name": "Grier Short",
+    "pos": "LB",
+    "snaps": 4
+   },
+   {
+    "name": "Nuk Simmons",
+    "pos": "DL",
+    "snaps": 2
+   }
+  ]
+ }
+}

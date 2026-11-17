@@ -5,7 +5,7 @@
  "teams": {
   "Tennessee": [
    {"name": "Mike Matthews", "pos": "WR", "status": "out", "note": "season-ending knee"},
-   {"name": "Daune Morris", "pos": "RB", "slot": "RB2", "status": "out", "note": "season-ending"},
+   {"name": "Daune Morris", "pos": "RB", "status": "out", "note": "season-ending"},
    {"name": "Nic Moore", "pos": "OL", "status": "out", "note": "illness, return unannounced"},
    {"name": "Tyree Weathersby", "pos": "DE", "status": "out", "note": "knee"},
    {"name": "Wendell Moe Jr.", "in_rating": true, "pos": "OL", "status": "out", "note": "season"},

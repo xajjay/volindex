@@ -3,70 +3,70 @@
  "game": "Vanderbilt at Tennessee",
  "teams": {
   "Tennessee": {
-   "total": -3.93,
+   "total": -3.68,
    "rows": [
     {
      "name": "Mike Matthews",
      "pos": "WR",
      "status": "out",
      "in_rating": false,
-     "depth": "WR-Z1",
-     "pts": -1.05,
-     "basis": "measured (rank within position slot)"
+     "depth": "WR2 (515 snaps)",
+     "pts": -1.06,
+     "basis": "measured, from season snaps"
     },
     {
      "name": "Daune Morris",
      "pos": "RB",
      "status": "out",
      "in_rating": false,
-     "depth": "RB2",
+     "depth": "RB2 (149 snaps)",
      "pts": -1.65,
-     "basis": "measured, slot set by hand"
+     "basis": "measured, from season snaps"
     },
     {
      "name": "Nic Moore",
      "pos": "OL",
      "status": "out",
      "in_rating": false,
-     "depth": "not on depth chart (assumed starter)",
-     "pts": -0.9,
-     "basis": "prior"
+     "depth": "OL5 (409 snaps, 72% of a starter)",
+     "pts": -0.65,
+     "basis": "prior, from season snaps"
     },
     {
      "name": "Tyree Weathersby",
      "pos": "DE",
      "status": "out",
      "in_rating": false,
-     "depth": "not on depth chart (assumed starter)",
+     "depth": "DL2 (330 snaps, 100% of a starter)",
      "pts": -0.33,
-     "basis": "measured, weak"
+     "basis": "measured, weak, from season snaps"
     },
     {
      "name": "Wendell Moe Jr.",
      "pos": "OL",
      "status": "out",
      "in_rating": true,
-     "depth": "not on depth chart (assumed starter)",
+     "depth": "OL7 (147 snaps, 26% of a starter)",
      "pts": -0.0,
-     "basis": "prior"
+     "basis": "prior, from season snaps"
     },
     {
      "name": "Ethan Davis",
      "pos": "TE",
      "status": "out",
      "in_rating": true,
-     "depth": "not on depth chart (assumed starter)",
-     "pts": -0.0,
-     "basis": "prior"
+     "depth": "TE4 (50 snaps)",
+     "pts": 0.0,
+     "basis": "prior, from season snaps"
     },
     {
      "name": "Edrees Farooq",
      "pos": "S",
      "status": "out",
      "in_rating": true,
-     "depth": "not on depth chart (assumed starter)",
-     "pts": -0.0,
-     "basis": "measured, weak"
+     "depth": "none",
+     "pts": 0.0,
+     "basis": "no snaps recorded, from season snaps"
     }
    ]
   },
