@@ -10,7 +10,7 @@
  },
  "talent": {
   "2026": "138 rows",
-  "2014": "0 rows"
+  "2014": "skipped: quota"
  },
  "returning": {
   "2026": "136 rows"
@@ -20,13 +20,13 @@
  },
  "portal": {
   "2026": "4484 rows",
-  "2020": "0 rows",
-  "2019": "0 rows",
-  "2018": "0 rows",
-  "2017": "0 rows",
-  "2016": "0 rows",
-  "2015": "0 rows",
-  "2014": "0 rows"
+  "2020": "skipped: quota",
+  "2019": "skipped: quota",
+  "2018": "skipped: quota",
+  "2017": "skipped: quota",
+  "2016": "skipped: quota",
+  "2015": "skipped: quota",
+  "2014": "skipped: quota"
  },
  "lines": {
   "2026": "2231 rows"
@@ -44,20 +44,20 @@
   "2026": "138 rows"
  },
  "rankings": {
-  "2026": "1552 rows"
+  "2026": "skipped: quota"
  },
  "games": {
-  "2026": "3718 rows"
+  "2026": "skipped: quota"
  },
  "coaches": {
-  "2026": "138 rows"
+  "2026": "skipped: quota"
  },
  "ppa_players": {
-  "2026": "4797 rows"
+  "2026": "skipped: quota"
  },
  "usage": {
-  "2026": "4797 rows"
+  "2026": "skipped: quota"
  },
- "_calls_remaining": 131,
- "_ran": "2026-11-17T22:51:19+00:00"
+ "_calls_remaining": 119,
+ "_ran": "2026-11-17T23:36:31+00:00"
 }

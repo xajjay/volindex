@@ -1,0 +1,1732 @@
+{
+ "fetched": "2026-11-17",
+ "source": "ourlads.com",
+ "teams": {
+  "tennessee": {
+   "slug": "tennessee",
+   "id": "91993",
+   "chart": {
+    "offense": {
+     "WR-X": [
+      {
+       "no": 3,
+       "name": "Radarious SO Jackson",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 1,
+       "name": "Travis SO Smith Jr.",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 81,
+       "name": "Ian RS JR/TR Duarte",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "WR-Z": [
+      {
+       "no": 4,
+       "name": "Mike JR Matthews",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 5,
+       "name": "TK FR Keys",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 88,
+       "name": "Deon RS JR/TR Hardin",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "WR-SL": [
+      {
+       "no": 14,
+       "name": "Braylon RS SO Staley",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 19,
+       "name": "Tyreek FR King",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "LT": [
+      {
+       "no": 70,
+       "name": "David SO Sanders Jr.",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 51,
+       "name": "Jeremias RS SO Heard",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 66,
+       "name": "Kamari FR Blair",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "LG": [
+      {
+       "no": 74,
+       "name": "Shamurad RS JR Umarov",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 63,
+       "name": "Jeremy FR George-El",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "C": [
+      {
+       "no": 56,
+       "name": "Sam RS JR/TR Pendleton",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 55,
+       "name": "Antoni SO Ogumoro",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "RG": [
+      {
+       "no": 69,
+       "name": "Donovan RS SR/TR Haslam",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 71,
+       "name": "Ed FR Baker",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "RT": [
+      {
+       "no": 72,
+       "name": "Jesse RS SO Perry",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 77,
+       "name": "Ory RS SO/TR Williams",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 79,
+       "name": "Gabriel FR Osenda",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "TE": [
+      {
+       "no": 7,
+       "name": "DaSaahn SO Brame",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 82,
+       "name": "Trent RS JR/TR Thomas",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 87,
+       "name": "Luca FR Wolf",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 80,
+       "name": "Cole RS SO Harrison",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "QB": [
+      {
+       "no": 12,
+       "name": "George RS FR MacIntyre",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 11,
+       "name": "Faizon FR Brandon",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 8,
+       "name": "Ryan RS JR/TR Staub",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "RB": [
+      {
+       "no": 18,
+       "name": "DeSean RS JR Bishop",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 6,
+       "name": "Javin SO/TR Gordon",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 2,
+       "name": "Justin SO Baker",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 24,
+       "name": "Hunter RS SR Barnes",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "DE": [
+      {
+       "no": 33,
+       "name": "Jordan RS JR/TR Norman",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 35,
+       "name": "Carson RS SO Gentle",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 97,
+       "name": "Hezekiah FR Harris",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 95,
+       "name": "Breeze FR Carter",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "NT": [
+      {
+       "no": 2,
+       "name": "Xavier RS SO/TR Gilliam",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 17,
+       "name": "Ethan SO Utley",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 26,
+       "name": "JJ FR Finch",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "DT": [
+      {
+       "no": 5,
+       "name": "Daevin SR Hobbs",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 19,
+       "name": "Nathan RS JR Robinson",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 47,
+       "name": "Isaiah SO Campbell",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "LEO": [
+      {
+       "no": 22,
+       "name": "Jeremiah SR Telander",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 9,
+       "name": "Mariyon SO Dye",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 44,
+       "name": "Christian RS FR Gass",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 37,
+       "name": "Kedric FR Golston II",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "WLB": [
+      {
+       "no": 7,
+       "name": "Arion SR Carter",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 13,
+       "name": "Edwin RS SO Spillman",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 28,
+       "name": "Brayden FR Rouse",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 50,
+       "name": "Ryan RS SO Scott",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "MLB": [
+      {
+       "no": 0,
+       "name": "Amare SR/TR Campbell",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 27,
+       "name": "Jadon SO Perlotte",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 11,
+       "name": "Jordan RS SO Burns",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 51,
+       "name": "TJ FR White",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "LCB": [
+      {
+       "no": 14,
+       "name": "Kayin SR/TR Lee",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 3,
+       "name": "Tre SO Poteat III",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 31,
+       "name": "Joel FR Wyatt",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "SS": [
+      {
+       "no": 10,
+       "name": "Dejuan JR/TR Lane",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 23,
+       "name": "Sidney SO Walton",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 40,
+       "name": "KJ FR McClain",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "FS": [
+      {
+       "no": 1,
+       "name": "TJ SR/TR Metcalf",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 42,
+       "name": "DJ RS SR/TR Burks",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "RCB": [
+      {
+       "no": 4,
+       "name": "Ty SO Redmond",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 25,
+       "name": "Tim SO Merritt",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 21,
+       "name": "Jamyan FR Theodore",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "NB": [
+      {
+       "no": 6,
+       "name": "Qua SR/TR Moss",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 20,
+       "name": "Tevis RS SO/TR Metcalf",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 29,
+       "name": "Isaiah RS JR/TR Hardge",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "PT": [
+      {
+       "no": 98,
+       "name": "Jackson RS SR Ross",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 99,
+       "name": "Logan FR Foley",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "PK": [
+      {
+       "no": 28,
+       "name": "Cooper RS SO/TR Ranvier",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 94,
+       "name": "Josh RS SR Turbyville",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 93,
+       "name": "Grady RS FR Dangerfield",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "KO": [
+      {
+       "no": 94,
+       "name": "Josh RS SR Turbyville",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 98,
+       "name": "Jackson RS SR Ross",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 93,
+       "name": "Grady RS FR Dangerfield",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "LS": [
+      {
+       "no": 48,
+       "name": "Bennett RS SR Brady",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 53,
+       "name": "Blake RS JR/TR Howard",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "H": [
+      {
+       "no": 98,
+       "name": "Jackson RS SR Ross",
+       "cls": "",
+       "rank": 1
+      }
+     ],
+     "PR": [
+      {
+       "no": 6,
+       "name": "Qua SR/TR Moss",
+       "cls": "",
+       "rank": 1
+      }
+     ],
+     "KR": [
+      {
+       "no": 6,
+       "name": "Qua SR/TR Moss",
+       "cls": "",
+       "rank": 1
+      }
+     ],
+     "RES": [
+      {
+       "no": 24,
+       "name": "Dylan SO Lewis",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 75,
+       "name": "Wendell RS SR/TR Moe Jr.",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 18,
+       "name": "Tyree RS JR Weathersby",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 17,
+       "name": "Daune SO Morris",
+       "cls": "",
+       "rank": 4
+      },
+      {
+       "no": 58,
+       "name": "Nic RS FR Moore",
+       "cls": "",
+       "rank": 5
+      }
+     ]
+    }
+   }
+  },
+  "lsu": {
+   "slug": "lsu",
+   "id": "90981",
+   "chart": {
+    "offense": {
+     "WR-X": [
+      {
+       "no": 3,
+       "name": "Eugene RS JR/TR Wilson III",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 2,
+       "name": "Tre' RS JR/TR Brown",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 86,
+       "name": "Jabari FR Mack",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 85,
+       "name": "Josh RS SO/TR Jackson",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "WR-Z": [
+      {
+       "no": 4,
+       "name": "Jackson RS JR/TR Harris",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 88,
+       "name": "Malik RS JR/TR Elzy",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 80,
+       "name": "Brayden FR Allen",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 1,
+       "name": "Jayce SR/TR Brown",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "WR-SL": [
+      {
+       "no": 6,
+       "name": "Winston SO/TR Watkins Jr.",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 83,
+       "name": "Corey FR Barber Jr.",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 84,
+       "name": "Tyree RS JR/TR Holloway",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 26,
+       "name": "Nolon FR Buckels",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "LT": [
+      {
+       "no": 77,
+       "name": "Jordan JR/TR Seaton",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 65,
+       "name": "Sean RS JR/TR Thompkins Jr.",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 71,
+       "name": "Brysten FR Martinez",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "LG": [
+      {
+       "no": 50,
+       "name": "William RS SO/TR Satterwhite II",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 67,
+       "name": "Bo RS SR Bordelon",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 52,
+       "name": "Ja'Quan RS JR/TR Sprinkle",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 54,
+       "name": "Ja'Mard SO/TR Jones Jr.",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "C": [
+      {
+       "no": 61,
+       "name": "Braelin RS SR/TR Moore",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 51,
+       "name": "Ryan FR Miret",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 74,
+       "name": "Braden RS JR Augustus",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "RG": [
+      {
+       "no": 55,
+       "name": "Aliou RS SR/TR Bah",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 70,
+       "name": "Devin SO/TR Harper",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 68,
+       "name": "Brett RS FR Bordelon",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "RT": [
+      {
+       "no": 75,
+       "name": "Weston RS SO Davis",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 69,
+       "name": "Darrin RS FR/TR Strey",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 53,
+       "name": "Hayes RS FR Fuqua",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "TE": [
+      {
+       "no": 7,
+       "name": "Trey'Dez JR Green",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 44,
+       "name": "Zach RS JR/TR Grace",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 14,
+       "name": "Roman RS JR/TR Mothershed",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 12,
+       "name": "Malachi JR/TR Thomas",
+       "cls": "",
+       "rank": 4
+      },
+      {
+       "no": 87,
+       "name": "JC FR Anderson",
+       "cls": "",
+       "rank": 5
+      }
+     ],
+     "QB": [
+      {
+       "no": 10,
+       "name": "Sam RS JR/TR Leavitt",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 11,
+       "name": "Landen RS SO/TR Clark",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 8,
+       "name": "Husan RS FR/TR Longstreet",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 19,
+       "name": "Kaden RS SR/TR Martin",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "RB": [
+      {
+       "no": 13,
+       "name": "Dilin RS SO/TR Jones",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 29,
+       "name": "Caden JR Durham",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 22,
+       "name": "Harlem SO Berry",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 23,
+       "name": "Stacy RS SO/TR Gage",
+       "cls": "",
+       "rank": 4
+      },
+      {
+       "no": 25,
+       "name": "Rod RS SO/TR Gainey Jr.",
+       "cls": "",
+       "rank": 5
+      }
+     ],
+     "LDE": [
+      {
+       "no": 1,
+       "name": "Princewill SR/TR Umanmielen",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 97,
+       "name": "Dylan RS JR Carpenter",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 48,
+       "name": "Kolaj RS SO Cobbins",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 91,
+       "name": "Trenton FR Henderson",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "LDT": [
+      {
+       "no": 99,
+       "name": "Deuce FR Geralds",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 96,
+       "name": "Dominick JR McKinley",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 92,
+       "name": "Brandon RS FR Brown",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "RDT": [
+      {
+       "no": 90,
+       "name": "Stephiylan RS JR/TR Green",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 47,
+       "name": "Malik JR/TR Blocton",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 95,
+       "name": "Shone RS SR/TR Washington",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "RDE": [
+      {
+       "no": 29,
+       "name": "Jordan JR/TR Ross",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 55,
+       "name": "Lamar FR Brown",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 41,
+       "name": "Junior SR/TR Tuihalamaka",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 93,
+       "name": "Jaylen RS SO/TR Brown",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "WLB": [
+      {
+       "no": 42,
+       "name": "Davhon JR Keys",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 24,
+       "name": "Tylen RS SO Singleton",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 56,
+       "name": "Jake RS JR Ibieta",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 32,
+       "name": "Keylan RS FR Moses",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "MLB": [
+      {
+       "no": 6,
+       "name": "TJ RS SR/TR Dottery",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 35,
+       "name": "Zach RS FR Weeks",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 15,
+       "name": "Jaiden RS FR Braker",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "LCB": [
+      {
+       "no": 5,
+       "name": "DJ SO Pickett",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 21,
+       "name": "Michael RS SO Turner Jr.",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 22,
+       "name": "Havon FR Finney Jr.",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "SS": [
+      {
+       "no": 0,
+       "name": "Tamarcus RS JR/TR Cooley",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 13,
+       "name": "Faheem SO/TR Delane",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 30,
+       "name": "Treylan RS JR/TR James",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "FS": [
+      {
+       "no": 28,
+       "name": "Jhase RS FR Thomas",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 33,
+       "name": "Isaiah FR Washington",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "RCB": [
+      {
+       "no": 11,
+       "name": "PJ JR Woodland",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 8,
+       "name": "Ja'Keem RS JR/TR Jackson",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "NB": [
+      {
+       "no": 2,
+       "name": "Ty SR/TR Benefield",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 31,
+       "name": "CJ SO Jimcoily",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "PT": [
+      {
+       "no": 90,
+       "name": "Grant JR/TR Chadwick",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 99,
+       "name": "Hayden RS FR/TR Craig",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "PK": [
+      {
+       "no": 80,
+       "name": "Scott SO/TR Starzyk",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 32,
+       "name": "Gavin FR Higgins",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "KO": [
+      {
+       "no": 80,
+       "name": "Scott SO/TR Starzyk",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 32,
+       "name": "Gavin FR Higgins",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "LS": [
+      {
+       "no": 43,
+       "name": "Silas SO Hall",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 39,
+       "name": "Mack RS FR/TR Mulhern",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "H": [
+      {
+       "no": 90,
+       "name": "Grant JR/TR Chadwick",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 99,
+       "name": "Hayden RS FR/TR Craig",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "PR": [
+      {
+       "no": 3,
+       "name": "Eugene RS JR/TR Wilson III",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 8,
+       "name": "Husan RS FR/TR Longstreet",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "KR": [
+      {
+       "no": 22,
+       "name": "Harlem SO Berry",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 3,
+       "name": "Eugene RS JR/TR Wilson III",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "RES": [
+      {
+       "no": 26,
+       "name": "Charles SO Ross II",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 88,
+       "name": "Richard FR Anderson",
+       "cls": "",
+       "rank": 2
+      }
+     ]
+    }
+   }
+  },
+  "vanderbilt": {
+   "slug": "vanderbilt",
+   "id": "92361",
+   "chart": {
+    "offense": {
+     "WR-X": [
+      {
+       "no": 0,
+       "name": "Junior SR Sherrill",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 15,
+       "name": "Joseph RS SO McVay",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "WR-Z": [
+      {
+       "no": 6,
+       "name": "Ja'Cory SR/TR Thomas",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 9,
+       "name": "Brycen RS SO Coleman",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 80,
+       "name": "Claiborne RS JR/TR Richards",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "WR-SL": [
+      {
+       "no": 5,
+       "name": "Tristen JR Brown",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 7,
+       "name": "Cole GR/TR Adams",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "QT": [
+      {
+       "no": 51,
+       "name": "Clinton RS SO/TR Azubuike",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 72,
+       "name": "Mitchell FR Smith",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "QG": [
+      {
+       "no": 70,
+       "name": "Cade GR/TR McConnell",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 52,
+       "name": "Kevo GR Wesley",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "C": [
+      {
+       "no": 56,
+       "name": "Lyndon GR/TR Cooper",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 78,
+       "name": "Keegan RS JR Wechsler",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "SG": [
+      {
+       "no": 58,
+       "name": "Orion RS SR/TR Irving",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 65,
+       "name": "Micah RS FR/TR DeBose",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "ST": [
+      {
+       "no": 62,
+       "name": "CJ RS SO Williams",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 75,
+       "name": "Beau RS JR/TR Johnson",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "TE": [
+      {
+       "no": 16,
+       "name": "Cole GR Spence",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 8,
+       "name": "Jayvontay RS JR/TR Conner",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 44,
+       "name": "Gabe RS JR Fisher",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 19,
+       "name": "Maurice RS JR/TR Veney",
+       "cls": "",
+       "rank": 4
+      },
+      {
+       "no": 12,
+       "name": "Walter RS SR/TR Taylor",
+       "cls": "",
+       "rank": 5
+      }
+     ],
+     "QB": [
+      {
+       "no": 2,
+       "name": "Jared FR Curtis",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 10,
+       "name": "Whit RS SO Muschamp",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 11,
+       "name": "Jack RS FR Elliott",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 14,
+       "name": "Drew RS FR/TR Cowart",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "RB": [
+      {
+       "no": 28,
+       "name": "Sedrick SR Alexander",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 22,
+       "name": "Makhilyn RS JR/TR Young",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 3,
+       "name": "Jamezell RS SO Lassiter",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 20,
+       "name": "Izayah FR Lee",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "DE": [
+      {
+       "no": 10,
+       "name": "Brian GR/TR Allen Jr.",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 96,
+       "name": "Khalil GR/TR Poteat",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 97,
+       "name": "Hayden GR/TR Bray",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "NT": [
+      {
+       "no": 99,
+       "name": "Talan JR/TR Carter",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 53,
+       "name": "Glenn JR Seabrooks III",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 15,
+       "name": "Mike GR/TR Diatta",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "DT": [
+      {
+       "no": 5,
+       "name": "Issa GR Ouattara",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 92,
+       "name": "Jaylon RS JR/TR Stone",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 94,
+       "name": "Bradley GR Mann",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "WLB": [
+      {
+       "no": 24,
+       "name": "Nick GR Rinaldi",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 30,
+       "name": "Austin SO Howard",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "MLB": [
+      {
+       "no": 11,
+       "name": "Bryan SR Longwell",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 22,
+       "name": "Bryce RS SR Cowan",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 20,
+       "name": "Jamison RS SO Curtis",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "LCB": [
+      {
+       "no": 26,
+       "name": "Cayden RS FR Daniels",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 6,
+       "name": "Jordan RS JR/TR Matthews",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 0,
+       "name": "Cobey RS FR/TR Sellers",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 23,
+       "name": "Bishop FR Starling",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "SS": [
+      {
+       "no": 8,
+       "name": "CJ JR/TR Heard",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 1,
+       "name": "Dontae JR Carter",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 12,
+       "name": "Vanzale RS FR Hinton",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "FS": [
+      {
+       "no": 7,
+       "name": "Ricardo JR/TR Jones",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 9,
+       "name": "Jalen RS JR Gilbert",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 35,
+       "name": "Payne RS JR Daniel",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "RCB": [
+      {
+       "no": 4,
+       "name": "Martel SR Hight",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 21,
+       "name": "Davin RS FR Chandler",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 2,
+       "name": "Jaylin JR Lackey",
+       "cls": "",
+       "rank": 3
+      },
+      {
+       "no": 16,
+       "name": "Jaylin GR/TR Davies",
+       "cls": "",
+       "rank": 4
+      }
+     ],
+     "NB": [
+      {
+       "no": 25,
+       "name": "Mason FR Lewis",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 3,
+       "name": "Carson SO Lawrence",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 14,
+       "name": "Jailen RS JR Ruth",
+       "cls": "",
+       "rank": 3
+      }
+     ],
+     "PT": [
+      {
+       "no": 37,
+       "name": "Tyler RS SR/TR Ebel",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 79,
+       "name": "Conor RS JR Weasler",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "PK": [
+      {
+       "no": 88,
+       "name": "Brock RS JR Taylor",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 47,
+       "name": "Justin RS FR Dewers",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "KO": [
+      {
+       "no": 88,
+       "name": "Brock RS JR Taylor",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 47,
+       "name": "Justin RS FR Dewers",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "LS": [
+      {
+       "no": 54,
+       "name": "Kaden GR/TR Schickel",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 53,
+       "name": "Stone RS FR Owens",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "H": [
+      {
+       "no": 37,
+       "name": "Tyler RS SR/TR Ebel",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 79,
+       "name": "Conor RS JR Weasler",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "PR": [
+      {
+       "no": 4,
+       "name": "Martel SR Hight",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 7,
+       "name": "Cole GR/TR Adams",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "KR": [
+      {
+       "no": 0,
+       "name": "Junior SR Sherrill",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 7,
+       "name": "Cole GR/TR Adams",
+       "cls": "",
+       "rank": 2
+      }
+     ],
+     "RES": [
+      {
+       "no": 50,
+       "name": "Gunner RS SR/TR Givens",
+       "cls": "",
+       "rank": 1
+      },
+      {
+       "no": 23,
+       "name": "Evan FR Hampton",
+       "cls": "",
+       "rank": 2
+      },
+      {
+       "no": 34,
+       "name": "Daniel FR Vollmer Jr.",
+       "cls": "",
+       "rank": 3
+      }
+     ]
+    }
+   }
+  }
+ }
+}
