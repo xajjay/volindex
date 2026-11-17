@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-16. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-17. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-16",
+ "updated": "2026-11-17",
  "team": {
   "record": "8-2",
   "sec": "5-2",
@@ -1637,7 +1637,7 @@ window.SITE_AUTO.football = {
    "line": "LSU -1.5",
    "ou": 46.5,
    "ml": "-105",
-   "book": "DraftKings",
+   "book": "Draft Kings",
    "win": 49.9
   },
   "Vanderbilt": {
@@ -15323,6 +15323,58 @@ window.SITE_AUTO.football = {
      "line": "5 INT"
     }
    ],
+   "games": [
+    [
+     "2026-09-05",
+     51,
+     10
+    ],
+    [
+     "2026-09-12",
+     45,
+     14
+    ],
+    [
+     "2026-09-19",
+     24,
+     32
+    ],
+    [
+     "2026-09-26",
+     35,
+     6
+    ],
+    [
+     "2026-10-03",
+     63,
+     14
+    ],
+    [
+     "2026-10-10",
+     34,
+     35
+    ],
+    [
+     "2026-10-17",
+     31,
+     0
+    ],
+    [
+     "2026-10-24",
+     38,
+     17
+    ],
+    [
+     "2026-11-07",
+     13,
+     31
+    ],
+    [
+     "2026-11-15",
+     21,
+     22
+    ]
+   ],
    "series": {
     "w": 21,
     "l": 10,
@@ -15630,6 +15682,58 @@ window.SITE_AUTO.football = {
      "line": "5 INT"
     }
    ],
+   "games": [
+    [
+     "2026-09-05",
+     28,
+     9
+    ],
+    [
+     "2026-09-12",
+     35,
+     26
+    ],
+    [
+     "2026-09-19",
+     35,
+     31
+    ],
+    [
+     "2026-09-26",
+     15,
+     21
+    ],
+    [
+     "2026-10-03",
+     14,
+     38
+    ],
+    [
+     "2026-10-10",
+     17,
+     52
+    ],
+    [
+     "2026-10-17",
+     21,
+     31
+    ],
+    [
+     "2026-10-24",
+     17,
+     34
+    ],
+    [
+     "2026-11-07",
+     25,
+     23
+    ],
+    [
+     "2026-11-14",
+     6,
+     21
+    ]
+   ],
    "series": {
     "w": 81,
     "l": 31,
@@ -15767,6 +15871,7 @@ window.SITE_AUTO.football = {
   "OK   box scores for finished games (ESPN)",
   "OK   matchup previews for remaining games (CFBD)",
   "OK   season-by-season schedules and team leaders (cached after the first run)",
+  "OK   predictor calibration (data/predict-cal.js)",
   "SKIP PEAR ratings: HTTP Error 403: Forbidden",
   "     PEAR probe saved to tools/cache/pear-probe.json",
   "OK   FPI ratings and ranks for the SEC (CFBD)"
