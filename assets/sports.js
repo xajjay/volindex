@@ -80,6 +80,7 @@
     const A = window.SITE_AUTO && window.SITE_AUTO[D.key];
     D.histGames = (window.SITE_AUTO && window.SITE_AUTO[D.key + 'History']) || null;
     if (!A) return D;
+    D._manual = (D.schedule || []).filter(g => g.manual);
     try {
       if (A.schedule && A.schedule.length && A.season === D.season) {
         const oldByDate = new Map(D.schedule.map(g => [g.date + '|' + g.opp.replace(/ \(.*\)$/, ''), g]));
@@ -93,6 +94,10 @@
             gid: g.id, hasBox: !!((A.box && A.box[String(g.id)]) || (A.boxIds && A.boxIds.includes(String(g.id)))), watch: g.watch, live: g.live, event: g.tournament, note: g.note,
           });
         });
+        // hand-entered games (e.g. NCAA Tournament) stay until the bot's schedule has a game on the same date
+        const have = new Set(D.schedule.map(g => g.date));
+        const keep = (D._manual || []).filter(g => !have.has(g.date));
+        if (keep.length) D.schedule = D.schedule.concat(keep).sort((a, b) => a.date.localeCompare(b.date));
         // Basketball: once the real season has started (a regular-season game has a result), the exhibitions drop off the schedule.
         if ((D.key === 'mbb' || D.key === 'wbb') && D.schedule.some(g => g.result && g.kind !== 'exh')) D.schedule = D.schedule.filter(g => g.kind !== 'exh');
         setRecord(D);
