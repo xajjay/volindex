@@ -49,13 +49,20 @@
     if (P.sp && P.sp.ut && P.sp.opp && P.sp.ut[0] != null && P.sp.opp[0] != null) src.push({ k: 'SP+', ut: +P.sp.ut[0], opp: +P.sp.opp[0] });
     if (P.fpi && P.fpi.ut && P.fpi.opp && P.fpi.ut[0] != null && P.fpi.opp[0] != null) src.push({ k: 'FPI', ut: +P.fpi.ut[0], opp: +P.fpi.opp[0] });
     if (sec[UT] && sec[opp]) src.push({ k: 'PEAR', ut: +sec[UT][0], opp: +sec[opp][0] });
+    const MF = root.MODEL_FB, mg = MF && (MF.games || []).find(x => x.date === g.date && x.opp === opp), pw = MF && MF.powerAll;
+    if (pw && pw[UT] != null && pw[opp] != null) src.push({ k: 'Play-by-play model', ut: +pw[UT], opp: +pw[opp] });
     const c = P.compare;
     if (!src.length && c && c.ppg && c.oppg) src.push({ k: 'Scoring margin', ut: (c.ppg[0] - c.oppg[0]) * 0.7, opp: (c.ppg[1] - c.oppg[1]) * 0.7 });
     if (!src.length) return null;
     const rU = src.reduce((s, x) => s + x.ut, 0) / src.length, rO = src.reduce((s, x) => s + x.opp, 0) / src.length;
     const site = g.site === 'H' ? 1 : g.site === 'A' ? -1 : 0;
     const factors = [{ k: 'Power ratings', v: rU - rO, note: src.map(x => `${x.k} ${x.ut.toFixed(1)} vs ${x.opp.toFixed(1)}`).join(' · ') }];
-    factors.push({ k: site > 0 ? 'Home field (Neyland)' : site < 0 ? `Road game (${opp})` : 'Neutral site', v: site * cal.hfa, note: site ? `${cal.hfa} points, measured from ${cal.fitted}` : 'No home-field edge either way' });
+    const hfaV = mg && site ? (cal.hfa + Math.abs(mg.hfa)) / 2 : cal.hfa;
+    factors.push({ k: site > 0 ? 'Home field (Neyland)' : site < 0 ? `Road game (${opp})` : 'Neutral site', v: site * hfaV, note: site ? (mg ? `${hfaV.toFixed(1)} points: ${cal.hfa} measured from ${cal.fitted}, ${Math.abs(mg.hfa)} for ${mg.hfaTeam} from home-minus-road results against the same opponents, averaged` : `${cal.hfa} points, measured from ${cal.fitted}`) : 'No home-field edge either way' });
+    if (mg) {
+      const rows = ((MF.availability && MF.availability.teams) || {}), lst = t => (rows[t] && rows[t].rows || []).filter(r => r.pts).map(r => `${r.name} (${r.pos}, ${r.status}) ${r.pts}`).join('; ');
+      factors.push({ k: 'Availability', v: mg.availU - mg.availO, note: `Points lost to players out or doubtful, from their depth-chart slot and measured cost of missing that slot. Tennessee ${mg.availU.toFixed(1)}${lst(UT) ? ': ' + lst(UT) : ''}. ${opp} ${mg.availO.toFixed(1)}${lst(opp) ? ': ' + lst(opp) : ' (no report filed yet)'}. Source: ${(MF.availability && MF.availability.asOf) || 'availability file'}` });
+    }
     // rest and form only count when both teams' schedules are known, so one side never gets an adjustment the other can't
     const ru = recent((ctx.schedule || []).map(x => [x.date, x.us, x.them]), g.date), ro = recent(P.games, g.date);
     if (ru && ro) {
@@ -76,9 +83,10 @@
       total = ((c.ppg[0] + c.oppg[1]) / 2 + (c.ppg[1] + c.oppg[0]) / 2) * 0.7 + NAT.total * 0.3;
       totalNote = 'Each offense\'s points per game against the other defense\'s points allowed, pulled 30% toward the national average';
     } else { total = NAT.total; totalNote = 'National average (no team scoring data yet)'; }
+    if (mg && mg.ptsU && mg.ptsO) { total = (total + mg.ptsU + mg.ptsO) / 2; totalNote += `; averaged with the drive model (${mg.drives} drives each, expected points per drive from play-by-play: ${(mg.ptsU + mg.ptsO).toFixed(0)} total)`; }
     total = clamp(total, 30, 86);
     const m = clamp(margin, -total + 8, total - 8);
-    return { opp, site, src, factors, margin, total, totalNote, ptsU: (total + m) / 2, ptsO: (total - m) / 2, ratingWin: phi(margin / cal.sd), rest: ru, restOpp: ro };
+    return { opp, site, mg, src, factors, margin, total, totalNote, ptsU: (total + m) / 2, ptsO: (total - m) / 2, ratingWin: phi(margin / cal.sd), rest: ru, restOpp: ro };
   };
 
   /* ====================================================================================================
@@ -190,7 +198,7 @@
       let y = 0, text = '', type = 'run', x = {}, stop = false, to = null;
       T[o].plays++;
       if (chance(pRun)) {
-        const kk = st.ball >= 75 ? clamp(Math.pow(M.k, 2.4), 0.4, 3) : Math.pow(M.k, 0.4), ypc = M.ypc * kk * 1.08, pBig = clamp(0.13 * ypc / NAT.ypc, 0.05, 0.22), mu = (ypc + 0.17 * 1.5 - pBig * 21) / (1 - 0.17 - pBig), z = R();
+        const kk = st.ball >= 75 ? clamp(Math.pow(M.k, 2.4), 0.4, 3) : Math.pow(M.k, 0.4), ypc = M.ypc * kk * 1.08, pBig = clamp(0.13 * ypc / NAT.ypc * (M.xk || 1), 0.04, 0.26), mu = (ypc + 0.17 * 1.5 - pBig * 21) / (1 - 0.17 - pBig), z = R();
         y = z < 0.17 ? -Math.floor(R() * 4) : z < 0.17 + pBig ? Math.round(10 + expo(11)) : Math.max(0, Math.round(mu + gauss() * 2.6));
         if (st.ball >= 95) y = Math.min(y, Math.round(y * 0.7 + 1));                           // a short field squeezes the run game
         y = Math.min(y, 100 - st.ball);
@@ -211,7 +219,7 @@
           text = st.ball + y >= 100 ? `${qb || tn(o) + ' QB'} scrambles in for the touchdown!` : `${qb || tn(o) + ' QB'} scrambles for ${y}.`; tick(5 + tm(), o);
         } else {
           type = 'pass';
-          const deep = chance(0.19 + (st.down === 3 && st.togo >= 10 ? 0.1 : 0) + (late && lead < -8 ? 0.1 : 0)), c0 = M.cmp / 100, cS = Math.min(0.86, c0 * 1.13), cD = c0 * 0.62;
+          const deep = chance(0.19 * Math.pow(M.xk || 1, 0.7) + (st.down === 3 && st.togo >= 10 ? 0.1 : 0) + (late && lead < -8 ? 0.1 : 0)), c0 = M.cmp / 100, cS = Math.min(0.86, c0 * 1.13), cD = c0 * 0.62;
           const base = 0.79 * cS * 9 + 0.21 * cD * 31, kk = st.ball >= 75 ? clamp(Math.pow(M.k, 2.4), 0.4, 3) : Math.pow(M.k, 0.4), sc = M.ypa * kk * 1.1 / base;
           const top1 = chance(0.3), tgt = N.wr && top1 ? N.wr : null; x.who = qb; x.tgt = tgt; x.deep = deep; x.side = chance(0.5) ? 1 : -1;
           T[o].att++; T[o].qb.att++;
@@ -324,7 +332,10 @@
     N = N || 1000; P = P || {};
     const m = VP.model(g, P, ctx, adj); if (!m) return null;
     const G0 = gamesIn(ctx && ctx.record), G1 = gamesIn(P.record), c = P.compare || null;
-    const pu = profile(c, 0, G0), po = profile(c, 1, G1), Ms = [matchup(pu, po), matchup(po, pu)];
+    const pu = profile(c, 0, G0), po = profile(c, 1, G1), mg = m.mg;
+    if (mg && mg.sim) { pu.runShare = clamp(1 - mg.sim.passU, 0.34, 0.68); po.runShare = clamp(1 - mg.sim.passO, 0.34, 0.68); pu.plays = mg.sim.playsU; po.plays = mg.sim.playsO; }
+    const Ms = [matchup(pu, po), matchup(po, pu)];
+    if (mg && mg.sim) { Ms[0].xk = mg.sim.explU; Ms[1].xk = mg.sim.explO; Ms[0].tempo = Ms[1].tempo = clamp(mg.sim.natDt / ((mg.sim.dtU + mg.sim.dtO) / 2), 0.8, 1.25); }
     const games = calibrate(Ms, m, N);
     const sims = []; let w = 0, ot = 0, one = 0;
     const agg = [0, 1].map(() => ({ pts: 0, rushY: 0, passY: 0, to: 0, plays: 0, sacks: 0, t3a: 0, t3c: 0, top: 0, fd: 0 }));
@@ -443,6 +454,19 @@
     if (E.line) out.push(`Line ${esc(E.line)}${E.ou ? ', over/under ' + esc(E.ou) : ''}`);
     return out.length ? `<p class="vp-note">For comparison, Tennessee's chances elsewhere: ${out.join(' · ')}.</p>` : '';
   }
+  function modelCard(res) {
+    const mg = res.m && res.m.mg; if (!mg) return '';
+    const o = res.g.opp, f = (v, d) => (+v).toFixed(d), rk = (a, d) => `${f(a[0], d)} <small>#${a[1]}</small>`;
+    const dec = k => /EPA|Line yards|Points per drive|Turnovers|Penalties/.test(k) ? (/Line yards|Points per drive|Turnovers|Penalties/.test(k) ? 2 : 3) : 1;
+    const t = mg.tend, tr = (l, a, b) => `<tr><td>${l}</td><td>${a}</td><td>${b}</td></tr>`, pct = v => f(v, 1) + '%';
+    const nat = t.ut;
+    return `<h4>How the two teams compare <span class="vp-note">(2026 play-by-play, garbage time removed; rank among FBS, 1 = best)</span></h4>
+      <div class="tablewrap"><table class="vp-box"><thead><tr><th></th><th>Tennessee offense</th><th>${esc(o)} defense</th><th>${esc(o)} offense</th><th>Tennessee defense</th></tr></thead><tbody>${mg.rows.map(r => `<tr><td>${esc(r.k)}</td><td>${rk(r.ut, dec(r.k))}</td><td>${rk(r.oppD, dec(r.k))}</td><td>${rk(r.opp, dec(r.k))}</td><td>${rk(r.utD, dec(r.k))}</td></tr>`).join('')}</tbody></table></div>
+      <h4>How each team plays <span class="vp-note">(these set the simulated game)</span></h4>
+      <div class="tablewrap"><table class="vp-box"><thead><tr><th></th><th>Tennessee</th><th>${esc(o)}</th></tr></thead><tbody>${tr('Pass rate (FBS average ' + pct(nat.natPassRate) + ')', pct(t.ut.c_pass_rate), pct(t.opp.c_pass_rate))}${tr('Pass rate over expected', (t.ut.c_proe > 0 ? '+' : '') + f(t.ut.c_proe, 1), (t.opp.c_proe > 0 ? '+' : '') + f(t.opp.c_proe, 1))}${tr('Plays per game (FBS average ' + f(nat.natPlays, 1) + ')', f(t.ut.c_plays, 1), f(t.opp.c_plays, 1))}${tr('Seconds per play (FBS average ' + f(nat.natDt, 1) + ')', f(t.ut.c_dt, 1), f(t.opp.c_dt, 1))}${tr('Explosive-play dial vs this opponent', f(mg.sim.explU, 2) + '×', f(mg.sim.explO, 2) + '×')}</tbody></table></div>
+      <h4>What each edge is worth <span class="vp-note">(model points for Tennessee; ratings are opponent-adjusted)</span></h4>
+      <div class="tablewrap"><table class="vp-box"><tbody>${mg.edges.map(e => `<tr><td>${esc(({ c_epa: 'Overall efficiency (EPA/play)', c_succ: 'Success rate', c_expl: 'Explosiveness', c_rush_epa: 'Rushing efficiency', c_pass_epa: 'Passing efficiency', pts_per_drive: 'Points per drive' })[e.m] || e.k)}</td><td>${e.pts >= 0 ? 'UT +' : esc(o) + ' +'}${Math.abs(e.pts).toFixed(1)}</td></tr>`).join('')}<tr><td><b>Ratings, neutral field</b></td><td><b>${mg.neutral >= 0 ? 'UT +' : esc(o) + ' +'}${Math.abs(mg.neutral).toFixed(1)}</b></td></tr></tbody></table></div>`;
+  }
   function report(res) {
     const g = res.g, o = g.opp, m = res.m, cal = CAL(), tO = teamOf(o), a = res.avg, bt = cal.backtest;
     const fav = m.margin >= 0 ? UT : o, sp = Math.abs(Math.round(res.mean * 2) / 2);
@@ -457,16 +481,17 @@
       <div><h4>What goes into the number</h4><table class="vp-fac"><tbody>${m.factors.map(f => `<tr><td>${esc(f.k)}<small>${esc(f.note)}</small></td><td class="n">${f.v > 0 ? 'UT +' + f.v.toFixed(1) : f.v < 0 ? esc(tO.abbr) + ' +' + (-f.v).toFixed(1) : '0.0'}</td></tr>`).join('')}
         <tr class="tot"><td>Expected margin<small>Expected total ${m.total.toFixed(1)}. ${esc(m.totalNote)}</small></td><td class="n">${m.margin >= 0 ? 'UT +' + m.margin.toFixed(1) : esc(tO.abbr) + ' +' + (-m.margin).toFixed(1)}</td></tr></tbody></table>
         <div class="vp-what"><label>What if Tennessee is <select data-vpadj="ut"><option value="0">at full strength</option><option value="-2">missing a key starter (−2)</option><option value="-4">missing several starters (−4)</option><option value="-6">without its starting QB (−6)</option></select></label><label>and ${esc(o)} is <select data-vpadj="opp"><option value="0">at full strength</option><option value="-2">missing a key starter (−2)</option><option value="-4">missing several starters (−4)</option><option value="-6">without its starting QB (−6)</option></select></label></div></div></div>
+      ${modelCard(res)}
       <h4>What decides it</h4><ul class="vp-keys">${keys(res).map(k => `<li>${k}</li>`).join('')}</ul>
       <h4>Projected team numbers <span class="vp-note">(average of ${res.N.toLocaleString()} games)</span></h4>
       <div class="tablewrap"><table class="vp-box"><thead><tr><th></th><th>Tennessee</th><th>${esc(o)}</th></tr></thead><tbody>${row('Points', a[0].pts, a[1].pts, 1)}${row('Total yards', a[0].rushY + a[0].passY, a[1].rushY + a[1].passY)}${row('Rushing yards', a[0].rushY, a[1].rushY)}${row('Passing yards', a[0].passY, a[1].passY)}${row('First downs', a[0].fd, a[1].fd, 1)}${row('Third-down %', a[0].t3c / Math.max(1, a[0].t3a) * 100, a[1].t3c / Math.max(1, a[1].t3a) * 100)}${row('Turnovers', a[0].to, a[1].to, 1)}${row('Sacks allowed', a[0].sacks, a[1].sacks, 1)}${row('Time of possession (min)', a[0].top / 60, a[1].top / 60, 1)}</tbody></table></div>
       <details style="margin-top:14px"><summary><b>How this works, and how good it is</b></summary>
-        <p>The margin comes from published power ratings (${m.src.map(s => s.k).join(', ')}), averaged, plus home field. Home field (${cal.hfa} points) and the usual miss around an expected margin (${cal.sd} points) were measured from ${esc(cal.fitted)}. Rest and recent form are added only when both teams' schedules are on the site. Series history is shown on the Series tab but is not in the number: once current team strength is counted, past meetings add nothing reliable.</p>
+        <p>The margin comes from power ratings (${m.src.map(s => s.k).join(', ')}), averaged, plus home field${m.mg ? ' and availability. The play-by-play model is our own opponent-adjusted ratings of six efficiency measures, fit to every FBS game since 2014; each team\'s pass rate, pace and explosiveness also set how the simulated game is played' : ''}. Home field (${cal.hfa} points) and the usual miss around an expected margin (${cal.sd} points) were measured from ${esc(cal.fitted)}. Rest and recent form are added only when both teams' schedules are on the site. Series history is shown on the Series tab but is not in the number: once current team strength is counted, past meetings add nothing reliable.</p>
         <p>The game is then played snap by snap ${res.N.toLocaleString()} times. Each offense starts from its season rates against the other defense's, and its yardage is tuned so the average simulated score matches the expected score above. In these simulations the margin lands within ${Math.round(res.sd)} points of expected about two times in three.</p>
         ${bt ? `<p><b>Backtest.</b> The same margin formula, using Elo ratings, was fit on ${esc(bt.train)} and then asked to call ${esc(bt.test)} it had never seen: it picked the winner ${bt.accuracy}% of the time, missed the margin by ${bt.mae} points on average, and had a Brier score of ${bt.brier} (0.25 is a coin flip; lower is better).</p>
         <div class="tablewrap"><table class="vp-box"><thead><tr><th>Favorite's win chance</th><th>Games</th><th>Predicted</th><th>Actually won</th></tr></thead><tbody>${bt.calibration.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}%</td><td>${r[3]}%</td></tr>`).join('')}</tbody></table></div>
         <p class="vp-note">The live number uses SP+, FPI and PEAR instead of Elo, so the backtest checks the method, not this exact blend.</p>` : ''}
-        <p class="vp-note">A simulation is an estimate, not a pick. Injuries and lineup news are not in the data unless you set them with the what-if menus.</p></details>`;
+        <p class="vp-note">A simulation is an estimate, not a pick. Availability comes from the SEC report (filled in Wednesday to Friday of game week) and Ourlads depth charts; anything not yet reported is not in the number, and the what-if menus add anything else.</p></details>`;
   }
 
   /* ====================================================================================================

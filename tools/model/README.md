@@ -76,3 +76,7 @@ production, transfer portal, recruiting, coaches, SP+/FPI/PEAR history, venues, 
 - Player absence costs, points per game (offense): QB1 -2.2, RB1 -1.1, RB2 -1.7, WR1 -1.1, WR2 -1.1, WR3 -0.3. Defensive absences are not distinguishable from zero with ESPN participation data (+0.33, se 0.27).
 - Availability feature improves walk-forward MAE by 0.02 pts; rest by 0.005. The market (MAE 12.20) still beats the model (13.03). Blending: market 0.95, model 0.07.
 - CFBD data (talent, returning production, portal, recruiting, lines, SP+, FPI, PPA, coaches, rankings, venues) is pulled by model.yml into tools/cache/fbm/cfbd. Next: preseason priors, market-difference model, matchup report, site wiring.
+
+## Projection model wired into the site (round 22)
+`fb_report.py` writes `data/model-fb.js`; `assets/predict.js` reads it. The margin averages SP+, FPI, PEAR and our own play-by-play power rating, adds a home field averaged from the old measured value and the team-specific one (UT 2.3, LSU 2.5, Vanderbilt 1.7, shrunken home-minus-road), and subtracts availability (`fb_avail.py`, SEC report + Ourlads depth charts). The simulation uses each team's real pass rate, plays per game, pace and an opponent-adjusted explosive-play dial. The report tab shows both teams' offense and defense metrics with FBS ranks.
+Honest status: the play-by-play model alone still trails the market in walk-forward tests (MAE 13.0 vs 12.2); it enters as one of four ratings, not as the sole input.

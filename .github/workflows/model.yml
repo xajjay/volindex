@@ -41,11 +41,12 @@ jobs:
         run: |
           python tools/model/fb_depth.py Tennessee LSU Vanderbilt
           python tools/model/fb_avail.py
+          python tools/model/fb_report.py
       - name: Save changes
         run: |
           git config user.name "vol-index-bot"
           git config user.email "vol-index-bot@users.noreply.github.com"
-          git add tools/cache/fbm
+          git add tools/cache/fbm data/model-fb.js
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git commit -m "Football model data $(date -u +%Y-%m-%d)"
           for i in 1 2 3 4; do git push && exit 0; sleep $((i * 5)); git pull --rebase -X theirs origin main || { git rebase --abort; git pull --no-rebase -X ours origin main; }; done
