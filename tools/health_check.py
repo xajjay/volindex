@@ -54,7 +54,7 @@ OFF_SEASON_MAX_AGE = 45
 # Hand-edited files: (path, label, max days since last edit, optional (start, end) window, who/what to do)
 MANUAL = [
     ("data/recruiting.js",     "On3 / recruiting rankings",         30, None,            "Update from the latest On3 Top 300 and class rankings."),
-    ("data/ratings-bb.js",     "KenPom / Torvik / EvanMiya ratings", 14, ((11, 5), (4, 8)), "Refresh the basketball ratings."),
+    ("data/bb-ratings-manual.js", "KenPom / Torvik / EvanMiya ratings", 14, ((11, 5), (4, 8)), "Refresh the basketball ratings."),
     ("data/football-depth.js", "Football depth chart",               14, ((8, 1), (1, 12)), "Re-check the depth chart after the latest game/injury news."),
     ("data/mbb-lineup.js",     "Men's basketball lineup",            21, ((10, 1), (4, 10)), "Re-check the projected lineup."),
     ("data/wbb-lineup.js",     "Women's basketball lineup",          21, ((10, 1), (4, 10)), "Re-check the projected lineup."),

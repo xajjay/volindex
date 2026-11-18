@@ -27,12 +27,12 @@ window.SITE.wbb = {
    "2025-26"
   ],
   [
-   "0",
-   "Returning players"
+   "1",
+   "Returning player"
   ]
  ],
  "quick": [
-  "A full rebuild in Kim Caldwell's third year: <b>no players return</b> from last season's 16-14 team.",
+  "A near-total rebuild in Kim Caldwell's third year: only one player returns from last season's 16-14 team, <b>Nya Robertson</b> (8.5 ppg, 57 threes in 2025-26; she joined the active roster Nov. 5).",
   "Caldwell added <b>13 transfers</b> (USA Today ranked the class <b>9th nationally</b>) and two freshmen, and replaced two assistants with Power Four coaches.",
   "Preseason polls: <b>unranked</b> but receiving votes (32nd in the AP, 29th in the coaches poll). Seven SEC teams are in the AP top 25, led by No. 1 South Carolina; the SEC media picked Tennessee 8th.",
   "Headliners: <b>Kaylene Smikle</b> (17.2 career ppg, All-Big Ten at Rutgers and Maryland) and <b>Rylie Theuerkauf</b> (40.6% from three at Georgia). 2027 commit: 4-star wing <b>Maci Pringle</b>.",
@@ -154,6 +154,17 @@ window.SITE.wbb = {
    "hs": "Trinity Church of England H.S.",
    "prev": null,
    "note": "Freshman"
+  },
+  {
+   "num": 12,
+   "name": "Nya Robertson",
+   "pos": "G",
+   "ht": "5'7\"",
+   "cls": "5th",
+   "home": "Fort Worth, Texas",
+   "hs": "Boswell H.S.",
+   "prev": "George Washington / SMU",
+   "note": "Lone returner; 8.5 ppg and a school-record 10 threes (vs. Coppin State) in 2025-26; All-ACC second team at SMU (18.5 ppg)"
   },
   {
    "num": 14,
@@ -988,8 +999,8 @@ window.SITE.wbb = {
   ],
   "lost": [
    [
-    "Entire 2025-26 roster",
-    "No returning players"
+    "Nearly the entire 2025-26 roster",
+    "Only Nya Robertson returns"
    ]
   ],
   "recruits": [],
