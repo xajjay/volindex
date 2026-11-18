@@ -1,6 +1,6 @@
 {
  "game_adv": {
-  "2026": "2814 rows"
+  "2026": "2820 rows"
  },
  "season_adv": {
   "2026": "skipped: quota"
@@ -58,6 +58,6 @@
  "usage": {
   "2026": "skipped: quota"
  },
- "_calls_remaining": 114,
- "_ran": "2026-11-18T00:05:14+00:00"
+ "_calls_remaining": 90,
+ "_ran": "2026-11-18T15:42:06+00:00"
 }
