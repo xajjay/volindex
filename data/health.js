@@ -19,11 +19,6 @@ window.SITE_HEALTH = {
   {
    "area": "manual",
    "level": "warn",
-   "msg": "KenPom / Torvik / EvanMiya ratings last edited 36 days ago (check every 14). Refresh the basketball ratings."
-  },
-  {
-   "area": "manual",
-   "level": "warn",
    "msg": "Volleyball lineup last edited 37 days ago (check every 21). Re-check the projected lineup."
   },
   {
@@ -43,9 +38,9 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 36,
-   "edited": "2026-10-13",
-   "file": "data/ratings-bb.js",
+   "ageDays": 0,
+   "edited": "2026-11-18",
+   "file": "data/bb-ratings-manual.js",
    "label": "KenPom / Torvik / EvanMiya ratings",
    "maxDays": 14
   },
@@ -165,5 +160,5 @@ window.SITE_HEALTH = {
    "updated": "2026-11-18"
   }
  ],
- "warnings": 3
+ "warnings": 2
 };
