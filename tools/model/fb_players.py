@@ -25,9 +25,34 @@ import fb_build as B
 import fb_ratings as FR
 
 PG = os.path.join(FR.DIR, "players_game.parquet")
-COLS = ["game_id", "pos_team", "def_pos_team", "play_type", "down", "yards_gained", "EPA", "success", "rush", "pass", "sack", "int", "period",
+COLS = ["play_text", "game_id", "pos_team", "def_pos_team", "play_type", "down", "yards_gained", "EPA", "success", "rush", "pass", "sack", "int", "period",
         "pos_team_score", "def_pos_team_score", "passer_player_name", "rusher_player_name", "receiver_player_name",
         "sack_player_name", "pass_breakup_player_name", "interception_player_name", "completion"]
+
+
+_NM = r"#\d+\s+([A-Z][A-Za-z]*\.\s?[A-Za-z'\-]+)"
+def pkey(name):
+    """'Sam Leavitt', 'S. Leavitt', 'S.Leavitt' -> 's leavitt' (first initial + last name), so one player is one key across seasons"""
+    if not isinstance(name, str) or not name.strip(): return None
+    t = name.replace(".", ". ").replace("'", "").split()
+    t = [x for x in t if x.lower().strip(".") not in ("jr", "sr", "ii", "iii", "iv", "v")]
+    return (t[0][0] + " " + t[-1]).lower() if len(t) >= 2 else None
+
+
+def fill_names(d):
+    """Recent play-by-play (this season) arrives with jersey-number text and no parsed names: '#11 F.Brandon pass complete ... to #4 M.Matthews'.
+    Where the name columns are mostly empty, read passer, rusher and receiver out of the play text."""
+    ps = d["pass"] == 1
+    if ps.sum() and d.loc[ps, "passer_player_name"].notna().mean() > 0.3: return d
+    t = d["play_text"].fillna("")
+    qb = t.str.extract(_NM + r"\s+(?:pass|sacked)")[0]
+    rb = t.str.extract(_NM + r"\s+(?:rush|run)\b")[0]
+    rc = t.str.extract(r"\bto\s+" + _NM)[0]
+    d = d.copy()
+    d.loc[d["passer_player_name"].isna(), "passer_player_name"] = qb
+    d.loc[d["rusher_player_name"].isna(), "rusher_player_name"] = rb
+    d.loc[d["receiver_player_name"].isna() & ps, "receiver_player_name"] = rc
+    return d
 
 
 def build():
@@ -39,6 +64,7 @@ def build():
             except Exception as e: print(y, "skipped", e); continue
             d = pd.read_parquet(p, columns=COLS); os.remove(p)
             d["game_id"] = d["game_id"].astype("int64")
+            d = fill_names(d)
             s0 = d[((d["rush"] == 1) | (d["pass"] == 1) | (d["sack"] == 1)) & d["EPA"].notna() & d["down"].notna()].copy()
             s0["gt"] = B.garbage(s0)
             s0["succ"] = s0["success"].fillna(0)
@@ -49,7 +75,7 @@ def build():
                 allp = df.groupby(["game_id", "pos_team", col]).size().rename("n_all")           # presence: every play, garbage time too
                 c = df[~df["gt"]].groupby(["game_id", "pos_team", col]).agg(n=("EPA", "size"), epa=("EPA", "sum"), succ=("succ", "sum"), yds=("yards_gained", "sum"))
                 g = pd.concat([allp, c], axis=1).fillna(0).reset_index()
-                g.columns = ["game_id", "team", "player", "n_all", "n", "epa", "succ", "yds"]; g["role"] = role; g["season"] = y; rows.append(g)
+                g.columns = ["game_id", "team", "player", "n_all", "n", "epa", "succ", "yds"]; g["role"] = role; g["season"] = y; g["pkey"] = g["player"].map(pkey); rows.append(g)
             for role, col in [("sack", "sack_player_name"), ("pbu", "pass_breakup_player_name"), ("int", "interception_player_name")]:
                 g = d[d[col].notna()].groupby(["game_id", "def_pos_team", col]).size().reset_index(name="n")
                 g.columns = ["game_id", "team", "player", "n"]; g["n_all"] = g["n"]; g["role"] = role; g["epa"] = 0.0; g["succ"] = 0.0; g["yds"] = 0.0; g["season"] = y; rows.append(g)

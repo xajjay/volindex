@@ -13,9 +13,13 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fb_ratings as FR
 import fb_hfa as HF
 import fb_ablate as AB
+import fb_matchup as MU_
 
 TEAM = "Tennessee"
 SD = 15.7
+UR = ["pass", "rush", "recv"]
+UW = {"pass": 1.0, "rush": 0.5, "recv": 0.5}      # one combined production score: a passer counts double a runner or a receiving group
+MXC = os.path.join(FR.DIR, "matchup_features.parquet")
 CF = os.path.join(FR.DIR, "cfbd")
 
 # label, column, higher is better for the offense, decimals, scale (x100 = percent)
@@ -60,7 +64,12 @@ def main():
     Dm["f_talent"] = (gv(tal, "home") - gv(tal, "away")) / 100; Dm["f_ret"] = gv(ret, "home") - gv(ret, "away")
     Dm = Dm.dropna(subset=["f_talent"]).copy(); Dm["f_ret"] = Dm["f_ret"].fillna(0)
     early = (Dm["week"] <= 4).astype(float)
-    X = np.c_[Dm[["f_" + m for m in FR.METRICS] + ["site", "f_talent", "f_ret"]].values, Dm["f_talent"] * early, Dm["f_ret"] * early]
+    MX = pd.read_parquet(MXC)[["game_id"] + [f"u_{r}_{s}" for r in UR for s in "ha"]].drop_duplicates("game_id")            # player production, from fb_matchup.py
+    Dm = Dm.merge(MX, on="game_id", how="left")
+    for r_ in UR: Dm["f_u_" + r_] = (Dm[f"u_{r_}_h"] - Dm[f"u_{r_}_a"]).fillna(0)
+    Dm["f_u_all"] = sum(UW[r_] * Dm["f_u_" + r_] for r_ in UR)
+    early = (Dm["week"] <= 4).astype(float).values
+    X = np.c_[Dm[["f_" + m for m in FR.METRICS] + ["site", "f_talent", "f_ret"]].values, Dm["f_talent"].values * early, Dm["f_ret"].values * early, Dm[["f_u_all"]].values]
     b = FR.ols(X, Dm["margin"].values)
 
     hfa = pd.read_csv(os.path.join(FR.DIR, "hfa_teams.csv"), index_col=0)["hfa"]
@@ -76,7 +85,12 @@ def main():
 
     def st(team, m): O, Dd, _, ix = S[m]; return float(O[ix[inv[team]]] - Dd[ix[inv[team]]])
     NM = len(FR.METRICS)
-    tr = lambda t: float(b[NM + 2] * (TAL[t] - tm) / 100 + b[NM + 3] * (RET[t] - rm))
+    CU = MU_.current_units(G)
+    ub = {r_: float(b[NM + 6]) * UW[r_] for r_ in UR}
+    um = {r_: float(np.mean([v[0] for (t, rr), v in CU.items() if rr == r_ and t in fbs])) for r_ in UR}
+    uval = lambda t, r_: CU.get((t, r_), (um[r_], []))[0]
+    prod = lambda t: sum(ub[r_] * (uval(t, r_) - um[r_]) for r_ in UR)
+    tr = lambda t: float(b[NM + 2] * (TAL[t] - tm) / 100 + b[NM + 3] * (RET[t] - rm) + prod(t))
     power = {t: sum(b[1 + i] * st(t, m) for i, m in enumerate(FR.METRICS)) + tr(t) for t in cur}
     prank = pd.Series(power).rank(ascending=False).astype(int)
 
@@ -137,7 +151,8 @@ def main():
         site = {"H": 1, "A": -1}.get(g["site"], 0)
         f = np.array([st(TEAM, m) - st(opp, m) for m in FR.METRICS])
         tU, tO = float(b[NM + 2] * (TAL[TEAM] - TAL[opp]) / 100), float(b[NM + 3] * (RET[TEAM] - RET[opp]))
-        neutral = float(b[0] + (b[1:1 + NM] * f).sum() + tU + tO)
+        pU = float(prod(TEAM) - prod(opp))
+        neutral = float(b[0] + (b[1:1 + NM] * f).sum() + tU + tO + pU)
         homeTeam = TEAM if site == 1 else opp
         h = float(hfa.get(homeTeam, mu)) if site else 0.0
         ok = avail.get("opp") == opp
@@ -145,6 +160,10 @@ def main():
         margin = neutral + site * h + au - ao
         edges = [{"k": FR.METRIC_LABELS[m] if hasattr(FR, "METRIC_LABELS") else m, "m": m, "ut": round(st(TEAM, m), 4), "opp": round(st(opp, m), 4), "pts": round(float(b[1 + i] * f[i]), 2)} for i, m in enumerate(FR.METRICS)]
         edges += [{"k": "Team talent composite", "m": "talent", "ut": round(TAL[TEAM], 1), "opp": round(TAL[opp], 1), "pts": round(tU, 2)}, {"k": "Returning production", "m": "ret", "ut": round(RET[TEAM], 2), "opp": round(RET[opp], 2), "pts": round(tO, 2)}]
+        LAB = {"pass": "Quarterback production", "rush": "Rushing production", "recv": "Receiver production"}
+        for r_ in UR:
+            nm = lambda t: (CU.get((t, r_), (0, []))[1] or [("n/a", 0, 0)])[0][0]
+            edges.append({"k": LAB[r_], "m": "u_" + r_, "ut": f"{nm(TEAM)} {uval(TEAM, r_) - um[r_]:+.3f}", "opp": f"{nm(opp)} {uval(opp, r_) - um[r_]:+.3f}", "pts": round(ub[r_] * (uval(TEAM, r_) - uval(opp, r_)), 2), "unit": True})
         # points from drives: each side's expected points per drive against the other, times the drives the game will have
         O, Dd, hh, ix = S["pts_per_drive"]; m0 = MU["pts_per_drive"]
         dr = (off.loc[TEAM, "drives"] + off.loc[opp, "drives"]) / 2
