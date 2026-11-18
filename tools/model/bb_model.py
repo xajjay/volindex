@@ -40,6 +40,7 @@ for _k in ("hl", "lam", "carry", "K"):
 
 def fetch():
     import urllib.request
+    os.makedirs(DIR, exist_ok=True)
     for s, (repo, d) in REPO.items():
         for y in range(Y0, Y1 + 1):
             for kind, sub, name in [("team_box", "team_box", f"team_box_{y}"), ("player_box", "player_box", f"player_box_{y}"), ("sched", "schedules", f"{d}_schedule_{y}")]:
