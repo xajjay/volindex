@@ -59,16 +59,16 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 8,
-   "edited": "2026-11-10",
+   "ageDays": 0,
+   "edited": "2026-11-18",
    "file": "data/mbb-lineup.js",
    "label": "Men's basketball lineup",
    "maxDays": 21
   },
   {
    "active": true,
-   "ageDays": 13,
-   "edited": "2026-11-05",
+   "ageDays": 0,
+   "edited": "2026-11-18",
    "file": "data/wbb-lineup.js",
    "label": "Women's basketball lineup",
    "maxDays": 21
