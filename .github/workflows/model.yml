@@ -5,6 +5,8 @@ name: Football model data
 on:
   schedule:
     - cron: "41 9 * * 2"      # Tuesdays, after the weekend's games are final everywhere
+    - cron: "43 12 * * 0"     # Sunday morning, right after Saturday's games
+    - cron: "43 12 * * 4"     # Thursday morning, picks up Tuesday/Wednesday MACtion and the week's availability file
   push:
     branches: [main]
     paths: ["tools/model/**", ".github/workflows/model.yml"]
@@ -36,6 +38,11 @@ jobs:
       - name: Rebuild the play-level tables (current season only)
         continue-on-error: true
         run: python tools/model/fb_build.py ${{ github.event_name == 'workflow_dispatch' && '2014 2026' || '2026 2026' }}
+      - name: Player production tables (names read from play text when the feed has none)
+        continue-on-error: true
+        run: |
+          python tools/model/fb_players.py --build
+          python tools/model/fb_matchup.py --rebuild
       - name: Ourlads depth charts (UT, LSU, Vanderbilt) and availability adjustment
         continue-on-error: true
         run: |

@@ -1,0 +1,54 @@
+# Basketball model: downloads ESPN box scores (SportsDataverse hoopR / wehoop, free on GitHub), rebuilds the men's and women's
+# power ratings, player production and Tennessee game projections -> data/model-bb.js.
+# Runs twice a day, after the "Update data" run and after late games are in the box-score data. Run by hand any time:
+# Actions tab -> "Basketball model" -> Run workflow.
+name: Basketball model
+
+on:
+  schedule:
+    - cron: "47 5 * * *"      # after the previous night's games (1:47 AM Eastern)
+    - cron: "47 11 * * *"     # after the morning "Update data" run (7:47 AM Eastern)
+  push:
+    branches: [main]
+    paths: ["tools/model/bb_*.py", ".github/workflows/bb-model.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bb-model-data
+  cancel-in-progress: false
+
+jobs:
+  model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install pandas pyarrow numpy scipy
+      - name: Box-score cache (finished seasons do not change)
+        uses: actions/cache@v4
+        with:
+          path: tools/cache/bbm
+          key: bbm-${{ hashFiles('tools/model/bb_model.py') }}-${{ github.run_id }}
+          restore-keys: bbm-
+      - name: Download box scores (finished seasons once, this season every run)
+        run: python tools/model/bb_model.py fetch
+      - name: Men's and women's projections
+        run: |
+          python tools/model/bb_report.py mbb
+          python tools/model/bb_report.py wbb
+      - name: Save changes
+        run: |
+          git config user.name "vol-index-bot"
+          git config user.email "vol-index-bot@users.noreply.github.com"
+          git add data/model-bb.js
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git commit -m "Basketball model data $(date -u +%Y-%m-%d)"
+          for i in 1 2 3 4; do git push && exit 0; sleep $((i * 5)); git pull --rebase -X theirs origin main || { git rebase --abort; git pull --no-rebase -X ours origin main; }; done
+          exit 1
