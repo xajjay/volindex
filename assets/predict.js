@@ -54,11 +54,12 @@
     const c = P.compare;
     if (!src.length && c && c.ppg && c.oppg) src.push({ k: 'Scoring margin', ut: (c.ppg[0] - c.oppg[0]) * 0.7, opp: (c.ppg[1] - c.oppg[1]) * 0.7 });
     if (!src.length) return null;
+    const PURE = !!mg;   // our own model only: efficiency, talent, returning production, availability. No SP+/FPI/PEAR, polls, records or betting line.
     const rU = src.reduce((s, x) => s + x.ut, 0) / src.length, rO = src.reduce((s, x) => s + x.opp, 0) / src.length;
     const site = g.site === 'H' ? 1 : g.site === 'A' ? -1 : 0;
-    const factors = [{ k: 'Power ratings', v: rU - rO, note: src.map(x => `${x.k} ${x.ut.toFixed(1)} vs ${x.opp.toFixed(1)}`).join(' · ') }];
-    const hfaV = mg && site ? (cal.hfa + Math.abs(mg.hfa)) / 2 : cal.hfa;
-    factors.push({ k: site > 0 ? 'Home field (Neyland)' : site < 0 ? `Road game (${opp})` : 'Neutral site', v: site * hfaV, note: site ? (mg ? `${hfaV.toFixed(1)} points: ${cal.hfa} measured from ${cal.fitted}, ${Math.abs(mg.hfa)} for ${mg.hfaTeam} from home-minus-road results against the same opponents, averaged` : `${cal.hfa} points, measured from ${cal.fitted}`) : 'No home-field edge either way' });
+    const factors = [PURE ? { k: 'Team strength', v: mg.neutral, note: `Opponent-adjusted efficiency (EPA, success, explosiveness, rushing, passing, points per drive) plus team talent and returning production. Tennessee ${(+pw[UT]).toFixed(1)}, ${opp} ${(+pw[opp]).toFixed(1)} points better than an average FBS team. Wins, losses, polls and reputation are not inputs` } : { k: 'Power ratings', v: rU - rO, note: src.map(x => `${x.k} ${x.ut.toFixed(1)} vs ${x.opp.toFixed(1)}`).join(' · ') }];
+    const hfaV = mg && site ? Math.abs(mg.hfa) : cal.hfa;
+    factors.push({ k: site > 0 ? 'Home field (Neyland)' : site < 0 ? `Road game (${opp})` : 'Neutral site', v: site * hfaV, note: site ? (mg ? `${hfaV.toFixed(1)} points for ${mg.hfaTeam}: how much better it plays at home than on the road against the same opponents, pulled toward the FBS average (${MF.hfaAvg}) because a few home games are a small sample` : `${cal.hfa} points, measured from ${cal.fitted}`) : 'No home-field edge either way' });
     if (mg) {
       const rows = ((MF.availability && MF.availability.teams) || {}), lst = t => (rows[t] && rows[t].rows || []).filter(r => r.pts).map(r => `${r.name} (${r.pos}, ${r.status}) ${r.pts}`).join('; ');
       factors.push({ k: 'Availability', v: mg.availU - mg.availO, note: `Points lost to players out or doubtful, from their depth-chart slot and measured cost of missing that slot. Tennessee ${mg.availU.toFixed(1)}${lst(UT) ? ': ' + lst(UT) : ''}. ${opp} ${mg.availO.toFixed(1)}${lst(opp) ? ': ' + lst(opp) : ' (no report filed yet)'}. Source: ${(MF.availability && MF.availability.asOf) || 'availability file'}` });
@@ -68,8 +69,8 @@
     if (ru && ro) {
       const rest = (ru.rest >= 12 && ro.rest <= 8) ? 1 : (ro.rest >= 12 && ru.rest <= 8) ? -1 : (ru.rest <= 5 && ro.rest >= 7) ? -1 : (ro.rest <= 5 && ru.rest >= 7) ? 1 : 0;
       factors.push({ k: 'Rest', v: rest, note: `Tennessee ${ru.rest} days since its last game, ${opp} ${ro.rest}` });
-      const form = clamp(0.12 * (ru.form - ro.form), -1.5, 1.5);
-      factors.push({ k: 'Recent form', v: form, note: `Last three games against the season average: Tennessee ${ru.form >= 0 ? '+' : ''}${ru.form.toFixed(1)}, ${opp} ${ro.form >= 0 ? '+' : ''}${ro.form.toFixed(1)}` });
+      const form = PURE ? 0 : clamp(0.12 * (ru.form - ro.form), -1.5, 1.5);
+      if (!PURE) factors.push({ k: 'Recent form', v: form, note: `Last three games against the season average: Tennessee ${ru.form >= 0 ? '+' : ''}${ru.form.toFixed(1)}, ${opp} ${ro.form >= 0 ? '+' : ''}${ro.form.toFixed(1)}` });
     } else factors.push({ k: 'Rest and recent form', v: 0, note: ru ? `Tennessee has had ${ru.rest} days since its last game. ${opp}'s schedule arrives with the next data update, so neither side is adjusted yet` : 'Not available yet' });
     const hu = +adj.ut || 0, ho = +adj.opp || 0;
     if (hu || ho) factors.push({ k: 'Your what-if', v: hu - ho, note: `${hu ? 'Tennessee ' + hu : ''}${hu && ho ? ', ' : ''}${ho ? opp + ' ' + ho : ''} points` });
@@ -79,7 +80,9 @@
     let mkt = null;
     if (lm && /^(even|pk)/i.test(String(E.line))) mkt = 0;
     else if (lm) { const sp = parseFloat(lm[2]); mkt = lm[1].trim() === UT ? -sp : lm[1].trim() === opp ? sp : null; }
-    if (mkt != null && isFinite(mkt)) {
+    if (mkt != null && isFinite(mkt) && PURE) {
+      factors.push({ k: 'Betting line (shown, not used)', v: 0, note: `The line (${E.line}) implies Tennessee ${mkt >= 0 ? '+' : ''}${mkt.toFixed(1)}; our model says ${margin >= 0 ? '+' : ''}${margin.toFixed(1)}. The line is not an input, so the gap is our model disagreeing with the market` });
+    } else if (mkt != null && isFinite(mkt)) {
       const W_MKT = 0.75, blended = W_MKT * mkt + (1 - W_MKT) * margin;
       factors.push({ k: 'Betting market', v: blended - margin, note: `The line (${E.line}) implies Tennessee ${mkt >= 0 ? '+' : ''}${mkt.toFixed(1)}. Our model above says ${margin >= 0 ? '+' : ''}${margin.toFixed(1)}. The line already prices injuries and news, so it carries ${Math.round(W_MKT * 100)}% of the weight and the model ${Math.round((1 - W_MKT) * 100)}%` });
       margin = blended;
@@ -93,8 +96,8 @@
       total = ((c.ppg[0] + c.oppg[1]) / 2 + (c.ppg[1] + c.oppg[0]) / 2) * 0.7 + NAT.total * 0.3;
       totalNote = 'Each offense\'s points per game against the other defense\'s points allowed, pulled 30% toward the national average';
     } else { total = NAT.total; totalNote = 'National average (no team scoring data yet)'; }
-    if (mg && mg.ptsU && mg.ptsO) { total = (total + mg.ptsU + mg.ptsO) / 2; totalNote += `; averaged with the drive model (${mg.drives} drives each, expected points per drive from play-by-play: ${(mg.ptsU + mg.ptsO).toFixed(0)} total)`; }
-    { const ou = parseFloat(E.ou); if (isFinite(ou) && ou > 30) { total = 0.3 * total + 0.7 * ou; totalNote += `; the posted over/under (${ou}) carries 70% of the weight`; } }
+    if (mg && mg.ptsU && mg.ptsO && PURE) { total = mg.ptsU + mg.ptsO; totalNote = `Drive model: ${mg.drives} drives each, expected points per drive from play-by-play efficiency (Tennessee ${mg.ptsU.toFixed(1)}, ${opp} ${mg.ptsO.toFixed(1)})`; } else if (mg && mg.ptsU && mg.ptsO) { total = (total + mg.ptsU + mg.ptsO) / 2; totalNote += `; averaged with the drive model (${mg.drives} drives each, expected points per drive from play-by-play: ${(mg.ptsU + mg.ptsO).toFixed(0)} total)`; }
+    { const ou = parseFloat(E.ou); if (!PURE && isFinite(ou) && ou > 30) { total = 0.3 * total + 0.7 * ou; totalNote += `; the posted over/under (${ou}) carries 70% of the weight`; } }
     total = clamp(total, 30, 86);
     const m = clamp(margin, -total + 8, total - 8);
     return { opp, site, mg, src, factors, margin, total, totalNote, ptsU: (total + m) / 2, ptsO: (total - m) / 2, ratingWin: phi(margin / cal.sd), rest: ru, restOpp: ro };
@@ -499,12 +502,12 @@
       <h4>Projected team numbers <span class="vp-note">(average of ${res.N.toLocaleString()} games)</span></h4>
       <div class="tablewrap"><table class="vp-box"><thead><tr><th></th><th>Tennessee</th><th>${esc(o)}</th></tr></thead><tbody>${row('Points', a[0].pts, a[1].pts, 1)}${row('Total yards', a[0].rushY + a[0].passY, a[1].rushY + a[1].passY)}${row('Rushing yards', a[0].rushY, a[1].rushY)}${row('Passing yards', a[0].passY, a[1].passY)}${row('First downs', a[0].fd, a[1].fd, 1)}${row('Third-down %', a[0].t3c / Math.max(1, a[0].t3a) * 100, a[1].t3c / Math.max(1, a[1].t3a) * 100)}${row('Turnovers', a[0].to, a[1].to, 1)}${row('Sacks allowed', a[0].sacks, a[1].sacks, 1)}${row('Time of possession (min)', a[0].top / 60, a[1].top / 60, 1)}</tbody></table></div>
       <details style="margin-top:14px"><summary><b>How this works, and how good it is</b></summary>
-        <p>The margin comes from power ratings (${m.src.map(s => s.k).join(', ')}), averaged, plus home field${m.mg ? ' and availability. The play-by-play model is our own opponent-adjusted ratings of six efficiency measures, fit to every FBS game since 2014; each team\'s pass rate, pace and explosiveness also set how the simulated game is played' : ''}. Home field (${cal.hfa} points) and the usual miss around an expected margin (${cal.sd} points) were measured from ${esc(cal.fitted)}. Rest and recent form are added only when both teams' schedules are on the site. Series history is shown on the Series tab but is not in the number: once current team strength is counted, past meetings add nothing reliable.</p>
+        <p>${m.mg ? `The margin comes from our own model only: opponent-adjusted efficiency (EPA per play, success rate, explosiveness, rushing, passing and points per drive, garbage time removed), team talent, returning production, home field (${esc(String(m.mg.hfaTeam))}'s own measured edge averaged with the long-run value) and player availability. It ignores wins and losses, polls, reputation, and the betting line. Each team's pass rate, pace and explosiveness also set how the simulated game is played.` : `The margin comes from power ratings (${m.src.map(s => s.k).join(', ')}), averaged, plus home field.`} The usual miss around an expected margin (${cal.sd} points) was measured from ${esc(cal.fitted)}. Rest is added only when both teams' schedules are on the site. Series history is shown on the Series tab but is not in the number.</p>
         <p>The game is then played snap by snap ${res.N.toLocaleString()} times. Each offense starts from its season rates against the other defense's, and its yardage is tuned so the average simulated score matches the expected score above. In these simulations the margin lands within ${Math.round(res.sd)} points of expected about two times in three.</p>
         ${bt ? `<p><b>Backtest.</b> The same margin formula, using Elo ratings, was fit on ${esc(bt.train)} and then asked to call ${esc(bt.test)} it had never seen: it picked the winner ${bt.accuracy}% of the time, missed the margin by ${bt.mae} points on average, and had a Brier score of ${bt.brier} (0.25 is a coin flip; lower is better).</p>
         <div class="tablewrap"><table class="vp-box"><thead><tr><th>Favorite's win chance</th><th>Games</th><th>Predicted</th><th>Actually won</th></tr></thead><tbody>${bt.calibration.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}%</td><td>${r[3]}%</td></tr>`).join('')}</tbody></table></div>
         <p class="vp-note">The live number uses SP+, FPI and PEAR instead of Elo, so the backtest checks the method, not this exact blend.</p>` : ''}
-        <p class="vp-note">A simulation is an estimate, not a pick. When a betting line is posted it carries 75% of the margin and 70% of the total, because it already prices injuries and news and beat every model we tested. Availability comes from the SEC report (filled in Wednesday to Friday of game week) and Ourlads depth charts; anything not yet reported is not in the number, and the what-if menus add anything else.</p></details>`;
+        <p class="vp-note">A simulation is an estimate, not a pick. Availability comes from the SEC report (filled in Wednesday to Friday of game week) and Ourlads depth charts; anything not yet reported is not in the number, and the what-if menus add anything else.</p></details>`;
   }
 
   /* ====================================================================================================

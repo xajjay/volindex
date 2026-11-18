@@ -12,6 +12,7 @@ import numpy as np, pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fb_ratings as FR
 import fb_hfa as HF
+import fb_ablate as AB
 
 TEAM = "Tennessee"
 SD = 15.7
@@ -51,9 +52,22 @@ def main():
     season = int(G["season"].max()); cut = int(P["day"].max()) + 1
     S = FR.strengths(P, teams, cut, hl, lam); idx = S[FR.METRICS[0]][3]
     D, H, mu = HF.home_edges(hl, lam)
-    b = FR.ols(D[["f_" + m for m in FR.METRICS] + ["site"]].values, D["margin"].values)
+    # margin model: six opponent-adjusted efficiency strengths + site + team talent + returning production (no Elo, no records, no polls, no market)
+    Dm = pd.read_parquet(AB.CACHE).merge(G[["game_id", "home_team", "away_team"]], on="game_id")
+    tal = pd.read_parquet(os.path.join(CF, "talent.parquet")).drop_duplicates(["season", "team"]).set_index(["season", "team"])["talent"]
+    ret = pd.read_parquet(os.path.join(CF, "returning.parquet")).drop_duplicates(["season", "team"]).set_index(["season", "team"])["percentPPA"]
+    gv = lambda ser, side: np.array([ser.get((a, t), np.nan) for a, t in zip(Dm["season"], Dm[side + "_team"])])
+    Dm["f_talent"] = (gv(tal, "home") - gv(tal, "away")) / 100; Dm["f_ret"] = gv(ret, "home") - gv(ret, "away")
+    Dm = Dm.dropna(subset=["f_talent"]).copy(); Dm["f_ret"] = Dm["f_ret"].fillna(0)
+    early = (Dm["week"] <= 4).astype(float)
+    X = np.c_[Dm[["f_" + m for m in FR.METRICS] + ["site", "f_talent", "f_ret"]].values, Dm["f_talent"] * early, Dm["f_ret"] * early]
+    b = FR.ols(X, Dm["margin"].values)
+
     hfa = pd.read_csv(os.path.join(FR.DIR, "hfa_teams.csv"), index_col=0)["hfa"]
     fbs = [names[t] for t in teams if t != -1 and t in names]
+    TAL = {t: float(tal.get((season, t), np.nan)) for t in fbs}; RET = {t: float(ret.get((season, t), np.nan)) for t in fbs}
+    tm, rm = np.nanmean(list(TAL.values())), np.nanmean(list(RET.values()))
+    TAL = {k: (tm if np.isnan(v) else v) for k, v in TAL.items()}; RET = {k: (rm if np.isnan(v) else v) for k, v in RET.items()}
     off, de, ng = season_table(T, season, fbs)
     cur = [t for t in fbs if t in ng.index and ng[t] >= 7]
     inv = {v: k for k, v in names.items()}
@@ -61,7 +75,9 @@ def main():
     MU = {m: FR.fit(P, m, cut, hl, lam, teams)[3] for m in ("c_expl", "pts_per_drive")}
 
     def st(team, m): O, Dd, _, ix = S[m]; return float(O[ix[inv[team]]] - Dd[ix[inv[team]]])
-    power = {t: sum(b[1 + i] * st(t, m) for i, m in enumerate(FR.METRICS)) for t in cur}
+    NM = len(FR.METRICS)
+    tr = lambda t: float(b[NM + 2] * (TAL[t] - tm) / 100 + b[NM + 3] * (RET[t] - rm))
+    power = {t: sum(b[1 + i] * st(t, m) for i, m in enumerate(FR.METRICS)) + tr(t) for t in cur}
     prank = pd.Series(power).rank(ascending=False).astype(int)
 
     def rank(col, team, side, better):
@@ -120,13 +136,15 @@ def main():
         if opp not in cur or TEAM not in cur: continue
         site = {"H": 1, "A": -1}.get(g["site"], 0)
         f = np.array([st(TEAM, m) - st(opp, m) for m in FR.METRICS])
-        neutral = float(b[0] + (b[1:1 + len(FR.METRICS)] * f).sum())
+        tU, tO = float(b[NM + 2] * (TAL[TEAM] - TAL[opp]) / 100), float(b[NM + 3] * (RET[TEAM] - RET[opp]))
+        neutral = float(b[0] + (b[1:1 + NM] * f).sum() + tU + tO)
         homeTeam = TEAM if site == 1 else opp
         h = float(hfa.get(homeTeam, mu)) if site else 0.0
         ok = avail.get("opp") == opp
         au, ao = (av(TEAM)["total"], av(opp)["total"]) if ok else (0.0, 0.0)
         margin = neutral + site * h + au - ao
         edges = [{"k": FR.METRIC_LABELS[m] if hasattr(FR, "METRIC_LABELS") else m, "m": m, "ut": round(st(TEAM, m), 4), "opp": round(st(opp, m), 4), "pts": round(float(b[1 + i] * f[i]), 2)} for i, m in enumerate(FR.METRICS)]
+        edges += [{"k": "Team talent composite", "m": "talent", "ut": round(TAL[TEAM], 1), "opp": round(TAL[opp], 1), "pts": round(tU, 2)}, {"k": "Returning production", "m": "ret", "ut": round(RET[TEAM], 2), "opp": round(RET[opp], 2), "pts": round(tO, 2)}]
         # points from drives: each side's expected points per drive against the other, times the drives the game will have
         O, Dd, hh, ix = S["pts_per_drive"]; m0 = MU["pts_per_drive"]
         dr = (off.loc[TEAM, "drives"] + off.loc[opp, "drives"]) / 2
