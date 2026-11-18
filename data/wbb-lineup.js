@@ -8,22 +8,22 @@
 window.LINEUP = window.LINEUP || {};
 window.LINEUP.wbb = {
   "label": "2026-27 projected starting five",
-  "updated": "2026-11-05",
-  "rev": 3,
-  "basedOn": "The Vol Index projected starting five (unofficial): Jada Eads, Rylie Theuerkauf, Kaylene Smikle, Gabby Minus and Aaliyah Moore",
+  "updated": "2026-11-18",
+  "rev": 4,
+  "basedOn": "The Vol Index projected starting five (unofficial); adjusted after the 87-65 win at Belmont (Nov. 17), whose starters were Smikle, Minus, Eads, White and Janneh. Smikle (21.8 ppg) and Minus have started all 5 games; Fauntleroy (19.8 mpg, 4.4 apg) and Theuerkauf lead the bench",
   "chart": {
     "Starting five": [
       ["PG", ["Jada Eads", "Kennedy Fauntleroy", "Shaelyn Steele"]],
-      ["SG", ["Rylie Theuerkauf", "Avery Mills", "Naomi White"]],
-      ["G/F", ["Kaylene Smikle", "Naomi White", "Harissoum Coulibaly"]],
-      ["F", ["Gabby Minus", "Fatmata Janneh", "Riley Makalusky"]],
-      ["F/C", ["Aaliyah Moore", "Zhen Craft", "Harper Peterson"]]
+      ["SG", ["Naomi White", "Rylie Theuerkauf"]],
+      ["G/F", ["Kaylene Smikle", "Harissoum Coulibaly"]],
+      ["F", ["Gabby Minus", "Riley Makalusky", "Harper Peterson"]],
+      ["F/C", ["Fatmata Janneh", "Aaliyah Moore", "Zhen Craft"]]
     ],
     "Rotation": [
-      ["First off the bench", ["Naomi White", "Zhen Craft", "Kennedy Fauntleroy", "Fatmata Janneh"]],
+      ["First off the bench", ["Kennedy Fauntleroy", "Rylie Theuerkauf", "Aaliyah Moore", "Zhen Craft"]],
       ["Rest of rotation", ["Harissoum Coulibaly", "Riley Makalusky"]],
       ["Developing", ["Harper Peterson", "Shaelyn Steele", "Irene Oboavwoduo"]],
-      ["Did not play (opener)", ["Avery Mills"]]
+      ["Has not played", ["Avery Mills"]]
     ]
   }
 };

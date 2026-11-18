@@ -122,6 +122,26 @@ def espn_final(sport, date):
             return bool(ty.get("completed")) and ty.get("state") == "post"
     return None
 
+# How long a game usually lasts, used only when ESPN's scoreboard can't be read (it returns 403 to GitHub's servers).
+GAME_HOURS = {"football": 4.0, "mbb": 2.5, "wbb": 2.5, "baseball": 3.5, "softball": 2.5, "volleyball": 2.5, "soccer": 2.25}
+
+def start_time(sport, date):
+    """Tip-off / first-pitch time (ET) of Tennessee's game on this date, from the site's own schedule; 7 PM if unknown."""
+    import re
+    path = os.path.join(DATA, "football-auto.js" if sport == "football" else f"{sport}-auto.js")
+    a = read_js_json(path, "window.SITE_AUTO.football = " if sport == "football" else f"window.SITE_AUTO['{sport}'] = ") or {}
+    for g in a.get("schedule", []):
+        if g.get("date") != date or g.get("exh"): continue
+        m = re.search(r"(\d{1,2})(?::(\d{2}))?\s*([ap])\.?m", str(g.get("time") or ""), re.I)
+        if m:
+            h = int(m.group(1)) % 12 + (12 if m.group(3).lower() == "p" else 0)
+            return datetime.datetime.fromisoformat(date) + datetime.timedelta(hours=h, minutes=int(m.group(2) or 0))
+    return datetime.datetime.fromisoformat(date) + datetime.timedelta(hours=19)
+
+def time_says_final(sport, date, now):
+    """Fallback when ESPN can't be read: the game should be over by now, so go and look at the school's own schedule."""
+    return now >= start_time(sport, date) + datetime.timedelta(hours=GAME_HOURS.get(sport, 3.0) + 0.25)
+
 def site_has_final(sport, date):
     """Does the site's data already have this game's result and box score?"""
     if sport == "football":
@@ -148,6 +168,7 @@ def gameday_due(day, now):
             if s.get("done"): continue
             if not s.get("final"):
                 f = espn_final(sport, date)
+                if f is None and time_says_final(sport, date, now): f = True     # ESPN unreadable: go by the clock; the updater reads the school's schedule
                 print(f"   {sport} {date}: {'final' if f else 'not final yet' if f is False else 'not on ESPN'}")
                 if not f: continue
                 s["final"] = now.isoformat(timespec="minutes")

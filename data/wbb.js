@@ -10,7 +10,7 @@ window.SITE.wbb = {
  "name": "Women's Basketball",
  "short": "Lady Vols Hoops",
  "season": "2026-27",
- "updated": "2026-11-04",
+ "updated": "2026-11-18",
  "venue": "Food City Center",
  "prevLabel": "2025-26",
  "header": [
@@ -36,7 +36,9 @@ window.SITE.wbb = {
   "Caldwell added <b>13 transfers</b> (USA Today ranked the class <b>9th nationally</b>) and two freshmen, and replaced two assistants with Power Four coaches.",
   "Preseason polls: <b>unranked</b> but receiving votes (32nd in the AP, 29th in the coaches poll). Seven SEC teams are in the AP top 25, led by No. 1 South Carolina; the SEC media picked Tennessee 8th.",
   "Headliners: <b>Kaylene Smikle</b> (17.2 career ppg, All-Big Ten at Rutgers and Maryland) and <b>Rylie Theuerkauf</b> (40.6% from three at Georgia). 2027 commit: 4-star wing <b>Maci Pringle</b>.",
-  "Season opened with a <b>109-62 win over Duquesne</b> (Nov. 2) after a 132-63 exhibition win over Florida A&M. <b>Kaylene Smikle</b> had 31 points on 11-of-13 shooting; the Vols hit 17 threes. Coppin State is next (Nov. 5); UCLA, UConn and Baylor come before SEC play."
+  "Season opened with a <b>109-62 win over Duquesne</b> (Nov. 2) after a 132-63 exhibition win over Florida A&M. <b>Kaylene Smikle</b> had 31 points on 11-of-13 shooting; the Vols hit 17 threes. "
+  ,"<b>5-0</b> after wins over Coppin State (98-60), New Haven (83-40), Middle Tennessee (110-64) and at Belmont (<b>87-65</b>, Nov. 17). <b>Kaylene Smikle</b> leads the team at <b>21.8 ppg</b> (30 vs. MTSU); <b>Naomi White</b> hit 7 of 15 threes for a season-high 25 at Belmont. Tennessee has made 10+ threes in all five games.",
+  "Next: Radford (Nov. 19) and UCLA (Nov. 22); UConn and Baylor come before SEC play."
  ],
  "staff": [
   [

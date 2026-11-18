@@ -9,7 +9,7 @@ window.SITE.mbb = {
  "name": "Men's Basketball",
  "short": "Men's Hoops",
  "season": "2026-27",
- "updated": "2026-11-10",
+ "updated": "2026-11-18",
  "venue": "Food City Center",
  "prevLabel": "2025-26",
  "header": [
@@ -36,7 +36,9 @@ window.SITE.mbb = {
   "A near-total reload: Rick Barnes added <b>seven double-digit scorers</b> from the portal, led by Wake Forest's <b>Juke Harris</b> (21.4 ppg), the only newcomer on the preseason First Team All-SEC.",
   "Exhibitions went badly: an <b>86-70</b> home loss to Xavier and a <b>103-64</b> loss at No. 2 Duke. <b>Terrence Hill Jr.</b> hurt his ankle early at Duke; <b>Jalen Washington</b> has been ruled ineligible for 2026-27 (the Tennessee Court of Appeals kept the stay in place on Oct. 13) and is appealing.",
   "Opener: a <b>90-59 win over Wofford</b> (Nov. 3, 18,389 at Food City Center). <b>DeWayne Brown II</b> had 17 points and 17 rebounds, <b>Terrence Hill Jr.</b> 17 points off the bench, and <b>Tyler Lundblade</b>, who missed the exhibitions, started and scored 12.",
-  "Second game: a <b>70-47 win over Radford</b> (Nov. 9, 18,483). <b>Terrence Hill Jr.</b> led with 18 points, <b>Dai Dai Ames</b> added 13 off the bench, <b>Jalen Haralson</b> had 11 points and 6 rebounds, and <b>DeWayne Brown II</b> grabbed 12 rebounds. Tennessee State visits Nov. 13; Michigan State Nov. 17."
+  "Second game: a <b>70-47 win over Radford</b> (Nov. 9, 18,483). <b>Terrence Hill Jr.</b> led with 18 points, <b>Dai Dai Ames</b> added 13 off the bench, <b>Jalen Haralson</b> had 11 points and 6 rebounds, and <b>DeWayne Brown II</b> grabbed 12 rebounds."
+  ,"Third game: an <b>83-78 win over Tennessee State</b> (Nov. 13). <b>Terrence Hill Jr.</b> scored 19 and <b>Jalen Haralson</b> 15 off the bench; Tennessee led 42-37 at halftime and held off a late Tigers run.",
+  "Fourth game: a <b>61-46 win over No. 2 Michigan State</b> (Nov. 17, 21,678 at Food City Center) to move to <b>4-0</b>. The Vols held the Spartans to <b>9-of-50 shooting (18%)</b>, the first time since 1949 an AP top-20 team failed to make 10 field goals in a game. <b>DeWayne Brown II</b> and <b>Miles Rubin</b> each scored 14. Next: Coastal Carolina (Nov. 20) and Maryland (Nov. 24)."
  ],
  "staff": [
   [

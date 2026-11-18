@@ -266,6 +266,12 @@ def update_log(log, key, preds, sched, today):
 
 def main():
     offline = "--offline" in sys.argv
+    if "--gameday" in sys.argv:    # game-night runs: only when the main updater just changed the basketball data
+        import subprocess
+        try:
+            if subprocess.run(["git", "diff", "--quiet", "HEAD", "--", "data/mbb-auto.js", "data/wbb-auto.js"], cwd=ROOT).returncode == 0:
+                print("Basketball ratings: no basketball change this run"); return
+        except Exception: pass
     today = os.environ.get("HEALTH_TODAY") or datetime.date.today().isoformat()
     calAll = read_js(os.path.join(DATA, "predict-cal-bb.js"), "window.PREDICT_CAL_BB = ")
     if not calAll: print("SKIP basketball ratings: data/predict-cal-bb.js is missing (run tools/calibrate_predictor_bb.py)"); return
