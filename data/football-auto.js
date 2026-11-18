@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-17. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-18. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-17",
+ "updated": "2026-11-18",
  "team": {
   "record": "8-2",
   "sec": "5-2",
@@ -110,6 +110,110 @@ window.SITE_AUTO.football = {
     "Ole Miss"
    ]
   ],
+  "cfp": 9,
+  "cfpWeek": "Week 12",
+  "cfpTop25": [
+   [
+    1,
+    "Georgia"
+   ],
+   [
+    2,
+    "Utah"
+   ],
+   [
+    3,
+    "Alabama"
+   ],
+   [
+    4,
+    "UCLA"
+   ],
+   [
+    5,
+    "Texas"
+   ],
+   [
+    6,
+    "Notre Dame"
+   ],
+   [
+    7,
+    "Miami"
+   ],
+   [
+    8,
+    "Indiana"
+   ],
+   [
+    9,
+    "Tennessee"
+   ],
+   [
+    10,
+    "BYU"
+   ],
+   [
+    11,
+    "Wake Forest"
+   ],
+   [
+    12,
+    "Texas Tech"
+   ],
+   [
+    13,
+    "Oregon"
+   ],
+   [
+    14,
+    "Ohio State"
+   ],
+   [
+    15,
+    "Iowa"
+   ],
+   [
+    16,
+    "Kentucky"
+   ],
+   [
+    17,
+    "Boise State"
+   ],
+   [
+    18,
+    "USC"
+   ],
+   [
+    19,
+    "Arizona"
+   ],
+   [
+    20,
+    "Houston"
+   ],
+   [
+    21,
+    "South Carolina"
+   ],
+   [
+    22,
+    "Oklahoma"
+   ],
+   [
+    23,
+    "Louisville"
+   ],
+   [
+    24,
+    "Florida"
+   ],
+   [
+    25,
+    "Ole Miss"
+   ]
+  ],
   "ranks": {
    "ppg": [
     31.4,
@@ -151,111 +255,7 @@ window.SITE_AUTO.football = {
     8,
     1
    ]
-  },
-  "cfp": 8,
-  "cfpWeek": "Week 11",
-  "cfpTop25": [
-   [
-    1,
-    "Georgia"
-   ],
-   [
-    2,
-    "Utah"
-   ],
-   [
-    3,
-    "Alabama"
-   ],
-   [
-    4,
-    "UCLA"
-   ],
-   [
-    5,
-    "Notre Dame"
-   ],
-   [
-    6,
-    "Texas"
-   ],
-   [
-    7,
-    "Miami"
-   ],
-   [
-    8,
-    "Tennessee"
-   ],
-   [
-    9,
-    "Indiana"
-   ],
-   [
-    10,
-    "BYU"
-   ],
-   [
-    11,
-    "Kentucky"
-   ],
-   [
-    12,
-    "Texas Tech"
-   ],
-   [
-    13,
-    "Wake Forest"
-   ],
-   [
-    14,
-    "Houston"
-   ],
-   [
-    15,
-    "Iowa"
-   ],
-   [
-    16,
-    "Oregon"
-   ],
-   [
-    17,
-    "South Carolina"
-   ],
-   [
-    18,
-    "USC"
-   ],
-   [
-    19,
-    "Ole Miss"
-   ],
-   [
-    20,
-    "Ohio State"
-   ],
-   [
-    21,
-    "LSU"
-   ],
-   [
-    22,
-    "Missouri"
-   ],
-   [
-    23,
-    "Arizona"
-   ],
-   [
-    24,
-    "Boise State"
-   ],
-   [
-    25,
-    "Oklahoma State"
-   ]
-  ]
+  }
  },
  "schedule": [
   {
@@ -1310,7 +1310,7 @@ window.SITE_AUTO.football = {
    "Arion Carter": [
     {
      "stat": "Tackles for loss",
-     "rank": 60
+     "rank": 61
     }
    ],
    "Tyree Weathersby": [
@@ -1320,7 +1320,7 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Tackles for loss",
-     "rank": 88
+     "rank": 89
     }
    ],
    "Xavier Gilliam": [
@@ -1330,13 +1330,13 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Sacks",
-     "rank": 39
+     "rank": 41
     }
    ],
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 67
+     "rank": 68
     }
    ],
    "Ty Redmond": [
@@ -1354,13 +1354,13 @@ window.SITE_AUTO.football = {
    "TJ Metcalf": [
     {
      "stat": "Interceptions",
-     "rank": 64
+     "rank": 66
     }
    ],
    "Kayin Lee": [
     {
      "stat": "Interceptions",
-     "rank": 64
+     "rank": 66
     }
    ],
    "Faizon Brandon": [
@@ -1635,9 +1635,9 @@ window.SITE_AUTO.football = {
    "tv": "ABC",
    "kick": "2026-11-21T20:30Z",
    "line": "LSU -1.5",
-   "ou": 46.5,
+   "ou": 45.5,
    "ml": "-105",
-   "book": "Draft Kings",
+   "book": "DraftKings",
    "win": 49.9
   },
   "Vanderbilt": {
@@ -1709,7 +1709,7 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     11.0,
-    106,
+    107,
     13,
     false
    ],
@@ -1790,7 +1790,7 @@ window.SITE_AUTO.football = {
     "3rd down conversion %",
     "Downs",
     36.5,
-    98,
+    97,
     14,
     false
    ],
@@ -1808,7 +1808,7 @@ window.SITE_AUTO.football = {
     "Penalty yards per game",
     "Downs",
     58.2,
-    85,
+    86,
     8,
     true
    ],
@@ -1826,7 +1826,7 @@ window.SITE_AUTO.football = {
     "Turnovers lost",
     "Downs",
     11.0,
-    46,
+    45,
     4,
     true
    ],
