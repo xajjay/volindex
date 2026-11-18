@@ -94,7 +94,7 @@
       totalNote = 'Each offense\'s points per game against the other defense\'s points allowed, pulled 30% toward the national average';
     } else { total = NAT.total; totalNote = 'National average (no team scoring data yet)'; }
     if (mg && mg.ptsU && mg.ptsO) { total = (total + mg.ptsU + mg.ptsO) / 2; totalNote += `; averaged with the drive model (${mg.drives} drives each, expected points per drive from play-by-play: ${(mg.ptsU + mg.ptsO).toFixed(0)} total)`; }
-    { const ou = parseFloat(E.ou); if (isFinite(ou) && ou > 30) { total = (total + ou) / 2; totalNote += `; averaged with the market total ${ou}`; } }
+    { const ou = parseFloat(E.ou); if (isFinite(ou) && ou > 30) { total = 0.3 * total + 0.7 * ou; totalNote += `; the posted over/under (${ou}) carries 70% of the weight`; } }
     total = clamp(total, 30, 86);
     const m = clamp(margin, -total + 8, total - 8);
     return { opp, site, mg, src, factors, margin, total, totalNote, ptsU: (total + m) / 2, ptsO: (total - m) / 2, ratingWin: phi(margin / cal.sd), rest: ru, restOpp: ro };
@@ -413,14 +413,14 @@
     if (document.getElementById('vpCss')) return;
     const s = document.createElement('style'); s.id = 'vpCss';
     s.textContent = `
-.vp{--vp-opp:#5E6670}.vp h4{margin:18px 0 8px;font:700 15px Archivo,system-ui,sans-serif}.vp p{margin:6px 0}
+.vp{--vp-opp:#5E6670;min-width:0;max-width:100%}.vp *{min-width:0}.vp .tablewrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}.vp-box{min-width:0}@media(max-width:560px){.vp-box{font-size:12.5px}.vp-box th,.vp-box td{padding:4px 4px}.vp-score{padding:10px;gap:6px}}.vp h4{margin:18px 0 8px;font:700 15px Archivo,system-ui,sans-serif}.vp p{margin:6px 0}
 .vp-score{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
 .vp-team{display:flex;flex-direction:column;gap:2px;min-width:0}.vp-team.r{text-align:right;align-items:flex-end}.vp-team b{font:800 clamp(30px,7vw,46px)/1 Archivo,system-ui,sans-serif;font-variant-numeric:tabular-nums}
 .vp-team span{font-weight:600;overflow-wrap:anywhere}.vp-mid{text-align:center;color:var(--muted);font-size:13px}
 .vp-bar{display:flex;height:26px;border-radius:6px;overflow:hidden;margin:10px 0 4px;font:700 13px Archivo,system-ui,sans-serif}
 .vp-bar i{display:flex;align-items:center;padding:0 8px;font-style:normal;color:#fff;white-space:nowrap;min-width:0}.vp-bar i:first-child{background:#FF8200;color:#1a1a1a}.vp-bar i:last-child{background:var(--vp-opp);justify-content:flex-end;margin-left:2px}
 .vp-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.vp-chips span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px;background:var(--surface)}.vp-chips b{font-variant-numeric:tabular-nums}
-.vp-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.vp-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:16px}
 .vp-hist{width:100%;height:auto;display:block}.vp-hist text{font:12px 'Source Sans 3',system-ui,sans-serif;fill:var(--fg)}.vp-hist .ax{fill:var(--muted);font-size:11px}
 .vp-fac{width:100%;border-collapse:collapse;font-size:14px}.vp-fac td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:top}.vp-fac td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
 .vp-fac small{display:block;color:var(--muted);line-height:1.3}.vp-fac tr.tot td{border-top:2px solid var(--line-strong);font-weight:700}
@@ -504,7 +504,7 @@
         ${bt ? `<p><b>Backtest.</b> The same margin formula, using Elo ratings, was fit on ${esc(bt.train)} and then asked to call ${esc(bt.test)} it had never seen: it picked the winner ${bt.accuracy}% of the time, missed the margin by ${bt.mae} points on average, and had a Brier score of ${bt.brier} (0.25 is a coin flip; lower is better).</p>
         <div class="tablewrap"><table class="vp-box"><thead><tr><th>Favorite's win chance</th><th>Games</th><th>Predicted</th><th>Actually won</th></tr></thead><tbody>${bt.calibration.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}%</td><td>${r[3]}%</td></tr>`).join('')}</tbody></table></div>
         <p class="vp-note">The live number uses SP+, FPI and PEAR instead of Elo, so the backtest checks the method, not this exact blend.</p>` : ''}
-        <p class="vp-note">A simulation is an estimate, not a pick. When a betting line is posted it carries 75% of the margin and half of the total, because it already prices injuries and news and beat every model we tested. Availability comes from the SEC report (filled in Wednesday to Friday of game week) and Ourlads depth charts; anything not yet reported is not in the number, and the what-if menus add anything else.</p></details>`;
+        <p class="vp-note">A simulation is an estimate, not a pick. When a betting line is posted it carries 75% of the margin and 70% of the total, because it already prices injuries and news and beat every model we tested. Availability comes from the SEC report (filled in Wednesday to Friday of game week) and Ourlads depth charts; anything not yet reported is not in the number, and the what-if menus add anything else.</p></details>`;
   }
 
   /* ====================================================================================================
