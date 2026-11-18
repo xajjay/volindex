@@ -53,10 +53,26 @@
     factors.push({ k: site > 0 ? 'Home court' : site < 0 ? 'Road game' : 'Neutral court', v: cal.hca * site, note: site ? `${cal.hca} points: half the gap between Tennessee's home and away results against the same opponent in the same season (${cal.hcaPairs[1]} pairs)` : 'No home-court edge either way' });
     const hu = +adj.ut || 0, ho = +adj.opp || 0;
     if (hu || ho) factors.push({ k: 'Your what-if', v: hu - ho, note: `${hu ? 'Tennessee ' + hu : ''}${hu && ho ? ', ' : ''}${ho ? e.name + ' ' + ho : ''} points` });
-    const margin = factors.reduce((s, f) => s + f.v, 0);
+    let margin = factors.reduce((s, f) => s + f.v, 0);
     const tots = done.map(x => +x.us + +x.them), tEst = tots.length ? tots.reduce((a, b) => a + b, 0) / tots.length : cal.avgTotal;
     const total = clamp(cal.avgTotal + (tEst - cal.avgTotal) * (tots.length / (tots.length + cal.k)), 105, 185);
     const m = clamp(margin, -total + 60, total - 60);
+    // our own power-rating model (data/model-bb.js: opponent-adjusted efficiency, player production, matchups; no records, polls or lines) carries most of the weight;
+    // the program-history model above (Tennessee's level, opponent program strength, AP rank, court) supplies the rest
+    const MB = root.MODEL_BB && root.MODEL_BB[key], nrm = x => String(x || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const mg = MB && (MB.games || []).find(x => x.date === g.date && nrm(x.opp) === nrm(e.name));
+    if (mg) {
+      const W = 0.75, adjV = hu - ho, oldM = margin - adjV, oldT = total, ft = mg.total * 0.7 + oldT * 0.3;
+      const mine = mg.margin, bt = MB.backtest || {};
+      const f2 = [
+        { k: 'Our power-rating model', v: W * mine, note: `Opponent-adjusted efficiency (points per 100 possessions, shooting, turnovers, rebounding, free throws), who is playing (minutes-weighted player production), style matchups and home court. Tennessee is No. ${MB.tennessee.rank} of ${MB.n} (${MB.tennessee.power >= 0 ? '+' : ''}${MB.tennessee.power}), ${e.name} No. ${mg.oppRank} (${mg.oppPower >= 0 ? '+' : ''}${mg.oppPower}); the model alone says ${mine >= 0 ? 'Tennessee +' : e.name + ' +'}${Math.abs(mine).toFixed(1)}. Backtest: missed games by ${bt.mae} points on average (${bt.games} games).` },
+        { k: 'Program history', v: (1 - W) * oldM, note: `Tennessee's results since 2000-01 and ${e.name}'s program strength and AP ranking, weighted ${Math.round((1 - W) * 100)}% against ${Math.round(W * 100)}% for the model above (the model called Tennessee's own games better in a walk-forward test).` },
+      ];
+      if (adjV) f2.push({ k: 'Your what-if', v: adjV, note: factors[factors.length - 1].note });
+      margin = f2.reduce((s, f) => s + f.v, 0);
+      const t2 = clamp(ft, 100, 190), m2 = clamp(margin, -t2 + 60, t2 - 60);
+      return { key, cal, opp: e.name, oppInfo: e.ti, rank: e.rank, site, factors: f2, margin, total: t2, ptsU: (t2 + m2) / 2, ptsO: (t2 - m2) / 2, ratingWin: phi(margin / (mg.sd || cal.sd)), games: resid.length, mg, mb: MB };
+    }
     return { key, cal, opp: e.name, oppInfo: e.ti, rank: e.rank, site, factors, margin, total, ptsU: (total + m) / 2, ptsO: (total - m) / 2, ratingWin: phi(margin / cal.sd), games: resid.length };
   };
 
@@ -158,6 +174,10 @@
     N = N || 1000;
     const m = VPB.model(D, g, adj); if (!m || m.pending) return m;
     const P = profiles(D); P.oppName = m.opp;
+    if (m.mg && m.mg.sim) {      // both teams' opponent-adjusted four factors and the expected pace, from our model
+      const q = m.mg.sim, a = P.t[0], b = P.t[1];
+      a.efg = q.efgU; a.tov = q.tovU; a.orb = q.orbU; a.ftr = q.ftrU; b.efg = q.efgO; b.tov = q.tovO; b.orb = q.orbO; b.ftr = q.ftrO; P.pace = q.pace;
+    }
     const games = calibrate(P, m, N), sims = []; let w = 0, ot = 0, one = 0;
     const agg = [0, 1].map(() => ({ pts: 0, fga: 0, fgm: 0, tpa: 0, tpm: 0, fta: 0, ftm: 0, orb: 0, drb: 0, to: 0, poss: 0 }));
     games.forEach(r => { const win = r.sc[0] > r.sc[1]; w += win; ot += r.ot ? 1 : 0; one += Math.abs(r.sc[0] - r.sc[1]) <= 5 ? 1 : 0;
@@ -190,6 +210,16 @@
       return `<rect x="${x}" y="${y}" width="${bw - 6}" height="${bh}" rx="4" fill="${h.lo > 0 ? '#FF8200' : 'var(--vp-opp)'}"><title>${lab(h)}: ${h.n} of ${res.N} games</title></rect><text x="${x + (bw - 6) / 2}" y="${y - 5}" text-anchor="middle" font-weight="700">${h.n / res.N < 0.005 && h.n ? '<1' : Math.round(h.n / res.N * 100)}%</text><text class="ax" x="${x + (bw - 6) / 2}" y="${H - bot + 15}" text-anchor="middle">${lab(h)}</text>`;
     }).join('')}<line x1="${pad}" x2="${W - pad}" y1="${H - bot}" y2="${H - bot}" stroke="var(--line-strong)"/><text class="ax" x="${W / 2}" y="${H - 4}" text-anchor="middle">Winner and margin of victory</text></svg>`;
   }
+  function bbCard(res) {
+    const m = res.m, mg = m && m.mg; if (!mg) return '';
+    const o = res.m.opp, f = (v, d) => (+v).toFixed(d), sg = v => (v > 0 ? '+' : '') + f(v, 1);
+    const pl = (list) => list.map(r => `<tr><td>${esc(r[0])}</td><td class="n">${Math.round(r[1] * 100)}%</td><td class="n">${r[2] > 0 ? '+' : ''}${f(r[2], 1)}</td></tr>`).join('');
+    return `<h4>What each edge is worth <span class="vp-note">(model points for Tennessee; ratings are opponent-adjusted)</span></h4>
+      <div class="tablewrap"><table class="vp-box"><tbody>${mg.edges.filter(e => e.m !== 'net').map(e => `<tr><td>${esc(e.k)}${e.m === 'L' ? ` <small>Tennessee ${sg(e.ut)}, ${esc(o)} ${sg(e.opp)} points per 40 minutes above average</small>` : ''}</td><td class="n">${sg(e.pts)}</td></tr>`).join('')}</tbody></table></div>
+      <h4>Who carries it <span class="vp-note">(share of recent minutes; value = Game Score per 40 minutes above the national average)</span></h4>
+      <div class="vp-two"><div class="tablewrap"><table class="vp-box"><thead><tr><th>Tennessee</th><th>Min</th><th>Value</th></tr></thead><tbody>${pl(mg.players.ut)}</tbody></table></div>
+      <div class="tablewrap"><table class="vp-box"><thead><tr><th>${esc(o)}</th><th>Min</th><th>Value</th></tr></thead><tbody>${pl(mg.players.opp)}</tbody></table></div></div>`;
+  }
   function report(res) {
     const m = res.m, o = m.opp, tO = m.oppInfo, a = res.avg, cal = m.cal, bt = cal.backtest, f = x => (x[1] >= 25 ? Math.round(x[0] / x[1] * 100) : null);
     const fav = res.mean >= 0 ? UT : o, sp = Math.abs(Math.round(res.mean * 2) / 2), cd = res.cond, keys = [];
@@ -205,14 +235,15 @@
       <div id="vpStage"></div>
       <div class="vp-two"><div><h4>${res.N.toLocaleString()} simulated games: how they ended</h4>${histSvg(res)}</div>
       <div><h4>What goes into the number</h4><table class="vp-fac"><tbody>${m.factors.map(x => `<tr><td>${esc(x.k)}<small>${esc(x.note)}</small></td><td class="n">${side(x.v)}</td></tr>`).join('')}
-        <tr class="tot"><td>Expected margin<small>Expected total ${m.total.toFixed(1)}, from Tennessee's games since 2018-19 and this season's so far</small></td><td class="n">${side(m.margin)}</td></tr></tbody></table>
+        <tr class="tot"><td>Expected margin<small>Expected total ${m.total.toFixed(1)}${m.mg ? ': 70% from both teams\' adjusted offense, defense and pace, 30% from Tennessee\'s own scoring history' : ', from Tennessee\'s games since 2018-19 and this season\'s so far'}</small></td><td class="n">${side(m.margin)}</td></tr></tbody></table>
         <div class="vp-what"><label>What if Tennessee is <select data-vpadj="ut"><option value="0">at full strength</option><option value="-2">missing a starter (−2)</option><option value="-4">missing two starters (−4)</option><option value="-6">without its best player (−6)</option></select></label><label>and ${esc(o)} is <select data-vpadj="opp"><option value="0">at full strength</option><option value="-2">missing a starter (−2)</option><option value="-4">missing two starters (−4)</option><option value="-6">without its best player (−6)</option></select></label></div></div></div>
+      ${bbCard(res)}
       ${keys.length ? `<h4>What decides it</h4><ul class="vp-keys">${keys.map(k => `<li>${k}</li>`).join('')}</ul>` : ''}
       <h4>Projected team numbers <span class="vp-note">(average of ${res.N.toLocaleString()} games)</span></h4>
       <div class="tablewrap"><table class="vp-box"><thead><tr><th></th><th>Tennessee</th><th>${esc(o)}</th></tr></thead><tbody>${row('Points', a[0].pts, a[1].pts, 1)}${row('Field goal %', pcts(0, 'fgm', 'fga'), pcts(1, 'fgm', 'fga'), 1)}${row('Threes made', a[0].tpm, a[1].tpm, 1)}${row('Three-point %', pcts(0, 'tpm', 'tpa'), pcts(1, 'tpm', 'tpa'), 1)}${row('Free throws made-attempted', 0, 0).replace(/<td>0<\/td><td>0<\/td>/, `<td>${a[0].ftm.toFixed(1)}-${a[0].fta.toFixed(1)}</td><td>${a[1].ftm.toFixed(1)}-${a[1].fta.toFixed(1)}</td>`)}${row('Rebounds', a[0].orb + a[0].drb, a[1].orb + a[1].drb, 1)}${row('Turnovers', a[0].to, a[1].to, 1)}${row('Possessions', a[0].poss, a[1].poss, 1)}</tbody></table></div>
       <details style="margin-top:14px"><summary><b>How this works, and how good it is</b></summary>
-        <p>The expected margin has four parts: how good Tennessee has been (last season's level, moved by each game this season), how strong the opponent's program is, whether the opponent is ranked, and home court. The weights were fitted on ${esc(cal.fitted)}. Real games land within about ${Math.round(cal.sd)} points of that expected margin two times in three, so the simulation is given the same spread.</p>
-        <p><b>What it does not know.</b> The site has no opponent-adjusted efficiency ratings for every opponent, so ${esc(o)} is measured by program strength and the AP poll, not by how this year's ${esc(o)} team has played. Expect it to be slow to notice a program having an unusually good or bad year. Tennessee's own four factors come from ${res.P.sample} game${res.P.sample === 1 ? '' : 's'}, so they are pulled most of the way to the national average.</p>
+        ${m.mg ? `<p>${esc(UT)}'s expected margin is 75% our power-rating model and 25% a program-history model. The power-rating model rates every Division I team from opponent-adjusted efficiency (points per 100 possessions, effective FG%, turnover rate, offensive-rebound rate, free-throw rate and tempo, each fit with recent games counting more and last season as the starting point), adds the minutes-weighted production of the players who are actually playing, and adds style matchups (pace, rebounding, turnovers, shooting against tempo). It never sees records, polls, rankings or betting lines. It is built from ESPN box scores for ${m.mb.n} teams through ${esc(m.mb.through)}. Tennessee's four factors and ${esc(o)}'s, adjusted for who they play, set how the simulated game is played.</p><p><b>What it does not know.</b> There is no live injury feed for basketball, so who is playing comes from the last five games; use the what-if menus for an absence. Early in the season a few games carry a lot of weight, which is why last season's ratings are kept at 95%.</p>` : `<p>The expected margin has four parts: how good Tennessee has been (last season's level, moved by each game this season), how strong the opponent's program is, whether the opponent is ranked, and home court. The weights were fitted on ${esc(cal.fitted)}. Real games land within about ${Math.round(cal.sd)} points of that expected margin two times in three, so the simulation is given the same spread.</p>
+        <p><b>What it does not know.</b> The site has no opponent-adjusted efficiency ratings for every opponent, so ${esc(o)} is measured by program strength and the AP poll, not by how this year's ${esc(o)} team has played. Expect it to be slow to notice a program having an unusually good or bad year. Tennessee's own four factors come from ${res.P.sample} game${res.P.sample === 1 ? '' : 's'}, so they are pulled most of the way to the national average.</p>`}
         ${bt ? `<p><b>Backtest.</b> Fitted on ${esc(bt.train)}, then asked to call ${esc(bt.test)} one at a time, using only games played before each one: it picked the winner ${bt.accuracy}% of the time, missed the margin by ${bt.mae} points on average, Brier score ${bt.brier} (0.25 is a coin flip; lower is better).</p>
         <div class="tablewrap"><table class="vp-box"><thead><tr><th>Favorite's win chance</th><th>Games</th><th>Predicted</th><th>Actually won</th></tr></thead><tbody>${bt.calibration.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}%</td><td>${r[3]}%</td></tr>`).join('')}</tbody></table></div>` : ''}
         <p class="vp-note">A simulation is an estimate, not a pick. Injuries are not in the data unless you set them with the what-if menus.</p></details>`;

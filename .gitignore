@@ -9,3 +9,6 @@ Thumbs.db
 # 247 composite, cfbfastR/nflverse pulls) — large, third-party, re-fetched per
 # session, never committed
 /hdata/
+
+# basketball box scores (SportsDataverse), re-downloaded by the model script
+tools/cache/bbm/
