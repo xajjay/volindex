@@ -1,18 +1,57 @@
 {
  "asOf": "2026-11-16",
- "note": "Fill from the SEC availability report (Wed/Thu/Fri, final 90 min before kickoff) for SEC games, and from team reports for others. status: out, doubtful, questionable, probable, available.",
- "game": "Vanderbilt at Tennessee",
+ "note": "Applies to the LSU game only. Fill LSU and Tennessee from the SEC availability report (Wed/Thu/Fri). Snap counts in data/snaps.json set each absent player's slot.",
+ "game": "LSU at Tennessee",
  "teams": {
   "Tennessee": [
-   {"name": "Mike Matthews", "pos": "WR", "status": "out", "note": "season-ending knee"},
-   {"name": "Daune Morris", "pos": "RB", "status": "out", "note": "season-ending"},
-   {"name": "Nic Moore", "pos": "OL", "status": "out", "note": "illness, return unannounced"},
-   {"name": "Tyree Weathersby", "pos": "DE", "status": "out", "note": "knee"},
-   {"name": "Wendell Moe Jr.", "in_rating": true, "pos": "OL", "status": "out", "note": "season"},
-   {"name": "Ethan Davis", "in_rating": true, "pos": "TE", "status": "out", "note": "ACL"},
-   {"name": "Edrees Farooq", "in_rating": true, "pos": "S", "status": "out", "note": "season"}
+   {
+    "name": "Mike Matthews",
+    "pos": "WR",
+    "status": "out",
+    "note": "season-ending knee"
+   },
+   {
+    "name": "Daune Morris",
+    "pos": "RB",
+    "status": "out",
+    "note": "season-ending"
+   },
+   {
+    "name": "Nic Moore",
+    "pos": "OL",
+    "status": "out",
+    "note": "illness, return unannounced"
+   },
+   {
+    "name": "Tyree Weathersby",
+    "pos": "DE",
+    "status": "out",
+    "note": "knee"
+   },
+   {
+    "name": "Wendell Moe Jr.",
+    "in_rating": true,
+    "pos": "OL",
+    "status": "out",
+    "note": "season"
+   },
+   {
+    "name": "Ethan Davis",
+    "in_rating": true,
+    "pos": "TE",
+    "status": "out",
+    "note": "ACL"
+   },
+   {
+    "name": "Edrees Farooq",
+    "in_rating": true,
+    "pos": "S",
+    "status": "out",
+    "note": "season"
+   }
   ],
   "Vanderbilt": [],
   "LSU": []
- }
+ },
+ "opp": "LSU"
 }

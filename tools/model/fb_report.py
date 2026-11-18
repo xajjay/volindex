@@ -123,7 +123,8 @@ def main():
         neutral = float(b[0] + (b[1:1 + len(FR.METRICS)] * f).sum())
         homeTeam = TEAM if site == 1 else opp
         h = float(hfa.get(homeTeam, mu)) if site else 0.0
-        au, ao = av(TEAM)["total"], av(opp)["total"]
+        ok = avail.get("opp") == opp
+        au, ao = (av(TEAM)["total"], av(opp)["total"]) if ok else (0.0, 0.0)
         margin = neutral + site * h + au - ao
         edges = [{"k": FR.METRIC_LABELS[m] if hasattr(FR, "METRIC_LABELS") else m, "m": m, "ut": round(st(TEAM, m), 4), "opp": round(st(opp, m), 4), "pts": round(float(b[1 + i] * f[i]), 2)} for i, m in enumerate(FR.METRICS)]
         # points from drives: each side's expected points per drive against the other, times the drives the game will have
@@ -137,7 +138,9 @@ def main():
                          "opp": [round(float(off.loc[opp, col]) * sc, dec), rank(col, opp, "o", better)], "oppD": [round(float(de.loc[opp, col]) * sc, dec), rank(col, opp, "d", -better)]})
         tu, to = tend(TEAM), tend(opp)
         nat = tu["natDt"]
-        sim = {"passU": tu["c_pass_rate"] / 100, "passO": to["c_pass_rate"] / 100, "playsU": tu["c_plays"], "playsO": to["c_plays"],
+        natSack = float(off.loc[cur, "c_sack_rate"].mean())
+        sackU = float(np.clip(off.loc[TEAM, "c_sack_rate"] + 0.6 * (de.loc[opp, "c_sack_rate"] - natSack), 0.02, 0.13)); sackO = float(np.clip(off.loc[opp, "c_sack_rate"] + 0.6 * (de.loc[TEAM, "c_sack_rate"] - natSack), 0.02, 0.13))
+        sim = {"sackU": round(sackU, 4), "sackO": round(sackO, 4), "passU": tu["c_pass_rate"] / 100, "passO": to["c_pass_rate"] / 100, "playsU": tu["c_plays"], "playsO": to["c_plays"],
                "explU": round(expl_k(TEAM, opp), 3), "explO": round(expl_k(opp, TEAM), 3), "dtU": tu["c_dt"], "dtO": to["c_dt"], "natDt": nat}
         games.append({"date": g["date"], "opp": opp, "site": site, "neutral": round(neutral, 2), "hfa": round(site * h, 2), "hfaTeam": homeTeam, "availU": round(au, 2), "availO": round(ao, 2),
                       "margin": round(margin, 2), "sd": SD, "win": round(0.5 * (1 + math.erf(margin / (SD * math.sqrt(2)))), 3),

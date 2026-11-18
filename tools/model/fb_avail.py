@@ -40,7 +40,7 @@ def cost(pos, rank, vals):
     return 0.0, "n/a"
 
 
-GROUP = {"QB": "QB", "RB": "RB", "FB": "RB", "WR": "WR", "TE": "TE", "OL": "OL", "OT": "OL", "OG": "OL", "DL": "DL", "DE": "DL", "DT": "DL", "LB": "LB", "CB": "DB", "S": "DB", "NB": "DB", "DB": "DB"}
+GROUP = {"QB": "QB", "RB": "RB", "FB": "RB", "WR": "WR", "TE": "TE", "OL": "OL", "OT": "OL", "OG": "OL", "DL": "DL", "DE": "DL", "DT": "DL", "LB": "LB", "CB": "DB", "S": "DB", "NB": "DB", "DB": "DB", "EDGE": "DL", "LT": "OL", "LG": "OL", "C": "OL", "RG": "OL", "RT": "OL"}
 TOPN = {"OL": 5, "DL": 4, "LB": 3, "DB": 5}
 
 
@@ -89,7 +89,7 @@ def main():
             res.append({"name": r["name"], "pos": r["pos"], "status": r["status"], "in_rating": bool(r.get("in_rating")), "depth": f"{slot_pos}{rk}" if hit else "not on depth chart (assumed starter)", "pts": round(w * c, 2), "basis": kind})
             tot += w * c
         out[team] = {"total": round(tot, 2), "rows": res}
-    json.dump({"asOf": av["asOf"], "game": av.get("game"), "teams": out}, open(os.path.join(ROOT, "tools", "cache", "fbm", "availability_adj.json"), "w"), indent=1)
+    json.dump({"asOf": av["asOf"], "game": av.get("game"), "opp": av.get("opp"), "teams": out}, open(os.path.join(ROOT, "tools", "cache", "fbm", "availability_adj.json"), "w"), indent=1)
     for t, v in out.items(): print(t, v["total"], [(r["name"], r["pts"]) for r in v["rows"]])
 
 

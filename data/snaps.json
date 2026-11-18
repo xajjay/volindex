@@ -375,5 +375,123 @@
     "snaps": 2
    }
   ]
+ },
+ "LSU": {
+  "asOf": "2026-11-14",
+  "games": 8,
+  "estimated": true,
+  "source": "user-supplied ESTIMATED snaps through Week 8 (starters only; QB exact), from The Depth Chart CFB per screenshot; not official",
+  "players": [
+   {
+    "name": "Sam Leavitt",
+    "pos": "QB",
+    "snaps": 516
+   },
+   {
+    "name": "Dilin Jones",
+    "pos": "RB",
+    "snaps": 413
+   },
+   {
+    "name": "Winston Watkins",
+    "pos": "WR",
+    "snaps": 409
+   },
+   {
+    "name": "Eugene Wilson III",
+    "pos": "WR",
+    "snaps": 354
+   },
+   {
+    "name": "Jackson Harris",
+    "pos": "WR",
+    "snaps": 348
+   },
+   {
+    "name": "Trey'Dez Green",
+    "pos": "TE",
+    "snaps": 253
+   },
+   {
+    "name": "Jordan Seaton",
+    "pos": "LT",
+    "snaps": 616
+   },
+   {
+    "name": "William Satterwhite",
+    "pos": "LG",
+    "snaps": 377
+   },
+   {
+    "name": "Braelin Moore",
+    "pos": "C",
+    "snaps": 616
+   },
+   {
+    "name": "Aliou Bah",
+    "pos": "RG",
+    "snaps": 616
+   },
+   {
+    "name": "Weston Davis",
+    "pos": "RT",
+    "snaps": 616
+   },
+   {
+    "name": "Princewill Umanmielen",
+    "pos": "EDGE",
+    "snaps": 266
+   },
+   {
+    "name": "Stephiylan Green",
+    "pos": "DT",
+    "snaps": 184
+   },
+   {
+    "name": "Deuce Geralds",
+    "pos": "DT",
+    "snaps": 229
+   },
+   {
+    "name": "Jordan Ross",
+    "pos": "EDGE",
+    "snaps": 239
+   },
+   {
+    "name": "TJ Dottery",
+    "pos": "LB",
+    "snaps": 445
+   },
+   {
+    "name": "Davhon Keys",
+    "pos": "LB",
+    "snaps": 318
+   },
+   {
+    "name": "Ty Benefield",
+    "pos": "S",
+    "snaps": 446
+   },
+   {
+    "name": "PJ Woodland",
+    "pos": "CB",
+    "snaps": 367
+   },
+   {
+    "name": "Tamarcus Cooley",
+    "pos": "S",
+    "snaps": 440
+   },
+   {
+    "name": "Jhase Thomas",
+    "pos": "S",
+    "snaps": 354
+   },
+   {
+    "name": "DJ Pickett",
+    "pos": "CB",
+    "snaps": 388
+   }
+  ]
  }
 }

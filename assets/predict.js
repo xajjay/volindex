@@ -198,6 +198,7 @@
       let pRun = M.runShare + (st.down === 1 ? 0.05 : 0);
       if (st.down === 2 && st.togo >= 8) pRun -= 0.12;
       if (st.down >= 3) pRun = st.togo <= 2 ? 0.66 : st.togo <= 5 ? 0.3 : 0.12;
+      pRun += M.rb || 0;                                     // calibrated so the simulated run share matches how the team really calls plays
       if (st.ball >= 96) pRun += 0.15;
       if (twoMin && !(late && lead > 0)) pRun *= 0.4;
       if (late && lead > 0) pRun = Math.max(pRun, st.clk < 360 ? 0.78 : 0.62);
@@ -327,13 +328,14 @@
     let out = null;
     for (let it = 0; it < 10; it++) {
       const n = it < 5 ? 200 : N, games = [];
-      let a = 0, b = 0, pl = 0;
-      for (let i = 0; i < n; i++) { const r = simGame(Ms, 1000 + i); a += r.sc[0]; b += r.sc[1]; pl += r.T[0].plays + r.T[1].plays; if (it >= 5) games.push(r); }
+      let a = 0, b = 0, pl = 0; const ra = [0, 0], pp = [0, 0];
+      for (let i = 0; i < n; i++) { const r = simGame(Ms, 1000 + i); a += r.sc[0]; b += r.sc[1]; pl += r.T[0].plays + r.T[1].plays; [0, 1].forEach(t => { ra[t] += r.T[t].rushA; pp[t] += r.T[t].plays; }); if (it >= 5) games.push(r); }
       a /= n; b /= n;
       if (it >= 5) { out = games; if ((Math.abs(a - want[0]) < 0.25 && Math.abs(b - want[1]) < 0.25) || it === 9) break; }
       const e = it < 5 ? 0.45 : 0.4;
       Ms[0].k = clamp(Ms[0].k * Math.pow(clamp(want[0] / Math.max(3, a), 0.7, 1.4), e), 0.55, 1.9); Ms[1].k = clamp(Ms[1].k * Math.pow(clamp(want[1] / Math.max(3, b), 0.7, 1.4), e), 0.55, 1.9);
-      if (it < 5) { const tf = clamp((pl / n) / plays, 0.85, 1.18); Ms[0].tempo = Ms[1].tempo = clamp(Ms[0].tempo * tf, 0.7, 1.4); }
+      [0, 1].forEach(t => { if (Ms[t].tgtRun != null) Ms[t].rb = clamp((Ms[t].rb || 0) + 0.9 * (Ms[t].tgtRun - ra[t] / Math.max(1, pp[t])), -0.3, 0.3); });
+      if (it < 5) { const tf = clamp((pl / n) / plays, 0.85, 1.18); Ms[0].tempo = clamp(Ms[0].tempo * tf, 0.6, 1.5); Ms[1].tempo = clamp(Ms[1].tempo * tf, 0.6, 1.5); }
     }
     return out;
   }
@@ -346,7 +348,7 @@
     const pu = profile(c, 0, G0), po = profile(c, 1, G1), mg = m.mg;
     if (mg && mg.sim) { pu.runShare = clamp(1 - mg.sim.passU, 0.34, 0.68); po.runShare = clamp(1 - mg.sim.passO, 0.34, 0.68); pu.plays = mg.sim.playsU; po.plays = mg.sim.playsO; }
     const Ms = [matchup(pu, po), matchup(po, pu)];
-    if (mg && mg.sim) { Ms[0].xk = mg.sim.explU; Ms[1].xk = mg.sim.explO; Ms[0].tempo = Ms[1].tempo = clamp(mg.sim.natDt / ((mg.sim.dtU + mg.sim.dtO) / 2), 0.8, 1.25); }
+    if (mg && mg.sim) { Ms[0].xk = mg.sim.explU; Ms[1].xk = mg.sim.explO; Ms[0].tempo = clamp(mg.sim.natDt / mg.sim.dtU, 0.8, 1.25); Ms[1].tempo = clamp(mg.sim.natDt / mg.sim.dtO, 0.8, 1.25); Ms[0].sackR = mg.sim.sackU / 1.05; Ms[1].sackR = mg.sim.sackO / 1.05; Ms[0].tgtRun = pu.runShare; Ms[1].tgtRun = po.runShare; }
     const games = calibrate(Ms, m, N);
     const sims = []; let w = 0, ot = 0, one = 0;
     const agg = [0, 1].map(() => ({ pts: 0, rushY: 0, passY: 0, to: 0, plays: 0, sacks: 0, t3a: 0, t3c: 0, top: 0, fd: 0 }));
