@@ -246,10 +246,28 @@
     [/\bsources?\b|\bcredits?\b|\bwhere .*data\b|\bdata from\b|\bcitations?\b/, () => ({ title: 'Sources & credits', html: '<p>Every source behind the numbers on The Vol Index, with links.</p>', go: '#sources', score: 70 })],
     [/\bcontact\b|\bemail\b|\breach (you|out)\b|\bget in touch\b|\bdm\b/, () => ({ title: 'Contact', html: '<p>Email <a href="mailto:thevolindex@gmail.com">thevolindex@gmail.com</a> or find <a href="https://x.com/Volindex" target="_blank" rel="noopener">@Volindex</a> on X.</p>', go: '#about-contact', score: 70 })],
   ];
+
+  // every page and feature of the site, so any of them can be found by name or by what it does
+  const FEATURES = [
+    [/\binjur|\bavailab|\bhealth|\bhurt\b|\bout for (the )?season\b|\bwho.?s (out|hurt)\b|\bquestionable\b|\bdoubtful\b|\bsec report\b|\bsnap counts?\b/, { title: 'Football injuries & availability', html: '<p>Players out for the season or the week, with status and notes, sit at the bottom of the football roster page. The game predictor also prices SEC availability-report absences into its margin.</p>', go: '#football-roster', score: 75 }],
+    [/\bpredict|\bprojection|\bsimulat|\bmost likely (result|score)\b|\bwin (probability|chance)|\bwho wins\b|\bwho will win\b|\bspread\b|\bover under\b|\bodds\b|\bline\b/, { title: 'Game predictor & simulation', html: '<p>Open any upcoming game and choose the Prediction tab: margin, win chance, total, a play-by-play most-likely-result simulation, and the factors behind them.</p>', go: '#football-schedule', score: 72 }],
+    [/\bpower (ratings?|rankings?)\b|\bmodel\b|\btop 25\b|\befficiency\b|\bepa\b|\btalent composite\b|\breturning production\b/, { title: 'Football power ratings & model', html: '<p>Our model rates every FBS team from efficiency, talent, returning production and availability. Ratings and the edge tables are on football Advanced and in each game\'s Prediction tab.</p>', go: '#football-advanced', score: 70 }],
+    [/\bdepth chart\b|\bdepth\b|\bstarters?\b|\bwho starts\b/, { title: 'Football depth chart', html: '<p>Position-by-position depth chart for Tennessee football.</p>', go: '#football-depth', score: 60 }],
+    [/\bstandings?\b|\bsec (race|table)\b|\bconference\b/, { title: 'Standings', html: '<p>Conference standings are on each sport\'s Schedule & Standings page.</p>', go: '#football-schedule', score: 55 }],
+    [/\bgames?\b.*\b(play|arcade|fun)\b|\barcade\b|\bplay a game\b|\bminigames?\b|\btrivia\b|\bguesser\b|\bhigher or lower\b|\bpower t grid\b|\bvfl career\b|\brocky top rankings\b|\bvol games\b/, { title: 'Vol Games', html: '<p>Trivia, Guesser, Higher or Lower, Power T Grid, VFL Career, Rocky Top Rankings and more.</p>', go: '#games', score: 66 }],
+    [/\bdynast(y|ies)\b|\bfranchise\b|\bcareer mode\b|\bsim (a )?season\b|\brecruit.*(game|sim)\b/, { title: 'Vol Dynasty', html: '<p>Run the program yourself: recruit, manage the roster and play seasons.</p>', go: '#games', score: 68 }],
+    [/\bcompare\b|\bversus\b.*\bplayers?\b|\bhead to head\b/, { title: 'Compare Vols', html: '<p>Put two Vols side by side by career stats.</p>', go: '#compare', score: 58 }],
+    [/\bplayer pages?\b|\bformer (vols|players)\b|\balumni\b|\ball.?time (players|vols)\b|\bcareer stats\b/, { title: 'Player pages', html: '<p>Season-by-season stats for current and former Vols.</p>', go: '#players', score: 58 }],
+    [/\bsign ?in\b|\blog ?in\b|\baccount\b|\bsync\b|\bsave(d)? (games|progress)\b/, { title: 'Sign in & sync', html: '<p>Sign in to sync your Vol games across devices.</p>', go: '#me', score: 56 }],
+    [/\bleaders?\b.*\bhonors?\b|\bhonors?\b|\ball.?americans?\b|\bawards?\b|\bhall of fame\b/, { title: 'Leaders & honors (football)', html: '<p>Award winners, All-Americans and team leaders.</p>', go: '#football-leaders', score: 56 }],
+    [/\b2027\b|\bnext season\b|\bpreview\b|\bprojected (roster|lineup)\b/, { title: 'Football 2027 preview', html: '<p>Who returns, who leaves, and the incoming class.</p>', go: '#football-next', score: 56 }],
+    [/\bpoll|\bap top\b|\bcoaches poll\b|\bcfp\b|\bplayoff\b|\brankings?\b/, { title: 'Football rankings & overview', html: '<p>Poll rank, record and national top 25 are on the football Overview page.</p>', go: '#football', score: 50 }],
+  ];
   function answer(q) {
     const P = parse(q); const out = [];
     if (!P.n) return out;
     SITE_PAGES.forEach(([re, f]) => { if (re.test(P.n)) out.push(f()); });
+    if (!P.opp && !P.players.length) FEATURES.forEach(([re, a]) => { if (re.test(P.n) && !(P.sports.length && P.sports.some(k => k !== 'football') && a.go.startsWith('#football'))) out.push(Object.assign({}, a)); });
     if (P.rec) out.push(recordAnswer(P.rec));
     P.players.forEach(h => out.push(playerAnswer(h)));
     pastPlayers(P.n, P.players).forEach(a => out.push(a));
@@ -275,7 +293,7 @@
   /* =====================================================================
      UI: top-bar button, panel, home-page box, pinned answer
      ===================================================================== */
-  const EX = ['Football Roster', 'Volleyball Schedule', 'Basketball Recruiting', 'Lady Vols basketball schedule', 'Arkansas vs Tennessee', 'Who has the passing yards record?', 'Juke Harris', 'Vols games this week'];
+  const EX = ['Football injuries', 'Game prediction', 'Vol Dynasty', 'Football Roster', 'Volleyball Schedule', 'Basketball Recruiting', 'Lady Vols basketball schedule', 'Arkansas vs Tennessee', 'Who has the passing yards record?', 'Juke Harris', 'Vols games this week'];
   function card(a, i) {
     return `<div class="askcard" data-i="${i}"><div class="askcard-h"><b>${esc(a.title)}</b>${a.go ? `<a class="golink" href="${esc(a.go)}" data-askgo="${i}">Go to page ›</a>` : ''}</div><div class="askcard-b">${a.html}</div>${a.open ? `<button class="btn small" data-askopen="${i}">${esc(a.openLabel || 'Open')}</button>` : ''}</div>`;
   }
