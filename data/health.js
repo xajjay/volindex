@@ -30,8 +30,8 @@ window.SITE_HEALTH = {
  "manual": [
   {
    "active": true,
-   "ageDays": 7,
-   "edited": "2026-11-11",
+   "ageDays": 0,
+   "edited": "2026-11-18",
    "file": "data/recruiting.js",
    "label": "On3 / recruiting rankings",
    "maxDays": 30
