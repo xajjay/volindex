@@ -36,19 +36,23 @@ window.SITE.soccer = {
  "quick": [
   "Tennessee is in the <b>NCAA Tournament</b> as a <b>No. 8 national seed</b> (18th bid in program history) and hosts <b>Liberty</b> in the first round <b>Friday, Nov. 20 at 6 p.m. ET</b> at Regal Soccer Stadium. A win sets up a second-round match on Nov. 27 against the Lipscomb / No. 1 Ohio State winner.",
   "Regular season: <b>7-5-4</b> (2-5-3 SEC). Tennessee <b>did not qualify for the SEC Tournament</b> and closed with a No. 40 RPI.",
-  "<b>Head coach Joe Kirt was fired</b> at the end of the regular season; the team still earned an at-large bid.",
+  "<b>Head coach Joe Kirt was relieved</b> at the end of the regular season and <b>Jonathan Morgan</b> is interim head coach. Tennessee announced <b>Richard Moodie</b> (Purdue head coach since 2023, formerly South Alabama) as the new head coach on Nov. 17; he joins after Purdue's season ends.",
   "Regular-season finale: a <b>3-1 home win over Oklahoma</b> (Nov. 1).",
   "<b>Kylee Simmons</b> led the team with 4 goals; <b>Ines Derrien</b> had 3 goals and a team-high 4 assists, and <b>Shae O'Rourke</b> had 3 goals and 3 assists.",
   "Preseason: <b>No. 24</b> in the United Soccer Coaches poll with TopDrawerSoccer's <b>No. 5</b> newcomer class; the Vols finished unranked."
  ],
  "staff": [
   [
-   "Joe Kirt",
-   "Head Coach (fired Nov. 2026; coached the regular season)"
+   "Richard Moodie",
+   "Head Coach (hired Nov. 17, 2026 from Purdue; joins after Purdue's season ends)"
   ],
   [
    "Jonathan Morgan",
-   "Associate Head Coach"
+   "Interim Head Coach (through the NCAA Tournament)"
+  ],
+  [
+   "Joe Kirt",
+   "Former Head Coach (relieved Nov. 2026; coached the regular season)"
   ],
   [
    "Mike Lyons",
