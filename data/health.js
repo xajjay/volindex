@@ -13,53 +13,8 @@ window.SITE_HEALTH = {
  "findings": [
   {
    "area": "football",
-   "level": "warn",
-   "msg": "Update step skipped: games, results and record: CFBD quota used up (429)"
-  },
-  {
-   "area": "football",
-   "level": "warn",
-   "msg": "Update step skipped: AP and Coaches polls: CFBD quota low (0 calls left)"
-  },
-  {
-   "area": "football",
-   "level": "note",
-   "msg": "Update step skipped: team per-game numbers and national/SEC ranks: CFBD quota low (0 calls left)"
-  },
-  {
-   "area": "football",
-   "level": "warn",
-   "msg": "Update step skipped: player season stats: CFBD quota low (0 calls left)"
-  },
-  {
-   "area": "football",
-   "level": "note",
-   "msg": "Update step skipped: national (FBS) ranks for Tennessee players: CFBD quota low (0 calls left)"
-  },
-  {
-   "area": "football",
-   "level": "note",
-   "msg": "Update step skipped: recruiting classes: CFBD quota low (0 calls left)"
-  },
-  {
-   "area": "football",
-   "level": "note",
-   "msg": "Update step skipped: full team stat sheet with national and SEC ranks: CFBD quota low (0 calls left)"
-  },
-  {
-   "area": "football",
-   "level": "note",
-   "msg": "Update step skipped: 247 ratings for the full roster (HS composite + transfer) and team talent: CFBD quota low (0 calls left)"
-  },
-  {
-   "area": "football",
    "level": "note",
    "msg": "Update step skipped: PEAR ratings: HTTP Error 403: Forbidden"
-  },
-  {
-   "area": "football",
-   "level": "note",
-   "msg": "Update step skipped: FPI ratings and ranks for the SEC (CFBD): CFBD quota low (0 calls left)"
   },
   {
    "area": "manual",
@@ -205,5 +160,5 @@ window.SITE_HEALTH = {
    "updated": "2026-11-19"
   }
  ],
- "warnings": 5
+ "warnings": 2
 };
