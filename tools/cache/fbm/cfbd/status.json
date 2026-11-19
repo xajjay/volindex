@@ -1,63 +1,62 @@
 {
- "game_adv": {
-  "2026": "2820 rows"
- },
- "season_adv": {
-  "2026": "skipped: quota"
- },
- "ppa_teams": {
-  "2026": "skipped: quota"
- },
- "talent": {
-  "2026": "skipped: quota",
-  "2014": "skipped: quota"
- },
- "returning": {
-  "2026": "skipped: quota"
- },
- "recruiting": {
-  "2026": "skipped: quota"
- },
- "portal": {
-  "2026": "skipped: quota",
-  "2020": "skipped: quota",
-  "2019": "skipped: quota",
-  "2018": "skipped: quota",
-  "2017": "skipped: quota",
-  "2016": "skipped: quota",
-  "2015": "skipped: quota",
-  "2014": "skipped: quota"
- },
  "lines": {
-  "2026": "skipped: quota"
- },
- "pregame_wp": {
-  "2026": "skipped: quota"
- },
- "sp": {
-  "2026": "skipped: quota"
- },
- "fpi": {
-  "2026": "skipped: quota"
- },
- "elo": {
-  "2026": "skipped: quota"
- },
- "rankings": {
-  "2026": "skipped: quota"
+  "2026": "2242 rows"
  },
  "games": {
-  "2026": "skipped: quota"
+  "2026": "3733 rows"
  },
- "coaches": {
-  "2026": "skipped: quota"
+ "rankings": {
+  "2026": "1577 rows"
+ },
+ "pregame_wp": {
+  "2026": "1000 rows"
+ },
+ "sp": {
+  "2026": "139 rows"
+ },
+ "fpi": {
+  "2026": "138 rows"
+ },
+ "elo": {
+  "2026": "138 rows"
+ },
+ "game_adv": {
+  "2026": "2824 rows"
+ },
+ "season_adv": {
+  "2026": "138 rows"
+ },
+ "ppa_teams": {
+  "2026": "138 rows"
  },
  "ppa_players": {
-  "2026": "skipped: quota"
+  "2026": "4801 rows"
  },
  "usage": {
-  "2026": "skipped: quota"
+  "2026": "4801 rows"
  },
- "_calls_remaining": 15,
- "_ran": "2026-11-18T17:56:34+00:00"
+ "roster": {
+  "2026": "31590 rows",
+  "2025": "30031 rows",
+  "2024": "22794 rows",
+  "2023": "22365 rows",
+  "2022": "30388 rows",
+  "2021": "18633 rows",
+  "2020": "16423 rows",
+  "2019": "18732 rows"
+ },
+ "portal": {
+  "2020": "0 rows",
+  "2019": "0 rows",
+  "2018": "0 rows",
+  "2017": "0 rows",
+  "2016": "0 rows",
+  "2015": "0 rows",
+  "2014": "0 rows"
+ },
+ "talent": {
+  "2014": "0 rows"
+ },
+ "_calls_remaining": 947,
+ "_ran": "2026-11-19T22:25:48+00:00"
 }
