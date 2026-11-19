@@ -78,15 +78,31 @@ def key():
         sys.exit("No CFBD API key. Put it in tools/cfbd_key.txt (see the top of this file).")
     return k
 
+class QuotaLow(Exception):
+    pass
+
+QUOTA = {"remaining": None}        # CFBD's X-CallLimit-Remaining from the last response
+QUOTA_RESERVE = 30                 # below this many calls left, stop spending (the model workflow shares the same key)
+# how long a saved CFBD answer counts as fresh (hours). Slow-changing data is fetched rarely; if CFBD is out of calls,
+# ANY saved answer (even an old one) is used instead of failing, so the site keeps showing the last good numbers.
+HTTP_TTL = {"/ratings/sp": 20, "/ratings/fpi": 20, "/teams/matchup": 24 * 7, "/talent": 24 * 7, "/roster": 20,
+            "/recruiting/players": 20}
+HTTP_CACHE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tools", "cache", "cfbd_http")
+
 def get(url, headers=None, tries=3):
     for i in range(tries):
         try:
             req = urllib.request.Request(url, headers=headers or {})
             with urllib.request.urlopen(req, timeout=30) as r:
+                rem = r.headers.get("X-CallLimit-Remaining")
+                if rem is not None:
+                    try: QUOTA["remaining"] = int(rem)
+                    except ValueError: pass
                 return json.loads(r.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
             if e.code in (401, 403):
                 sys.exit(f"CFBD refused the key ({e.code}). Check tools/cfbd_key.txt.")
+            if e.code == 429: QUOTA["remaining"] = 0; raise QuotaLow("CFBD quota used up (429)")   # retrying only wastes time
             if i == tries - 1: raise
         except Exception:
             if i == tries - 1: raise
@@ -94,7 +110,26 @@ def get(url, headers=None, tries=3):
 
 def cfbd(path, **params):
     q = "&".join(f"{k}={urllib.request.quote(str(v))}" for k, v in params.items())
-    return get(f"{CFBD}{path}?{q}", {"Authorization": f"Bearer {KEY}", "Accept": "application/json"})
+    url = f"{CFBD}{path}?{q}"
+    ttl = HTTP_TTL.get(path)
+    cp = None
+    if ttl is not None:
+        import hashlib
+        os.makedirs(HTTP_CACHE, exist_ok=True)
+        cp = os.path.join(HTTP_CACHE, path.strip("/").replace("/", "_") + "-" + hashlib.md5(q.encode()).hexdigest()[:10] + ".json")
+        if os.path.exists(cp) and not REFRESH and (time.time() - os.path.getmtime(cp)) < ttl * 3600:
+            with open(cp, encoding="utf-8") as f: return json.load(f)
+    try:
+        if QUOTA["remaining"] is not None and QUOTA["remaining"] < QUOTA_RESERVE: raise QuotaLow(f"CFBD quota low ({QUOTA['remaining']} calls left)")
+        data = get(url, {"Authorization": f"Bearer {KEY}", "Accept": "application/json"})
+    except QuotaLow as e:
+        if cp and os.path.exists(cp):
+            note(f"     (CFBD out of calls: using saved {path} from {datetime.date.fromtimestamp(os.path.getmtime(cp))})")
+            with open(cp, encoding="utf-8") as f: return json.load(f)
+        raise
+    if cp:
+        with open(cp, "w", encoding="utf-8") as f: json.dump(data, f)
+    return data
 
 def section(name):
     def wrap(fn):

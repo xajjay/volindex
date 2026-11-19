@@ -12,16 +12,19 @@ Layers (each one is tested out-of-sample so you can see whether it earns its pla
   4. Home field       : added ONLY when you predict a specific game
   5. Availability     : per-game adjustment (not part of the power rating itself)
 """
+import os
 import numpy as np, pandas as pd
 
+HERE = os.path.dirname(os.path.abspath(__file__))     # so it works no matter which folder the terminal is in
+
 # ---------------------------------------------------------------- data
-G = pd.read_csv("games.csv").dropna(subset=["home_score", "away_score", "home_team"])
+G = pd.read_csv(os.path.join(HERE, "games.csv")).dropna(subset=["home_score", "away_score", "home_team"])
 G["margin"] = G.home_score - G.away_score                       # home minus away
 G["neutral"] = G.neutral_site.fillna(False).astype(bool)
 G["fbs_game"] = (G.home_div == "fbs") & (G.away_div == "fbs")
-TAL = pd.read_csv("talent.csv").set_index(["season", "team"]).talent
-EFF = pd.read_csv("team_game_efficiency.csv")
-AVL = pd.read_csv("availability.csv")
+TAL = pd.read_csv(os.path.join(HERE, "talent.csv")).set_index(["season", "team"]).talent
+EFF = pd.read_csv(os.path.join(HERE, "team_game_efficiency.csv"))
+AVL = pd.read_csv(os.path.join(HERE, "availability.csv"))
 METRICS = ["c_epa", "c_succ", "c_expl", "c_rush_epa", "c_pass_epa", "pts_per_drive"]
 
 
@@ -175,7 +178,7 @@ if __name__ == "__main__":
     R["pure_rank"] = R.pure_gilbert.rank(ascending=False).astype(int)
     print(f"\nTOP 25 POWER RATINGS, {y} through week {wk}  (points better than an average FBS team, neutral field)")
     print(R.head(25).round(1).to_string(index=False))
-    R.to_csv("my_power_ratings.csv", index=False)
+    R.to_csv(os.path.join(HERE, "my_power_ratings.csv"), index=False)
 
     # ---- predictions: power gap + home field (ONLY here) + availability swing
     pw = R.set_index("team").power
