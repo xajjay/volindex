@@ -81,3 +81,15 @@ production, transfer portal, recruiting, coaches, SP+/FPI/PEAR history, venues, 
 `fb_report.py` writes `data/model-fb.js`; `assets/predict.js` reads it. The margin averages SP+, FPI, PEAR and our own play-by-play power rating, adds a home field averaged from the old measured value and the team-specific one (UT 2.3, LSU 2.5, Vanderbilt 1.7, shrunken home-minus-road), and subtracts availability (`fb_avail.py`, SEC report + Ourlads depth charts). The simulation uses each team's real pass rate, plays per game, pace and an opponent-adjusted explosive-play dial. The report tab shows both teams' offense and defense metrics with FBS ranks.
 Honest status: the play-by-play model alone still trails the market in walk-forward tests (MAE 13.0 vs 12.2); it enters as one of four ratings, not as the sole input.
 Market anchor: when the site has a line for the game, margin = 0.75 x line + 0.25 x model (model already includes availability, which the line prices too, so the model share is kept small), total = average of model and posted over/under. UT snap counts (through Nov 14) are in data/snaps.json and set the slot and share of a starter for each absent player.
+
+## Update, Nov 19: v3 power rating built on Gilbert's formula (fb_vol_v3.py)
+
+Starting point is Dr. Gilbert's rating: *a team's rating = average opponent rating + average margin of victory* (Point-Jacobi, repeated until stable).
+The Vol Index version removes home field from the margins first (HFA is estimated from the data, about 2.2 points a game, 1.3 to 2.4 by season), starts each team from a prior built from its talent composite and last season's rating (3 pretend games), then adds talent and efficiency (six opponent-adjusted stats, offense minus defense).
+
+    power = w1*Gilbert(prior-informed) + w2*talent (more weight in weeks 1-5) + w3*efficiency
+    margin = power gap + home field (matchup only) + 0.56 * availability swing
+
+Walk-forward 2019-2025 (3,872 FBS games): avg miss 12.57, winners 72.5%. Gilbert as sent was 15.0. Returning production was dropped (worth 0.06 points). Sportsbook-style HFA extras (team HFA, travel, time zones, elevation, stadium size, conference game, rest) each moved the miss by 0.01 or less, so HFA stays one league-wide number.
+Files: fb_gilbert.py (baseline), fb_stack.py / fb_stack2.py (layer backtests), fb_prior.py, fb_vol_v3.py (ratings + predictions), fb_experience.py (class-year check for LSU/Tennessee/Vanderbilt).
+tools/tutorial/ has a pandas-only version with its own README for learning. The older PURE / market-blend notes above describe the previous model.
