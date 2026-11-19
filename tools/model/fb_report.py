@@ -14,6 +14,7 @@ import fb_ratings as FR
 import fb_hfa as HF
 import fb_ablate as AB
 import fb_matchup as MU_
+import fb_v3 as V3
 
 TEAM = "Tennessee"
 SD = 15.7
@@ -93,6 +94,12 @@ def main():
     tr = lambda t: float(b[NM + 2] * (TAL[t] - tm) / 100 + b[NM + 3] * (RET[t] - rm) + prod(t))
     power = {t: sum(b[1 + i] * st(t, m) for i, m in enumerate(FR.METRICS)) + tr(t) for t in cur}
     prank = pd.Series(power).rank(ascending=False).astype(int)
+    # ---- v3: Gilbert's margin-of-victory rating (home field removed; talent + last-season prior) + talent + efficiency. Replaces the older ridge-OLS power rating.
+    B3 = V3.betas()
+    R3, I3 = V3.power_table(B3, season, lambda t, m: st(t, m), cur)
+    P3 = dict(zip(R3.team, R3.power)); parts3 = {r.team: r for r in R3.itertuples()}
+    power = {t: float(P3[t]) for t in cur}; prank = pd.Series(power).rank(ascending=False).astype(int)
+    SD3 = round(float(B3["backtest"]["rmse"]), 1)
 
     def rank(col, team, side, better):
         s = (off if side == "o" else de)[col].reindex(cur)
@@ -150,20 +157,21 @@ def main():
         if opp not in cur or TEAM not in cur: continue
         site = {"H": 1, "A": -1}.get(g["site"], 0)
         f = np.array([st(TEAM, m) - st(opp, m) for m in FR.METRICS])
-        tU, tO = float(b[NM + 2] * (TAL[TEAM] - TAL[opp]) / 100), float(b[NM + 3] * (RET[TEAM] - RET[opp]))
-        pU = float(prod(TEAM) - prod(opp))
-        neutral = float(b[0] + (b[1:1 + NM] * f).sum() + tU + tO + pU)
+        neutral = float(P3[TEAM] - P3[opp] + B3["b0"])
         homeTeam = TEAM if site == 1 else opp
-        h = float(hfa.get(homeTeam, mu)) if site else 0.0
+        h = float(B3["site"]) if site else 0.0           # one league-wide home-field number; team-specific edges tested no better
         ok = avail.get("opp") == opp
-        au, ao = (av(TEAM)["total"], av(opp)["total"]) if ok else (0.0, 0.0)
+        au, ao = (av(TEAM)["total"] * B3["av"], av(opp)["total"] * B3["av"]) if ok else (0.0, 0.0)   # availability counted at its backtested weight
         margin = neutral + site * h + au - ao
-        edges = [{"k": FR.METRIC_LABELS[m] if hasattr(FR, "METRIC_LABELS") else m, "m": m, "ut": round(st(TEAM, m), 4), "opp": round(st(opp, m), 4), "pts": round(float(b[1 + i] * f[i]), 2)} for i, m in enumerate(FR.METRICS)]
-        edges += [{"k": "Team talent composite", "m": "talent", "ut": round(TAL[TEAM], 1), "opp": round(TAL[opp], 1), "pts": round(tU, 2)}, {"k": "Returning production", "m": "ret", "ut": round(RET[TEAM], 2), "opp": round(RET[opp], 2), "pts": round(tO, 2)}]
+        pu_, po_ = parts3[TEAM], parts3[opp]
+        edges = [{"k": "Results and schedule (Gilbert rating)", "m": "gilbert", "ut": round(float(pu_.results), 2), "opp": round(float(po_.results), 2), "pts": round(float(pu_.results - po_.results + B3["b0"]), 2)},
+                 {"k": "Team talent (247 composite)", "m": "talent", "ut": round(TAL[TEAM], 1), "opp": round(TAL[opp], 1), "pts": round(float(pu_.talent - po_.talent), 2)},
+                 {"k": "Last season's rating", "m": "last_season", "ut": round(float(pu_.last_season), 2), "opp": round(float(po_.last_season), 2), "pts": round(float(pu_.last_season - po_.last_season), 2)}]
+        edges += [{"k": FR.METRIC_LABELS[m] if hasattr(FR, "METRIC_LABELS") else m, "m": m, "ut": round(st(TEAM, m), 4), "opp": round(st(opp, m), 4), "pts": round(float(pu_.eff[m] - po_.eff[m]), 2)} for m in FR.METRICS]
         LAB = {"pass": "Quarterback production", "rush": "Rushing production", "recv": "Receiver production"}
-        for r_ in UR:
+        for r_ in UR:        # shown for information; production added nothing in the backtest, so it carries no points
             nm = lambda t: (CU.get((t, r_), (0, []))[1] or [("n/a", 0, 0)])[0][0]
-            edges.append({"k": LAB[r_], "m": "u_" + r_, "ut": f"{nm(TEAM)} {uval(TEAM, r_) - um[r_]:+.3f}", "opp": f"{nm(opp)} {uval(opp, r_) - um[r_]:+.3f}", "pts": round(ub[r_] * (uval(TEAM, r_) - uval(opp, r_)), 2), "unit": True})
+            edges.append({"k": LAB[r_] + " (info only)", "m": "u_" + r_, "ut": f"{nm(TEAM)} {uval(TEAM, r_) - um[r_]:+.3f}", "opp": f"{nm(opp)} {uval(opp, r_) - um[r_]:+.3f}", "pts": 0.0, "unit": True})
         # points from drives: each side's expected points per drive against the other, times the drives the game will have
         O, Dd, hh, ix = S["pts_per_drive"]; m0 = MU["pts_per_drive"]
         dr = (off.loc[TEAM, "drives"] + off.loc[opp, "drives"]) / 2
@@ -180,12 +188,12 @@ def main():
         sim = {"sackU": round(sackU, 4), "sackO": round(sackO, 4), "passU": tu["c_pass_rate"] / 100, "passO": to["c_pass_rate"] / 100, "playsU": tu["c_plays"], "playsO": to["c_plays"],
                "explU": round(expl_k(TEAM, opp), 3), "explO": round(expl_k(opp, TEAM), 3), "dtU": tu["c_dt"], "dtO": to["c_dt"], "natDt": nat}
         games.append({"date": g["date"], "opp": opp, "site": site, "neutral": round(neutral, 2), "hfa": round(site * h, 2), "hfaTeam": homeTeam, "availU": round(au, 2), "availO": round(ao, 2),
-                      "margin": round(margin, 2), "sd": SD, "win": round(0.5 * (1 + math.erf(margin / (SD * math.sqrt(2)))), 3),
-                      "ptsU": round(float(ppU * dr), 1), "ptsO": round(float(ppO * dr), 1), "drives": round(float(dr), 1), "edges": edges, "rows": rows, "tend": {"ut": tu, "opp": to}, "sim": sim})
+                      "margin": round(margin, 2), "sd": SD3, "win": round(0.5 * (1 + math.erf(margin / (SD3 * math.sqrt(2)))), 3),
+                      "ptsU": round(float((ppU + ppO) * dr / 2 + margin / 2), 1), "ptsO": round(float((ppU + ppO) * dr / 2 - margin / 2), 1), "drives": round(float(dr), 1), "edges": edges, "rows": rows, "tend": {"ut": tu, "opp": to}, "sim": sim})
         print(f"{g['date']} {opp:<12} neutral {neutral:+5.1f} hfa {site * h:+4.1f} avail {au - ao:+4.1f} -> {margin:+5.1f}  pts {ppU * dr:.0f}-{ppO * dr:.0f}  win {games[-1]['win']:.0%}  explK {sim['explU']}/{sim['explO']}")
-    out = {"asOf": pd.Timestamp.today().strftime("%Y-%m-%d"), "season": season, "hl": hl, "lam": lam, "betas": [round(float(x), 3) for x in b], "hfaAvg": round(float(mu), 2), "sd": SD,
-           "teams": {t: {"power": round(power[t], 1), "rank": int(prank[t]), "of": len(cur), "ctx": ctx.get(t, {}), "tend": tend(t), "hfa": round(float(hfa.get(t, mu)), 2)} for t in (TEAM, "LSU", "Vanderbilt") if t in cur},
-           "powerAll": {t: round(power[t], 1) for t in cur}, "availability": avail, "games": games}
+    out = {"asOf": pd.Timestamp.today().strftime("%Y-%m-%d"), "season": season, "hl": hl, "lam": lam, "model": "v3", "betas": {k: (round(v, 3) if isinstance(v, float) else v) for k, v in B3.items()}, "hfaAvg": round(float(B3["site"]), 2), "sd": SD3, "week": I3["week"],
+           "teams": {t: {"power": round(power[t], 1), "rank": int(prank[t]), "of": len(cur), "ctx": ctx.get(t, {}), "tend": tend(t), "hfa": round(float(B3["site"]), 2)} for t in (TEAM, "LSU", "Vanderbilt") if t in cur},
+           "powerAll": {t: round(power[t], 1) for t in cur}, "powerParts": {t: [round(float(p.results), 1), round(float(p.talent), 1), round(float(p.last_season), 1), round(float(p.efficiency), 1)] for t, p in parts3.items()}, "powerPartsKey": ["results and schedule", "talent", "last season", "efficiency"], "availability": avail, "games": games}
     p = os.path.join(FR.ROOT, "data", "model-fb.js")
     open(p, "w", encoding="utf-8").write("window.MODEL_FB = " + json.dumps(out, ensure_ascii=False, separators=(",", ":")) + ";\n")
     print("wrote", p, os.path.getsize(p), "bytes")
