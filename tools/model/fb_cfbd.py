@@ -86,9 +86,10 @@ def have(name, year):
     except Exception: return False
 
 
-def pull(name, path, year, explode=None, **extra):
-    """One endpoint for one season. Past seasons already saved are skipped."""
-    if year != THIS and have(name, year): return
+def pull(name, path, year, explode=None, static=False, **extra):
+    """One endpoint for one season. Past seasons already saved are skipped.
+    static=True: preseason-type data (talent, returning production, recruiting, portal, coaches, rosters) - fetched once per season, not every run."""
+    if (year != THIS or static) and have(name, year): return
     if state["remaining"] is not None and state["remaining"] < LOW:
         STATUS.setdefault(name, {})[year] = "skipped: quota"; return
     try:
@@ -139,25 +140,27 @@ def main():
     # current season first, then newest to oldest, so a quota stop costs the least-useful years
     years = sorted(years, key=lambda y: (y != THIS, -y))
     for y in years:
-        pull("game_adv", "/stats/game/advanced", y, excludeGarbageTime="true")
-        pull("season_adv", "/stats/season/advanced", y, excludeGarbageTime="true")
-        pull("ppa_teams", "/ppa/teams", y, excludeGarbageTime="true")
-        pull("talent", "/talent", y)
-        pull("returning", "/player/returning", y)
-        pull("recruiting", "/recruiting/teams", y)
-        pull("portal", "/player/portal", y)
+        # most valuable first, so if the quota runs low the important feeds are already saved
         pull("lines", "/lines", y, explode=x_lines)
+        pull("games", "/games", y, seasonType="both")
+        pull("rankings", "/rankings", y, explode=x_rank)
         pull("pregame_wp", "/metrics/wp/pregame", y)
         pull("sp", "/ratings/sp", y)
         pull("fpi", "/ratings/fpi", y)
         pull("elo", "/ratings/elo", y)
-        pull("rankings", "/rankings", y, explode=x_rank)
-        pull("games", "/games", y, seasonType="both")
-        pull("coaches", "/coaches", y, explode=x_coaches)
+        pull("game_adv", "/stats/game/advanced", y, excludeGarbageTime="true")
+        pull("season_adv", "/stats/season/advanced", y, excludeGarbageTime="true")
+        pull("ppa_teams", "/ppa/teams", y, excludeGarbageTime="true")
         if y >= 2019:                    # player tables are big; the model uses recent seasons
             pull("ppa_players", "/ppa/players/season", y, excludeGarbageTime="true")
             pull("usage", "/player/usage", y, excludeGarbageTime="true")
-            pull("roster", "/roster", y)          # class year (1=FR ... 5=5th) for experience tests; joins to usage/ppa on player id
+        # preseason-type data: once per season
+        pull("talent", "/talent", y, static=True)
+        pull("returning", "/player/returning", y, static=True)
+        pull("recruiting", "/recruiting/teams", y, static=True)
+        pull("coaches", "/coaches", y, explode=x_coaches, static=True)
+        pull("portal", "/player/portal", y, static=True)
+        if y >= 2019: pull("roster", "/roster", y, static=True)       # class year for experience tests
     # venues are not seasonal
     vp = os.path.join(OUT, "venues.parquet")
     if not os.path.exists(vp):

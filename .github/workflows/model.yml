@@ -31,6 +31,8 @@ jobs:
       - name: Install
         run: pip install pandas pyarrow numpy scipy scikit-learn
       - name: Pull CollegeFootballData
+        # Pushes only rebuild the model from data already saved (no CFBD calls spent); the key is used on the schedule and on manual runs.
+        if: github.event_name != 'push'
         continue-on-error: true
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
