@@ -1,5 +1,5 @@
 {
- "asOf": "2026-11-16",
+ "asOf": "2026-11-18",
  "game": "LSU at Tennessee",
  "opp": "LSU",
  "teams": {
@@ -68,6 +68,33 @@
      "depth": "none",
      "pts": 0.0,
      "basis": "no snaps recorded, from season snaps"
+    },
+    {
+     "name": "Joakim Dodson",
+     "pos": "WR",
+     "status": "out",
+     "in_rating": false,
+     "depth": "WR6 (15 snaps)",
+     "pts": 0.0,
+     "basis": "measured, from season snaps"
+    },
+    {
+     "name": "Jaedon Harmon",
+     "pos": "LB",
+     "status": "out",
+     "in_rating": false,
+     "depth": "none",
+     "pts": 0.0,
+     "basis": "no snaps recorded, from season snaps"
+    },
+    {
+     "name": "Dylan Lewis",
+     "pos": "DB",
+     "status": "out",
+     "in_rating": false,
+     "depth": "none",
+     "pts": 0.0,
+     "basis": "no snaps recorded, from season snaps"
     }
    ]
   },
@@ -76,8 +103,90 @@
    "rows": []
   },
   "LSU": {
-   "total": 0.0,
-   "rows": []
+   "total": -1.03,
+   "rows": [
+    {
+     "name": "Dashawn Spears",
+     "pos": "S",
+     "status": "out",
+     "in_rating": false,
+     "depth": "DB7 (105 snaps, 20% of a starter)",
+     "pts": -0.07,
+     "basis": "measured, weak, from season snaps"
+    },
+    {
+     "name": "Phillip Wright III",
+     "pos": "WR",
+     "status": "out",
+     "in_rating": false,
+     "depth": "WR8 (28 snaps)",
+     "pts": 0.0,
+     "basis": "measured, from season snaps"
+    },
+    {
+     "name": "Charles Ross II",
+     "pos": "LB",
+     "status": "out",
+     "in_rating": false,
+     "depth": "LB5 (25 snaps, 7% of a starter)",
+     "pts": -0.02,
+     "basis": "measured, weak, from season snaps"
+    },
+    {
+     "name": "Richard Anderson",
+     "pos": "DT",
+     "status": "out",
+     "in_rating": false,
+     "depth": "DL8 (96 snaps, 25% of a starter)",
+     "pts": -0.08,
+     "basis": "measured, weak, from season snaps"
+    },
+    {
+     "name": "Trenton Henderson",
+     "pos": "DE",
+     "status": "out",
+     "in_rating": false,
+     "depth": "DL15 (5 snaps, 1% of a starter)",
+     "pts": -0.0,
+     "basis": "measured, weak, from season snaps"
+    },
+    {
+     "name": "Whit Weeks",
+     "pos": "LB",
+     "status": "doubtful",
+     "in_rating": false,
+     "depth": "LB3 (185 snaps, 49% of a starter)",
+     "pts": -0.15,
+     "basis": "measured, weak, from season snaps"
+    },
+    {
+     "name": "Jackson Harris",
+     "pos": "WR",
+     "status": "questionable",
+     "in_rating": false,
+     "depth": "WR2 (540 snaps)",
+     "pts": -0.53,
+     "basis": "measured, from season snaps"
+    },
+    {
+     "name": "Winston Watkins Jr.",
+     "pos": "WR",
+     "status": "questionable",
+     "in_rating": false,
+     "depth": "WR3 (537 snaps)",
+     "pts": -0.15,
+     "basis": "measured, from season snaps"
+    },
+    {
+     "name": "Jhase Thomas",
+     "pos": "S",
+     "status": "probable",
+     "in_rating": false,
+     "depth": "DB5 (414 snaps, 80% of a starter)",
+     "pts": -0.03,
+     "basis": "measured, weak, from season snaps"
+    }
+   ]
   }
  }
 }

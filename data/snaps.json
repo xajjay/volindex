@@ -377,120 +377,350 @@
   ]
  },
  "LSU": {
-  "asOf": "2026-11-14",
-  "games": 8,
-  "estimated": true,
-  "source": "user-supplied ESTIMATED snaps through Week 8 (starters only; QB exact), from The Depth Chart CFB per screenshot; not official",
+  "asOf": "2026-11-18",
+  "games": null,
+  "estimated": false,
+  "source": "user-supplied PFF-based LSU season snap counts, offense and defense, from screenshots (latest PFF data available). Richard Anderson's count (96) was read from a partly covered row; verify.",
   "players": [
    {
-    "name": "Sam Leavitt",
-    "pos": "QB",
-    "snaps": 516
-   },
-   {
-    "name": "Dilin Jones",
-    "pos": "RB",
-    "snaps": 413
-   },
-   {
-    "name": "Winston Watkins",
-    "pos": "WR",
-    "snaps": 409
-   },
-   {
-    "name": "Eugene Wilson III",
-    "pos": "WR",
-    "snaps": 354
-   },
-   {
-    "name": "Jackson Harris",
-    "pos": "WR",
-    "snaps": 348
-   },
-   {
-    "name": "Trey'Dez Green",
-    "pos": "TE",
-    "snaps": 253
+    "name": "Aliou Bah",
+    "pos": "G",
+    "snaps": 719
    },
    {
     "name": "Jordan Seaton",
-    "pos": "LT",
-    "snaps": 616
-   },
-   {
-    "name": "William Satterwhite",
-    "pos": "LG",
-    "snaps": 377
+    "pos": "T",
+    "snaps": 702
    },
    {
     "name": "Braelin Moore",
     "pos": "C",
-    "snaps": 616
-   },
-   {
-    "name": "Aliou Bah",
-    "pos": "RG",
-    "snaps": 616
+    "snaps": 701
    },
    {
     "name": "Weston Davis",
-    "pos": "RT",
-    "snaps": 616
+    "pos": "T",
+    "snaps": 682
    },
    {
-    "name": "Princewill Umanmielen",
-    "pos": "EDGE",
-    "snaps": 266
+    "name": "Sam Leavitt",
+    "pos": "QB",
+    "snaps": 683
    },
    {
-    "name": "Stephiylan Green",
-    "pos": "DT",
-    "snaps": 184
+    "name": "Eugene Wilson III",
+    "pos": "WR",
+    "snaps": 583
    },
    {
-    "name": "Deuce Geralds",
-    "pos": "DT",
-    "snaps": 229
+    "name": "Jackson Harris",
+    "pos": "WR",
+    "snaps": 540
    },
    {
-    "name": "Jordan Ross",
-    "pos": "EDGE",
-    "snaps": 239
+    "name": "Winston Watkins Jr.",
+    "pos": "WR",
+    "snaps": 537
    },
    {
-    "name": "TJ Dottery",
-    "pos": "LB",
-    "snaps": 445
+    "name": "William Satterwhite II",
+    "pos": "G",
+    "snaps": 515
    },
    {
-    "name": "Davhon Keys",
-    "pos": "LB",
-    "snaps": 318
+    "name": "Dilin Jones",
+    "pos": "RB",
+    "snaps": 610
+   },
+   {
+    "name": "Trey'Dez Green",
+    "pos": "TE",
+    "snaps": 395
+   },
+   {
+    "name": "Bo Bordelon",
+    "pos": "G",
+    "snaps": 302
+   },
+   {
+    "name": "Zach Grace",
+    "pos": "TE",
+    "snaps": 287
+   },
+   {
+    "name": "Malik Elzy",
+    "pos": "WR",
+    "snaps": 174
+   },
+   {
+    "name": "Jayce Brown",
+    "pos": "WR",
+    "snaps": 157
+   },
+   {
+    "name": "Corey Barber Jr.",
+    "pos": "WR",
+    "snaps": 142
+   },
+   {
+    "name": "Tre' Brown",
+    "pos": "WR",
+    "snaps": 127
+   },
+   {
+    "name": "Roman Mothershed",
+    "pos": "TE",
+    "snaps": 103
+   },
+   {
+    "name": "Devin Harper",
+    "pos": "G",
+    "snaps": 95
+   },
+   {
+    "name": "Malachi Thomas",
+    "pos": "TE",
+    "snaps": 87
+   },
+   {
+    "name": "Harlem Berry",
+    "pos": "RB",
+    "snaps": 68
+   },
+   {
+    "name": "Stacy Gage",
+    "pos": "RB",
+    "snaps": 68
+   },
+   {
+    "name": "Brysten Martinez",
+    "pos": "T",
+    "snaps": 62
+   },
+   {
+    "name": "Caden Durham",
+    "pos": "RB",
+    "snaps": 60
+   },
+   {
+    "name": "Ja'Quan Sprinkle",
+    "pos": "G",
+    "snaps": 59
+   },
+   {
+    "name": "Ryan Miret",
+    "pos": "C",
+    "snaps": 53
+   },
+   {
+    "name": "Darrin Strey",
+    "pos": "T",
+    "snaps": 53
+   },
+   {
+    "name": "Phillip Wright III",
+    "pos": "WR",
+    "snaps": 28
+   },
+   {
+    "name": "Tyree Holloway",
+    "pos": "WR",
+    "snaps": 26
+   },
+   {
+    "name": "Jabari Mack",
+    "pos": "WR",
+    "snaps": 18
+   },
+   {
+    "name": "Brayden Allen",
+    "pos": "WR",
+    "snaps": 17
+   },
+   {
+    "name": "Rod Gainey Jr.",
+    "pos": "RB",
+    "snaps": 3
    },
    {
     "name": "Ty Benefield",
     "pos": "S",
-    "snaps": 446
-   },
-   {
-    "name": "PJ Woodland",
-    "pos": "CB",
-    "snaps": 367
-   },
-   {
-    "name": "Tamarcus Cooley",
-    "pos": "S",
-    "snaps": 440
-   },
-   {
-    "name": "Jhase Thomas",
-    "pos": "S",
-    "snaps": 354
+    "snaps": 567
    },
    {
     "name": "DJ Pickett",
     "pos": "CB",
-    "snaps": 388
+    "snaps": 558
+   },
+   {
+    "name": "Tamarcus Cooley",
+    "pos": "S",
+    "snaps": 546
+   },
+   {
+    "name": "TJ Dottery",
+    "pos": "LB",
+    "snaps": 525
+   },
+   {
+    "name": "PJ Woodland",
+    "pos": "CB",
+    "snaps": 489
+   },
+   {
+    "name": "Jordan Ross",
+    "pos": "EDGE",
+    "snaps": 479
+   },
+   {
+    "name": "Princewill Umanmielen",
+    "pos": "EDGE",
+    "snaps": 432
+   },
+   {
+    "name": "Davhon Keys",
+    "pos": "LB",
+    "snaps": 419
+   },
+   {
+    "name": "Jhase Thomas",
+    "pos": "S",
+    "snaps": 414
+   },
+   {
+    "name": "Deuce Geralds",
+    "pos": "DT",
+    "snaps": 368
+   },
+   {
+    "name": "Stephiylan Green",
+    "pos": "DT",
+    "snaps": 285
+   },
+   {
+    "name": "Malik Blocton",
+    "pos": "DT",
+    "snaps": 236
+   },
+   {
+    "name": "Dylan Carpenter",
+    "pos": "EDGE",
+    "snaps": 222
+   },
+   {
+    "name": "Whit Weeks",
+    "pos": "LB",
+    "snaps": 185
+   },
+   {
+    "name": "Dominick McKinley",
+    "pos": "DT",
+    "snaps": 172
+   },
+   {
+    "name": "Ja'Keem Jackson",
+    "pos": "CB",
+    "snaps": 172
+   },
+   {
+    "name": "Richard Anderson",
+    "pos": "DT",
+    "snaps": 96
+   },
+   {
+    "name": "Dashawn Spears",
+    "pos": "CB",
+    "snaps": 105
+   },
+   {
+    "name": "Lamar Brown",
+    "pos": "EDGE",
+    "snaps": 86
+   },
+   {
+    "name": "Faheem Delane",
+    "pos": "S",
+    "snaps": 75
+   },
+   {
+    "name": "Michael Turner Jr.",
+    "pos": "CB",
+    "snaps": 68
+   },
+   {
+    "name": "Tylen Singleton",
+    "pos": "LB",
+    "snaps": 61
+   },
+   {
+    "name": "Kolaj Cobbins",
+    "pos": "EDGE",
+    "snaps": 55
+   },
+   {
+    "name": "CJ Jimcoily",
+    "pos": "CB",
+    "snaps": 55
+   },
+   {
+    "name": "Isaiah Washington",
+    "pos": "S",
+    "snaps": 39
+   },
+   {
+    "name": "Havon Finney Jr.",
+    "pos": "CB",
+    "snaps": 40
+   },
+   {
+    "name": "Shone Washington",
+    "pos": "DT",
+    "snaps": 36
+   },
+   {
+    "name": "Brandon Brown",
+    "pos": "DT",
+    "snaps": 28
+   },
+   {
+    "name": "Charles Ross II",
+    "pos": "LB",
+    "snaps": 25
+   },
+   {
+    "name": "Treylan James",
+    "pos": "S",
+    "snaps": 20
+   },
+   {
+    "name": "Junior Tuihalamaka",
+    "pos": "EDGE",
+    "snaps": 17
+   },
+   {
+    "name": "Jaiden Braker",
+    "pos": "LB",
+    "snaps": 15
+   },
+   {
+    "name": "Jake Ibieta",
+    "pos": "LB",
+    "snaps": 13
+   },
+   {
+    "name": "Gabriel Reliford",
+    "pos": "EDGE",
+    "snaps": 11
+   },
+   {
+    "name": "Trenton Henderson",
+    "pos": "EDGE",
+    "snaps": 5
+   },
+   {
+    "name": "Keylan Moses",
+    "pos": "LB",
+    "snaps": 2
    }
   ]
  }
