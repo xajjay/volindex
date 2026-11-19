@@ -16,6 +16,7 @@ Sources (all CFBD) and what each gives the model
     stats/season/advanced the same per season
     ppa/players/season    each player's PPA (points added) by position  -> player value
     player/usage          each player's share of the offense's plays
+    roster                every FBS player with class year, height, weight, position (experience / age tests)
     player/returning      returning production (offense / defense, passing / rushing / receiving / tackles / sacks)
     talent                247 team talent composite by year
     recruiting/teams      recruiting class rank and points
@@ -156,6 +157,7 @@ def main():
         if y >= 2019:                    # player tables are big; the model uses recent seasons
             pull("ppa_players", "/ppa/players/season", y, excludeGarbageTime="true")
             pull("usage", "/player/usage", y, excludeGarbageTime="true")
+            pull("roster", "/roster", y)          # class year (1=FR ... 5=5th) for experience tests; joins to usage/ppa on player id
     # venues are not seasonal
     vp = os.path.join(OUT, "venues.parquet")
     if not os.path.exists(vp):
