@@ -14,7 +14,42 @@ window.SITE_HEALTH = {
   {
    "area": "football",
    "level": "warn",
-   "msg": "Update step skipped: matchup previews for remaining games (CFBD): HTTP Error 429: Too Many Requests"
+   "msg": "Update step skipped: games, results and record: CFBD quota used up (429)"
+  },
+  {
+   "area": "football",
+   "level": "warn",
+   "msg": "Update step skipped: AP and Coaches polls: CFBD quota low (0 calls left)"
+  },
+  {
+   "area": "football",
+   "level": "note",
+   "msg": "Update step skipped: team per-game numbers and national/SEC ranks: CFBD quota low (0 calls left)"
+  },
+  {
+   "area": "football",
+   "level": "warn",
+   "msg": "Update step skipped: player season stats: CFBD quota low (0 calls left)"
+  },
+  {
+   "area": "football",
+   "level": "note",
+   "msg": "Update step skipped: national (FBS) ranks for Tennessee players: CFBD quota low (0 calls left)"
+  },
+  {
+   "area": "football",
+   "level": "note",
+   "msg": "Update step skipped: recruiting classes: CFBD quota low (0 calls left)"
+  },
+  {
+   "area": "football",
+   "level": "note",
+   "msg": "Update step skipped: full team stat sheet with national and SEC ranks: CFBD quota low (0 calls left)"
+  },
+  {
+   "area": "football",
+   "level": "note",
+   "msg": "Update step skipped: 247 ratings for the full roster (HS composite + transfer) and team talent: CFBD quota low (0 calls left)"
   },
   {
    "area": "football",
@@ -24,7 +59,7 @@ window.SITE_HEALTH = {
   {
    "area": "football",
    "level": "note",
-   "msg": "Update step skipped: FPI ratings and ranks for the SEC (CFBD): HTTP Error 429: Too Many Requests"
+   "msg": "Update step skipped: FPI ratings and ranks for the SEC (CFBD): CFBD quota low (0 calls left)"
   },
   {
    "area": "manual",
@@ -122,12 +157,12 @@ window.SITE_HEALTH = {
    "updated": "2026-11-19"
   },
   {
-   "ageDays": 1,
+   "ageDays": 0,
    "games": 34,
    "key": "mbb",
    "poll": "AP Top 25",
    "pollDate": "2026-11-16",
-   "updated": "2026-11-18"
+   "updated": "2026-11-19"
   },
   {
    "ageDays": 0,
@@ -138,37 +173,37 @@ window.SITE_HEALTH = {
    "updated": "2026-11-19"
   },
   {
-   "ageDays": 1,
+   "ageDays": 0,
    "games": 57,
    "key": "baseball",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-18"
+   "updated": "2026-11-19"
   },
   {
-   "ageDays": 1,
+   "ageDays": 0,
    "games": 33,
    "key": "softball",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-18"
+   "updated": "2026-11-19"
   },
   {
-   "ageDays": 1,
+   "ageDays": 0,
    "games": 28,
    "key": "volleyball",
    "poll": "AVCA Coaches Poll",
    "pollDate": "2026-11-15",
-   "updated": "2026-11-18"
+   "updated": "2026-11-19"
   },
   {
-   "ageDays": 1,
+   "ageDays": 0,
    "games": 19,
    "key": "soccer",
    "poll": "United Soccer Coaches",
    "pollDate": "2026-11-10",
-   "updated": "2026-11-18"
+   "updated": "2026-11-19"
   }
  ],
- "warnings": 3
+ "warnings": 5
 };
