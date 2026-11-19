@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-18. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-19. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-18",
+ "updated": "2026-11-19",
  "team": {
   "record": "8-2",
   "sec": "5-2",
@@ -252,7 +252,7 @@ window.SITE_AUTO.football = {
    ],
    "oPassYpg": [
     164.2,
-    8,
+    9,
     1
    ]
   }
@@ -1354,13 +1354,13 @@ window.SITE_AUTO.football = {
    "TJ Metcalf": [
     {
      "stat": "Interceptions",
-     "rank": 66
+     "rank": 67
     }
    ],
    "Kayin Lee": [
     {
      "stat": "Interceptions",
-     "rank": 66
+     "rank": 67
     }
    ],
    "Faizon Brandon": [
@@ -1378,7 +1378,7 @@ window.SITE_AUTO.football = {
    "DeSean Bishop": [
     {
      "stat": "Rushing yards",
-     "rank": 7
+     "rank": 8
     },
     {
      "stat": "Rushing TD",
@@ -1700,7 +1700,7 @@ window.SITE_AUTO.football = {
     "Yards per pass attempt",
     "Passing",
     7.15,
-    80,
+    79,
     10,
     false
    ],
@@ -1709,7 +1709,7 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     11.0,
-    107,
+    108,
     13,
     false
    ],
@@ -1772,7 +1772,7 @@ window.SITE_AUTO.football = {
     "Yards per reception",
     "Receiving",
     10.92,
-    105,
+    107,
     13,
     false
    ],
@@ -1871,7 +1871,7 @@ window.SITE_AUTO.football = {
     "Passing yards allowed per game",
     "Pass defense",
     164.2,
-    8,
+    9,
     1,
     true
    ],
@@ -15072,6 +15072,24 @@ window.SITE_AUTO.football = {
    ]
   }
  },
+ "log": [
+  "OK   games, results and record",
+  "OK   AP and Coaches polls",
+  "OK   team per-game numbers and national/SEC ranks",
+  "OK   player season stats",
+  "OK   national (FBS) ranks for Tennessee players",
+  "OK   recruiting classes",
+  "OK   ESPN lines, TV and win chances",
+  "OK   full team stat sheet with national and SEC ranks",
+  "OK   247 ratings for the full roster (HS composite + transfer) and team talent",
+  "OK   box scores for finished games (ESPN)",
+  "SKIP matchup previews for remaining games (CFBD): HTTP Error 429: Too Many Requests",
+  "OK   season-by-season schedules and team leaders (cached after the first run)",
+  "OK   predictor calibration (data/predict-cal.js)",
+  "SKIP PEAR ratings: HTTP Error 403: Forbidden",
+  "     PEAR probe saved to tools/cache/pear-probe.json",
+  "SKIP FPI ratings and ranks for the SEC (CFBD): HTTP Error 429: Too Many Requests"
+ ],
  "previews": {
   "LSU": {
    "record": "6-4",
@@ -15858,24 +15876,6 @@ window.SITE_AUTO.football = {
    35
   ]
  },
- "log": [
-  "OK   games, results and record",
-  "OK   AP and Coaches polls",
-  "OK   team per-game numbers and national/SEC ranks",
-  "OK   player season stats",
-  "OK   national (FBS) ranks for Tennessee players",
-  "OK   recruiting classes",
-  "OK   ESPN lines, TV and win chances",
-  "OK   full team stat sheet with national and SEC ranks",
-  "OK   247 ratings for the full roster (HS composite + transfer) and team talent",
-  "OK   box scores for finished games (ESPN)",
-  "OK   matchup previews for remaining games (CFBD)",
-  "OK   season-by-season schedules and team leaders (cached after the first run)",
-  "OK   predictor calibration (data/predict-cal.js)",
-  "SKIP PEAR ratings: HTTP Error 403: Forbidden",
-  "     PEAR probe saved to tools/cache/pear-probe.json",
-  "OK   FPI ratings and ranks for the SEC (CFBD)"
- ],
  "pear": {
   "week": 11,
   "ratings": [
