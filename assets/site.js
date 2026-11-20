@@ -764,7 +764,7 @@ ${part('next')}
     return `<div class="box"><div class="lb"><h4>${title} <span>Value · FBS rank</span></h4></div><ul class="list mlist">${rows.map(r => `<li><span class="grow">${esc(r[0])}</span><span class="num">${esc(r[1])}</span>${rankBar(r[2])}<b class="num rk">${r[2]}</b></li>`).join('')}</ul></div>`;
   }
   function advanced() {
-    const A = F.advanced, P = A.pear, f = A.fpi;
+    const A = F.advanced, P = A.pear, f = Object.assign({}, A.fpi, ((window.MODEL_FB || {}).season) || {});   // projected record, win-out, conference, playoff and title odds come from our own season simulation (data/model-fb.js)
     const sec = A.sec.slice().sort((a, b) => a[2] - b[2]);
     const tnSec = sec.findIndex(r => r[0] === 'Tennessee') + 1;
     const fpiSec = A.sec.slice().sort((a, b) => a[9] - b[9]).findIndex(r => r[0] === 'Tennessee') + 1;
@@ -772,9 +772,9 @@ ${part('next')}
       <div class="tiles" style="margin-bottom:16px">
         <div class="tile"><b>${P.ratings[0][2]}</b><span>${tip('PEAR')} TSR rank</span><em>${ord(tnSec)} in SEC</em></div>
         <div class="tile"><b>${f.rank}</b><span>${tip('FPI')} rank (${f.fpi})</span><em>${ord(fpiSec)} in SEC</em></div>
-        <div class="tile"><b>${f.proj}</b><span>${tip('FPI')} projected record</span><em>Win out: ${f.winOut}%</em></div>
-        <div class="tile"><b>${f.playoff}%</b><span>Playoff chance (FPI)</span><em>Win SEC: ${f.winConf}%</em></div>
-        <div class="tile"><b>${f.winNC}%</b><span>Win national title</span><em>Reach title game: ${f.makeNC}%</em></div>
+        <div class="tile"><b>${f.proj}</b><span>Projected record (Vol Index model)</span><em>Win out: ${f.winOut}%</em></div>
+        <div class="tile"><b>${f.playoff}%</b><span>Playoff chance (Vol Index model)</span><em>Win SEC: ${f.winConf}%</em></div>
+        <div class="tile"><b>${f.winNC}%</b><span>Win national title (model)</span><em>Reach title game: ${f.makeNC}%</em></div>
       </div>
       <div class="grid g3x">
         ${metricList('Computer ratings', P.ratings)}

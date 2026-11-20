@@ -99,6 +99,14 @@ def main():
     R3, I3 = V3.power_table(B3, season, lambda t, m: st(t, m), cur)
     P3 = dict(zip(R3.team, R3.power)); parts3 = {r.team: r for r in R3.itertuples()}
     power = {t: float(P3[t]) for t in cur}; prank = pd.Series(power).rank(ascending=False).astype(int)
+    try:   # projected record / win-out / conference, playoff and title odds from our own ratings (replaces the hand-typed FPI tiles)
+        import fb_season_sim as SS
+        _auto = json.loads(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "football-auto.js"), encoding="utf-8").read().split("window.SITE_AUTO.football = ", 1)[1].rsplit(";", 1)[0])
+        _cfp = [tuple(x) for x in _auto["team"]["cfpTop25"]]
+        SEASON_SIM = SS.run(power, season, _cfp, B3["b0"], B3["backtest"]["rmse"], hfa=B3["site"], team=TEAM, n=10000)
+        SEASON_SIM["winNC"] = float(SEASON_SIM["winNC"])
+    except Exception as _e:
+        print("season sim skipped:", _e); SEASON_SIM = None
     # Display scale: SP+ and FPI spread teams wider (SD ~12.8) than our shrunk forecast ratings (SD ~11). Rescale what we publish so the blend and the tables compare like with like. Game margins (neutral, sim) stay on the model's own scale.
     try:
         _c = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "cache", "fbm", "cfbd")
@@ -201,7 +209,7 @@ def main():
         print(f"{g['date']} {opp:<12} neutral {neutral:+5.1f} hfa {site * h:+4.1f} avail {au - ao:+4.1f} -> {margin:+5.1f}  pts {ppU * dr:.0f}-{ppO * dr:.0f}  win {games[-1]['win']:.0%}  explK {sim['explU']}/{sim['explO']}")
     out = {"asOf": pd.Timestamp.today().strftime("%Y-%m-%d"), "season": season, "hl": hl, "lam": lam, "model": "v3", "betas": {k: (round(v, 3) if isinstance(v, float) else v) for k, v in B3.items()}, "hfaAvg": round(float(B3["site"]), 2), "sd": SD3, "week": I3["week"],
            "teams": {t: {"power": round(power[t] * SCALE, 1), "rank": int(prank[t]), "of": len(cur), "ctx": ctx.get(t, {}), "tend": tend(t), "hfa": round(float(B3["site"]), 2)} for t in (TEAM, "LSU", "Vanderbilt") if t in cur},
-           "powerScale": SCALE, "powerAll": {t: round(power[t] * SCALE, 1) for t in cur}, "powerParts": {t: [round(float(p.results) * SCALE, 1), round(float(p.talent) * SCALE, 1), round(float(p.efficiency) * SCALE, 1)] for t, p in parts3.items()}, "powerPartsKey": ["results and schedule", "talent", "efficiency"], "availability": avail, "games": games}
+           "season": SEASON_SIM, "powerScale": SCALE, "powerAll": {t: round(power[t] * SCALE, 1) for t in cur}, "powerParts": {t: [round(float(p.results) * SCALE, 1), round(float(p.talent) * SCALE, 1), round(float(p.efficiency) * SCALE, 1)] for t, p in parts3.items()}, "powerPartsKey": ["results and schedule", "talent", "efficiency"], "availability": avail, "games": games}
     p = os.path.join(FR.ROOT, "data", "model-fb.js")
     open(p, "w", encoding="utf-8").write("window.MODEL_FB = " + json.dumps(out, ensure_ascii=False, separators=(",", ":")) + ";\n")
     print("wrote", p, os.path.getsize(p), "bytes")
