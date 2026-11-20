@@ -625,7 +625,7 @@
       c.strokeStyle = 'rgba(255,255,255,.5)'; c.lineWidth = 1; c.beginPath(); for (let yd = 11; yd < 110; yd++) { if (yd % 5 === 0) continue; [-6.6, 6.6].forEach(v => { c.moveTo(X(yd), Y(v) - 2); c.lineTo(X(yd), Y(v) + 2); }); } c.stroke();   // hash marks
       c.strokeStyle = '#FFD21F'; c.lineWidth = 2; [[1.2], [118.8]].forEach(([x]) => { c.beginPath(); c.moveTo(X(x), Y(-3.1)); c.lineTo(X(x), Y(3.1)); c.stroke(); });   // goal posts
     }
-    const dot = (x, y, col, r, ring) => { c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.fillStyle = col; c.fill(); c.lineWidth = Math.max(0.8, r * 0.28); c.strokeStyle = ring || '#fff'; c.stroke(); };
+    const dot = (x, y, col, r, ring) => { c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.fillStyle = col; c.fill(); c.lineWidth = Math.max(1, r * 0.32); c.strokeStyle = ring || '#fff'; c.stroke(); };
     // where everyone is, in field yards, at one moment of a staged play: [Tennessee's eleven, the opponent's eleven] and the ball
     function world(p, stg, tt) {
       const o = p.o, lx = fx(o, p.ball), dr = dir(o), lat = p.type === 'ko' ? 0 : (p.lat || 0);
@@ -636,7 +636,7 @@
     function draw() {
       field();
       const p = S.cur; if (!p) return;
-      const o = p.o, d = 1 - o, lx = fx(o, p.ball), dr = dir(o), lat = p.lat || 0, r = Math.max(2.2, W / 230), rb = Math.max(3, r * 1.25);
+      const o = p.o, d = 1 - o, lx = fx(o, p.ball), dr = dir(o), lat = p.lat || 0, r = Math.max(3, W / 150), rb = r;
       const colO = o === 0 ? tU.col : tO.col, colD = d === 0 ? tU.col : tO.col;
       if (p.type !== 'ko' && p.type !== 'pat') {
         c.lineWidth = 2; c.strokeStyle = 'rgba(40,110,255,.9)'; c.beginPath(); c.moveTo(X(lx), 0); c.lineTo(X(lx), H); c.stroke();
