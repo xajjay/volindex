@@ -165,8 +165,7 @@ def main():
         margin = neutral + site * h + au - ao
         pu_, po_ = parts3[TEAM], parts3[opp]
         edges = [{"k": "Results and schedule (Gilbert rating)", "m": "gilbert", "ut": round(float(pu_.results), 2), "opp": round(float(po_.results), 2), "pts": round(float(pu_.results - po_.results + B3["b0"]), 2)},
-                 {"k": "Team talent (247 composite)", "m": "talent", "ut": round(TAL[TEAM], 1), "opp": round(TAL[opp], 1), "pts": round(float(pu_.talent - po_.talent), 2)},
-                 {"k": "Last season's rating", "m": "last_season", "ut": round(float(pu_.last_season), 2), "opp": round(float(po_.last_season), 2), "pts": round(float(pu_.last_season - po_.last_season), 2)}]
+                 {"k": "Team talent (247 composite)", "m": "talent", "ut": round(TAL[TEAM], 1), "opp": round(TAL[opp], 1), "pts": round(float(pu_.talent - po_.talent), 2)}]
         edges += [{"k": FR.METRIC_LABELS[m] if hasattr(FR, "METRIC_LABELS") else m, "m": m, "ut": round(st(TEAM, m), 4), "opp": round(st(opp, m), 4), "pts": round(float(pu_.eff[m] - po_.eff[m]), 2)} for m in FR.METRICS]
         LAB = {"pass": "Quarterback production", "rush": "Rushing production", "recv": "Receiver production"}
         for r_ in UR:        # shown for information; production added nothing in the backtest, so it carries no points
@@ -193,7 +192,7 @@ def main():
         print(f"{g['date']} {opp:<12} neutral {neutral:+5.1f} hfa {site * h:+4.1f} avail {au - ao:+4.1f} -> {margin:+5.1f}  pts {ppU * dr:.0f}-{ppO * dr:.0f}  win {games[-1]['win']:.0%}  explK {sim['explU']}/{sim['explO']}")
     out = {"asOf": pd.Timestamp.today().strftime("%Y-%m-%d"), "season": season, "hl": hl, "lam": lam, "model": "v3", "betas": {k: (round(v, 3) if isinstance(v, float) else v) for k, v in B3.items()}, "hfaAvg": round(float(B3["site"]), 2), "sd": SD3, "week": I3["week"],
            "teams": {t: {"power": round(power[t], 1), "rank": int(prank[t]), "of": len(cur), "ctx": ctx.get(t, {}), "tend": tend(t), "hfa": round(float(B3["site"]), 2)} for t in (TEAM, "LSU", "Vanderbilt") if t in cur},
-           "powerAll": {t: round(power[t], 1) for t in cur}, "powerParts": {t: [round(float(p.results), 1), round(float(p.talent), 1), round(float(p.last_season), 1), round(float(p.efficiency), 1)] for t, p in parts3.items()}, "powerPartsKey": ["results and schedule", "talent", "last season", "efficiency"], "availability": avail, "games": games}
+           "powerAll": {t: round(power[t], 1) for t in cur}, "powerParts": {t: [round(float(p.results), 1), round(float(p.talent), 1), round(float(p.efficiency), 1)] for t, p in parts3.items()}, "powerPartsKey": ["results and schedule", "talent", "efficiency"], "availability": avail, "games": games}
     p = os.path.join(FR.ROOT, "data", "model-fb.js")
     open(p, "w", encoding="utf-8").write("window.MODEL_FB = " + json.dumps(out, ensure_ascii=False, separators=(",", ":")) + ";\n")
     print("wrote", p, os.path.getsize(p), "bytes")
