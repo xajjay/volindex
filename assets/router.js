@@ -14,7 +14,7 @@
   Object.keys(SPORT).forEach(function (k) { SPORT_BACK[SPORT[k]] = k; });
   Object.keys(TAB).forEach(function (k) { if (k !== 'recruits' && k !== 'ratings') TAB_BACK[TAB[k]] = k; });
   // players-<sport>-<name-slug> (the slug has its own hyphens), compare, me (your games profile)
-  var KEY_RE = /^(games(-[a-z0-9]+){0,2}|players(-[a-z0-9]+)*|compare|me|home|sources|about|football|volleyball|soccer|mbb|wbb|baseball|softball)(-[a-z0-9]+)?$/;
+  var KEY_RE = /^(games(-[a-z0-9]+){0,2}|players(-[a-z0-9]+)*|compare|me|live|home|sources|about|football|volleyball|soccer|mbb|wbb|baseball|softball)(-[a-z0-9]+)?$/;
 
   var host = location.hostname, BASE = null;
   if (/^https?:$/.test(location.protocol)) {
@@ -67,7 +67,7 @@
   if (pathMode) {
     // old #links become clean addresses
     var h = location.hash.slice(1);
-    if (h && KEY_RE.test(h)) history.replaceState({ key: h }, '', pathOf(h));
+    if (h && KEY_RE.test(h)) history.replaceState({ key: h }, '', pathOf(h) + location.search);
     window.addEventListener('popstate', fire);
     // clicks on in-site links change the page without reloading
     document.addEventListener('click', function (e) {

@@ -78,6 +78,7 @@
     else if (sport === 'games' && window.renderGames) window.renderGames(app, tab, sub);
     else if (sport === 'players' && window.renderPlayers) window.renderPlayers(app, tab, h.split('-').slice(2).join('-'));
     else if (sport === 'compare' && window.renderCompare) window.renderCompare(app);
+    else if (sport === 'live' && window.renderTracker) window.renderTracker(app, tab);
     else if (sport === 'me' && window.renderMe) window.renderMe(app);
     else renderHub();
     if (window.VI_SET_TITLE) window.VI_SET_TITLE(h);

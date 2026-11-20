@@ -41,6 +41,7 @@
     if (SPORT_NAME[a]) t = `Tennessee ${SPORT_NAME[a]}${TAB_NAME[b] ? ' ' + TAB_NAME[b] : ''}${S}`;
     else if (a === 'games') t = !b ? 'Vol Games' + S : !c ? `${SPORT_NAME[b] || 'Football'} games${S}` : `${(GAME_NAME[c] && gName(SPORT_NAME[b] ? b : 'football', c)) || 'Vol Games'} · ${SPORT_NAME[b] || 'Football'}${S}`;
     else if (a === 'players') t = !b ? 'Tennessee players' + S : key.split('-').length > 2 ? `${titleCase(key.split('-').slice(2).join('-'))} · Tennessee ${SPORT_NAME[b] || ''}${S}` : `Tennessee ${SPORT_NAME[b] || ''} players${S}`;
+    else if (a === 'live') t = 'Live game tracker' + S;
     else if (a === 'compare') t = 'Compare Vols' + S;
     else if (a === 'me') t = 'Your Vol games' + S;
     else if (a === 'sources') t = 'Sources & credits' + S;
