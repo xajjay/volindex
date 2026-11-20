@@ -9,25 +9,25 @@
    ============================================================ */
 window.DEPTH = window.DEPTH || {};
 window.DEPTH.football = {
-  "rev": 9,
+  "rev": 10,
   "current": {
     "label": "2026 depth chart",
-    "updated": "2026-11-11",
+    "updated": "2026-11-20",
     "basedOn": "The Vol Index depth chart (unofficial)",
     "chart": {
     "Backfield": [
       ["QB", ["George MacIntyre","Faizon Brandon","Ryan Staub"]],
-      ["RB", ["DeSean Bishop","Daune Morris","Javin Gordon","Justin Baker"]]
+      ["RB", ["DeSean Bishop","Javin Gordon","Justin Baker"]]
     ],
     "Receivers": [
-      ["WR-X", ["Radarious Jackson","TK Keys","Ian Duarte"]],
-      ["WR-Z", ["Mike Matthews","Travis Smith Jr."]],
+      ["WR-X", ["TK Keys","Ian Duarte"]],
+      ["WR-Z", ["Radarious Jackson","Travis Smith Jr."]],
       ["WR-SL", ["Braylon Staley","Tyreek King"]],
       ["TE", ["DaSaahn Brame","Trent Thomas","Luca Wolf"]]
     ],
     "Offensive Line": [
       ["LT", ["David Sanders Jr.","Gabriel Osenda","Jeremias Heard"]],
-      ["LG", ["Nic Moore","Ed Baker","Jeremy George-El"]],
+      ["LG", ["Shamurad Umarov","Ed Baker","Jeremy George-El"]],
       ["C", ["Sam Pendleton","Antoni Ogumoro"]],
       ["RG", ["Donovan Haslam","Shamurad Umarov"]],
       ["RT", ["Jesse Perry","Ory Williams","Kamari Blair"]]
@@ -62,7 +62,7 @@ window.DEPTH.football = {
   },
   "next": {
     "label": "2027 projected depth chart",
-    "updated": "2026-11-11",
+    "updated": "2026-11-20",
     "basedOn": "The Vol Index 2027 projected depth chart (unofficial). Projection: 2026 chart minus 5th-year players and High NFL draft risks, plus 2027 commits. Seniors are shown returning for their 5th year",
     "chart": {
     "Backfield": [
