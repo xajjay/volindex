@@ -502,9 +502,21 @@
     return [...listed.values()];
   }
 
+  /* PEAR API numbers (data/pear-diamond.js, written daily by tools/pear_diamond.py) replace the hand-entered baseball and softball PEAR card, game projections and SEC table */
+  function pearLive(D, A) {
+    const P = ((window.SITE_PEAR || {})[D.key]); if (!P || !P.tennessee || !A || !A.teams) return;
+    const t = P.tennessee, card = A.teams.find(x => x.src === 'PEAR'); if (!card) return;
+    card.rank = t.rank; card.rating = 'TSR ' + (+t.tsr).toFixed(2); card.date = (window.SITE_PEAR.fetched ? 'updated ' + fmtDate(window.SITE_PEAR.fetched, { month: 'short', day: 'numeric' }) : card.date);
+    card.extra = [t.pcr != null ? 'PCR No. ' + t.pcr : '', t.sos != null ? 'SOS ' + (+t.sos).toFixed(2) : '', t.rqi != null ? 'RQI ' + (+t.rqi).toFixed(3) : ''].filter(Boolean).join(' · ') || card.extra;
+    if (t.off != null && t.defense != null) { card.off = [(+t.off).toFixed(1), '–']; card.def = [(+t.defense).toFixed(1), '–']; }
+    if (P.games && P.games.length) A.pearGames = P.games.filter(g => g[3] != null);
+    if (P.sec && P.sec.length && !A.conf) { A.confTitle = 'SEC by PEAR rating'; A.confCols = ['PEAR rank', 'TSR', 'PCR', 'SOS']; A.conf = P.sec.map(r => [r[0], r[1], r[2], r[3] == null ? '—' : r[3], r[4] == null ? '—' : r[4]]); }
+  }
+
   /* ---------- advanced ---------- */
   function advancedSport(D) {
-    const A = X(D).advanced; const auto = [D.rpiAuto, D.pollCur].filter(Boolean).filter(a => !A.teams.some(t => t.src === a.poll && (t.rank = a.rank, t.date = 'through ' + fmtDate(a.date, { month: 'short', day: 'numeric' }), t.rating = a.record ? a.record + ' record' : t.rating, true)));
+    const A = X(D).advanced; pearLive(D, A);
+    const auto = [D.rpiAuto, D.pollCur].filter(Boolean).filter(a => !A.teams.some(t => t.src === a.poll && (t.rank = a.rank, t.date = 'through ' + fmtDate(a.date, { month: 'short', day: 'numeric' }), t.rating = a.record ? a.record + ' record' : t.rating, true)));
     return `<div class="panel-head"><div><h2>Advanced</h2><p>${esc(A.intro || '')}</p></div></div>
       <div class="grid g3">${A.teams.map(t => `<div class="box adv"><div class="eyebrow"><a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.src)}</a> · ${esc(t.date || '')}</div>
         <div class="advrank"><b>No. ${esc(t.rank)}</b><span>${esc(t.rating || '')}</span></div>
