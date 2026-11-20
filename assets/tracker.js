@@ -156,7 +156,7 @@
     });
     const tm = demoTeams('LSU', 'LSU', '#461D7C'); let n = 3; const t0 = Date.now();
     return async () => {
-      n = Math.min(plays.length, 3 + Math.floor((Date.now() - t0) / (3000 / DSPEED)));
+      n = Math.min(plays.length, 3 + Math.floor((Date.now() - t0) / (7500 / DSPEED)));
       const vis = plays.slice(0, n), last = vis[vis.length - 1], nx = plays[n], done = n >= plays.length;
       const home = Object.assign({}, tm.home, { score: last.hs }), away = Object.assign({}, tm.away, { score: last.as });
       const tot = [0, 0], rush = [0, 0], pass = [0, 0], tov = [0, 0];
@@ -341,82 +341,55 @@
   const STAGE = {};
   const chipHtml = (c, cls) => `<div class="trk-pl ${cls || ''}" style="--c:${esc(c.color)};left:${c.x0}%;top:${c.y0}%"><i>${esc(c.role)}</i><b><span class="f">${esc(c.name)}</span><span class="s">${esc(shortName(c.name))}</span></b></div>`;
 
-  /* ---- football ---- */
-  const FH = 520, FX = y => 100 + y * 10;
+  /* ---- football: FieldViz acts each play out; three looks, the choice is remembered ---- */
+  const FV_VIEWS = [['broadcast', 'Wide'], ['vertical', 'Vertical'], ['lens', 'Ball cam']];
+  const fvDefault = () => (window.matchMedia && window.matchMedia('(max-width: 719px)').matches) ? 'vertical' : 'broadcast';
+  const fvView = () => { const v = LS.get('vi-trk-fv'); return FV_VIEWS.some(x => x[0] === v) ? v : fvDefault(); };
+  // an ESPN play (or demo play) -> what FieldViz needs
+  function fvPlay(S, p) {
+    const t = String(p.text || ''), w = whoIn(t), offT = p.team != null ? tmOf(S, p.team) : null; if (!offT) return null;
+    const off = offT === S.home ? 'home' : 'away', d = off === 'home' ? 1 : -1, toX = ytg => ytg == null ? null : (off === 'home' ? 100 - ytg : ytg);
+    const sp = toX(p.ytg); if (sp == null || !isFinite(sp)) return null;
+    let type = 'none';
+    if (/sacked/i.test(t)) type = 'sack'; else if (/intercept/i.test(t)) type = 'int'; else if (/pass incomplete|incomplete pass|pass .*incomplete/i.test(t)) type = 'inc'; else if (/pass complete|pass .* complete/i.test(t)) type = 'pass';
+    else if (/field goal/i.test(t)) type = 'fg'; else if (/punt/i.test(t) && !/punt return/i.test(t)) type = 'punt'; else if (/scramble/i.test(t)) type = 'scramble'; else if (/\b(run|rush)\w* for|\bruns?\b.* for/i.test(t) && !/kickoff|punt|touchback/i.test(t)) type = 'run';
+    const td = /touchdown|\bTD\b/i.test(t) && type !== 'int' || (p.scoring && /touchdown/i.test(p.type || '') && type !== 'int');
+    let ep = toX(p.eytg); if (ep == null || !isFinite(ep)) ep = p.yds != null ? clamp(sp + d * p.yds, 0, 100) : sp;
+    const ret = +(/return(?:ed)? for (\d+) y/i.exec(t) || [])[1] || (type === 'int' ? 8 : 0), yd = +(/(?:for|gain of) (-?\d+) y/i.exec(t) || [])[1];
+    const dn = p.down || 0;
+    return { id: p.id, off, sp: clamp(sp, 1, 99), ep: clamp(ep, 0, 100), yds: isFinite(p.yds) && p.yds != null ? p.yds : (isFinite(yd) ? yd : (ep - sp) * d), type, td: !!td, good: !/no good|missed|blocked/i.test(t), ret, text: t,
+      fd: dn && p.dist ? clamp(sp + d * p.dist, 0, 100) : null, down: dn, dist: p.dist, names: { passer: w.passer, receiver: w.receiver, rusher: w.rusher, tacklers: w.tacklers, sacker: w.sacker, interceptor: w.interceptor, kicker: w.kicker, returner: w.returner } };
+  }
   STAGE.football = {
     html() {
-      let s = `<svg class="trk-field" viewBox="0 0 1200 ${FH}" role="img" aria-label="Football field"><defs><linearGradient id="trkgrass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E7D3B"/><stop offset="1" stop-color="#256B31"/></linearGradient></defs>
-        <rect width="1200" height="${FH}" fill="url(#trkgrass)"/>`;
-      for (let y = 0; y < 100; y += 10) s += `<rect x="${FX(y)}" y="0" width="100" height="${FH}" fill="#fff" opacity="${(y / 10) % 2 ? .035 : 0}"/>`;
-      s += `<rect id="trkEzA" x="0" y="0" width="100" height="${FH}" fill="#555" opacity=".95"/><rect id="trkEzH" x="1100" y="0" width="100" height="${FH}" fill="#555" opacity=".95"/>
-        <text id="trkEzAt" x="50" y="${FH / 2}" transform="rotate(-90 50 ${FH / 2})" text-anchor="middle" class="trk-ez"></text><text id="trkEzHt" x="1150" y="${FH / 2}" transform="rotate(90 1150 ${FH / 2})" text-anchor="middle" class="trk-ez"></text>`;
-      for (let y = 0; y <= 100; y += 5) s += `<line x1="${FX(y)}" x2="${FX(y)}" y1="0" y2="${FH}" stroke="#fff" stroke-opacity="${y % 10 === 0 ? .75 : .3}" stroke-width="${y === 0 || y === 100 ? 5 : 2}"/>`;
-      for (let y = 10; y <= 90; y += 10) { const n = y <= 50 ? y : 100 - y; s += `<text x="${FX(y)}" y="${FH - 22}" text-anchor="middle" class="trk-yd">${n}</text><text x="${FX(y)}" y="46" text-anchor="middle" class="trk-yd" transform="rotate(180 ${FX(y)} 34)">${n}</text>`; }
-      for (let y = 1; y < 100; y++) if (y % 5) s += `<line x1="${FX(y)}" x2="${FX(y)}" y1="${FH / 2 - 40}" y2="${FH / 2 - 30}" stroke="#fff" stroke-opacity=".35"/><line x1="${FX(y)}" x2="${FX(y)}" y1="${FH / 2 + 30}" y2="${FH / 2 + 40}" stroke="#fff" stroke-opacity=".35"/>`;
-      s += `<rect id="trkRed" x="0" y="0" width="0" height="${FH}" fill="#E0201B" opacity="0"/><rect id="trkTr" x="0" y="${FH / 2 - 22}" width="0" height="44" fill="#FF8200" opacity=".38" rx="8"/>
-        <g id="trkLos" class="trk-mv"><line x1="0" x2="0" y1="0" y2="${FH}" stroke="#2F6BFF" stroke-width="5"/></g><g id="trkFd" class="trk-mv"><line x1="0" x2="0" y1="0" y2="${FH}" stroke="#FFD21F" stroke-width="6"/></g>
-        <g id="trkBall" class="trk-mv"><ellipse cx="0" cy="${FH / 2}" rx="26" ry="15" fill="#7A3E12" stroke="#fff" stroke-width="3"/><path d="M-9 ${FH / 2}h18M-4 ${FH / 2 - 6}v12M0 ${FH / 2 - 6}v12M4 ${FH / 2 - 6}v12" stroke="#fff" stroke-width="2"/><path id="trkArrow" d="M30 ${FH / 2}l-12-11v22z" fill="#fff"/></g></svg>`;
-      return `<div class="trk-fh"><span id="trkFieldTxt"></span><button type="button" class="trk-fs" id="trkExpand" aria-label="Make the field full screen">⤢ Full screen</button></div><div class="trk-vp" id="trkVp"><div class="trk-cam" id="trkCam">${s}<div class="trk-chips" id="trkChips"></div><div class="trk-flyball" id="trkFly"></div></div></div><div class="trk-last" id="trkLast"></div>`;
+      return `<div class="trk-fh"><span id="trkFieldTxt"></span><div class="trk-seg" id="trkFvSeg" role="group" aria-label="Field view">${FV_VIEWS.map(v => `<button type="button" data-v="${v[0]}">${v[1]}</button>`).join('')}</div></div><div class="trk-fvbox" id="trkFvBox"></div><div class="trk-last" id="trkLast"></div>`;
     },
     init() {
-      const b = document.getElementById('trkExpand');
-      b.addEventListener('click', () => { const c = document.getElementById('trkStage'), on = c.classList.toggle('trk-full'); document.body.classList.toggle('trk-lock', on); b.textContent = on ? '✕ Close' : '⤢ Full screen'; camSet(T.lastPos ?? 50); });
-      window.addEventListener('resize', () => camSet(T && T.lastPos != null ? T.lastPos : 50));
+      document.getElementById('trkFvSeg').addEventListener('click', e => { const b = e.target.closest('button[data-v]'); if (!b) return; LS.set('vi-trk-fv', b.dataset.v); T.fv && T.fv.stop(); T.fv = null; T.fvKey = null; if (T.S) STAGE.football.update(T.S); });
+      window.addEventListener('resize', () => { const w = window.innerWidth >= 720; if (T && T.fv && T.fvWide != null && T.fvWide !== w) { T.fv.stop(); T.fv = null; T.fvKey = null; if (T.S) STAGE.football.update(T.S); } });
     },
     update(S) {
-      const live = S.state === 'in', fin = S.state === 'post', on = live && S.poss && S.ytg != null && isFinite(S.ytg);
-      const ez = (id, tid, t) => { document.getElementById(id).setAttribute('fill', t.color); document.getElementById(tid).textContent = t.name.toUpperCase(); };
-      ez('trkEzA', 'trkEzAt', S.home); ez('trkEzH', 'trkEzHt', S.away);            // home defends the left end zone and attacks right
-      const ball = document.getElementById('trkBall'), los = document.getElementById('trkLos'), fd = document.getElementById('trkFd'), tr = document.getElementById('trkTr'), red = document.getElementById('trkRed');
-      [ball, los, fd, tr, red].forEach(e => e.style.opacity = on ? '' : '0');
-      let pos = T.lastPos != null ? T.lastPos : 50;
-      if (on) {
-        const right = S.poss === 'home'; pos = right ? 100 - S.ytg : S.ytg; const fdPos = right ? Math.min(100, pos + (S.dist || 0)) : Math.max(0, pos - (S.dist || 0)), x = FX(pos), o = S[S.poss];
-        ball.style.transform = `translateX(${x}px)`; los.style.transform = `translateX(${x}px)`; fd.style.transform = `translateX(${FX(fdPos)}px)`; fd.style.opacity = S.down ? '' : '0';
-        document.getElementById('trkArrow').setAttribute('d', right ? `M30 ${FH / 2}l-12-11v22z` : `M-30 ${FH / 2}l12-11v22z`);
-        const lp0 = S.plays[S.plays.length - 1], dkey = (lp0 ? lp0.d : -1) + ':' + S.poss; if (!T.drive || T.drive.key !== dkey) T.drive = { key: dkey, pos };
-        const a = FX(Math.min(pos, T.drive.pos)), b = FX(Math.max(pos, T.drive.pos)); tr.setAttribute('x', a); tr.setAttribute('width', Math.max(0, b - a)); tr.setAttribute('fill', o.color);
-        red.setAttribute('x', right ? FX(80) : FX(0)); red.setAttribute('width', S.red ? 200 : 0); red.style.opacity = S.red ? '.18' : '0';
-        const own = right ? pos : 100 - pos, opp = right ? S.away : S.home, d = own === 50 ? 'at midfield' : own < 50 ? 'at its own ' + own : 'at the ' + opp.abbr + ' ' + (100 - own);
-        document.getElementById('trkFieldTxt').innerHTML = `<b>${esc(o.name)}</b> ball · ${esc(S.dd || '')} · ${d}`;
-      } else document.getElementById('trkFieldTxt').textContent = fin ? 'Final' : 'Waiting for the next snap';
-      T.lastPos = pos; camSet(pos);
-      const lp = S.plays[S.plays.length - 1]; set('trkLast', lp ? `<b>Last play</b> ${esc(lp.text)}` : esc(S.last || ''));
-      if (lp && lp.id !== T.animId) { T.animId = lp.id; animFootball(S, lp); }
+      const live = S.state === 'in', fin = S.state === 'post', view = fvView(), box = document.getElementById('trkFvBox');
+      document.querySelectorAll('#trkFvSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === view));
+      const mount = () => {
+        const wide = window.innerWidth >= 720; T.fvWide = wide; box.innerHTML = '';
+        T.fv = window.FieldViz.mount(box, { style: view, home: { abbr: S.home.abbr, name: S.home.name, color: S.home.color }, away: { abbr: S.away.abbr, name: S.away.name, color: S.away.color }, tall: wide ? 1.15 : 1.5, speed: 1 });
+        T.fvKey = view; T.fvSeen = new Set(S.plays.map(p => p.id)); T.fvFirst = true;
+      };
+      if (!window.FieldViz) { box.innerHTML = '<p class="dim">Field view could not load.</p>'; return; }
+      if (!T.fv || T.fvKey !== view) mount();
+      const lp = S.plays[S.plays.length - 1], on = live && S.poss && S.ytg != null && isFinite(S.ytg);
+      if (T.fvFirst) { // first look at this game: line up where the ball is, do not replay the past
+        T.fvFirst = false; const off = S.poss || (lp && lp.team != null ? (tmOf(S, lp.team) === S.home ? 'home' : 'away') : 'home'), d = off === 'home' ? 1 : -1;
+        const sp = on ? (off === 'home' ? 100 - S.ytg : S.ytg) : (lp && lp.eytg != null ? (off === 'home' ? 100 - lp.eytg : lp.eytg) : 25);
+        T.fv.setup({ off, sp: clamp(sp, 1, 99), fd: on && S.dist ? clamp(sp + d * S.dist, 0, 100) : null });
+      }
+      S.plays.forEach(p => { if (T.fvSeen.has(p.id)) return; T.fvSeen.add(p.id); if (fin && !T.fvLive) return; const fp = fvPlay(S, p); if (fp && fp.type !== 'none') { T.fv.play(fp); T.fvLive = true; } });
+      const q = T.fv.queued(); T.fv.speed(q > 4 ? 2.6 : q > 2 ? 1.7 : 1); if (q > 5) T.fv.trim(2);
+      const o = on ? S[S.poss] : null, ytg = on ? S.ytg : null;
+      document.getElementById('trkFieldTxt').innerHTML = on ? `<b>${esc(o.name)}</b> ball · ${esc(S.dd || '')} · ${ytg === 50 ? 'midfield' : ytg > 50 ? 'at its own ' + (100 - ytg) : 'at the ' + esc((S.poss === 'home' ? S.away : S.home).abbr) + ' ' + ytg}` : fin ? 'Final' : 'Waiting for the next snap';
+      set('trkLast', lp ? `<b>Last play</b> ${esc(lp.text)}` : esc(S.last || ''));
     } };
-  // the camera: the whole field on a wide screen, a window that follows the ball on a phone
-  function camSet(pos) {
-    const vp = document.getElementById('trkVp'), cam = document.getElementById('trkCam'), stg = document.getElementById('trkStage'); if (!vp || !cam || !stg) return;
-    const full = stg.classList.contains('trk-full'), W = vp.clientWidth || 360, k = W < 720 ? 2.4 : 1, contentH = W * FH / 1200;
-    cam.style.width = W + 'px'; cam.style.setProperty('--k', k);
-    const h = full ? Math.max(260, window.innerHeight - 130) : (k > 1 ? Math.round(W * 0.74) : contentH); vp.style.height = h + 'px';
-    const tx = k > 1 ? clamp(W / 2 - (FX(pos) / 1200) * W * k, -(k - 1) * W, 0) : 0, ty = (h - contentH * k) / 2;
-    cam.style.transform = `translate(${tx}px, ${ty}px) scale(${k})`;
-  }
-  // a play, acted out with the players named in it
-  function animFootball(S, p) {
-    const box = document.getElementById('trkChips'), fly = document.getElementById('trkFly'); if (!box) return;
-    const w = whoIn(p.text), off = tmOf(S, p.team), def = off === S.home ? S.away : S.home, right = off === S.home;
-    const sp = p.ytg != null ? (right ? 100 - p.ytg : p.ytg) : (T.lastPos != null ? T.lastPos : 50), ep = p.eytg != null ? (right ? 100 - p.eytg : p.eytg) : clamp(sp + (right ? 1 : -1) * (p.yds || 0), 0, 100);
-    const dir = right ? 1 : -1, X = y => (FX(clamp(y, -9, 109)) / 1200) * 100, lane = (hash(p.id + 'a') % 40) + 30, lane2 = (hash(p.id + 'b') % 40) + 30, inc = /incomplete/i.test(p.text);
-    const L = [], add = (name, role, color, x0, y0, x1, y1) => { if (name) L.push({ name, role, color, x0: X(x0), y0, x1: X(x1), y1 }); };
-    if (w.passer) add(w.passer, 'QB', off.color, sp - 5 * dir, 50, w.sacker ? ep : sp - 6 * dir, 50);
-    if (w.rusher) add(w.rusher, 'RB', off.color, sp - 4 * dir, 50, ep, lane);
-    if (w.receiver) add(w.receiver, 'WR', off.color, sp + 1 * dir, lane2, inc ? sp + 12 * dir : ep, lane);
-    (w.sacker || []).forEach((n, i) => add(n, 'DEF', def.color, sp + 3 * dir, 40 + i * 20, ep, 40 + i * 14));
-    w.tacklers.forEach((n, i) => add(n, 'DEF', def.color, ep + 5 * dir, 30 + i * 35, ep + 1 * dir, lane + (i ? 14 : -14)));
-    if (w.interceptor) add(w.interceptor, 'DEF', def.color, sp + 25 * dir, 50, ep, 50);
-    if (w.kicker) add(w.kicker, 'K', off.color, sp - 7 * dir, 50, sp - 7 * dir, 50);
-    if (w.returner) add(w.returner, 'RET', def.color, ep + 10 * dir, 50, ep, 50);
-    box.innerHTML = L.map(c => chipHtml(c, '')).join('');
-    const els = [...box.children]; if (!els.length) { fly.style.opacity = 0; return; }
-    requestAnimationFrame(() => requestAnimationFrame(() => els.forEach((el, i) => { el.classList.add('go'); el.style.left = L[i].x1 + '%'; el.style.top = L[i].y1 + '%'; })));
-    if (w.passer && (w.receiver || w.interceptor) && !w.sacker) {
-      const tgt = L.find(c => c.role === 'WR') || L.find(c => w.interceptor && c.name === w.interceptor);
-      fly.style.transition = 'none'; fly.style.left = X(sp - 5 * dir) + '%'; fly.style.top = '50%'; fly.style.opacity = 1;
-      requestAnimationFrame(() => requestAnimationFrame(() => { fly.style.transition = ''; fly.style.left = (tgt ? tgt.x1 : X(ep)) + '%'; fly.style.top = (tgt ? tgt.y1 : 50) + '%'; }));
-    } else fly.style.opacity = 0;
-  }
 
   /* ---- basketball ---- */
   STAGE.mbb = STAGE.wbb = {
@@ -521,7 +494,7 @@
     set('trkHead', head(S)); const sb = document.getElementById('trkSticky'); if (sb) sb.innerHTML = stickyBar(S);
     document.getElementById('trkPre').innerHTML = S.state === 'pre' ? pregame(S) : '';
     const stg = document.getElementById('trkStage'), st = stageFor(S.sport);
-    if (stg && st) { const wasHidden = stg.hidden; stg.hidden = !(live || (fin && S.plays.length)); if (!stg.hidden) { st.update(S); if (wasHidden && S.sport === 'football') camSet(T.lastPos != null ? T.lastPos : 50); } }
+    if (stg && st) { stg.hidden = !(live || (fin && S.plays.length)); if (!stg.hidden) st.update(S); }
     const wc = document.getElementById('trkWpCard'), g = modelFor(S), pre = g ? Math.round(g.win * 100) : null;
     wc.hidden = !(S.wp.length > 1); if (!wc.hidden) {
       set('trkWpBox', wpSvg(S, pre), S.wp.length + ':' + S.wp[S.wp.length - 1]);
@@ -565,7 +538,7 @@
     u.textContent = (T.S && T.S.state === 'in' ? `Updated ${s} second${s === 1 ? '' : 's'} ago.` : T.S && T.S.state === 'post' ? 'Final.' : '') + (u.dataset.note ? ' ' + u.dataset.note : '');
     const cd = document.getElementById('trkCd'); if (cd && T.S && T.S.start) { const ms = new Date(T.S.start) - Date.now(); if (ms > 0) cd.textContent = cdText(ms); }
   }
-  function stop() { if (!T) return; clearTimeout(T.timer); clearInterval(T.tick); if (T.io) T.io.disconnect(); T = null; document.body.classList.remove('trk-on', 'trk-lock'); if (wake) { try { wake.release(); } catch (e) { } wake = null; } }
+  function stop() { if (!T) return; if (T.fv) { try { T.fv.stop(); } catch (e) { } } clearTimeout(T.timer); clearInterval(T.tick); if (T.io) T.io.disconnect(); T = null; document.body.classList.remove('trk-on', 'trk-lock'); if (wake) { try { wake.release(); } catch (e) { } wake = null; } }
   window.renderTracker = function (app, want) {
     stop(); const k = pickSport(want); first = true; seen = new Set(); filter = 'all';
     T = { sport: k, at: Date.now() }; document.body.classList.add('trk-on'); skeleton(app, k);

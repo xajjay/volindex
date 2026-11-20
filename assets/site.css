@@ -860,3 +860,17 @@ body.trk-lock { overflow: hidden; }
 .trk-cnt div { display: flex; gap: 6px; } .trk-cnt i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line-strong); background: transparent; } .trk-cnt i.on { background: var(--c); border-color: var(--c); }
 @media (prefers-reduced-motion: reduce) { .trk-cam, .trk-pl.go, .trk-flyball { transition: none !important; } }
 @media (max-width: 719px) { .trk-toast { bottom: auto; top: 12px; } }
+
+/* ---- FieldViz (football field that acts out each play) ---- */
+.trk-fh { flex-wrap: wrap; }
+.trk-seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 999px; overflow: hidden; background: var(--surface); }
+.trk-seg button { border: 0; background: transparent; color: var(--fg); font: 700 12px var(--f-body); padding: 6px 12px; cursor: pointer; }
+.trk-seg button.on { background: var(--head-bg); color: var(--head-fg); }
+.trk-fvbox { position: relative; }
+.fv { position: relative; } .fv-svg { display: block; width: 100%; height: auto; }
+.fv-view { overflow: hidden; border-radius: 12px; background: #2A7A38; }
+.fv-view-lens { height: 340px; margin-top: 8px; } .fv-view-lens .fv-svg { height: 100%; }
+.fv-style-vertical .fv-view-main { max-width: 360px; margin: 0 auto; }
+.fv .fv-ez { fill: #fff; font-weight: 800; font-family: var(--f-display), system-ui; font-size: 52px; letter-spacing: .12em; }
+.fv .fv-yd { fill: #fff; opacity: .5; font-weight: 700; font-family: var(--f-display), system-ui; font-size: 28px; }
+.fv .fv-lab { font-weight: 700; font-family: system-ui, sans-serif; }
