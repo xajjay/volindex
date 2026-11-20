@@ -217,10 +217,10 @@
         y = z < 0.17 ? -Math.floor(R() * 4) : z < 0.17 + pBig ? Math.round(10 + expo(11)) : Math.max(0, Math.round(mu + gauss() * 2.6));
         if (st.ball >= 95) y = Math.min(y, Math.round(y * 0.7 + 1));                           // a short field squeezes the run game
         y = Math.min(y, 100 - st.ball);
-        const lead1 = chance(0.62), who = N.rb && lead1 ? N.rb : null; x.who = who; x.lane = rr(-1, 1);      // always draw, so a game is the same with or without names
-        T[o].rushA++; T[o].rushY += y; if (who) { T[o].rb.car++; T[o].rb.yds += y; }
+        const lead1 = chance(0.62), sy = R(), shortY = (st.togo <= 2 && st.down >= 3) || (st.ball >= 97) || (st.togo <= 1 && st.down === 2), who = N.qb2 && (shortY ? sy < 0.55 : sy < 0.07) ? N.qb2 : (N.rb && lead1 ? N.rb : null); x.who = who; x.lane = rr(-1, 1);      // always draw, so a game is the same with or without names
+        T[o].rushA++; T[o].rushY += y; if (who) { const bk = who === N.qb2 ? T[o].qb2 || (T[o].qb2 = { car: 0, yds: 0, td: 0 }) : T[o].rb; bk.car++; bk.yds += y; }
         if (chance(M.fumR * 0.9) && st.ball + y < 100) { to = 'fum'; text = `${who || tn(o)} fumbles after ${y > 0 ? 'a gain of ' + y : 'the handoff'}: ${tn(d)} recovers!`; }
-        else if (st.ball + y >= 100) { text = `${who || tn(o)}: ${y}-yard touchdown run!`; if (who) T[o].rb.td++; }
+        else if (st.ball + y >= 100) { text = `${who || tn(o)}: ${y}-yard touchdown run!`; if (who) (who === N.qb2 ? T[o].qb2 : T[o].rb).td++; }
         else text = y >= 15 ? `${who || tn(o)} breaks free for ${y} yards.` : y > 0 ? `${who || tn(o) + ' run'}${who ? ' runs' : ''} for ${y} yard${y === 1 ? '' : 's'}.` : y === 0 ? `${who || tn(o)} is stopped for no gain${DN.tkl ? ' by ' + DN.tkl : ''}.` : `${who || tn(o)} is dropped for a loss of ${-y}${DN.tkl ? ' by ' + DN.tkl : ''}.`;
         tick(5 + tm(), o);
       } else {
@@ -383,16 +383,20 @@
   };
   // the names used in the play-by-play: quarterback, lead back, lead receiver, and the other side's top tackler, pass rusher and ball hawk
   function namesFor(P, ctx, opp) {
-    const pickN = (list, what, pos) => { const x = (list || []).find(z => z.what === what && (!pos || pos.test(z.pos || ''))); return x ? x.name.split(' ').slice(-1)[0] : null; };
-    const side = (list, qb) => ({ qb: qb || pickN(list, 'passing'), rb: pickN(list, 'rushing'), wr: pickN(list, 'receiving'), tkl: pickN(list, 'defensive'), sack: pickN(list, 'defensive', /DL|DE|DT|EDGE|LB/) || pickN(list, 'dl'), int: pickN(list, 'interceptions') });
-    const u = side(P.utImpact, ctx && ctx.utQB ? ctx.utQB.split(' ').slice(-1)[0] : null), o = side(P.impact); u.team = UT; o.team = opp;
-    // an offense's play is defended by the other team's players
+    const MFa = (typeof MODEL_FB !== 'undefined' && MODEL_FB.availability) || {}, AV = (MFa.teams || {});
+    const outOf = t => { const a = AV[t]; const l = Array.isArray(a) ? a : (a && (a.rows || a.players)) || []; return l.filter(r => /^(out|doubtful)/i.test(r.status || '')).map(r => r.name); };
+    const gone = {}; [UT, opp].forEach(t => { gone[t] = outOf(t); });
+    const isOut = (t, n) => (gone[t] || []).includes(n);
+    const pickN = (t, list, what, pos) => { const x = (list || []).find(z => z.what === what && (!pos || pos.test(z.pos || '')) && !isOut(t, z.name)); return x ? x.name.split(' ').slice(-1)[0] : null; };
+    const side = (t, list, qb) => ({ qb: qb || pickN(t, list, 'passing'), rb: pickN(t, list, 'rushing'), wr: pickN(t, list, 'receiving'), tkl: pickN(t, list, 'defensive'), sack: pickN(t, list, 'defensive', /DL|DE|DT|EDGE|LB/) || pickN(t, list, 'dl'), int: pickN(t, list, 'interceptions') });
+    const u = side(UT, P.utImpact, ctx && ctx.utQB ? ctx.utQB.split(' ').slice(-1)[0] : null), o = side(opp, P.impact); u.team = UT; o.team = opp;
+    if (u.qb !== 'Brandon') u.qb2 = 'Brandon';          // QB2 Faizon Brandon: the short-yardage runner
     return [Object.assign({}, u, { team: UT }), Object.assign({}, o, { team: opp })].map((x, i) => x);
   }
   VP.game = (res, seed, ctx) => {
     const nm = namesFor(res.P, ctx, res.g.opp);
     // offense names from its own side; defensive names from the other side
-    const NM = [{ team: UT, qb: nm[0].qb, rb: nm[0].rb, wr: nm[0].wr }, { team: res.g.opp, qb: nm[1].qb, rb: nm[1].rb, wr: nm[1].wr }];
+    const NM = [{ team: UT, qb: nm[0].qb, qb2: nm[0].qb2, rb: nm[0].rb, wr: nm[0].wr }, { team: res.g.opp, qb: nm[1].qb, rb: nm[1].rb, wr: nm[1].wr }];
     const DEF = [{ tkl: nm[0].tkl, sack: nm[0].sack, int: nm[0].int }, { tkl: nm[1].tkl, sack: nm[1].sack, int: nm[1].int }];
     const names = [Object.assign({}, NM[0]), Object.assign({}, NM[1])];
     // simGame reads the defender names from the defending team's entry
@@ -601,7 +605,7 @@
     host.innerHTML = `<div class="vp-stage"><div class="vp-bug"><div class="t" id="vpTu"><i style="background:${tU.col}"></i><span>TENN</span><b id="vpSu">0</b><em></em></div><div class="c"><span id="vpQ">1st 15:00</span><small>${esc(label)}</small></div><div class="t r" id="vpTo"><i style="background:${tO.col}"></i><span>${esc(tO.abbr)}</span><b id="vpSo">0</b><em></em></div></div>
       <div class="vp-dd"><span id="vpDd">Kickoff</span><span id="vpWpT">Tennessee win chance ${pc(res.win)}</span></div>
       <canvas class="vp-cv" id="vpCv" aria-label="Animated field showing the simulated game"></canvas><div class="vp-call" id="vpCall" aria-live="polite">Press play to watch.</div><canvas class="vp-wp" id="vpWp" aria-label="Tennessee win probability through the game"></canvas>
-      <div class="vp-ctl"><button class="vp-btn pri" data-vpc="play">▶ Play</button><button class="vp-btn" data-vpc="mode" aria-pressed="true" title="Key plays at full speed, routine plays quicker">Highlights</button><button class="vp-btn" data-vpc="speed" title="Slower to see every step, faster to move through the game">Speed 2×</button><button class="vp-btn" data-vpc="score">Next score ⏭</button><button class="vp-btn" data-vpc="quarter">Next quarter ⏭</button><span class="sp"></span><button class="vp-btn" data-vpc="random" title="Draw a different game from the 1,000 simulations">🎲 Random game</button>${ownerOn() ? '<button class="vp-btn" data-vpc="rec" title="Owner only: replays the game from the start and saves it as a video file">⏺ Download video</button>' : ''}<button class="vp-btn" data-vpc="end">Skip to final</button></div>
+      <div class="vp-ctl"><button class="vp-btn pri" data-vpc="play">▶ Play</button><button class="vp-btn" data-vpc="mode" aria-pressed="true" title="Key plays at full speed, routine plays quicker">Highlights</button><button class="vp-btn" data-vpc="speed" title="Slower to see every step, faster to move through the game">Speed 1×</button><button class="vp-btn" data-vpc="score">Next score ⏭</button><button class="vp-btn" data-vpc="quarter">Next quarter ⏭</button><span class="sp"></span><button class="vp-btn" data-vpc="random" title="Draw a different game from the 1,000 simulations">🎲 Random game</button>${ownerOn() ? '<button class="vp-btn" data-vpc="rec" title="Owner only: replays the game from the start and saves it as a video file">⏺ Download video</button>' : ''}<button class="vp-btn" data-vpc="end">Skip to final</button></div>
       <div class="vp-log" id="vpLog" tabindex="0" aria-label="Play-by-play"></div></div><div id="vpFinal"></div>`;
     const $ = s => host.querySelector(s), cv = $('#vpCv'), c = cv.getContext('2d'), wpc = $('#vpWp'), wc = wpc.getContext('2d');
     let W = 0, H = 0, dpr = 1;
@@ -609,7 +613,7 @@
     size();
     // field geometry: 120 yards long (two 10-yard end zones), 53.3 wide. Tennessee always drives left to right.
     const X = yd => (yd / 120) * W, Y = v => H / 2 + (v / 53.3) * H * 0.96, fx = (o, ball) => o === 0 ? 10 + ball : 110 - ball, dir = o => o === 0 ? 1 : -1;
-    const S = { i: -1, t: 0, st: null, playing: false, speed: 2, hi: true, raf: null, last: 0, done: false, hold: 0, cur: null, quick: null, banner: null, bt: 0, sc: [0, 0], until: null };
+    const S = { i: -1, t: 0, st: null, playing: false, speed: 1, hi: true, raf: null, last: 0, done: false, hold: 0, cur: null, quick: null, banner: null, bt: 0, sc: [0, 0], until: null };
     function field() {
       c.setTransform(dpr, 0, 0, dpr, 0, 0);
       for (let i = 0; i < 20; i++) { c.fillStyle = i % 2 ? '#2A7A39' : '#2F8540'; c.fillRect(X(10 + i * 5), 0, X(5) + 1, H); }
@@ -722,7 +726,7 @@
     function end() {
       if (S.rec) setTimeout(stopRec, 1800);      // keep the final score on screen for a moment, then save the video
       S.playing = false; S.done = true; S.until = null; $('[data-vpc="play"]').textContent = '↺ Watch again';
-      const T = G.T, won = G.sc[0] > G.sc[1], n = G.names, ld = (t, i) => { const x = T[i]; return [n[i].qb ? `${n[i].qb}: ${x.qb.cmp}-${x.qb.att}, ${x.qb.yds} yds, ${x.qb.td} TD, ${x.qb.int} INT` : null, n[i].rb && x.rb.car ? `${n[i].rb}: ${x.rb.car} car, ${x.rb.yds} yds, ${x.rb.td} TD` : null, n[i].wr && x.wr.rec ? `${n[i].wr}: ${x.wr.rec} rec, ${x.wr.yds} yds, ${x.wr.td} TD` : null].filter(Boolean).join(' · '); };
+      const T = G.T, won = G.sc[0] > G.sc[1], n = G.names, ld = (t, i) => { const x = T[i]; return [n[i].qb ? `${n[i].qb}: ${x.qb.cmp}-${x.qb.att}, ${x.qb.yds} yds, ${x.qb.td} TD, ${x.qb.int} INT` : null, n[i].rb && x.rb.car ? `${n[i].rb}: ${x.rb.car} car, ${x.rb.yds} yds, ${x.rb.td} TD` : null, n[i].qb2 && x.qb2 && x.qb2.car ? `${n[i].qb2} (QB): ${x.qb2.car} car, ${x.qb2.yds} yds, ${x.qb2.td} TD` : null, n[i].wr && x.wr.rec ? `${n[i].wr}: ${x.wr.rec} rec, ${x.wr.yds} yds, ${x.wr.td} TD` : null].filter(Boolean).join(' · '); };
       const qh = Math.max(T[0].q[4] || T[1].q[4] ? 5 : 4, 4), row = (l, a, b) => `<tr><td>${l}</td><td>${a}</td><td>${b}</td></tr>`;
       $('#vpCall').innerHTML = `<b>Final${G.ot ? ' (' + (G.ot > 1 ? G.ot + 'OT' : 'OT') + ')' : ''}:</b> Tennessee ${G.sc[0]}, ${esc(tO.name)} ${G.sc[1]}. ${won ? 'Vols win.' : esc(tO.name) + ' wins.'}`;
       host.querySelector('#vpFinal').innerHTML = `<h4>This game's box score</h4><div class="tablewrap"><table class="vp-box"><thead><tr><th></th>${Array.from({ length: qh }, (_, i) => `<th>${i < 4 ? i + 1 : 'OT'}</th>`).join('')}<th>T</th></tr></thead><tbody>${[0, 1].map(i => `<tr><td><b>${i === 0 ? 'Tennessee' : esc(tO.name)}</b></td>${Array.from({ length: qh }, (_, k) => `<td>${T[i].q[k]}</td>`).join('')}<td><b>${G.sc[i]}</b></td></tr>`).join('')}</tbody></table></div>

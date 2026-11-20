@@ -255,7 +255,7 @@
     host.innerHTML = `<div class="vp-stage"><div class="vp-bug"><div class="t" id="vpTu"><i style="background:${tU.col}"></i><span>TENN</span><b id="vpSu">0</b><em></em></div><div class="c"><span id="vpQ">${men ? '1st half' : 'Q1'} ${men ? '20:00' : '10:00'}</span><small>${esc(label)}</small></div><div class="t r" id="vpTo"><i style="background:${tO.col}"></i><span>${esc(tO.abbr)}</span><b id="vpSo">0</b><em></em></div></div>
       <div class="vp-dd"><span id="vpDd">Tip-off</span><span id="vpWpT">Tennessee win chance ${pc(res.win)}</span></div>
       <canvas class="vp-cv" id="vpCv" aria-label="Animated court showing the simulated game"></canvas><div class="vp-call" id="vpCall" aria-live="polite">Press play to watch.</div><canvas class="vp-wp" id="vpWp" aria-label="Tennessee win probability through the game"></canvas>
-      <div class="vp-ctl"><button class="vp-btn pri" data-vpc="play">▶ Play</button><button class="vp-btn" data-vpc="mode" aria-pressed="true" title="Big plays in full, the rest in fast forward">Highlights</button><button class="vp-btn" data-vpc="speed" title="Slower to see every step, faster to move through the game">Speed 2×</button><button class="vp-btn" data-vpc="period">Next ${men ? 'half' : 'quarter'} ⏭</button><span class="sp"></span><button class="vp-btn" data-vpc="random" title="Draw a different game from the 1,000 simulations">🎲 Random game</button><button class="vp-btn" data-vpc="end">Skip to final</button></div>
+      <div class="vp-ctl"><button class="vp-btn pri" data-vpc="play">▶ Play</button><button class="vp-btn" data-vpc="mode" aria-pressed="true" title="Big plays in full, the rest in fast forward">Highlights</button><button class="vp-btn" data-vpc="speed" title="Slower to see every step, faster to move through the game">Speed 1×</button><button class="vp-btn" data-vpc="period">Next ${men ? 'half' : 'quarter'} ⏭</button><span class="sp"></span><button class="vp-btn" data-vpc="random" title="Draw a different game from the 1,000 simulations">🎲 Random game</button><button class="vp-btn" data-vpc="end">Skip to final</button></div>
       <div class="vp-log" id="vpLog" tabindex="0" aria-label="Play-by-play"></div></div><div id="vpFinal"></div>`;
     const $ = s => host.querySelector(s), cv = $('#vpCv'), c = cv.getContext('2d'), wpc = $('#vpWp'), wc = wpc.getContext('2d');
     let W = 0, H = 0, dpr = 1;
@@ -267,7 +267,7 @@
     const toXY = (o, d, y) => [o === 0 ? 94 - d : d, o === 0 ? y : 50 - y], rimOf = o => [o === 0 ? 88.75 : 5.25, 25];
     const dots = [0, 1].map(t => Array.from({ length: 5 }, (_, i) => ({ p: [47 + (t ? 3 : -3), 12 + i * 6.5], g: [47, 25], v: [0, 0] })));
     const ball = { p: [47, 25], v: [0, 0], z: 0, hold: null, fl: null };
-    const S = { i: -1, t: 0, e: null, playing: false, speed: 2, hi: true, raf: null, last: 0, done: false, sc: [0, 0], until: null, quick: false, T: 0, steps: null, flash: null, ft: 0, curDone: true };
+    const S = { i: -1, t: 0, e: null, playing: false, speed: 1, hi: true, raf: null, last: 0, done: false, sc: [0, 0], until: null, quick: false, T: 0, steps: null, flash: null, ft: 0, curDone: true };
     function setFormation(o, e) {
       const d = 1 - o, rim = rimOf(o);
       SPOT.forEach((s, i) => { const jit = (i * 37 + S.i * 13) % 7 / 7 - 0.5; dots[o][i].g = toXY(o, s[0] + jit * 1.6, s[1] + jit * 2); });
