@@ -491,7 +491,7 @@
       <div class="vp-bar" role="img" aria-label="Tennessee wins ${pc(res.win)} of simulations, ${esc(o)} ${pc(1 - res.win)}"><i style="flex:${Math.max(0.12, res.win)}">Tennessee ${pc(res.win)}</i><i style="flex:${Math.max(0.12, 1 - res.win)}">${esc(tO.abbr)} ${pc(1 - res.win)}</i></div>
       <div class="vp-chips"><span>Spread: <b>${sp === 0 ? 'Pick’em' : esc(fav) + ' by ' + sp}</b></span><span>Total: <b>${Math.round((a[0].pts + a[1].pts) * 2) / 2}</b></span><span>One-score game: <b>${pc(res.one)}</b></span><span>Overtime: <b>${pc(res.ot)}</b></span><span>Middle 80% of results: <b>${res.p10 > 0 ? 'UT by ' + res.p10 : res.p10 < 0 ? tO.abbr + ' by ' + -res.p10 : 'even'} to ${res.p90 > 0 ? 'UT by ' + res.p90 : res.p90 < 0 ? tO.abbr + ' by ' + -res.p90 : 'even'}</b></span></div>
       ${others(res)}
-      <div class="vp-watch"><button class="vp-btn pri" data-vpw="likely">▶ Watch the most likely game</button>${res.picks.upset ? `<button class="vp-btn" data-vpw="upset">Watch ${esc(res.favU ? o : 'Tennessee')} pull the upset</button>` : ''}<button class="vp-btn" data-vpw="best">Watch Tennessee's best day</button></div>
+      <div class="vp-watch"><button class="vp-btn pri" data-vpw="likely">▶ Watch the most likely game</button>${res.picks.upset ? `<button class="vp-btn" data-vpw="upset">Watch ${esc(res.favU ? o : 'Tennessee')} pull the upset</button>` : ''}<button class="vp-btn" data-vpw="best">Watch Tennessee's best day</button><button class="vp-btn" data-vpw="random">🎲 Watch a random simulation</button></div>
       <div id="vpStage"></div>
       <div class="vp-two"><div><h4>${res.N.toLocaleString()} simulated games: how they ended</h4>${histSvg(res)}</div>
       <div><h4>What goes into the number</h4><table class="vp-fac"><tbody>${m.factors.map(f => `<tr><td>${esc(f.k)}<small>${esc(f.note)}</small></td><td class="n">${f.v > 0 ? 'UT +' + f.v.toFixed(1) : f.v < 0 ? esc(tO.abbr) + ' +' + (-f.v).toFixed(1) : '0.0'}</td></tr>`).join('')}
@@ -515,11 +515,18 @@
      ==================================================================================================== */
   const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   // position on a path of [t, u, v] keyframes
+  // Smooth motion: a cubic Hermite curve through the keyframes with continuous velocity (players start and finish at rest), so nobody
+  // stops and restarts at every keyframe the way a per-segment ease does.
   function at(path, t) {
-    if (t <= path[0][0]) return path[0]; const n = path.length; if (t >= path[n - 1][0]) return path[n - 1];
-    for (let i = 1; i < n; i++) if (t <= path[i][0]) { const a = path[i - 1], b = path[i], k = ease((t - a[0]) / Math.max(1e-6, b[0] - a[0])); return [t, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k, (a[3] || 0) + ((b[3] || 0) - (a[3] || 0)) * k]; }
-    return path[n - 1];
+    const n = path.length; if (t <= path[0][0]) return path[0]; if (t >= path[n - 1][0]) return path[n - 1];
+    let i = 1; while (i < n - 1 && t > path[i][0]) i++;
+    const a = path[i - 1], b = path[i], h = Math.max(1e-6, b[0] - a[0]), u = (t - a[0]) / h, u2 = u * u, u3 = u2 * u;
+    const h00 = 2 * u3 - 3 * u2 + 1, h10 = u3 - 2 * u2 + u, h01 = -2 * u3 + 3 * u2, h11 = u3 - u2;
+    const slope = (j, c) => { const p0 = path[j - 1], p1 = path[j + 1]; if (!p0 || !p1) return 0; const dt = p1[0] - p0[0]; return dt > 1e-6 ? (p1[c] - p0[c]) / dt : 0; };
+    const f = c => { const x0 = a[c] || 0, x1 = b[c] || 0, m0 = slope(i - 1, c), m1 = slope(i, c); return h00 * x0 + h10 * h * m0 + h01 * x1 + h11 * h * m1; };
+    return [t, f(1), f(2), c3(a[3], b[3], u)];
   }
+  const c3 = (a, b, u) => { a = a || 0; b = b || 0; const k = u * u * (3 - 2 * u); return a + (b - a) * k; };
   // 22 players and the ball for one play, in the offense's frame: u = yards past the line of scrimmage, v = yards across from the ball
   function stage(p, seed) {
     const R = rng(seed + 77), rr = (a, b) => a + R() * (b - a);
@@ -592,7 +599,7 @@
     host.innerHTML = `<div class="vp-stage"><div class="vp-bug"><div class="t" id="vpTu"><i style="background:${tU.col}"></i><span>TENN</span><b id="vpSu">0</b><em></em></div><div class="c"><span id="vpQ">1st 15:00</span><small>${esc(label)}</small></div><div class="t r" id="vpTo"><i style="background:${tO.col}"></i><span>${esc(tO.abbr)}</span><b id="vpSo">0</b><em></em></div></div>
       <div class="vp-dd"><span id="vpDd">Kickoff</span><span id="vpWpT">Tennessee win chance ${pc(res.win)}</span></div>
       <canvas class="vp-cv" id="vpCv" aria-label="Animated field showing the simulated game"></canvas><div class="vp-call" id="vpCall" aria-live="polite">Press play to watch.</div><canvas class="vp-wp" id="vpWp" aria-label="Tennessee win probability through the game"></canvas>
-      <div class="vp-ctl"><button class="vp-btn pri" data-vpc="play">▶ Play</button><button class="vp-btn" data-vpc="mode" aria-pressed="true" title="Key plays at full speed, routine plays quicker">Highlights</button><button class="vp-btn" data-vpc="speed">Speed 1×</button><button class="vp-btn" data-vpc="score">Next score ⏭</button><span class="sp"></span><button class="vp-btn" data-vpc="end">Skip to final</button></div>
+      <div class="vp-ctl"><button class="vp-btn pri" data-vpc="play">▶ Play</button><button class="vp-btn" data-vpc="mode" aria-pressed="true" title="Key plays at full speed, routine plays quicker">Highlights</button><button class="vp-btn" data-vpc="speed" title="Slower to see every step, faster to move through the game">Speed 2×</button><button class="vp-btn" data-vpc="score">Next score ⏭</button><button class="vp-btn" data-vpc="quarter">Next quarter ⏭</button><span class="sp"></span><button class="vp-btn" data-vpc="random" title="Draw a different game from the 1,000 simulations">🎲 Random game</button><button class="vp-btn" data-vpc="end">Skip to final</button></div>
       <div class="vp-log" id="vpLog" tabindex="0" aria-label="Play-by-play"></div></div><div id="vpFinal"></div>`;
     const $ = s => host.querySelector(s), cv = $('#vpCv'), c = cv.getContext('2d'), wpc = $('#vpWp'), wc = wpc.getContext('2d');
     let W = 0, H = 0, dpr = 1;
@@ -600,7 +607,7 @@
     size();
     // field geometry: 120 yards long (two 10-yard end zones), 53.3 wide. Tennessee always drives left to right.
     const X = yd => (yd / 120) * W, Y = v => H / 2 + (v / 53.3) * H * 0.96, fx = (o, ball) => o === 0 ? 10 + ball : 110 - ball, dir = o => o === 0 ? 1 : -1;
-    const S = { i: -1, t: 0, st: null, playing: false, speed: 1, hi: true, raf: null, last: 0, done: false, hold: 0, cur: null, quick: null, banner: null, bt: 0, sc: [0, 0], until: null };
+    const S = { i: -1, t: 0, st: null, playing: false, speed: 2, hi: true, raf: null, last: 0, done: false, hold: 0, cur: null, quick: null, banner: null, bt: 0, sc: [0, 0], until: null };
     function field() {
       c.setTransform(dpr, 0, 0, dpr, 0, 0);
       for (let i = 0; i < 20; i++) { c.fillStyle = i % 2 ? '#2A7A39' : '#2F8540'; c.fillRect(X(10 + i * 5), 0, X(5) + 1, H); }
@@ -616,7 +623,7 @@
       c.strokeStyle = 'rgba(255,255,255,.5)'; c.lineWidth = 1; c.beginPath(); for (let yd = 11; yd < 110; yd++) { if (yd % 5 === 0) continue; [-6.6, 6.6].forEach(v => { c.moveTo(X(yd), Y(v) - 2); c.lineTo(X(yd), Y(v) + 2); }); } c.stroke();   // hash marks
       c.strokeStyle = '#FFD21F'; c.lineWidth = 2; [[1.2], [118.8]].forEach(([x]) => { c.beginPath(); c.moveTo(X(x), Y(-3.1)); c.lineTo(X(x), Y(3.1)); c.stroke(); });   // goal posts
     }
-    const dot = (x, y, col, r, ring) => { c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.fillStyle = col; c.fill(); c.lineWidth = Math.max(1, r * 0.32); c.strokeStyle = ring || '#fff'; c.stroke(); };
+    const dot = (x, y, col, r, ring) => { c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.fillStyle = col; c.fill(); c.lineWidth = Math.max(0.8, r * 0.28); c.strokeStyle = ring || '#fff'; c.stroke(); };
     // where everyone is, in field yards, at one moment of a staged play: [Tennessee's eleven, the opponent's eleven] and the ball
     function world(p, stg, tt) {
       const o = p.o, lx = fx(o, p.ball), dr = dir(o), lat = p.type === 'ko' ? 0 : (p.lat || 0);
@@ -627,7 +634,7 @@
     function draw() {
       field();
       const p = S.cur; if (!p) return;
-      const o = p.o, d = 1 - o, lx = fx(o, p.ball), dr = dir(o), lat = p.lat || 0, r = Math.max(3, W / 150);
+      const o = p.o, d = 1 - o, lx = fx(o, p.ball), dr = dir(o), lat = p.lat || 0, r = Math.max(2.2, W / 230), rb = Math.max(3, r * 1.25);
       const colO = o === 0 ? tU.col : tO.col, colD = d === 0 ? tU.col : tO.col;
       if (p.type !== 'ko' && p.type !== 'pat') {
         c.lineWidth = 2; c.strokeStyle = 'rgba(40,110,255,.9)'; c.beginPath(); c.moveTo(X(lx), 0); c.lineTo(X(lx), H); c.stroke();
@@ -644,8 +651,8 @@
       W0.tm[o].forEach(q => dot(X(q[0]), Y(q[1]), colO, r, o === 0 ? '#fff' : '#E8E8E8'));
       if (stg.flag) { c.fillStyle = '#FFD21F'; c.fillRect(X(lx + dr * stg.flag[0]) - 4, Y(lat + stg.flag[1]) - 4, 8, 8); }
       const b = [X(W0.ball[0]), Y(W0.ball[1]), W0.ball[2] || 0], z = b[2];
-      c.fillStyle = 'rgba(0,0,0,.28)'; c.beginPath(); c.ellipse(b[0], b[1] + 2, r * 0.9, r * 0.5, 0, 0, 6.2832); c.fill();
-      c.fillStyle = '#7A4A21'; c.strokeStyle = '#fff'; c.lineWidth = 1; c.beginPath(); c.ellipse(b[0], b[1] - z * (H / 53.3) * 0.55, r * (0.85 + z * 0.05), r * (0.6 + z * 0.035), 0, 0, 6.2832); c.fill(); c.stroke();
+      c.fillStyle = 'rgba(0,0,0,.28)'; c.beginPath(); c.ellipse(b[0], b[1] + 2, rb * 0.9, rb * 0.5, 0, 0, 6.2832); c.fill();
+      c.fillStyle = '#7A4A21'; c.strokeStyle = '#fff'; c.lineWidth = 1; c.beginPath(); c.ellipse(b[0], b[1] - z * (H / 53.3) * 0.55, rb * (0.85 + z * 0.04), rb * (0.6 + z * 0.028), 0, 0, 6.2832); c.fill(); c.stroke();
       const nm = p.type === 'run' || p.type === 'sack' ? p.who : p.type === 'pass' ? (tt > stg.T * 0.45 ? p.tgt : p.who) : p.type === 'inc' || p.type === 'int' ? p.who : null;
       if (nm && tt > 0.5 && W >= 420) { c.font = `700 ${Math.max(10, W / 85)}px Archivo, system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'bottom'; c.lineWidth = 3; c.strokeStyle = 'rgba(0,0,0,.65)'; const hx = p.type === 'pass' && tt <= stg.T * 0.45 || p.type === 'inc' || p.type === 'int' ? pos(stg.off[6]) : b; c.strokeText(nm, hx[0], hx[1] - r * 1.8); c.fillStyle = '#fff'; c.fillText(nm, hx[0], hx[1] - r * 1.8); }
       if (S.banner && S.bt > 0) {
@@ -695,10 +702,11 @@
     }
     function frame(ts) {
       S.raf = null; if (!S.playing) return;
-      const dt = Math.min(0.1, (ts - S.last) / 1000) * S.speed; S.last = ts;
+      const dt = Math.min(0.05, (ts - S.last) / 1000) * S.speed; S.last = ts;
       if (S.until != null) {      // skipping ahead: run the plays without animating them
         S.bt = 0; S.banner = null; if (S.cur && !S.curDone) finish(); let n = 0;
-        while (S.until != null && n++ < 600) { if (S.i + 1 >= plays.length) return end(); begin(S.i + 1); finish(); }
+        if (S.until === 'quarter' && S.untilQ == null) S.untilQ = (plays[S.i + 1] || {}).q;     // run to the end of the quarter the next play belongs to
+        while (S.until != null && n++ < 600) { if (S.i + 1 >= plays.length) return end(); if (S.until === 'quarter' && plays[S.i + 1].q !== S.untilQ) { S.until = null; break; } begin(S.i + 1); finish(); }
         S.now = world(S.cur, S.st, S.st.T); S.from = null; S.trans = 0; S.rate = 1; S.t = S.st.T; S.hold = 0.9; draw(); S.raf = requestAnimationFrame(frame); return;
       }
       if (S.bt > 0) { S.bt -= dt / Math.max(1, S.speed * 0.6); draw(); S.raf = requestAnimationFrame(frame); return; }
@@ -716,7 +724,7 @@
       $('#vpCall').innerHTML = `<b>Final${G.ot ? ' (' + (G.ot > 1 ? G.ot + 'OT' : 'OT') + ')' : ''}:</b> Tennessee ${G.sc[0]}, ${esc(tO.name)} ${G.sc[1]}. ${won ? 'Vols win.' : esc(tO.name) + ' wins.'}`;
       host.querySelector('#vpFinal').innerHTML = `<h4>This game's box score</h4><div class="tablewrap"><table class="vp-box"><thead><tr><th></th>${Array.from({ length: qh }, (_, i) => `<th>${i < 4 ? i + 1 : 'OT'}</th>`).join('')}<th>T</th></tr></thead><tbody>${[0, 1].map(i => `<tr><td><b>${i === 0 ? 'Tennessee' : esc(tO.name)}</b></td>${Array.from({ length: qh }, (_, k) => `<td>${T[i].q[k]}</td>`).join('')}<td><b>${G.sc[i]}</b></td></tr>`).join('')}</tbody></table></div>
         <div class="tablewrap"><table class="vp-box"><thead><tr><th></th><th>Tennessee</th><th>${esc(tO.name)}</th></tr></thead><tbody>${row('Total yards', T[0].rushY + T[0].sackY + T[0].passY, T[1].rushY + T[1].sackY + T[1].passY)}${row('Rushing (sacks included)', `${T[0].rushA + T[0].sacks}-${T[0].rushY + T[0].sackY}`, `${T[1].rushA + T[1].sacks}-${T[1].rushY + T[1].sackY}`)}${row('Passing', `${T[0].cmp}-${T[0].att}, ${T[0].passY}`, `${T[1].cmp}-${T[1].att}, ${T[1].passY}`)}${row('First downs', T[0].fd, T[1].fd)}${row('Third downs', `${T[0].t3c}-${T[0].t3a}`, `${T[1].t3c}-${T[1].t3a}`)}${row('Turnovers', T[0].int + T[0].fum, T[1].int + T[1].fum)}${row('Sacks allowed', T[0].sacks, T[1].sacks)}${row('Time of possession', clk(T[0].top), clk(T[1].top))}</tbody></table></div>
-        <p class="small"><b>Tennessee:</b> ${esc(ld(T, 0)) || '—'}<br><b>${esc(tO.name)}:</b> ${esc(ld(T, 1)) || '—'}</p><p class="vp-note">One simulated game out of ${res.N.toLocaleString()}, shown because it ${label.toLowerCase().includes('likely') ? 'sits closest to the middle of all of them' : 'shows that kind of outcome'}. Player lines are simulated, not predictions for individuals.</p>`;
+        <p class="small"><b>Tennessee:</b> ${esc(ld(T, 0)) || '—'}<br><b>${esc(tO.name)}:</b> ${esc(ld(T, 1)) || '—'}</p><p class="vp-note">One simulated game out of ${res.N.toLocaleString()}, ${label.toLowerCase().includes('random') ? 'drawn at random' : 'shown because it ' + (label.toLowerCase().includes('likely') ? 'sits closest to the middle of all of them' : 'shows that kind of outcome')}. Player lines are simulated, not predictions for individuals.</p>`;
       draw(); wpDraw();
     }
     function reset() { S.now = null; S.from = null; S.i = -1; S.t = 0; S.sc = [0, 0]; S.done = false; S.hold = 0; S.cur = null; S.st = null; S.quick = null; S.bt = 0; S.until = null; $('#vpLog').innerHTML = ''; host.querySelector('#vpFinal').innerHTML = ''; $('#vpSu').textContent = 0; $('#vpSo').textContent = 0; }
@@ -726,8 +734,10 @@
       const b = e.target.closest('[data-vpc]'); if (!b) return; const k = b.dataset.vpc;
       if (k === 'play') { S.playing ? pause() : go(); }
       if (k === 'mode') { S.hi = !S.hi; b.setAttribute('aria-pressed', S.hi); b.textContent = S.hi ? 'Highlights' : 'Every play'; }
-      if (k === 'speed') { S.speed = S.speed === 1 ? 2 : S.speed === 2 ? 4 : 1; b.textContent = `Speed ${S.speed}×`; }
+      if (k === 'speed') { const L = [0.5, 1, 2, 4]; S.speed = L[(L.indexOf(S.speed) + 1) % L.length]; b.textContent = `Speed ${S.speed === 0.5 ? '0.5' : S.speed}×`; }
       if (k === 'score') { S.until = 'score'; S.bt = 0; go(); }
+      if (k === 'quarter') { S.until = 'quarter'; S.untilQ = null; S.bt = 0; go(); }
+      if (k === 'random' && VP._watch) VP._watch('random');
       if (k === 'end') { S.until = 'end'; S.bt = 0; go(); }
     });
     const onR = () => { if (!document.body.contains(cv)) { root.removeEventListener('resize', onR); S.playing = false; return; } size(); draw(); wpDraw(); };
@@ -749,13 +759,15 @@
       el.className = 'vp'; el.style.setProperty('--vp-opp', teamOf(g.opp).col === '#1C1C1C' || teamOf(g.opp).col === '#2B2B2B' ? '#6B6B6B' : teamOf(g.opp).col);
       el.innerHTML = report(res);
       el.querySelectorAll('[data-vpadj]').forEach(s => { s.value = String(adj[s.dataset.vpadj]); s.addEventListener('change', () => { adj[s.dataset.vpadj] = +s.value; render(); }); });
-      el.querySelectorAll('[data-vpw]').forEach(b => b.addEventListener('click', () => {
-        const k = b.dataset.vpw, pk = res.picks[k]; if (!pk) return;
+      const watch = k => {
+        const pk = k === 'random' ? { seed: 1000 + Math.floor(Math.random() * (res.N || 1000)) } : res.picks[k]; if (!pk) return;
         if (VP._player) VP._player.stop();
-        const label = k === 'likely' ? 'Most likely game' : k === 'upset' ? 'The upset' : "Tennessee's best day";
+        const label = k === 'random' ? `Random simulation #${pk.seed - 999} of ${(res.N || 1000).toLocaleString()}` : k === 'likely' ? 'Most likely game' : k === 'upset' ? 'The upset' : "Tennessee's best day";
         const stageEl = el.querySelector('#vpStage'); player(stageEl, res, VP.game(res, pk.seed, ctx), label);
         stageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }));
+      };
+      VP._watch = watch;
+      el.querySelectorAll('[data-vpw]').forEach(b => b.addEventListener('click', () => watch(b.dataset.vpw)));
     };
     render();
   };
