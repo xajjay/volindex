@@ -114,7 +114,7 @@
     return `<div class="eyebrow">${live ? '<span class="livedot"></span>Live' : '<span class="finalpill ' + (g.result || '') + '">' + (g.result === 'W' ? 'Win' : g.result === 'L' ? 'Loss' : 'Final') + '</span>Final'} · ${esc(live ? g.detail : g.detail === 'Final' ? new Date(g.start).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : g.detail)}${g.tv ? ' · ' + esc(g.tv) : ''}</div>
       <div class="lboard">${team(a, 'away')}<span class="lat">at</span>${team(h, 'home')}</div>
       ${live && g.extra ? `<div class="lsit">${esc(g.extra)}</div>` : ''}
-      <div class="golink"><a class="btn primary" href="${href('live-' + g.sport)}">${live ? 'Live tracker' : 'Game tracker'} ›</a> <button type="button" class="btn lbx-open" data-livebox="${esc(g.sport)}">${live ? 'Live box score' : 'Box score'} ›</button></div>
+      <div class="golink"><a class="btn primary" href="${href('live-' + g.sport)}">${live ? 'Live box score' : 'Box score'} ›</a></div>
       <div class="golink">${live ? (g.link ? `<a href="${esc(g.link)}" target="_blank" rel="noopener">Follow on ESPN Gamecast ›</a>` : 'Updating every 20 seconds') : `Season stats and the full box score update on The Vol Index within about 30 minutes${g.link ? ` · <a href="${esc(g.link)}" target="_blank" rel="noopener">ESPN box score ›</a>` : ''}`}</div>`;
   }
   function bannerHtml(games) {

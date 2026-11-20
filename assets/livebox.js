@@ -50,7 +50,7 @@
     m.addEventListener('click', e => { if (e.target === m || e.target.closest('.lbx-x')) close(); });
     document.body.appendChild(m); document.body.classList.add('lbx-lock'); load();
   }
-  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-livebox]'); if (b) { e.preventDefault(); open(b.dataset.livebox); } });
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-livebox]'); if (b) { e.preventDefault(); if (window.VI_ROUTER) { location.href = window.VI_ROUTER.href('live-' + b.dataset.livebox); } else { location.hash = 'live-' + b.dataset.livebox; } } });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && document.getElementById('lbx')) load(); });
 })();
