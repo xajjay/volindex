@@ -1,6 +1,6 @@
 {
- "asOf": "2026-11-18",
- "note": "Applies to the LSU game only. Source: SEC Initial Availability Report, posted 7:10 PM CT Wednesday Nov. 18 (typed from the graphic). Thursday and Friday updates replace it. Snap counts in data/snaps.json set each absent player's slot.",
+ "asOf": "2026-11-19",
+ "note": "Applies to the LSU game only. Source: SEC Thursday Report, posted 7:10 PM CT Thursday Nov. 19 (typed from the graphic). Friday's update replaces it. Snap counts in data/snaps.json set each absent player's slot.",
  "game": "LSU at Tennessee",
  "teams": {
   "Tennessee": [
@@ -53,23 +53,29 @@
     "name": "Joakim Dodson",
     "pos": "WR",
     "status": "out",
-    "note": "new on Nov 18 report"
+    "note": "out on Wed and Thu reports"
    },
    {
     "name": "Jaedon Harmon",
     "pos": "LB",
     "status": "out",
-    "note": "new on Nov 18 report"
+    "note": "out on Wed and Thu reports"
    },
    {
     "name": "Dylan Lewis",
     "pos": "DB",
     "status": "out",
-    "note": "new on Nov 18 report"
+    "note": "out on Wed and Thu reports"
    }
   ],
   "Vanderbilt": [],
   "LSU": [
+   {
+    "name": "Whit Weeks",
+    "pos": "LB",
+    "status": "out",
+    "note": "moved from doubtful to out on Thursday"
+   },
    {
     "name": "Dashawn Spears",
     "pos": "S",
@@ -96,11 +102,6 @@
     "status": "out"
    },
    {
-    "name": "Whit Weeks",
-    "pos": "LB",
-    "status": "doubtful"
-   },
-   {
     "name": "Jackson Harris",
     "pos": "WR",
     "status": "questionable"
@@ -109,6 +110,11 @@
     "name": "Winston Watkins Jr.",
     "pos": "WR",
     "status": "questionable"
+   },
+   {
+    "name": "Aidan Anding",
+    "pos": "CB",
+    "status": "probable"
    },
    {
     "name": "Jhase Thomas",

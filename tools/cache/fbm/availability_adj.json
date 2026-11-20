@@ -1,5 +1,5 @@
 {
- "asOf": "2026-11-18",
+ "asOf": "2026-11-19",
  "game": "LSU at Tennessee",
  "opp": "LSU",
  "teams": {
@@ -103,8 +103,17 @@
    "rows": []
   },
   "LSU": {
-   "total": -1.03,
+   "total": -1.04,
    "rows": [
+    {
+     "name": "Whit Weeks",
+     "pos": "LB",
+     "status": "out",
+     "in_rating": false,
+     "depth": "LB3 (185 snaps, 49% of a starter)",
+     "pts": -0.16,
+     "basis": "measured, weak, from season snaps"
+    },
     {
      "name": "Dashawn Spears",
      "pos": "S",
@@ -151,15 +160,6 @@
      "basis": "measured, weak, from season snaps"
     },
     {
-     "name": "Whit Weeks",
-     "pos": "LB",
-     "status": "doubtful",
-     "in_rating": false,
-     "depth": "LB3 (185 snaps, 49% of a starter)",
-     "pts": -0.15,
-     "basis": "measured, weak, from season snaps"
-    },
-    {
      "name": "Jackson Harris",
      "pos": "WR",
      "status": "questionable",
@@ -176,6 +176,15 @@
      "depth": "WR3 (537 snaps)",
      "pts": -0.15,
      "basis": "measured, from season snaps"
+    },
+    {
+     "name": "Aidan Anding",
+     "pos": "CB",
+     "status": "probable",
+     "in_rating": false,
+     "depth": "none",
+     "pts": 0.0,
+     "basis": "no snaps recorded, from season snaps"
     },
     {
      "name": "Jhase Thomas",
