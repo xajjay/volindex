@@ -1,0 +1,212 @@
+{
+ "baseball_ratings": {
+  "columns": [
+   "Team",
+   "power_rating",
+   "PCR",
+   "pcr_score",
+   "Conference",
+   "Season"
+  ],
+  "head": [
+   {
+    "Team": "Texas",
+    "power_rating": 6.67,
+    "PCR": 2,
+    "pcr_score": null,
+    "Conference": "SEC",
+    "Season": 2027
+   },
+   {
+    "Team": "Auburn",
+    "power_rating": 6.67,
+    "PCR": 1,
+    "pcr_score": null,
+    "Conference": "SEC",
+    "Season": 2027
+   },
+   {
+    "Team": "Mississippi St.",
+    "power_rating": 6.37,
+    "PCR": 3,
+    "pcr_score": null,
+    "Conference": "SEC",
+    "Season": 2027
+   }
+  ],
+  "attrs": {
+   "date": "January 01, 2027",
+   "count": "309"
+  }
+ },
+ "baseball_schedule": {
+  "columns": [
+   "game_id",
+   "Date",
+   "Time",
+   "home_team",
+   "away_team",
+   "home_score",
+   "away_score",
+   "home_win_prob",
+   "Spread",
+   "PEAR",
+   "GQI",
+   "is_conference_game",
+   "neutral"
+  ],
+  "head": [
+   {
+    "game_id": "B1-2027-03567",
+    "Date": "2027-02-19",
+    "Time": "5:00 PM CT",
+    "home_team": "Air Force",
+    "away_team": "Iowa",
+    "home_score": null,
+    "away_score": null,
+    "home_win_prob": 0.3763,
+    "Spread": -1.58,
+    "PEAR": "Iowa -1.58",
+    "GQI": 7.3,
+    "is_conference_game": false,
+    "neutral": true
+   },
+   {
+    "game_id": "B1-2027-02805",
+    "Date": "2027-02-19",
+    "Time": "11:00 AM CT",
+    "home_team": "Alcorn",
+    "away_team": "UMES",
+    "home_score": null,
+    "away_score": null,
+    "home_win_prob": 0.3838,
+    "Spread": -1.48,
+    "PEAR": "UMES -1.48",
+    "GQI": 2.5,
+    "is_conference_game": false,
+    "neutral": true
+   },
+   {
+    "game_id": "B1-2027-00001",
+    "Date": "2027-02-19",
+    "Time": "11:00 AM CT",
+    "home_team": "Arizona",
+    "away_team": "Oklahoma",
+    "home_score": null,
+    "away_score": null,
+    "home_win_prob": 0.3088,
+    "Spread": -2.52,
+    "PEAR": "Oklahoma -2.52",
+    "GQI": 8.4,
+    "is_conference_game": false,
+    "neutral": true
+   }
+  ],
+  "rows": 4551
+ },
+ "softball_ratings": {
+  "columns": [
+   "Team",
+   "power_rating",
+   "PCR",
+   "pcr_score",
+   "Conference",
+   "Season"
+  ],
+  "head": [
+   {
+    "Team": "Oklahoma",
+    "power_rating": 12.26,
+    "PCR": 1,
+    "pcr_score": null,
+    "Conference": "SEC",
+    "Season": 2027
+   },
+   {
+    "Team": "Texas",
+    "power_rating": 12.13,
+    "PCR": 2,
+    "pcr_score": null,
+    "Conference": "SEC",
+    "Season": 2027
+   },
+   {
+    "Team": "Arkansas",
+    "power_rating": 11.84,
+    "PCR": 3,
+    "pcr_score": null,
+    "Conference": "SEC",
+    "Season": 2027
+   }
+  ],
+  "attrs": {
+   "date": "January 01, 2027",
+   "count": "308"
+  }
+ },
+ "softball_schedule": {
+  "columns": [
+   "game_id",
+   "Date",
+   "Time",
+   "home_team",
+   "away_team",
+   "home_score",
+   "away_score",
+   "home_win_prob",
+   "Spread",
+   "PEAR",
+   "GQI",
+   "is_conference_game",
+   "neutral"
+  ],
+  "head": [
+   {
+    "game_id": "S1-2027-00001",
+    "Date": "2027-02-11",
+    "Time": "TBA",
+    "home_team": "Alabama",
+    "away_team": "Texas St.",
+    "home_score": null,
+    "away_score": null,
+    "home_win_prob": 0.8731,
+    "Spread": 6.03,
+    "PEAR": "Alabama -6.03",
+    "GQI": 7.9,
+    "is_conference_game": false,
+    "neutral": true
+   },
+   {
+    "game_id": "S1-2027-02559",
+    "Date": "2027-02-11",
+    "Time": "TBA",
+    "home_team": "Arizona",
+    "away_team": "Weber St.",
+    "home_score": null,
+    "away_score": null,
+    "home_win_prob": 0.9659,
+    "Spread": 10.46,
+    "PEAR": "Arizona -10.46",
+    "GQI": 5.1,
+    "is_conference_game": false,
+    "neutral": false
+   },
+   {
+    "game_id": "S1-2027-00002",
+    "Date": "2027-02-11",
+    "Time": "5:00 PM CT",
+    "home_team": "Auburn",
+    "away_team": "Nebraska",
+    "home_score": null,
+    "away_score": null,
+    "home_win_prob": 0.2732,
+    "Spread": -3.06,
+    "PEAR": "Nebraska -3.06",
+    "GQI": 8.6,
+    "is_conference_game": false,
+    "neutral": true
+   }
+  ],
+  "rows": 2932
+ }
+}

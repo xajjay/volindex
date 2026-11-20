@@ -1634,10 +1634,10 @@ window.SITE_AUTO.football = {
   "LSU": {
    "tv": "ABC",
    "kick": "2026-11-21T20:30Z",
-   "line": "LSU -1.5",
+   "line": "TENN -1.5",
    "ou": 45.5,
    "ml": "-105",
-   "book": "DraftKings",
+   "book": "Draft Kings",
    "win": 49.9
   },
   "Vanderbilt": {
