@@ -85,11 +85,11 @@ Market anchor: when the site has a line for the game, margin = 0.75 x line + 0.2
 ## Update, Nov 19: v3 power rating built on Gilbert's formula (fb_vol_v3.py)
 
 Starting point is Dr. Gilbert's rating: *a team's rating = average opponent rating + average margin of victory* (Point-Jacobi, repeated until stable).
-The Vol Index version removes home field from the margins first (HFA is estimated from the data, about 2.2 points a game, 1.3 to 2.4 by season), starts each team from a prior built from its talent composite and last season's rating (3 pretend games), then adds talent and efficiency (six opponent-adjusted stats, offense minus defense).
+The Vol Index version removes home field from the margins first (HFA is estimated from the data, about 2.2 points a game, 1.3 to 2.4 by season), starts each team from a prior built from this season's talent composite only (3 pretend games; no last-season carryover), then adds talent and efficiency (six opponent-adjusted stats, offense minus defense).
 
     power = w1*Gilbert(prior-informed) + w2*talent (more weight in weeks 1-5) + w3*efficiency
     margin = power gap + home field (matchup only) + 0.56 * availability swing
 
-Walk-forward 2019-2025 (3,872 FBS games): avg miss 12.57, winners 72.5%. Gilbert as sent was 15.0. Returning production was dropped (worth 0.06 points). Sportsbook-style HFA extras (team HFA, travel, time zones, elevation, stadium size, conference game, rest) each moved the miss by 0.01 or less, so HFA stays one league-wide number.
+Walk-forward 2019-2025 (3,872 FBS games): avg miss 12.64, winners 72.2% (carrying last season's rating too gave 12.57 but was dropped on purpose). Gilbert as sent was 15.0. Returning production was dropped (worth 0.06 points). Sportsbook-style HFA extras (team HFA, travel, time zones, elevation, stadium size, conference game, rest) each moved the miss by 0.01 or less, so HFA stays one league-wide number.
 Files: fb_gilbert.py (baseline), fb_stack.py / fb_stack2.py (layer backtests), fb_prior.py, fb_vol_v3.py (ratings + predictions), fb_experience.py (class-year check for LSU/Tennessee/Vanderbilt).
 tools/tutorial/ has a pandas-only version with its own README for learning. The older PURE / market-blend notes above describe the previous model.

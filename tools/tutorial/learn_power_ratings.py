@@ -6,7 +6,7 @@ Needs only:  pip install pandas numpy      Run:  python learn_power_ratings.py
 Layers (each one is tested out-of-sample so you can see whether it earns its place):
   1. Gilbert baseline : rating = average opponent rating + average margin   (Point-Jacobi)
                         home field is REMOVED from the margins first, so ratings are neutral-field
-  1b. Prior           : early in the season a team starts from its talent + last season's rating, not from zero
+  1b. Prior           : early in the season a team starts from the rating its TALENT predicts, not from zero
   2. Talent           : 247 team talent composite, weighted heavily EARLY in the season
   3. Efficiency       : the same Gilbert trick applied to EPA / success / explosiveness margins
   4. Home field       : added ONLY when you predict a specific game
@@ -79,19 +79,19 @@ def efficiency_ratings(games, upto_games):
     return out
 
 
-# ------------------------------------------------- the prior: talent + last season's final rating
-FINAL = {y: rate(G[G.season == y])[0] for y in range(2015, 2026)}      # last season's end-of-year ratings
+# ------------------------------------------------- the prior: this season's talent
+FINAL = {y: rate(G[G.season == y])[0] for y in range(2015, 2026)}      # end-of-year ratings, used only to learn the talent slope
 
 
 def make_prior(y):
-    """0.5 * (rating implied by this year's talent) + 0.5 * (0.8 * last year's final rating)."""
+    """Start each team from the rating its TALENT predicts (this season's roster only; no team carries last season's rating).
+    Last season is used only to learn how many rating points one talent point is worth."""
     last = FINAL.get(y - 1, {})
     ts = [t for t in last if (y - 1, t) in TAL.index and (y, t) in TAL.index]
     if len(ts) < 50: return None
     slope = np.polyfit([TAL[(y - 1, t)] / 100 for t in ts], [last[t] for t in ts], 1)[0]   # points per 100 talent points
     tm = np.mean([TAL[(y, t)] for t in ts]) / 100
-    from_talent = {t: slope * (TAL[(y, t)] / 100 - tm) for t in ts}
-    return {t: 0.5 * from_talent.get(t, 0) + 0.5 * 0.8 * last.get(t, 0) for t in set(from_talent) | set(last)}
+    return {t: slope * (TAL[(y, t)] / 100 - tm) for t in ts}
 
 
 # ------------------------------------------------- build one row per game, using ONLY earlier games

@@ -5,7 +5,7 @@ This folder rebuilds the Vol Index football power rating in about 150 lines of P
 ## What the model is
 
 ```
-power rating  =  Gilbert rating (opponent average + margin of victory, home field removed, started from talent + last year)
+power rating  =  Gilbert rating (opponent average + margin of victory, home field removed, started from this season's team talent)
                + talent (extra weight in weeks 1-5)
                + efficiency (offense minus defense: EPA, success rate, explosiveness, rush EPA, pass EPA, points per drive)
 
@@ -16,7 +16,7 @@ game prediction = power rating gap + home field (added only here) + availability
 |---|---|
 | Gilbert's formula | `gilbert()` |
 | Home field removed from the margins, estimated from the data | `rate()` and `estimate_hfa()` |
-| Early-season prior (talent + last season) | `make_prior()` |
+| Early-season prior (this season's talent) | `make_prior()` |
 | Efficiency with the same trick | `efficiency_ratings()` |
 | Walk-forward rows, using only past games | `build_features()` |
 | Weights by least squares and the backtest | `walk_forward()` |
