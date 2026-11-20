@@ -46,8 +46,8 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 8,
-   "edited": "2026-11-11",
+   "ageDays": 0,
+   "edited": "2026-11-19",
    "file": "data/football-depth.js",
    "label": "Football depth chart",
    "maxDays": 14
@@ -104,12 +104,12 @@ window.SITE_HEALTH = {
  "ok": false,
  "sports": [
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 12,
    "key": "football",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-19"
+   "updated": "2026-11-20"
   },
   {
    "ageDays": 0,
@@ -120,12 +120,12 @@ window.SITE_HEALTH = {
    "updated": "2026-11-19"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 33,
    "key": "wbb",
    "poll": "AP Top 25",
    "pollDate": "2026-11-16",
-   "updated": "2026-11-19"
+   "updated": "2026-11-20"
   },
   {
    "ageDays": 0,
