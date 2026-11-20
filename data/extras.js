@@ -274,7 +274,7 @@ window.EXTRAS = {
       ['D1Softball / NFCA / Softball America preseason', 'Jan.', 'Released in January', 'https://d1softball.com/'],
     ],
     advanced: {
-      intro: 'PEAR\'s softball model rates Tennessee third in the country heading into 2027 and projects every SEC series.',
+      intro: 'PEAR\'s softball model rates every D-I team and projects every game on Tennessee\'s 2027 schedule. Numbers refresh daily from the PEAR API.',
       teams: [
         { src: 'PEAR', url: 'https://pearatings.com/csoft/d1/team-profile?team=Tennessee&season=2027', rank: 3, rating: 'TSR 8.50', extra: 'Projected PCR No. 7 · SEC games so far posted: 26', date: 'Preseason' },
       ],
