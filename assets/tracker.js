@@ -177,11 +177,12 @@
     while (true) {
       clk -= 10 + R() * 16; if (clk <= 0) { if (half === 2) break; half = 2; clk = 1200; }
       const us = off === 1, nm = pf(us ? W : them), r = R(), base = { id: 'b' + (id++), per: half, clk: mmss(clk), team: us ? 'h' : 'a' };
-      if (r < 0.12) { ev.push(Object.assign(base, { text: `${nm} Turnover.`, type: 'turnover', hs, as })); off = 1 - off; continue; }
+      if (r < 0.12) { ev.push(Object.assign(base, { text: `${nm} Turnover.`, type: 'turnover', hs, as })); if (R() < 0.55) ev.push({ id: 'b' + (id++), per: half, clk: mmss(clk), team: us ? 'a' : 'h', text: `${pf(us ? them : W)} Steal.`, type: 'steal', hs, as }); off = 1 - off; continue; }
+      if (r < 0.2) { const fn = pf(us ? them : W), sh = pf(us ? W : them); ev.push(Object.assign(base, { team: us ? 'a' : 'h', text: `Foul on ${fn}.`, type: 'foul', hs, as })); for (let q = 0; q < 2; q++) { const mk = R() < 0.72; if (mk) { if (us) hs++; else as++; } ev.push({ id: 'b' + (id++), per: half, clk: mmss(clk), team: us ? 'h' : 'a', text: `${sh} ${mk ? 'made' : 'missed'} Free Throw.`, type: 'ft', scoring: mk, hs, as, pts: mk ? 1 : 0 }); } off = 1 - off; continue; }
       const three = R() < 0.36, made = R() < (three ? 0.35 : 0.52), pts = made ? (three ? 3 : 2) : 0;
       let sx, sy; if (three) { const a = (R() - 0.5) * 2.7; sx = 25 + Math.sin(a) * 23.5; sy = 5.25 + Math.cos(a) * 23.5; if (sy < 5) sy = 3 + R() * 2; } else if (R() < 0.45) { sx = 25 + (R() - 0.5) * 8; sy = 2 + R() * 4; } else { sx = 25 + (R() - 0.5) * 30; sy = 6 + R() * 12; }
       if (us) hs += pts; else as += pts;
-      ev.push(Object.assign(base, { text: `${nm} ${made ? 'made' : 'missed'} ${three ? 'Three Point Jumper' : sy < 6 ? 'Layup' : 'Jumper'}.`, type: 'shot', scoring: made, hs, as, pts, coord: { x: clamp(sx, 1, 49), y: clamp(sy, 1, 40) }, shoot: true }));
+      ev.push(Object.assign(base, { text: `${nm} ${made ? 'made' : 'missed'} ${three ? 'Three Point Jumper' : sy < 6 ? 'Layup' : 'Jumper'}.${made && R() < 0.6 ? ' Assisted by ' + pf((us ? W : them).filter(x => x !== nm)) + '.' : ''}`, type: 'shot', scoring: made, hs, as, pts, coord: { x: clamp(sx, 1, 49), y: clamp(sy, 1, 40) }, shoot: true }));
       if (!made) { const offReb = R() < 0.27, rt = (offReb ? us : !us); ev.push({ id: 'b' + (id++), per: half, clk: mmss(clk), team: rt ? 'h' : 'a', text: `${pf(rt ? W : them)} ${offReb ? 'Offensive' : 'Defensive'} Rebound.`, type: 'rebound', hs, as }); if (!offReb) off = 1 - off; } else off = 1 - off;
     }
     let n = 4; const t0 = Date.now();
@@ -391,36 +392,43 @@
       set('trkLast', lp ? `<b>Last play</b> ${esc(lp.text)}` : esc(S.last || ''));
     } };
 
-  /* ---- basketball ---- */
+  /* ---- basketball: "Live board" (CourtViz) — latest shots on a half court, pop-ups, and a feed with each player's updated line ---- */
+  // ESPN play text -> events CourtViz understands (made/missed shots with a spot, assists, rebounds, steals, turnovers, fouls, free throws)
+  function bbEvents(S) {
+    const out = [];
+    S.plays.forEach(p => {
+      const nm = x => x == null ? x : String(x).replace(/ (?:Bad Pass|Lost Ball|Traveling|Double Dribble|Offensive Charge|Shot Clock|Out of Bounds|Personal|Shooting|Offensive|Technical|Flagrant|Loose Ball|Charging|Illegal Screen|Foul|Turnover)\b.*$/i, '').replace(/\.$/, '').replace(/\b(Jr|Sr)$/, '$1.'), t = String(p.text || '').trim(), side = p.team != null ? (tmOf(S, p.team) === S.home ? 'h' : 'a') : null;
+      const base = { id: p.id, per: p.per, clk: p.clk, text: t, team: side, hs: p.hs, as: p.as }, prev = out[out.length - 1];
+      const other = () => out.push(Object.assign(base, { type: 'other' }));
+      if (/team rebound/i.test(t)) return other();
+      let m;
+      if ((m = new RegExp('^(' + N + ') (?:Offensive|Defensive) Rebound', 'i').exec(t))) return out.push(Object.assign(base, { type: 'rebound', name: nm(m[1]), offReb: /Offensive/i.test(t) }));
+      if (/free throw/i.test(t) && (m = new RegExp('^(' + N + ') (made|missed)', 'i').exec(t))) return out.push(Object.assign(base, { type: 'ft', name: nm(m[1]), made: /made/i.test(m[2]), pts: /made/i.test(m[2]) ? 1 : 0 }));
+      if ((m = new RegExp('^(' + N + ') (made|missed) ', 'i').exec(t))) {
+        const made = /made/i.test(m[2]), three = /three point/i.test(t), as = new RegExp('Assisted by (' + N + ')', 'i').exec(t), c = p.coord, ok = c && c.x != null && c.y != null && c.x > -100 && c.y > -100 && c.x < 200 && c.y < 200;
+        return out.push(Object.assign(base, { type: 'shot', name: nm(m[1]), made, three, pts: made ? (three ? 3 : 2) : 0, assist: made && as ? nm(as[1]) : null, coord: ok ? { x: +c.x, y: +c.y } : null }));
+      }
+      if ((m = new RegExp('^(' + N + ') Steal', 'i').exec(t))) { if (prev && prev.type === 'turnover' && !prev.steal) prev.steal = nm(m[1]); return other(); }
+      if ((m = new RegExp('^(' + N + ').*Turnover', 'i').exec(t))) { const st = new RegExp('Stolen by (' + N + ')', 'i').exec(t); return out.push(Object.assign(base, { type: 'turnover', name: nm(m[1]), steal: st ? nm(st[1]) : null })); }
+      if ((m = new RegExp('^Foul on (' + N + ')', 'i').exec(t)) || (m = new RegExp('^(' + N + ') (?:Personal|Shooting|Offensive|Technical|Flagrant|Loose Ball)?\\s*Foul', 'i').exec(t))) return out.push(Object.assign(base, { type: 'foul', name: nm(m[1]) }));
+      other();
+    });
+    return out;
+  }
   STAGE.mbb = STAGE.wbb = {
-    html() {
-      const s = `<svg class="trk-court" viewBox="-10 -10 520 490" role="img" aria-label="Shot chart"><rect x="-10" y="-10" width="520" height="490" fill="#C98F55" rx="14"/><rect x="0" y="0" width="500" height="470" fill="#D9A56B" stroke="#fff" stroke-width="4"/>
-        <rect x="170" y="0" width="160" height="190" fill="#B5471D" opacity=".45" stroke="#fff" stroke-width="3"/><circle cx="250" cy="190" r="60" fill="none" stroke="#fff" stroke-width="3"/>
-        <path d="M30 0V141.9A237.5 237.5 0 0 0 470 141.9V0" fill="none" stroke="#fff" stroke-width="3"/><path d="M210 52.5A40 40 0 0 0 290 52.5" fill="none" stroke="#fff" stroke-width="3"/>
-        <line x1="220" x2="280" y1="40" y2="40" stroke="#fff" stroke-width="5"/><circle cx="250" cy="52.5" r="9" fill="none" stroke="#FF5A1F" stroke-width="4"/>
-        <g id="trkShots"></g><g id="trkLastShot"></g></svg>`;
-      return `<div class="trk-fh"><span id="trkFieldTxt"></span></div><div class="trk-cw"><div class="trk-cc">${s}<div class="trk-chips" id="trkCt"></div></div><div class="trk-cs" id="trkCs"></div></div><div class="trk-last" id="trkLast"></div>`;
-    },
+    html() { return `<div class="trk-fh"><span id="trkFieldTxt"></span></div><div class="trk-cvbox" id="trkCvBox"></div><div id="trkRun"></div>`; },
     init() {},
     update(S) {
-      const sh = S.shots || [], me = S.us === 'home' ? S.home : S.away, X = v => v * 10;
-      document.getElementById('trkShots').innerHTML = sh.map(s => { const t = tmOf(S, s.team), c = t.tn ? ORANGE : t.color, x = X(s.x), y = X(s.y); return s.made ? `<circle cx="${x}" cy="${y}" r="9" fill="${c}" stroke="#fff" stroke-width="2.5"/>` : `<g stroke="${c}" stroke-width="3.5" opacity=".85"><path d="M${x - 6} ${y - 6}l12 12M${x + 6} ${y - 6}l-12 12"/></g>`; }).join('');
-      const ls = sh[sh.length - 1], lg = document.getElementById('trkLastShot'), ct = document.getElementById('trkCt');
-      if (ls && ls.id !== T.lastShotShown) {
-        T.lastShotShown = ls.id; const t = tmOf(S, ls.team);
-        lg.innerHTML = `<circle cx="${X(ls.x)}" cy="${X(ls.y)}" r="9" fill="none" stroke="#fff" stroke-width="4"><animate attributeName="r" from="9" to="40" dur="1.1s" repeatCount="3"/><animate attributeName="opacity" from="1" to="0" dur="1.1s" repeatCount="3"/></circle>`;
-        if (ls.name) { const x0 = clamp((X(ls.x) + 10) / 520 * 100, 16, 84), y0 = clamp((X(ls.y) + 10) / 490 * 100 + 7, 8, 94); ct.innerHTML = chipHtml({ name: ls.name, role: ls.made ? (ls.three ? '3PT' : 'MADE') : 'MISS', color: t.tn ? ORANGE : t.color, x0, y0 }, 'static'); }
-      }
-      const own = sh.filter(s => tmOf(S, s.team) === me), opp = sh.filter(s => tmOf(S, s.team) !== me), f = a => `${a.filter(s => s.made).length}-${a.length}`, t3 = a => `${a.filter(s => s.made && s.three).length}-${a.filter(s => s.three).length}`;
+      const box = document.getElementById('trkCvBox'); if (!box) return;
+      if (!window.CourtViz) { box.innerHTML = '<p class="dim">Court view could not load.</p>'; return; }
+      if (!T.cv) T.cv = window.CourtViz.mount(box, { style: 'live', home: { abbr: S.home.abbr, name: S.home.name, color: S.home.color }, away: { abbr: S.away.abbr, name: S.away.name, color: S.away.color }, us: S.us === 'home' ? 'h' : 'a', names: { h: S.home.name, a: S.away.name }, speed: 1 });
+      T.cv.update(bbEvents(S));
       // the run: points in a row since the other team last scored
       let run = 0, who = null, prevH = 0, prevA = 0; const sc = [];
       S.plays.forEach(p => { if (p.hs == null) return; if (p.scoring) { const dh = p.hs - prevH, da = p.as - prevA; sc.push({ t: dh > 0 ? 'h' : 'a', n: Math.max(dh, da) }); } prevH = p.hs; prevA = p.as; });
       for (let i = sc.length - 1; i >= 0; i--) { if (who == null) who = sc[i].t; if (sc[i].t !== who) break; run += sc[i].n; }
-      set('trkCs', `<div class="trk-cl"><span><i class="d" style="background:${ORANGE}"></i>Tennessee made</span><span><i class="x" style="color:${ORANGE}">✕</i>missed</span></div>
-        <div class="trk-cs-row"><b>${esc(me.abbr)}</b> shooting <b>${f(own)}</b> (3-pt ${t3(own)})</div><div class="trk-cs-row"><b>${esc((me === S.home ? S.away : S.home).abbr)}</b> shooting <b>${f(opp)}</b> (3-pt ${t3(opp)})</div>
-        ${run >= 6 && who ? `<div class="trk-run"><b>${run}-0 run</b> by ${esc(tmOf(S, who).name)}</div>` : ''}`);
-      const lp = S.plays[S.plays.length - 1]; document.getElementById('trkFieldTxt').innerHTML = S.state === 'in' ? `<b>${esc(S.detail)}</b> · every shot this game` : 'Shot chart · every shot this game';
-      set('trkLast', lp ? `<b>Last play</b> ${esc(lp.text)}` : '');
+      set('trkRun', run >= 6 && who ? `<div class="trk-run"><b>${run}-0 run</b> by ${esc(tmOf(S, who).name)}</div>` : '');
+      document.getElementById('trkFieldTxt').innerHTML = S.state === 'in' ? `<b>${esc(S.detail)}</b> · latest shots and plays` : S.state === 'post' ? 'Final · last plays' : 'Waiting for tip-off';
     } };
 
   /* ---- baseball and softball ---- */
@@ -538,7 +546,7 @@
     u.textContent = (T.S && T.S.state === 'in' ? `Updated ${s} second${s === 1 ? '' : 's'} ago.` : T.S && T.S.state === 'post' ? 'Final.' : '') + (u.dataset.note ? ' ' + u.dataset.note : '');
     const cd = document.getElementById('trkCd'); if (cd && T.S && T.S.start) { const ms = new Date(T.S.start) - Date.now(); if (ms > 0) cd.textContent = cdText(ms); }
   }
-  function stop() { if (!T) return; if (T.fv) { try { T.fv.stop(); } catch (e) { } } clearTimeout(T.timer); clearInterval(T.tick); if (T.io) T.io.disconnect(); T = null; document.body.classList.remove('trk-on', 'trk-lock'); if (wake) { try { wake.release(); } catch (e) { } wake = null; } }
+  function stop() { if (!T) return; if (T.fv) { try { T.fv.stop(); } catch (e) { } } if (T.cv) { try { T.cv.stop(); } catch (e) { } } clearTimeout(T.timer); clearInterval(T.tick); if (T.io) T.io.disconnect(); T = null; document.body.classList.remove('trk-on', 'trk-lock'); if (wake) { try { wake.release(); } catch (e) { } wake = null; } }
   window.renderTracker = function (app, want) {
     stop(); const k = pickSport(want); first = true; seen = new Set(); filter = 'all';
     T = { sport: k, at: Date.now() }; document.body.classList.add('trk-on'); skeleton(app, k);
