@@ -594,12 +594,14 @@
     return { off, def, ball, T, flag, banner };
   }
 
+  // the owner passcode (Games > Settings > Owner editor) unlocks owner-only tools for an hour; assets/devedit.js keeps the timestamp in sessionStorage
+  const ownerOn = () => { try { if (root.DEVEDIT && root.DEVEDIT.on && root.DEVEDIT.on()) return true; return (+root.sessionStorage.getItem('vi_dev_until') || 0) > Date.now(); } catch (e) { return false; } };
   function player(host, res, G, label) {
     const g = res.g, tU = teamOf(UT), tO = teamOf(g.opp), plays = G.rec;
     host.innerHTML = `<div class="vp-stage"><div class="vp-bug"><div class="t" id="vpTu"><i style="background:${tU.col}"></i><span>TENN</span><b id="vpSu">0</b><em></em></div><div class="c"><span id="vpQ">1st 15:00</span><small>${esc(label)}</small></div><div class="t r" id="vpTo"><i style="background:${tO.col}"></i><span>${esc(tO.abbr)}</span><b id="vpSo">0</b><em></em></div></div>
       <div class="vp-dd"><span id="vpDd">Kickoff</span><span id="vpWpT">Tennessee win chance ${pc(res.win)}</span></div>
       <canvas class="vp-cv" id="vpCv" aria-label="Animated field showing the simulated game"></canvas><div class="vp-call" id="vpCall" aria-live="polite">Press play to watch.</div><canvas class="vp-wp" id="vpWp" aria-label="Tennessee win probability through the game"></canvas>
-      <div class="vp-ctl"><button class="vp-btn pri" data-vpc="play">▶ Play</button><button class="vp-btn" data-vpc="mode" aria-pressed="true" title="Key plays at full speed, routine plays quicker">Highlights</button><button class="vp-btn" data-vpc="speed" title="Slower to see every step, faster to move through the game">Speed 2×</button><button class="vp-btn" data-vpc="score">Next score ⏭</button><button class="vp-btn" data-vpc="quarter">Next quarter ⏭</button><span class="sp"></span><button class="vp-btn" data-vpc="random" title="Draw a different game from the 1,000 simulations">🎲 Random game</button><button class="vp-btn" data-vpc="end">Skip to final</button></div>
+      <div class="vp-ctl"><button class="vp-btn pri" data-vpc="play">▶ Play</button><button class="vp-btn" data-vpc="mode" aria-pressed="true" title="Key plays at full speed, routine plays quicker">Highlights</button><button class="vp-btn" data-vpc="speed" title="Slower to see every step, faster to move through the game">Speed 2×</button><button class="vp-btn" data-vpc="score">Next score ⏭</button><button class="vp-btn" data-vpc="quarter">Next quarter ⏭</button><span class="sp"></span><button class="vp-btn" data-vpc="random" title="Draw a different game from the 1,000 simulations">🎲 Random game</button>${ownerOn() ? '<button class="vp-btn" data-vpc="rec" title="Owner only: replays the game from the start and saves it as a video file">⏺ Download video</button>' : ''}<button class="vp-btn" data-vpc="end">Skip to final</button></div>
       <div class="vp-log" id="vpLog" tabindex="0" aria-label="Play-by-play"></div></div><div id="vpFinal"></div>`;
     const $ = s => host.querySelector(s), cv = $('#vpCv'), c = cv.getContext('2d'), wpc = $('#vpWp'), wc = wpc.getContext('2d');
     let W = 0, H = 0, dpr = 1;
@@ -718,6 +720,7 @@
       S.raf = requestAnimationFrame(frame);
     }
     function end() {
+      if (S.rec) setTimeout(stopRec, 1800);      // keep the final score on screen for a moment, then save the video
       S.playing = false; S.done = true; S.until = null; $('[data-vpc="play"]').textContent = '↺ Watch again';
       const T = G.T, won = G.sc[0] > G.sc[1], n = G.names, ld = (t, i) => { const x = T[i]; return [n[i].qb ? `${n[i].qb}: ${x.qb.cmp}-${x.qb.att}, ${x.qb.yds} yds, ${x.qb.td} TD, ${x.qb.int} INT` : null, n[i].rb && x.rb.car ? `${n[i].rb}: ${x.rb.car} car, ${x.rb.yds} yds, ${x.rb.td} TD` : null, n[i].wr && x.wr.rec ? `${n[i].wr}: ${x.wr.rec} rec, ${x.wr.yds} yds, ${x.wr.td} TD` : null].filter(Boolean).join(' · '); };
       const qh = Math.max(T[0].q[4] || T[1].q[4] ? 5 : 4, 4), row = (l, a, b) => `<tr><td>${l}</td><td>${a}</td><td>${b}</td></tr>`;
@@ -730,6 +733,36 @@
     function reset() { S.now = null; S.from = null; S.i = -1; S.t = 0; S.sc = [0, 0]; S.done = false; S.hold = 0; S.cur = null; S.st = null; S.quick = null; S.bt = 0; S.until = null; $('#vpLog').innerHTML = ''; host.querySelector('#vpFinal').innerHTML = ''; $('#vpSu').textContent = 0; $('#vpSo').textContent = 0; }
     function go() { if (S.done) reset(); S.playing = true; S.last = performance.now(); $('[data-vpc="play"]').textContent = '❚❚ Pause'; if (!S.raf) S.raf = requestAnimationFrame(frame); }
     function pause() { S.playing = false; $('[data-vpc="play"]').textContent = '▶ Play'; }
+    /* Owner-only video export: replays the game from the start into a 1280x720 canvas (scoreboard, down and distance, field, play call) and records it in real time. */
+    const RW = 1280, RH = 720;
+    function composeRec() {
+      const rc = S.rec; if (!rc) return; const x = rc.ctx; x.fillStyle = '#111'; x.fillRect(0, 0, RW, RH);
+      x.fillStyle = '#161616'; x.fillRect(0, 0, RW, 62);
+      x.fillStyle = tU.col; x.fillRect(18, 15, 10, 32); x.fillStyle = tO.col; x.fillRect(RW - 28, 15, 10, 32);
+      x.textBaseline = 'middle'; x.fillStyle = '#fff'; x.font = '800 30px Archivo, system-ui, sans-serif'; x.textAlign = 'left'; x.fillText('TENN', 40, 32); x.font = '800 38px Archivo, system-ui, sans-serif'; x.fillText($('#vpSu').textContent, 138, 32);
+      x.textAlign = 'right'; x.font = '800 30px Archivo, system-ui, sans-serif'; x.fillText(tO.abbr, RW - 40, 32); x.font = '800 38px Archivo, system-ui, sans-serif'; x.fillText($('#vpSo').textContent, RW - 138, 32);
+      x.textAlign = 'center'; x.font = '800 28px Archivo, system-ui, sans-serif'; x.fillText($('#vpQ').firstChild.nodeValue, RW / 2, 24); x.font = '600 14px Archivo, system-ui, sans-serif'; x.fillStyle = '#9a9a9a'; x.fillText(rc.label, RW / 2, 48);
+      x.fillStyle = '#222'; x.fillRect(0, 62, RW, 34); x.fillStyle = '#e8e8e8'; x.font = '700 18px Archivo, system-ui, sans-serif'; x.textAlign = 'left'; x.fillText($('#vpDd').textContent, 18, 80); x.textAlign = 'right'; x.fillText($('#vpWpT').textContent, RW - 18, 80);
+      const fh = Math.round(RW * cv.height / cv.width); x.drawImage(cv, 0, 96, RW, fh);
+      x.fillStyle = '#161616'; x.fillRect(0, 96 + fh, RW, RH - 96 - fh); x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = '600 19px Archivo, system-ui, sans-serif';
+      const t = ($('#vpCall').textContent || '').slice(0, 130); x.fillText(t, RW / 2, 96 + fh + (RH - 96 - fh) / 2, RW - 40);
+      rc.raf = requestAnimationFrame(composeRec);
+    }
+    function startRec(btn) {
+      if (!root.MediaRecorder) { btn.textContent = 'Video not supported in this browser'; return; }
+      const out = document.createElement('canvas'); out.width = RW; out.height = RH;
+      const mt = ['video/mp4;codecs=avc1.42E01E', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m)); if (!mt) { btn.textContent = 'Video not supported in this browser'; return; }
+      const rec = new MediaRecorder(out.captureStream(30), { mimeType: mt, videoBitsPerSecond: 6000000 }), chunks = [];
+      rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+      rec.onstop = () => {
+        const ext = mt.startsWith('video/mp4') ? 'mp4' : 'webm', blob = new Blob(chunks, { type: mt.split(';')[0] }), a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'vol-index-' + String(g.opp).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + String(label).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.' + ext;
+        document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000); btn.textContent = '⏺ Download video'; btn.removeAttribute('aria-pressed');
+      };
+      reset(); draw(); S.rec = { ctx: out.getContext('2d'), rec, label, raf: null, btn }; btn.textContent = '■ Stop and save'; btn.setAttribute('aria-pressed', 'true');
+      composeRec(); rec.start(500); go();
+    }
+    function stopRec() { const r = S.rec; if (!r) return; S.rec = null; cancelAnimationFrame(r.raf); try { r.rec.stop(); } catch (e) { } }
     host.querySelector('.vp-ctl').addEventListener('click', e => {
       const b = e.target.closest('[data-vpc]'); if (!b) return; const k = b.dataset.vpc;
       if (k === 'play') { S.playing ? pause() : go(); }
@@ -738,6 +771,7 @@
       if (k === 'score') { S.until = 'score'; S.bt = 0; go(); }
       if (k === 'quarter') { S.until = 'quarter'; S.untilQ = null; S.bt = 0; go(); }
       if (k === 'random' && VP._watch) VP._watch('random');
+      if (k === 'rec') { S.rec ? (pause(), stopRec()) : startRec(b); }
       if (k === 'end') { S.until = 'end'; S.bt = 0; go(); }
     });
     const onR = () => { if (!document.body.contains(cv)) { root.removeEventListener('resize', onR); S.playing = false; return; } size(); draw(); wpDraw(); };
