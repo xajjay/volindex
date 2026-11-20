@@ -20,7 +20,9 @@ def proxy_weight(power, wl, cfp_top):
         if c > best: best, bw = c, w
     return bw, best
 
-def run(power_raw, season, cfp_top, b0, sd, hfa=HFA_FALLBACK, team="Tennessee", n=20000, seed=7):
+def run(power_raw, season, cfp_top, b0, sd, hfa=HFA_FALLBACK, team="Tennessee", n=20000, seed=7, force=None):
+    """force: optional {opponent: "W"|"L"} to condition the team's remaining games (what-if scenarios)."""
+    force = force or ({k: v for k, v in (x.split(":") for x in os.environ["VI_FORCE"].split(","))} if os.environ.get("VI_FORCE") else {})
     g = pd.read_parquet(os.path.join(CF, "games.parquet")); g = g[(g.season == season) & (g.seasonType == "regular")]
     fbs = lambda c: str(c).lower() == "fbs"
     g = g[g.homeClassification.map(fbs) | g.awayClassification.map(fbs)].copy()
@@ -49,6 +51,10 @@ def run(power_raw, season, cfp_top, b0, sd, hfa=HFA_FALLBACK, team="Tennessee", 
     rh = np.where(H >= 0, P[np.maximum(H, 0)], FCS_PW); ra = np.where(A >= 0, P[np.maximum(A, 0)], FCS_PW)
     mu = rh - ra + b0 + np.where(N, 0, hfa)
     pwin_h = np.array([_phi(m / sd) for m in mu])
+    for k, x in enumerate(gm):
+        if force and (x[0] == idx[team] or x[1] == idx[team]):
+            o = x[1] if x[0] == idx[team] else x[0]; res = force.get(teams[o] if o >= 0 else "")
+            if res: pwin_h[k] = float((res == "W") == (x[0] == idx[team]))
     cur_wl = {t: W[idx[t]] - L[idx[t]] for t in teams}
     w, corr = proxy_weight(power_raw, cur_wl, cfp_top)
     ut = idx[team]; out = dict(wins=0.0, winOut=0, conf=0, playoff=0, mk=0, nc=0); wins_hist = []
