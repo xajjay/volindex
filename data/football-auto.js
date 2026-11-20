@@ -1637,7 +1637,7 @@ window.SITE_AUTO.football = {
    "line": "LSU -1.5",
    "ou": 45.5,
    "ml": "-105",
-   "book": "DraftKings",
+   "book": "Draft Kings",
    "win": 49.9
   },
   "Vanderbilt": {
