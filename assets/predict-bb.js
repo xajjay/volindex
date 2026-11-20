@@ -231,7 +231,7 @@
     return `<div class="vp-score"><div class="vp-team"><span>Tennessee</span><b>${res.medU}</b></div><div class="vp-mid">Most likely<br>final score</div><div class="vp-team r"><span>${esc(o)}</span><b>${res.medO}</b></div></div>
       <div class="vp-bar" role="img" aria-label="Tennessee wins ${pc(res.win)} of simulations"><i style="flex:${Math.max(0.14, res.win)}">Tennessee ${res.win > 0.995 ? '>99%' : pc(res.win)}</i><i style="flex:${Math.max(0.14, 1 - res.win)}">${esc(tO.abbr)} ${res.win > 0.995 ? '<1%' : pc(1 - res.win)}</i></div>
       <div class="vp-chips"><span>Spread: <b>${sp === 0 ? 'Pick’em' : esc(fav) + ' by ' + sp}</b></span><span>Total: <b>${Math.round((a[0].pts + a[1].pts) * 2) / 2}</b></span><span>Within 5 points: <b>${pc(res.one)}</b></span><span>Overtime: <b>${pc(res.ot)}</b></span><span>Middle 80% of results: <b>${esc(band(res.p10))} to ${esc(band(res.p90))}</b></span></div>
-      <div class="vp-watch"><button class="vp-btn pri" data-vpw="likely">▶ Watch the most likely game</button>${res.picks.upset ? `<button class="vp-btn" data-vpw="upset">Watch ${esc(res.favU ? o : 'Tennessee')} pull the upset</button>` : ''}<button class="vp-btn" data-vpw="best">Watch Tennessee's best night</button></div>
+      <div class="vp-watch"><button class="vp-btn pri" data-vpw="likely">▶ Watch the most likely game</button>${res.picks.upset ? `<button class="vp-btn" data-vpw="upset">Watch ${esc(res.favU ? o : 'Tennessee')} pull the upset</button>` : ''}<button class="vp-btn" data-vpw="best">Watch Tennessee's best night</button><button class="vp-btn" data-vpw="random">🎲 Watch a random simulation</button></div>
       <div id="vpStage"></div>
       <div class="vp-two"><div><h4>${res.N.toLocaleString()} simulated games: how they ended</h4>${histSvg(res)}</div>
       <div><h4>What goes into the number</h4><table class="vp-fac"><tbody>${m.factors.map(x => `<tr><td>${esc(x.k)}<small>${esc(x.note)}</small></td><td class="n">${side(x.v)}</td></tr>`).join('')}
@@ -255,7 +255,7 @@
     host.innerHTML = `<div class="vp-stage"><div class="vp-bug"><div class="t" id="vpTu"><i style="background:${tU.col}"></i><span>TENN</span><b id="vpSu">0</b><em></em></div><div class="c"><span id="vpQ">${men ? '1st half' : 'Q1'} ${men ? '20:00' : '10:00'}</span><small>${esc(label)}</small></div><div class="t r" id="vpTo"><i style="background:${tO.col}"></i><span>${esc(tO.abbr)}</span><b id="vpSo">0</b><em></em></div></div>
       <div class="vp-dd"><span id="vpDd">Tip-off</span><span id="vpWpT">Tennessee win chance ${pc(res.win)}</span></div>
       <canvas class="vp-cv" id="vpCv" aria-label="Animated court showing the simulated game"></canvas><div class="vp-call" id="vpCall" aria-live="polite">Press play to watch.</div><canvas class="vp-wp" id="vpWp" aria-label="Tennessee win probability through the game"></canvas>
-      <div class="vp-ctl"><button class="vp-btn pri" data-vpc="play">▶ Play</button><button class="vp-btn" data-vpc="mode" aria-pressed="true" title="Big plays in full, the rest in fast forward">Highlights</button><button class="vp-btn" data-vpc="speed">Speed 1×</button><button class="vp-btn" data-vpc="period">Next ${men ? 'half' : 'quarter'} ⏭</button><span class="sp"></span><button class="vp-btn" data-vpc="end">Skip to final</button></div>
+      <div class="vp-ctl"><button class="vp-btn pri" data-vpc="play">▶ Play</button><button class="vp-btn" data-vpc="mode" aria-pressed="true" title="Big plays in full, the rest in fast forward">Highlights</button><button class="vp-btn" data-vpc="speed" title="Slower to see every step, faster to move through the game">Speed 2×</button><button class="vp-btn" data-vpc="period">Next ${men ? 'half' : 'quarter'} ⏭</button><span class="sp"></span><button class="vp-btn" data-vpc="random" title="Draw a different game from the 1,000 simulations">🎲 Random game</button><button class="vp-btn" data-vpc="end">Skip to final</button></div>
       <div class="vp-log" id="vpLog" tabindex="0" aria-label="Play-by-play"></div></div><div id="vpFinal"></div>`;
     const $ = s => host.querySelector(s), cv = $('#vpCv'), c = cv.getContext('2d'), wpc = $('#vpWp'), wc = wpc.getContext('2d');
     let W = 0, H = 0, dpr = 1;
@@ -265,9 +265,9 @@
     // spots on the floor, measured from the baseline being attacked: point, two wings, a corner, the post
     const SPOT = [[26, 25], [20, 7], [20, 43], [4.5, 3.5], [7, 31]], FTL = [19, 25];
     const toXY = (o, d, y) => [o === 0 ? 94 - d : d, o === 0 ? y : 50 - y], rimOf = o => [o === 0 ? 88.75 : 5.25, 25];
-    const dots = [0, 1].map(t => Array.from({ length: 5 }, (_, i) => ({ p: [47 + (t ? 3 : -3), 12 + i * 6.5], g: [47, 25] })));
-    const ball = { p: [47, 25], z: 0, hold: null, fl: null };
-    const S = { i: -1, t: 0, e: null, playing: false, speed: 1, hi: true, raf: null, last: 0, done: false, sc: [0, 0], until: null, quick: false, T: 0, steps: null, flash: null, ft: 0, curDone: true };
+    const dots = [0, 1].map(t => Array.from({ length: 5 }, (_, i) => ({ p: [47 + (t ? 3 : -3), 12 + i * 6.5], g: [47, 25], v: [0, 0] })));
+    const ball = { p: [47, 25], v: [0, 0], z: 0, hold: null, fl: null };
+    const S = { i: -1, t: 0, e: null, playing: false, speed: 2, hi: true, raf: null, last: 0, done: false, sc: [0, 0], until: null, quick: false, T: 0, steps: null, flash: null, ft: 0, curDone: true };
     function setFormation(o, e) {
       const d = 1 - o, rim = rimOf(o);
       SPOT.forEach((s, i) => { const jit = (i * 37 + S.i * 13) % 7 / 7 - 0.5; dots[o][i].g = toXY(o, s[0] + jit * 1.6, s[1] + jit * 2); });
@@ -304,14 +304,24 @@
         c.strokeStyle = '#E8590C'; c.beginPath(); c.arc(X(rx), Y(25), X(0.9), 0, 6.2832); c.stroke(); c.strokeStyle = 'rgba(255,255,255,.92)'; c.beginPath(); c.moveTo(X(bx + dir * 4), Y(22)); c.lineTo(X(bx + dir * 4), Y(28)); c.stroke(); });
       c.fillStyle = 'rgba(0,0,0,.14)'; c.font = `800 ${Math.max(12, H * 0.07)}px Archivo, system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('VOL INDEX', W / 2, H * 0.5);
     }
+    // Smooth motion: each player is pulled toward the spot he is cutting to by a critically damped spring, so he accelerates and settles
+    // instead of snapping to full speed; the carried ball follows its holder the same way. Frame-rate independent (fixed small sub-steps).
+    function spring(pos, vel, tgt, w, dt) {
+      const n = Math.max(1, Math.ceil(dt / 0.008)), h = dt / n;
+      for (let s = 0; s < n; s++) for (let a = 0; a < 2; a++) { const acc = w * w * (tgt[a] - pos[a]) - 2 * w * vel[a]; vel[a] += acc * h; pos[a] += vel[a] * h; }
+    }
+    function step(dt) {
+      const w = S.quick ? 15 : 8.5; dots.forEach(t => t.forEach(d => spring(d.p, d.v, d.g, w, dt)));
+      if (!ball.fl && ball.hold) { const d = dots[ball.hold[0]][ball.hold[1]]; spring(ball.p, ball.v, [d.p[0] + (ball.hold[0] === 0 ? 1 : -1), d.p[1] + 0.8], 26, dt); }
+    }
     function draw() {
       court();
       const r = Math.max(4.5, W / 78), e = S.e;
       [1, 0].forEach(t => dots[t].forEach(d => { c.beginPath(); c.arc(X(d.p[0]), Y(d.p[1]), r, 0, 6.2832); c.fillStyle = t === 0 ? tU.col : tO.col; c.fill(); c.lineWidth = Math.max(1.4, r * 0.28); c.strokeStyle = '#fff'; c.stroke(); }));
       let bp = ball.p, z = 0;
-      if (ball.fl) { const k = clamp((S.t - ball.fl.t0) / ball.fl.dur, 0, 1); bp = [ball.fl.a[0] + (ball.fl.b[0] - ball.fl.a[0]) * k, ball.fl.a[1] + (ball.fl.b[1] - ball.fl.a[1]) * k]; z = Math.sin(k * Math.PI) * ball.fl.arc; if (k >= 1 && ball.fl.to) { ball.hold = ball.fl.to; ball.fl = null; } }
-      else if (ball.hold) { const d = dots[ball.hold[0]][ball.hold[1]]; bp = [d.p[0] + (ball.hold[0] === 0 ? 1 : -1), d.p[1] + 0.8]; }
-      ball.p = bp;
+      if (ball.fl) { const k = clamp((S.t - ball.fl.t0) / ball.fl.dur, 0, 1), ke = ball.fl.arc > 5 ? k : k * k * (3 - 2 * k) * 0.35 + k * 0.65; bp = [ball.fl.a[0] + (ball.fl.b[0] - ball.fl.a[0]) * ke, ball.fl.a[1] + (ball.fl.b[1] - ball.fl.a[1]) * ke]; z = Math.sin(k * Math.PI) * ball.fl.arc; ball.p[0] = bp[0]; ball.p[1] = bp[1]; ball.v[0] = ball.v[1] = 0; if (k >= 1 && ball.fl.to) { ball.hold = ball.fl.to; ball.fl = null; } }
+      else if (ball.hold) bp = ball.p;
+      else ball.p = bp;
       c.fillStyle = 'rgba(0,0,0,.25)'; c.beginPath(); c.ellipse(X(bp[0]), Y(bp[1]) + 2, r * 0.55, r * 0.3, 0, 0, 6.2832); c.fill();
       c.fillStyle = '#E8590C'; c.strokeStyle = '#3a1c05'; c.lineWidth = 1; c.beginPath(); c.arc(X(bp[0]), Y(bp[1]) - z * (H / 50) * 0.5, r * (0.55 + z * 0.03), 0, 6.2832); c.fill(); c.stroke();
       if (e && e.who && ball.hold && ball.hold[0] === 0 && W >= 420 && !S.quick) { const d = dots[0][ball.hold[1]]; c.font = `700 ${Math.max(10, W / 80)}px Archivo, system-ui, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'bottom'; c.lineWidth = 3; c.strokeStyle = 'rgba(0,0,0,.6)'; c.strokeText(e.who, X(d.p[0]), Y(d.p[1]) - r * 1.5); c.fillStyle = '#fff'; c.fillText(e.who, X(d.p[0]), Y(d.p[1]) - r * 1.5); }
@@ -367,12 +377,12 @@
     }
     function frame(ts) {
       S.raf = null; if (!S.playing) return;
-      const dt = Math.min(0.1, (ts - S.last) / 1000) * S.speed; S.last = ts;
-      if (S.until != null) { if (S.e && !S.curDone) finish(); let n = 0; while (S.until != null && n++ < 900) { if (S.i + 1 >= ev.length) return end(); begin(S.i + 1); finish(); } dots.forEach(t => t.forEach(d => { d.p = d.g.slice(); })); draw(); wpDraw(); S.raf = requestAnimationFrame(frame); return; }
+      const dt = Math.min(0.05, (ts - S.last) / 1000) * S.speed; S.last = ts;
+      if (S.until != null) { if (S.e && !S.curDone) finish(); let n = 0; while (S.until != null && n++ < 900) { if (S.i + 1 >= ev.length) return end(); begin(S.i + 1); finish(); } dots.forEach(t => t.forEach(d => { d.p = d.g.slice(); d.v = [0, 0]; })); ball.v = [0, 0]; if (ball.hold) { const d = dots[ball.hold[0]][ball.hold[1]]; ball.p = [d.p[0], d.p[1]]; } draw(); wpDraw(); S.raf = requestAnimationFrame(frame); return; }
       if (S.i < 0 || (S.curDone && S.t >= S.T + (S.quick ? 0 : 0.35))) { if (S.i + 1 >= ev.length) return end(); begin(S.i + 1); }
       S.t += dt;
       while (S.steps && S.steps.length && S.steps[0][0] <= S.t) S.steps.shift()[1]();
-      const k = Math.min(1, dt * (S.quick ? 9 : 5.5)); dots.forEach(t => t.forEach(d => { d.p[0] += (d.g[0] - d.p[0]) * k; d.p[1] += (d.g[1] - d.p[1]) * k; }));
+      step(dt);
       if (S.t >= S.T && !S.curDone) { finish(); wpDraw(); }
       draw(); S.raf = requestAnimationFrame(frame);
     }
@@ -382,7 +392,8 @@
       const b = x.target.closest('[data-vpc]'); if (!b) return; const k = b.dataset.vpc;
       if (k === 'play') { if (S.playing) { S.playing = false; b.textContent = '▶ Play'; } else go(); }
       if (k === 'mode') { S.hi = !S.hi; b.setAttribute('aria-pressed', S.hi); b.textContent = S.hi ? 'Highlights' : 'Every possession'; }
-      if (k === 'speed') { S.speed = S.speed === 1 ? 2 : S.speed === 2 ? 4 : 1; b.textContent = `Speed ${S.speed}×`; }
+      if (k === 'speed') { const L = [0.5, 1, 2, 4]; S.speed = L[(L.indexOf(S.speed) + 1) % L.length]; b.textContent = `Speed ${S.speed === 0.5 ? '0.5' : S.speed}×`; }
+      if (k === 'random' && VPB._watch) VPB._watch('random');
       if (k === 'period') { S.until = 'period'; go(); }
       if (k === 'end') { S.until = 'end'; go(); }
     });
@@ -404,11 +415,13 @@
       const col = res.m.oppInfo.col; el.style.setProperty('--vp-opp', /^#(0|1|2)[0-9a-f](0|1|2)[0-9a-f](0|1|2)[0-9a-f]$/i.test(col) ? '#6B6B6B' : col);
       el.innerHTML = report(res);
       el.querySelectorAll('[data-vpadj]').forEach(s => { s.value = String(adj[s.dataset.vpadj]); s.addEventListener('change', () => { adj[s.dataset.vpadj] = +s.value; render(); }); });
-      el.querySelectorAll('[data-vpw]').forEach(b => b.addEventListener('click', () => {
-        const k = b.dataset.vpw, pk = res.picks[k]; if (!pk) return; if (VP._player) VP._player.stop();
-        const stage = el.querySelector('#vpStage'); player(stage, res, VPB.game(res, pk.seed), k === 'likely' ? 'Most likely game' : k === 'upset' ? 'The upset' : "Tennessee's best night");
+      const watch = k => {
+        const pk = k === 'random' ? { seed: 1000 + Math.floor(Math.random() * (res.N || 1000)) } : res.picks[k]; if (!pk) return; if (VP._player) VP._player.stop();
+        const stage = el.querySelector('#vpStage'); player(stage, res, VPB.game(res, pk.seed), k === 'random' ? `Random simulation #${pk.seed - 999} of ${(res.N || 1000).toLocaleString()}` : k === 'likely' ? 'Most likely game' : k === 'upset' ? 'The upset' : "Tennessee's best night");
         stage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }));
+      };
+      VPB._watch = watch;
+      el.querySelectorAll('[data-vpw]').forEach(b => b.addEventListener('click', () => watch(b.dataset.vpw)));
     };
     render();
   };
