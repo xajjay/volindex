@@ -40,6 +40,7 @@ jobs:
       - name: Run scheduled updates
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          PEAR_API_KEY: ${{ secrets.PEAR_API_KEY }}
         run: python tools/update_data.py --auto ${{ (inputs.force || github.event_name == 'push') && '--force' || '' }} ${{ github.event.schedule == '7,22,37,52 16-23,0-7 * * *' && '--gameday' || '' }}
       - name: Update men's basketball advanced stats (CBBD)
         continue-on-error: true      # optional extra data: never block the rest of the update

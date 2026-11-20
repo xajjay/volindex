@@ -13,8 +13,14 @@ SITE = "https://pearatings.com"
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36 VolIndexBot/1.0",
       "Accept": "application/json, text/html;q=0.9, */*;q=0.5"}
 
+def _headers():
+    """With a PEAR API key (env PEAR_API_KEY) the requests identify themselves, which is what lets them through when the public pages block automated traffic."""
+    h = dict(UA); k = os.environ.get("PEAR_API_KEY", "").strip()
+    if k: h["Authorization"] = "Bearer " + k; h["X-API-Key"] = k
+    return h
+
 def _get(url, n=None):
-    req = urllib.request.Request(url, headers=UA)
+    req = urllib.request.Request(url, headers=_headers())
     with urllib.request.urlopen(req, timeout=30) as r:
         b = r.read() if n is None else r.read(n)
         return r.status, r.headers.get("Content-Type", ""), b.decode("utf-8", "replace")
