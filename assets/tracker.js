@@ -268,7 +268,7 @@
       }
     } catch (e) { if (DEMO) console.error('tracker demo:', e && e.stack || e); }
     if (!T) return; if (!S) S = preFromSchedule(k);
-    T.S = S; T.at = Date.now(); paint();
+    T.S = S; T.at = Date.now(); try { paint(); } catch (e) { console.error('tracker paint:', e); }
     clearTimeout(T.timer);
     if (S && S.state === 'in') T.timer = setTimeout(load, DEMO ? 1500 : 10e3);
     else if (S && S.state === 'pre') { const ms = S.start ? new Date(S.start) - Date.now() : 1e9; T.timer = setTimeout(load, ms < 20 * 60e3 ? 30e3 : 5 * 60e3); }
@@ -502,7 +502,7 @@
     set('trkHead', head(S)); const sb = document.getElementById('trkSticky'); if (sb) sb.innerHTML = stickyBar(S);
     document.getElementById('trkPre').innerHTML = S.state === 'pre' ? pregame(S) : '';
     const stg = document.getElementById('trkStage'), st = stageFor(S.sport);
-    if (stg && st) { stg.hidden = !(live || (fin && S.plays.length)); if (!stg.hidden) st.update(S); }
+    if (stg && st) { stg.hidden = !(live || (fin && S.plays.length)); if (!stg.hidden) { try { st.update(S); } catch (e) { console.error('tracker stage:', e); } } }
     const wc = document.getElementById('trkWpCard'), g = modelFor(S), pre = g ? Math.round(g.win * 100) : null;
     wc.hidden = !(S.wp.length > 1); if (!wc.hidden) {
       set('trkWpBox', wpSvg(S, pre), S.wp.length + ':' + S.wp[S.wp.length - 1]);
