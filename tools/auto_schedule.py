@@ -175,7 +175,7 @@ def gameday_due(day, now):
             fin = datetime.datetime.fromisoformat(s["final"])
             have = site_has_final(sport, date)
             if not have:
-                if s.get("tries", 0) >= 12: s["done"] = "gave up (morning run will retry)"
+                if s.get("tries", 0) >= 36: s["done"] = "gave up (morning run will retry)"
                 else: due.append((sport, "game final, result/box score not on the site yet")); s["tries"] = s.get("tries", 0) + 1
             elif not s.get("settled") and now - fin >= datetime.timedelta(minutes=60):
                 due.append((sport, "final stats pass, an hour after the game")); s["settled"] = now.isoformat(timespec="minutes"); s["done"] = True

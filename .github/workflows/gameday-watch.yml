@@ -1,0 +1,44 @@
+# Game-night watcher. The 15-minute schedule in update.yml is often skipped by GitHub (hours can pass with no run),
+# so a final score and the new season stats could sit unpublished. This job starts a few times a day and then stays
+# running for about 5.5 hours, checking ESPN every 4 minutes; the moment Tennessee's game is final it updates the
+# result, box score and season stats, then publishes the site. A newer watcher replaces an older one, so there are no gaps.
+# Run it by hand any time: Actions tab -> "Game night watch" -> Run workflow.
+name: Game night watch
+
+on:
+  schedule:
+    - cron: "41 15 * * *"   # about 10:41 AM Eastern: covers day games
+    - cron: "41 20 * * *"   # about 3:41 PM Eastern: covers early evening games
+    - cron: "41 0 * * *"    # about 7:41 PM Eastern: covers prime-time games, runs past 1 AM
+    - cron: "41 3 * * *"    # about 10:41 PM Eastern: covers late finishes
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "How long to keep watching (minutes)"
+        default: "330"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: gameday-watch
+  cancel-in-progress: true
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Watch for finals and update
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          CBBD_API_KEY: ${{ secrets.CBBD_API_KEY }}
+        run: bash tools/gameday_watch.sh "${{ inputs.minutes || '330' }}" 240
