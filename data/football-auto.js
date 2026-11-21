@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-20. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-21. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-20",
+ "updated": "2026-11-21",
  "team": {
   "record": "8-2",
   "sec": "5-2",
@@ -1320,7 +1320,7 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Tackles for loss",
-     "rank": 89
+     "rank": 90
     }
    ],
    "Xavier Gilliam": [
@@ -1382,7 +1382,7 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Rushing TD",
-     "rank": 9
+     "rank": 10
     }
    ]
   }
@@ -1634,10 +1634,10 @@ window.SITE_AUTO.football = {
   "LSU": {
    "tv": "ABC",
    "kick": "2026-11-21T20:30Z",
-   "line": "TENN -1.5",
+   "line": "LSU -1.5",
    "ou": 45.5,
    "ml": "-105",
-   "book": "Draft Kings",
+   "book": "DraftKings",
    "win": 49.9
   },
   "Vanderbilt": {
@@ -1673,7 +1673,7 @@ window.SITE_AUTO.football = {
     "Yards per play",
     "Total offense",
     5.63,
-    79,
+    80,
     9,
     false
    ],
@@ -1700,7 +1700,7 @@ window.SITE_AUTO.football = {
     "Yards per pass attempt",
     "Passing",
     7.15,
-    79,
+    80,
     10,
     false
    ],
@@ -1727,7 +1727,7 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     23.0,
-    91,
+    90,
     9,
     true
    ],
@@ -1772,7 +1772,7 @@ window.SITE_AUTO.football = {
     "Yards per reception",
     "Receiving",
     10.92,
-    107,
+    108,
     13,
     false
    ],
@@ -1826,7 +1826,7 @@ window.SITE_AUTO.football = {
     "Turnovers lost",
     "Downs",
     11.0,
-    45,
+    44,
     4,
     true
    ],
@@ -1952,7 +1952,7 @@ window.SITE_AUTO.football = {
     "Kick return average",
     "Returning",
     16.2,
-    123,
+    122,
     14,
     false
    ],
@@ -2055,7 +2055,7 @@ window.SITE_AUTO.football = {
     ],
     [
      "Touchback Percentage",
-     "78"
+     "80"
     ],
     [
      "Average Kickoff Return Yards",
