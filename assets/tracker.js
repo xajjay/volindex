@@ -113,9 +113,9 @@
     S.shots = [];
     S.plays.forEach(p => {
       const c = p.coord; if (!c || c.x == null || c.y == null || c.x < -100 || c.y < -100) return;
-      const made = /\bmade\b/i.test(p.text) && !/missed/i.test(p.text); if (!made && !/missed/i.test(p.text)) return;
+      const made = /\b(made|makes)\b/i.test(p.text) && !/\b(missed|misses)\b/i.test(p.text); if (!made && !/\b(missed|misses)\b/i.test(p.text)) return; if (/free throw/i.test(p.text)) return;
       let x = +c.x, y = +c.y; if (y > 47) { y = 94 - y; x = 50 - x; }
-      S.shots.push({ id: p.id, x: clamp(x, 0, 50), y: clamp(y, 0, 47), made, three: /three point/i.test(p.text) || (p.pts === 3 && made), team: p.team, name: m1(new RegExp('^(' + N + ') (?:made|missed)'), p.text) || '', text: p.text });
+      S.shots.push({ id: p.id, x: clamp(x, 0, 50), y: clamp(y, 0, 47), made, three: /three point/i.test(p.text) || (p.pts === 3 && made), team: p.team, name: m1(new RegExp('^(' + N + ') (?:made|makes|missed|misses)'), p.text) || '', text: p.text });
     });
   }
   function preFromSchedule(k) {
@@ -395,21 +395,24 @@
   /* ---- basketball: "Live board" (CourtViz) — latest shots on a half court, pop-ups, and a feed with each player's updated line ---- */
   // ESPN play text -> events CourtViz understands (made/missed shots with a spot, assists, rebounds, steals, turnovers, fouls, free throws)
   function bbEvents(S) {
-    const out = [];
+    const out = [], teamNames = [S.home.name, S.away.name, S.home.abbr, S.away.abbr].filter(Boolean).map(x => String(x).toLowerCase());
+    // ESPN words the same play two ways: "Name made Layup. Assisted by X." (after the game) and "Name makes 23-foot three point jumper (X assists)" (live)
+    const MK = '(makes?|made|misses?|missed)';
     S.plays.forEach(p => {
-      const nm = x => x == null ? x : String(x).replace(/ (?:Bad Pass|Lost Ball|Traveling|Double Dribble|Offensive Charge|Shot Clock|Out of Bounds|Personal|Shooting|Offensive|Technical|Flagrant|Loose Ball|Charging|Illegal Screen|Foul|Turnover)\b.*$/i, '').replace(/\.$/, '').replace(/\b(Jr|Sr)$/, '$1.'), t = String(p.text || '').trim(), side = p.team != null ? (tmOf(S, p.team) === S.home ? 'h' : 'a') : null;
+      const nm = x => x == null ? x : String(x).replace(/ (?:Bad Pass|Lost Ball|Traveling|Double Dribble|Offensive Charge|Shot Clock|Out of Bounds|Personal|Shooting|Offensive|Technical|Flagrant|Loose Ball|Charging|Illegal Screen|Foul|Turnover)\b.*$/i, '').replace(/\.$/, '').replace(/\b(Jr|Sr)$/, '$1.');
+      const t = String(p.text || '').replace(/\s+/g, ' ').trim(), side = p.team != null ? (tmOf(S, p.team) === S.home ? 'h' : 'a') : null;
       const base = { id: p.id, per: p.per, clk: p.clk, text: t, team: side, hs: p.hs, as: p.as }, prev = out[out.length - 1];
-      const other = () => out.push(Object.assign(base, { type: 'other' }));
+      const other = () => out.push(Object.assign(base, { type: 'other' })), isTeam = x => teamNames.includes(String(x || '').toLowerCase());
       if (/team rebound/i.test(t)) return other();
       let m;
-      if ((m = new RegExp('^(' + N + ') (?:Offensive|Defensive) Rebound', 'i').exec(t))) return out.push(Object.assign(base, { type: 'rebound', name: nm(m[1]), offReb: /Offensive/i.test(t) }));
-      if (/free throw/i.test(t) && (m = new RegExp('^(' + N + ') (made|missed)', 'i').exec(t))) return out.push(Object.assign(base, { type: 'ft', name: nm(m[1]), made: /made/i.test(m[2]), pts: /made/i.test(m[2]) ? 1 : 0 }));
-      if ((m = new RegExp('^(' + N + ') (made|missed) ', 'i').exec(t))) {
-        const made = /made/i.test(m[2]), three = /three point/i.test(t), as = new RegExp('Assisted by (' + N + ')', 'i').exec(t), c = p.coord, ok = c && c.x != null && c.y != null && c.x > -100 && c.y > -100 && c.x < 200 && c.y < 200;
+      if ((m = new RegExp('^(' + N + ') (?:Offensive|Defensive) Rebound', 'i').exec(t))) { if (isTeam(m[1])) return other(); return out.push(Object.assign(base, { type: 'rebound', name: nm(m[1]), offReb: /Offensive/i.test(t) })); }
+      if (/free throw/i.test(t) && (m = new RegExp('^(' + N + ') ' + MK + ' ', 'i').exec(t))) { const ok = /^(makes?|made)$/i.test(m[2]); return out.push(Object.assign(base, { type: 'ft', name: nm(m[1]), made: ok, pts: ok ? 1 : 0 })); }
+      if ((m = new RegExp('^(' + N + ') ' + MK + ' ', 'i').exec(t)) && !isTeam(m[1])) {
+        const made = /^(makes?|made)$/i.test(m[2]), three = /three point/i.test(t), as = new RegExp('Assisted by (' + N + ')', 'i').exec(t) || new RegExp('\\((' + N + ') assists?\\)', 'i').exec(t), c = p.coord, ok = c && c.x != null && c.y != null && c.x > -100 && c.y > -100 && c.x < 200 && c.y < 200;
         return out.push(Object.assign(base, { type: 'shot', name: nm(m[1]), made, three, pts: made ? (three ? 3 : 2) : 0, assist: made && as ? nm(as[1]) : null, coord: ok ? { x: +c.x, y: +c.y } : null }));
       }
-      if ((m = new RegExp('^(' + N + ') Steal', 'i').exec(t))) { if (prev && prev.type === 'turnover' && !prev.steal) prev.steal = nm(m[1]); return other(); }
-      if ((m = new RegExp('^(' + N + ').*Turnover', 'i').exec(t))) { const st = new RegExp('Stolen by (' + N + ')', 'i').exec(t); return out.push(Object.assign(base, { type: 'turnover', name: nm(m[1]), steal: st ? nm(st[1]) : null })); }
+      if ((m = new RegExp('^(' + N + ') Steals?\\b', 'i').exec(t))) { if (prev && prev.type === 'turnover' && !prev.steal) prev.steal = nm(m[1]); return other(); }
+      if (/turnover/i.test(t) && (m = /^(.+?) (?:bad pass|lost ball|traveling|double dribble|offensive charge|charging|shot clock|out of bounds|illegal|palming|backcourt|\d+[- ]second|\w+ violation|turnover)/i.exec(t)) && m[1].split(' ').length <= 4 && !isTeam(m[1])) { const st = new RegExp('Stolen by (' + N + ')', 'i').exec(t); return out.push(Object.assign(base, { type: 'turnover', name: nm(m[1]), steal: st ? nm(st[1]) : null })); }
       if ((m = new RegExp('^Foul on (' + N + ')', 'i').exec(t)) || (m = new RegExp('^(' + N + ') (?:Personal|Shooting|Offensive|Technical|Flagrant|Loose Ball)?\\s*Foul', 'i').exec(t))) return out.push(Object.assign(base, { type: 'foul', name: nm(m[1]) }));
       other();
     });
