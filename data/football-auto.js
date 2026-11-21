@@ -217,7 +217,7 @@ window.SITE_AUTO.football = {
   "ranks": {
    "ppg": [
     31.4,
-    41,
+    40,
     6
    ],
    "oppg": [
@@ -242,12 +242,12 @@ window.SITE_AUTO.football = {
    ],
    "oypg": [
     284.8,
-    12,
+    13,
     3
    ],
    "oRushYpg": [
     120.6,
-    33,
+    34,
     6
    ],
    "oPassYpg": [
@@ -1310,17 +1310,17 @@ window.SITE_AUTO.football = {
    "Arion Carter": [
     {
      "stat": "Tackles for loss",
-     "rank": 61
+     "rank": 63
     }
    ],
    "Tyree Weathersby": [
     {
      "stat": "Sacks",
-     "rank": 17
+     "rank": 18
     },
     {
      "stat": "Tackles for loss",
-     "rank": 90
+     "rank": 93
     }
    ],
    "Xavier Gilliam": [
@@ -1336,13 +1336,13 @@ window.SITE_AUTO.football = {
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 68
+     "rank": 69
     }
    ],
    "Ty Redmond": [
     {
      "stat": "Passes defended",
-     "rank": 2
+     "rank": 3
     }
    ],
    "Dejuan Lane": [
@@ -1655,7 +1655,7 @@ window.SITE_AUTO.football = {
     "Points per game",
     "Total offense",
     31.4,
-    41,
+    40,
     6,
     false
    ],
@@ -1673,7 +1673,7 @@ window.SITE_AUTO.football = {
     "Yards per play",
     "Total offense",
     5.63,
-    80,
+    81,
     9,
     false
    ],
@@ -1691,7 +1691,7 @@ window.SITE_AUTO.football = {
     "Completion %",
     "Passing",
     65.4,
-    37,
+    36,
     7,
     false
    ],
@@ -1700,7 +1700,7 @@ window.SITE_AUTO.football = {
     "Yards per pass attempt",
     "Passing",
     7.15,
-    80,
+    81,
     10,
     false
    ],
@@ -1727,7 +1727,7 @@ window.SITE_AUTO.football = {
     "Sacks allowed",
     "Passing",
     23.0,
-    90,
+    89,
     9,
     true
    ],
@@ -1745,7 +1745,7 @@ window.SITE_AUTO.football = {
     "Yards per carry",
     "Rushing",
     4.81,
-    42,
+    41,
     3,
     false
    ],
@@ -1781,7 +1781,7 @@ window.SITE_AUTO.football = {
     "First downs per game",
     "Downs",
     21.1,
-    45,
+    43,
     6,
     false
    ],
@@ -1826,7 +1826,7 @@ window.SITE_AUTO.football = {
     "Turnovers lost",
     "Downs",
     11.0,
-    44,
+    43,
     4,
     true
    ],
@@ -1844,7 +1844,7 @@ window.SITE_AUTO.football = {
     "Yards allowed per game",
     "Yards allowed",
     284.8,
-    12,
+    13,
     3,
     true
    ],
@@ -1862,7 +1862,7 @@ window.SITE_AUTO.football = {
     "Opponent 3rd down %",
     "Yards allowed",
     31.8,
-    19,
+    20,
     5,
     true
    ],
@@ -1880,7 +1880,7 @@ window.SITE_AUTO.football = {
     "Opponent completion %",
     "Pass defense",
     62.4,
-    82,
+    83,
     10,
     true
    ],
@@ -1907,7 +1907,7 @@ window.SITE_AUTO.football = {
     "Rushing yards allowed per game",
     "Run defense",
     120.6,
-    33,
+    34,
     6,
     true
    ],
@@ -1916,7 +1916,7 @@ window.SITE_AUTO.football = {
     "Yards per carry allowed",
     "Run defense",
     3.87,
-    53,
+    54,
     11,
     true
    ],
@@ -1925,7 +1925,7 @@ window.SITE_AUTO.football = {
     "Tackles for loss",
     "Run defense",
     74.0,
-    9,
+    10,
     1,
     false
    ],
@@ -1952,7 +1952,7 @@ window.SITE_AUTO.football = {
     "Kick return average",
     "Returning",
     16.2,
-    122,
+    123,
     14,
     false
    ],
