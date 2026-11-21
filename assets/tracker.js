@@ -103,6 +103,7 @@
         ['turnovers', 'Turnovers'], ['totalPenaltiesYards', 'Penalties'], ['possessionTime', 'Time of possession'], ['fieldGoalPct', 'FG %'], ['threePointFieldGoalPct', '3-pt %'], ['freeThrowPct', 'FT %'], ['totalRebounds', 'Rebounds'], ['assists', 'Assists'], ['hits', 'Hits'], ['errors', 'Errors']];
       WANT.forEach(([n, l]) => { const x = (a.statistics || []).find(s => s.name === n), y = (h.statistics || []).find(s => s.name === n); if (x && y && x.displayValue != null) S.stats.push({ l, a: x.displayValue, h: y.displayValue, low: /turnover|penalt|error/i.test(l) }); });
     }
+    S.box = ((sum.boxscore || {}).players || []).map(tp => ({ tid: (tp.team || {}).id, groups: (tp.statistics || []).filter(g => (g.athletes || []).length).map(g => ({ name: g.name || '', labels: g.labels || [], rows: g.athletes.filter(a => (a.stats || []).length).map(a => ({ n: (a.athlete || {}).shortName || (a.athlete || {}).displayName || '', s: a.stats })) })) }));
     (sum.leaders || []).forEach(L => (L.leaders || []).forEach(c => {
       const e = (c.leaders || [])[0]; if (!e) return; let row = S.leaders.find(r => r.l === c.displayName); if (!row) { row = { l: c.displayName, away: '', home: '' }; S.leaders.push(row); }
       const txt = `${esc((e.athlete || {}).shortName || (e.athlete || {}).displayName || '')} <i>${esc(e.displayValue || '')}</i>`; if (L.team && L.team.id === home.id) row.home = txt; else row.away = txt; }));
@@ -278,6 +279,7 @@
   const rk = t => t.rank ? `<i class="trk-rk">${t.rank}</i>` : '';
   const tmOf = (S, id) => id === 'h' || id === S.home.id ? S.home : S.away;
   const modelFor = S => { if (S.sport !== 'football' || !window.MODEL_FB || !window.MODEL_FB.games) return null; const opp = (S.us === 'home' ? S.away : S.home).name; return window.MODEL_FB.games.find(g => g.opp === opp) || null; };
+  const usOf = S => S[S.us === 'home' ? 'home' : 'away'], themOf = S => S[S.us === 'home' ? 'away' : 'home'];
   function teamRow(S, t) {
     const hasBall = S.state === 'in' && S.poss && S[S.poss] === t;
     return `<div class="trk-team${t.tn ? ' ut' : ''}${S.state === 'post' && t.winner ? ' won' : ''}"><span class="trk-dot" style="background:${esc(t.color)}"></span><span class="trk-nm">${rk(t)}${esc(t.name)}${hasBall ? '<i class="poss" title="Has the ball"></i>' : ''}<small>${esc(t.record)}</small></span><b class="trk-sc">${t.score}</b></div>`;
@@ -285,9 +287,9 @@
   function head(S) {
     const live = S.state === 'in', fin = S.state === 'post', st = live ? `<span class="livedot"></span><b>LIVE</b> · ${esc(S.detail)}` : fin ? '<b>Final</b>' : `<b>${esc(S.detail || 'Upcoming')}</b>`;
     const sit = live && S.dd ? `<div class="trk-sit">${esc(S.dd)}${S.red ? ' · <b class="red">Red zone</b>' : ''}</div>` : '';
-    return `<div class="trk-board"><div class="trk-st">${st}</div>${teamRow(S, S.away)}${teamRow(S, S.home)}${sit}<div class="trk-meta">${[S.tv, S.venue].filter(Boolean).map(esc).join(' · ')}</div></div>`;
+    return `<div class="trk-board"><div class="trk-st">${st}</div>${teamRow(S, usOf(S))}${teamRow(S, themOf(S))}${sit}<div class="trk-meta">${[S.tv, S.venue].filter(Boolean).map(esc).join(' · ')}</div></div>`;
   }
-  const stickyBar = S => `${S.state === 'in' ? '<span class="livedot"></span>' : ''}<b>${esc(S.away.abbr)} ${S.away.score}</b> <span>·</span> <b>${esc(S.home.abbr)} ${S.home.score}</b> <em>${S.state === 'in' ? esc(S.detail) : S.state === 'post' ? 'Final' : esc(S.detail || 'Upcoming')}</em>`;
+  const stickyBar = S => `${S.state === 'in' ? '<span class="livedot"></span>' : ''}<b>${esc(usOf(S).abbr)} ${usOf(S).score}</b> <span>·</span> <b>${esc(themOf(S).abbr)} ${themOf(S).score}</b> <em>${S.state === 'in' ? esc(S.detail) : S.state === 'post' ? 'Final' : esc(S.detail || 'Upcoming')}</em>`;
   const cdText = ms => `${Math.floor(ms / 864e5) ? Math.floor(ms / 864e5) + 'd ' : ''}${Math.floor(ms / 36e5) % 24}h ${String(Math.floor(ms / 6e4) % 60).padStart(2, '0')}m ${String(Math.floor(ms / 1e3) % 60).padStart(2, '0')}s`;
   function pregame(S) {
     const g = modelFor(S), ms = S.start ? new Date(S.start) - Date.now() : null;
@@ -312,31 +314,54 @@
   const FILT = [['all', 'All plays'], ['score', 'Scoring'], ['big', 'Big plays'], ['tov', 'Turnovers'], ['ut', 'Tennessee']];
   const isBig = p => p.big || (S_isFb() && p.yds != null && p.yds >= 20 && /rush|run|pass|reception/i.test(p.type + ' ' + p.text)), isTov = p => /intercept|fumble|turnover|steal/i.test((p.type || '') + ' ' + p.text) && !/no turnover/i.test(p.text);
   const S_isFb = () => T && T.sport === 'football';
+  const MAXPLAYS = 10;
   function playsHtml(S) {
     if (!S.plays.length) return S.state === 'pre' ? '' : '<p class="dim">Plays will appear here as they happen.</p>';
     const me = S.us === 'home' ? S.home : S.away, ok = p => filter === 'all' || (filter === 'score' && p.scoring) || (filter === 'big' && isBig(p)) || (filter === 'tov' && isTov(p)) || (filter === 'ut' && p.team != null && tmOf(S, p.team) === me);
     const per = p => S.sport === 'baseball' || S.sport === 'softball' ? esc(p.clk) : (p.per ? (S.sport === 'football' ? (p.per > 4 ? 'OT' : 'Q' + p.per) : S.sport === 'mbb' || S.sport === 'wbb' ? 'H' + p.per : 'P' + p.per) : '') + ' ' + esc(p.clk);
-    const row = p => `<li class="${p.scoring ? 'sc' : ''}${isTov(p) ? ' tov' : ''}${isBig(p) ? ' big' : ''}"><span class="trk-t">${per(p)}</span><span class="trk-x">${p.down ? `<small>${['', '1st', '2nd', '3rd', '4th'][p.down] || ''} &amp; ${p.dist}</small> ` : ''}${esc(p.text)}${p.scoring && p.hs != null ? ` <b class="trk-ss">${esc(S.away.abbr)} ${p.as} – ${esc(S.home.abbr)} ${p.hs}</b>` : ''}</span></li>`;
+    const row = p => `<li class="${p.scoring ? 'sc' : ''}${isTov(p) ? ' tov' : ''}${isBig(p) ? ' big' : ''}"><span class="trk-t">${per(p)}</span><span class="trk-x">${p.down ? `<small>${['', '1st', '2nd', '3rd', '4th'][p.down] || ''} &amp; ${p.dist}</small> ` : ''}${esc(p.text)}${p.scoring && p.hs != null ? ` <b class="trk-ss">${esc(usOf(S).abbr)} ${S.us === 'home' ? p.hs : p.as} – ${esc(themOf(S).abbr)} ${S.us === 'home' ? p.as : p.hs}</b>` : ''}</span></li>`;
     if (S.drives.length) {
-      const out = []; for (let di = S.drives.length - 1; di >= 0; di--) {
-        const d = S.drives[di], ps = S.plays.filter(p => p.d === di && ok(p)); if (!ps.length) continue; const t = tmOf(S, d.team);
+      const out = []; let left = MAXPLAYS; for (let di = S.drives.length - 1; di >= 0 && left > 0; di--) {
+        const d = S.drives[di], all = S.plays.filter(p => p.d === di && ok(p)); if (!all.length) continue; const ps = all.slice(-left); left -= ps.length; const t = tmOf(S, d.team);
         out.push(`<div class="trk-drive${d.cur ? ' cur' : ''}"><div class="trk-dh" style="border-color:${esc(t.color)}"><b>${esc(t.name)}</b> <span>${d.n != null ? d.n + ' plays, ' : ''}${d.yds != null ? d.yds + ' yds' : ''}${d.top ? ', ' + esc(d.top) : ''}</span> <em class="${d.score ? 'tdp' : ''}">${d.cur ? 'In progress' : esc(d.result)}</em></div><ol>${ps.slice().reverse().map(row).join('')}</ol></div>`);
       } return out.join('') || '<p class="dim">No plays match this filter yet.</p>';
     }
-    const ps = S.plays.filter(ok).slice(-120).reverse(); return ps.length ? `<ol class="trk-flat">${ps.map(row).join('')}</ol>` : '<p class="dim">No plays match this filter yet.</p>';
+    const ps = S.plays.filter(ok).slice(-MAXPLAYS).reverse(); return ps.length ? `<ol class="trk-flat">${ps.map(row).join('')}</ol>` : '<p class="dim">No plays match this filter yet.</p>';
   }
   function statsHtml(S) {
     if (!S.stats.length) return '';
-    return `<div class="trk-card"><h3>Team stats</h3><div class="trk-sh"><b style="color:${esc(S.away.color)}">${esc(S.away.abbr)}</b><b style="color:${esc(S.home.color)}">${esc(S.home.abbr)}</b></div>${S.stats.map(r => {
-      const a = toSec(r.a), h = toSec(r.h), tot = (a || 0) + (h || 0), pa = tot > 0 && isFinite(a) && isFinite(h) ? Math.round(100 * a / tot) : 50;
-      return `<div class="trk-sr"><span>${esc(r.a)}</span><div class="trk-bar"><i style="width:${pa}%;background:${esc(S.away.color)}"></i><i style="width:${100 - pa}%;background:${esc(S.home.color)}"></i></div><span>${esc(r.h)}</span><small>${esc(r.l)}</small></div>`; }).join('')}</div>`;
+    return `<div class="trk-card"><h3>Team stats</h3><div class="trk-sh"><b style="color:${esc(usOf(S).color)}">${esc(usOf(S).abbr)}</b><b style="color:${esc(themOf(S).color)}">${esc(themOf(S).abbr)}</b></div>${S.stats.map(r0 => {
+      const r = S.us === 'home' ? { l: r0.l, a: r0.h, h: r0.a } : r0, a = toSec(r.a), h = toSec(r.h), tot = (a || 0) + (h || 0), pa = tot > 0 && isFinite(a) && isFinite(h) ? Math.round(100 * a / tot) : 50;
+      return `<div class="trk-sr"><span>${esc(r.a)}</span><div class="trk-bar"><i style="width:${pa}%;background:${esc(usOf(S).color)}"></i><i style="width:${100 - pa}%;background:${esc(themOf(S).color)}"></i></div><span>${esc(r.h)}</span><small>${esc(r.l)}</small></div>`; }).join('')}</div>`;
   }
   function lineHtml(S) {
     const n = Math.max(S.home.lines.length, S.away.lines.length); if (!n) return '';
     const h = Array.from({ length: n }, (_, i) => `<th class="n">${i + 1}</th>`).join(''), r = t => `<tr class="${t.tn ? 'me' : ''}"><td><b>${esc(t.abbr)}</b></td>${Array.from({ length: n }, (_, i) => `<td class="n">${esc(t.lines[i] ?? '')}</td>`).join('')}<td class="n"><b>${t.score}</b></td></tr>`;
-    return `<div class="trk-card"><h3>Line score</h3><div class="tablewrap"><table class="lbx-line"><thead><tr><th></th>${h}<th class="n">T</th></tr></thead><tbody>${r(S.away)}${r(S.home)}</tbody></table></div></div>`;
+    return `<div class="trk-card"><h3>Line score</h3><div class="tablewrap"><table class="lbx-line"><thead><tr><th></th>${h}<th class="n">T</th></tr></thead><tbody>${r(usOf(S))}${r(themOf(S))}</tbody></table></div></div>`;
   }
-  const leadersHtml = S => S.leaders.length ? `<div class="trk-card"><h3>Leaders</h3><div class="tablewrap"><table><thead><tr><th>${esc(S.away.abbr)}</th><th></th><th>${esc(S.home.abbr)}</th></tr></thead><tbody>${S.leaders.map(r => `<tr><td>${r.away}</td><td class="dim small">${esc(r.l)}</td><td>${r.home}</td></tr>`).join('')}</tbody></table></div></div>` : '';
+
+  // player box score: ESPN's own when it has one, otherwise totalled from the plays we already read (basketball)
+  function boxFromPlays(S) {
+    const P = {}, get = (side, n) => (P[side + n] = P[side + n] || { side, n, pts: 0, fgm: 0, fga: 0, tpm: 0, tpa: 0, ftm: 0, fta: 0, reb: 0, ast: 0, stl: 0, tov: 0, pf: 0 });
+    bbEvents(S).forEach(e => { if (!e.name || !e.team) return; const a = get(e.team, e.name);
+      if (e.type === 'shot') { a.fga++; if (e.three) a.tpa++; if (e.made) { a.fgm++; a.pts += e.pts; if (e.three) a.tpm++; if (e.assist) get(e.team, e.assist).ast++; } }
+      else if (e.type === 'ft') { a.fta++; if (e.made) { a.ftm++; a.pts++; } } else if (e.type === 'rebound') a.reb++; else if (e.type === 'turnover') { a.tov++; if (e.steal) get(e.team === 'h' ? 'a' : 'h', e.steal).stl++; } else if (e.type === 'foul') a.pf++; });
+    const labels = ['PTS', 'REB', 'AST', 'FG', '3PT', 'FT', 'STL', 'TO', 'PF'], mk = side => ({ name: '', labels, rows: Object.values(P).filter(x => x.side === side).sort((x, y) => y.pts - x.pts || y.reb - x.reb).slice(0, 12).map(x => ({ n: shortName(x.n), s: [x.pts, x.reb, x.ast, x.fgm + '-' + x.fga, x.tpm + '-' + x.tpa, x.ftm + '-' + x.fta, x.stl, x.tov, x.pf] })) });
+    return { h: mk('h'), a: mk('a') };
+  }
+  function boxHtml(S) {
+    if (S.state === 'pre') return '';
+    const us = usOf(S), them = themOf(S); let teams = [];
+    if (S.box && S.box.length) teams = [us, them].map(tm => { const b = S.box.find(x => String(x.tid) === String(tm.id)); return b ? { tm, groups: b.groups } : null; }).filter(Boolean);
+    if (!teams.length && (S.sport === 'mbb' || S.sport === 'wbb') && S.plays.length) { const d = boxFromPlays(S); teams = [us, them].map(tm => ({ tm, groups: [d[tm === S.home ? 'h' : 'a']], derived: true })); }
+    teams = teams.filter(x => x.groups.some(g => g.rows.length)); if (!teams.length) return '';
+    const BB = ['MIN', 'PTS', 'REB', 'AST', 'FG', '3PT', 'FT', 'STL', 'BLK', 'TO', 'PF'], bb = S.sport === 'mbb' || S.sport === 'wbb';
+    return `<div class="trk-card trk-box"><h3>Box score</h3>${teams.map(x => x.groups.filter(g => g.rows.length).map(g => {
+      const idx = bb && !x.derived ? BB.map(l => g.labels.indexOf(l)).filter(i => i >= 0) : g.labels.map((_, i) => i), rows = g.rows.slice(0, bb ? 13 : 8);
+      return `<h4 style="border-color:${esc(x.tm.color)}">${esc(x.tm.name)}${g.name ? ' · ' + esc(String(g.name).replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase())) : ''}</h4><div class="tablewrap"><table class="trk-bt"><thead><tr><th>Player</th>${idx.map(i => `<th class="n">${esc(g.labels[i])}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r.n)}</td>${idx.map(i => `<td class="n">${esc(r.s[i] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    }).join('')).join('')}${teams.some(x => x.derived) ? '<p class="dim small">Totalled from the play-by-play as it comes in.</p>' : ''}</div>`;
+  }
+  const leadersHtml = S => S.leaders.length ? `<div class="trk-card"><h3>Leaders</h3><div class="tablewrap"><table><thead><tr><th>${esc(usOf(S).abbr)}</th><th></th><th>${esc(themOf(S).abbr)}</th></tr></thead><tbody>${S.leaders.map(r => `<tr><td>${S.us === 'home' ? r.home : r.away}</td><td class="dim small">${esc(r.l)}</td><td>${S.us === 'home' ? r.away : r.home}</td></tr>`).join('')}</tbody></table></div></div>` : '';
 
   /* ================= stages (each sport's picture) ================= */
   const STAGE = {};
@@ -513,7 +538,7 @@
     }
     const pc = document.getElementById('trkPlayCard'); pc.hidden = !S.plays.length;
     if (S.plays.length) set('trkPlays', playsHtml(S), S.plays.length + ':' + filter + ':' + S.state + ':' + (S.plays[S.plays.length - 1].text || '').length);
-    set('trkSide', lineHtml(S) + statsHtml(S) + leadersHtml(S) + (S.state === 'pre' || S.sport !== 'football' ? '' : `<div class="trk-card trk-links"><a href="${href('football-schedule')}">Our prediction for this game ›</a></div>`), JSON.stringify([S.home.score, S.away.score, S.stats.length && S.stats[0].a, S.state, S.leaders.length, S.home.lines.join(',')]));
+    set('trkSide', lineHtml(S) + boxHtml(S) + statsHtml(S) + leadersHtml(S) + (S.state === 'pre' || S.sport !== 'football' ? '' : `<div class="trk-card trk-links"><a href="${href('football-schedule')}">Our prediction for this game ›</a></div>`), JSON.stringify([S.home.score, S.away.score, S.stats.length && S.stats[0].a, S.state, S.leaders.length, S.home.lines.join(','), S.plays.length, S.box ? S.box.length : 0]));
     const es = document.getElementById('trkEspn'); if (es && S.id) { es.href = `https://www.espn.com/${S.sport === 'football' ? 'college-football' : S.sport === 'mbb' ? 'mens-college-basketball' : S.sport === 'wbb' ? 'womens-college-basketball' : 'college-' + S.sport}/game/_/gameId/${S.id}`; es.hidden = !!S.demo; }
     const sc = S.plays.filter(p => p.scoring);
     if (first) { sc.forEach(p => seen.add(p.id)); first = false; } else sc.forEach(p => { if (seen.has(p.id)) return; seen.add(p.id); celebrate(S, p); });
