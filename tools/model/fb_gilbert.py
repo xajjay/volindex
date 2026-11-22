@@ -4,6 +4,24 @@ import os, sys, json, numpy as np, pandas as pd
 D = os.path.join(os.path.dirname(__file__), "..", "cache", "fbm")
 G = pd.read_parquet(f"{D}/games.parquet")
 G = G[G.home_score.notna() & G.away_score.notna() & G.home_team.notna()].copy()
+
+def _backfill(G):
+    """The play-by-play release (cfbfastR) lags on late-Saturday games, so finished games can be missing from G for a day or two. The results-and-schedule rating only needs the final score, so fill the gap from the CFBD schedule (already pulled each run).
+    Efficiency stats still come from play-by-play and catch up when that release does. Only games that involve an FBS team, current season only."""
+    try:
+        c = pd.read_parquet(f"{D}/cfbd/games.parquet")
+        S = int(G.season.max()); c = c[(c.season == S) & (c.seasonType == "regular") & (c.completed == True) & c.homePoints.notna() & c.awayPoints.notna()]
+        c = c[~c.id.isin(G.game_id)]
+        c = c[(c.homeClassification == "fbs") | (c.awayClassification == "fbs")]
+        if c.empty: return G
+        add = pd.DataFrame({"game_id": c.id.values, "season": S, "week": c.week.values, "home_team": c.homeTeam.values, "away_team": c.awayTeam.values,
+                            "home_score": c.homePoints.values, "away_score": c.awayPoints.values, "neutral_site": c.neutralSite.fillna(False).astype(bool).values,
+                            "home_team_division": c.homeClassification.astype(str).str.lower().values, "away_team_division": c.awayClassification.astype(str).str.lower().values})
+        print(f"fb_gilbert: filled {len(add)} finished games missing from the play-by-play release (results rating only)")
+        return pd.concat([G, add], ignore_index=True)
+    except Exception as e:
+        print("fb_gilbert: backfill skipped:", e); return G
+G = _backfill(G)
 G["m"] = G.home_score - G.away_score
 G["neu"] = G.neutral_site.fillna(False).astype(bool)
 G["fbs"] = (G.home_team_division == "fbs") & (G.away_team_division == "fbs")

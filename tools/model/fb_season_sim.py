@@ -20,8 +20,9 @@ def proxy_weight(power, wl, cfp_top):
         if c > best: best, bw = c, w
     return bw, best
 
-def run(power_raw, season, cfp_top, b0, sd, hfa=HFA_FALLBACK, team="Tennessee", n=20000, seed=7, force=None, tally=None):
+def run(power_raw, season, cfp_top, b0, sd, hfa=HFA_FALLBACK, team="Tennessee", n=20000, seed=7, force=None, tally=None, cfp_thru=None):
     """force: optional {opponent: "W"|"L"} to condition the team's remaining games (what-if scenarios).
+    cfp_thru: last regular-season week the committee ranking already counted (e.g. 11 for the "Week 12" release). Given it, the committee order is the baseline: every ranked team keeps its committee slot, unranked teams stay below #25, and only results after that release move teams.
     tally: optional dict; when given it is filled with per-team counts (field, bye, seed histogram, semifinal, title, champ, avg wins) over all sims."""
     force = force or ({k: v for k, v in (x.split(":") for x in os.environ["VI_FORCE"].split(","))} if os.environ.get("VI_FORCE") else {})
     g = pd.read_parquet(os.path.join(CF, "games.parquet")); g = g[(g.season == season) & (g.seasonType == "regular")]
@@ -57,7 +58,25 @@ def run(power_raw, season, cfp_top, b0, sd, hfa=HFA_FALLBACK, team="Tennessee", 
             o = x[1] if x[0] == idx[team] else x[0]; res = force.get(teams[o] if o >= 0 else "")
             if res: pwin_h[k] = float((res == "W") == (x[0] == idx[team]))
     cur_wl = {t: W[idx[t]] - L[idx[t]] for t in teams}
-    w, corr = proxy_weight(power_raw, cur_wl, cfp_top)
+    if cfp_thru is None:
+        base_wl = cur_wl
+    else:
+        bw_ = {t: 0.0 for t in teams}
+        for _, r in done[done.week <= cfp_thru].iterrows():
+            hw = r.homePoints > r.awayPoints
+            for t, win in ((r.homeTeam, hw), (r.awayTeam, not hw)):
+                if t in bw_: bw_[t] += 1 if win else -1
+        base_wl = bw_
+    w, corr = proxy_weight(power_raw, base_wl, cfp_top)
+    rk = np.zeros(nT)
+    if cfp_thru is not None:       # committee baseline: re-deal the ranked teams' own scores in committee order; cap unranked teams just under #25
+        m0 = {t: power_raw[t] + w * base_wl.get(t, 0) for t in teams}
+        ranked = [t for _, t in sorted(cfp_top) if t in idx]
+        vals = sorted((m0[t] for t in ranked), reverse=True)
+        for v, t in zip(vals, ranked): rk[idx[t]] = v - m0[t]
+        s25 = vals[-1]
+        for t in teams:
+            if t not in ranked: rk[idx[t]] = min(0.0, s25 - 0.5 - m0[t])
     ut = idx[team]; out = dict(wins=0.0, winOut=0, conf=0, playoff=0, mk=0, nc=0); wins_hist = []
     confs = sorted(set(conf.values())); members = {c: [idx[t] for t in teams if conf.get(t) == c] for c in confs}
     if tally is not None:
@@ -88,7 +107,7 @@ def run(power_raw, season, cfp_top, b0, sd, hfa=HFA_FALLBACK, team="Tennessee", 
             champs[c] = top[0] if rng.random() < _phi(d / sd) else top[1]
             w_[champs[c]] += 1; l_[top[0] if champs[c] == top[1] else top[1]] += 1
             if ut in top and champs[c] == ut: out["conf"] += 1
-        score = P + w * (w_ - l_)
+        score = P + w * (w_ - l_) + rk
         order = list(np.argsort(-score)); champset = set(champs.values())
         cc = [i for i in order if i in champset][:5]
         rest = [i for i in order if i not in cc][:7]; field = sorted(cc + rest, key=lambda i: -score[i])

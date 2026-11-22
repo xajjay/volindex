@@ -12,7 +12,7 @@ def load():
 def project(n=20000):
     d, auto = load(); sc = d["powerScale"]; raw = {t: v / sc for t, v in d["powerAll"].items()}
     cfp = [tuple(x) for x in auto["team"]["cfpTop25"]]; tl = {}
-    SS.run(raw, 2026, cfp, d["betas"]["b0"], d["betas"]["backtest"]["rmse"], hfa=d["betas"]["site"], n=n, tally=tl)
+    SS.run(raw, 2026, cfp, d["betas"]["b0"], d["betas"]["backtest"]["rmse"], hfa=d["betas"]["site"], n=n, tally=tl, cfp_thru=int("".join(c for c in (auto["team"].get("cfpWeek") or "0") if c.isdigit()) or 0) - 1 or None)
     return d, tl
 if __name__ == "__main__":
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 20000

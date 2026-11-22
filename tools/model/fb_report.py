@@ -103,7 +103,7 @@ def main():
         import fb_season_sim as SS
         _auto = json.loads(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "football-auto.js"), encoding="utf-8").read().split("window.SITE_AUTO.football = ", 1)[1].rsplit(";", 1)[0])
         _cfp = [tuple(x) for x in _auto["team"]["cfpTop25"]]
-        SEASON_SIM = SS.run(power, season, _cfp, B3["b0"], B3["backtest"]["rmse"], hfa=B3["site"], team=TEAM, n=10000)
+        SEASON_SIM = SS.run(power, season, _cfp, B3["b0"], B3["backtest"]["rmse"], hfa=B3["site"], team=TEAM, n=10000, cfp_thru=int(re.sub(r"\D", "", _auto["team"].get("cfpWeek") or "0") or 0) - 1 or None)
         SEASON_SIM["winNC"] = float(SEASON_SIM["winNC"])
     except Exception as _e:
         print("season sim skipped:", _e); SEASON_SIM = None
