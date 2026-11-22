@@ -12,15 +12,15 @@
    {
     "Team": "Texas",
     "power_rating": 6.67,
-    "PCR": 2,
+    "PCR": 1,
     "pcr_score": null,
     "Conference": "SEC",
     "Season": 2027
    },
    {
     "Team": "Auburn",
-    "power_rating": 6.67,
-    "PCR": 1,
+    "power_rating": 6.66,
+    "PCR": 2,
     "pcr_score": null,
     "Conference": "SEC",
     "Season": 2027
@@ -207,6 +207,6 @@
     "neutral": true
    }
   ],
-  "rows": 3018
+  "rows": 3053
  }
 }
