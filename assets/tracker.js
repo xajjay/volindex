@@ -87,7 +87,7 @@
     }
     const mapPlay = (p, drv, di) => ({ id: p.id, per: (p.period && p.period.number) || 0, clk: (p.clock && p.clock.displayValue) || p.periodText || '', text: p.text || p.shortText || '', type: (p.type && p.type.text) || '',
       scoring: !!p.scoringPlay, hs: p.homeScore, as: p.awayScore, yds: p.statYardage, d: di, team: (p.start && p.start.team && p.start.team.id) || (drv && drv.team && drv.team.id) || (p.team && p.team.id) || null,
-      down: p.start && p.start.down, dist: p.start && p.start.distance, ytg: p.start && p.start.yardsToEndzone, eytg: p.end && p.end.yardsToEndzone, pts: p.scoreValue, coord: p.coordinate, shoot: !!p.shootingPlay });
+      down: p.start && p.start.down, dist: p.start && p.start.distance, dd: p.start && (p.start.downDistanceText || p.start.shortDownDistanceText) || '', edown: p.end && p.end.down, edist: p.end && p.end.distance, edd: p.end && (p.end.downDistanceText || p.end.shortDownDistanceText) || '', epos: p.end && p.end.possessionText || '', eteam: p.end && p.end.team && p.end.team.id || null, ytg: p.start && p.start.yardsToEndzone, eytg: p.end && p.end.yardsToEndzone, pts: p.scoreValue, coord: p.coordinate, shoot: !!p.shootingPlay });
     const dr = sum.drives ? (sum.drives.previous || []).concat(sum.drives.current ? [sum.drives.current] : []) : [];
     if (dr.length) dr.forEach((d, di) => {
       S.drives.push({ team: d.team && d.team.id, desc: d.description || '', n: d.offensivePlays, yds: d.yards, top: d.timeElapsed && d.timeElapsed.displayValue, result: d.displayResult || d.result || '', score: !!d.isScore, cur: d === sum.drives.current && S.state === 'in' });
@@ -95,6 +95,19 @@
     });
     else (sum.plays || sum.keyEvents || []).forEach(p => S.plays.push(mapPlay(p, null, -1)));
     S.plays = S.plays.filter(p => p.text);
+    if (k === 'football') {
+      const ord = n => ['', '1st', '2nd', '3rd', '4th'][n] || '';
+      S.plays.forEach((p, i) => { const pv = S.plays[i - 1];   // a play with no down of its own starts where the one before it ended
+        if (!(p.down > 0) && pv && pv.d === p.d && pv.edown > 0 && !/kickoff|punt/i.test(p.type + ' ' + p.text)) { p.down = pv.edown; p.dist = pv.edist; p.dd = p.dd || pv.edd; }
+        if (p.down > 0 && !p.dd) p.dd = ord(p.down) + ' & ' + (p.dist != null ? p.dist : ''); });
+      const lp = S.plays[S.plays.length - 1];
+      if (S.state === 'in' && lp && !S.dd) {   // ESPN's live "situation" can be missing: the end of the last play is the next snap
+        const dn = lp.edown > 0 ? lp.edown : 0;
+        if (dn) { S.down = dn; S.dist = lp.edist; S.dd = lp.edd || (ord(dn) + ' & ' + lp.edist); }
+        if (!S.poss && lp.eteam) S.poss = String(lp.eteam) === String(home.id) ? 'home' : String(lp.eteam) === String(away.id) ? 'away' : null;
+        if (S.ytg == null && lp.eytg != null) S.ytg = lp.eytg;
+      }
+    }
     if (k === 'mbb' || k === 'wbb') shotsFrom(S);
     (sum.winprobability || []).forEach(w => { S.wp.push(Math.round((w.homeWinPercentage ?? 0.5) * 1000) / 10); S.wpIds.push(w.playId); });
     const bt = (sum.boxscore || {}).teams || [], tt = x => bt.find(b => b.team && b.team.id === x.id), a = tt(away), h = tt(home);
@@ -319,7 +332,7 @@
     if (!S.plays.length) return S.state === 'pre' ? '' : '<p class="dim">Plays will appear here as they happen.</p>';
     const me = S.us === 'home' ? S.home : S.away, ok = p => filter === 'all' || (filter === 'score' && p.scoring) || (filter === 'big' && isBig(p)) || (filter === 'tov' && isTov(p)) || (filter === 'ut' && p.team != null && tmOf(S, p.team) === me);
     const per = p => S.sport === 'baseball' || S.sport === 'softball' ? esc(p.clk) : (p.per ? (S.sport === 'football' ? (p.per > 4 ? 'OT' : 'Q' + p.per) : S.sport === 'mbb' || S.sport === 'wbb' ? 'H' + p.per : 'P' + p.per) : '') + ' ' + esc(p.clk);
-    const row = p => `<li class="${p.scoring ? 'sc' : ''}${isTov(p) ? ' tov' : ''}${isBig(p) ? ' big' : ''}"><span class="trk-t">${per(p)}</span><span class="trk-x">${p.down ? `<small>${['', '1st', '2nd', '3rd', '4th'][p.down] || ''} &amp; ${p.dist}</small> ` : ''}${esc(p.text)}${p.scoring && p.hs != null ? ` <b class="trk-ss">${esc(usOf(S).abbr)} ${S.us === 'home' ? p.hs : p.as} – ${esc(themOf(S).abbr)} ${S.us === 'home' ? p.as : p.hs}</b>` : ''}</span></li>`;
+    const row = p => `<li class="${p.scoring ? 'sc' : ''}${isTov(p) ? ' tov' : ''}${isBig(p) ? ' big' : ''}"><span class="trk-t">${per(p)}</span><span class="trk-x">${p.dd || p.down > 0 ? `<small>${esc(p.dd || ((['', '1st', '2nd', '3rd', '4th'][p.down] || '') + ' & ' + p.dist))}</small> ` : ''}${esc(p.text)}${p.scoring && p.hs != null ? ` <b class="trk-ss">${esc(usOf(S).abbr)} ${S.us === 'home' ? p.hs : p.as} – ${esc(themOf(S).abbr)} ${S.us === 'home' ? p.as : p.hs}</b>` : ''}</span></li>`;
     if (S.drives.length) {
       const out = []; let left = MAXPLAYS; for (let di = S.drives.length - 1; di >= 0 && left > 0; di--) {
         const d = S.drives[di], all = S.plays.filter(p => p.d === di && ok(p)); if (!all.length) continue; const ps = all.slice(-left); left -= ps.length; const t = tmOf(S, d.team);
