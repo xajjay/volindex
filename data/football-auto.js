@@ -1687,10 +1687,10 @@ window.SITE_AUTO.football = {
   "Vanderbilt": {
    "tv": "ESPN",
    "kick": "2026-11-29T00:00Z",
-   "line": "TENN -13.5",
-   "ou": 44.5,
-   "ml": "-520",
-   "book": "Draft Kings",
+   "line": "TENN -12.5",
+   "ou": 43.5,
+   "ml": "-440",
+   "book": "DraftKings",
    "win": 87.7
   }
  },
