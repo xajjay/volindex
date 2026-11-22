@@ -16698,12 +16698,12 @@ window.SITE_AUTO.football = {
   "OK   FPI ratings and ranks for the SEC (CFBD)"
  ],
  "pear": {
-  "week": 12,
+  "week": 13,
   "ratings": [
    [
     "TSR",
-    "19.9",
-    10
+    "20.8",
+    8
    ],
    [
     "SP+",
@@ -16749,7 +16749,7 @@ window.SITE_AUTO.football = {
   "offense": [
    [
     "Rating",
-    "38.8",
+    "39.0",
     15
    ],
    [
@@ -16786,7 +16786,7 @@ window.SITE_AUTO.football = {
   "defense": [
    [
     "Rating",
-    "18.9",
+    "18.2",
     6
    ],
    [
@@ -16822,22 +16822,8 @@ window.SITE_AUTO.football = {
   ],
   "games": [
    [
-    "Texas A&M",
-    26,
-    "Tennessee -3.6",
-    "30.6-27.0",
-    60.0
-   ],
-   [
-    "LSU",
-    7,
-    "Tennessee -0.2",
-    "31.0-30.8",
-    50.6
-   ],
-   [
     "Vanderbilt",
-    67,
+    63,
     "Tennessee -14.6",
     "36.0-21.4",
     83.8
@@ -16879,155 +16865,163 @@ window.SITE_AUTO.football = {
    [
     "Kentucky",
     29
+   ],
+   [
+    "Texas A&M",
+    35
+   ],
+   [
+    "LSU",
+    11
    ]
   ],
-  "record": "8-2",
+  "record": "9-2",
   "sec": {
    "Georgia": [
-    28.6,
+    29.9,
     1,
-    46.8,
+    47.0,
     1,
-    18.2,
-    3,
+    17.1,
+    1,
     24
    ],
    "Alabama": [
-    23.9,
+    24.3,
     4,
-    44.2,
+    43.8,
     4,
-    20.3,
-    14,
+    19.5,
+    11,
     6
    ],
    "Texas": [
-    23.1,
-    6,
-    42.0,
-    6,
-    18.8,
+    24.8,
+    3,
+    42.9,
+    5,
+    18.1,
     5,
     4
    ],
    "LSU": [
-    21.0,
-    8,
-    41.6,
-    8,
-    20.5,
-    15,
+    20.3,
+    11,
+    40.7,
+    11,
+    20.4,
+    17,
     18
    ],
    "Tennessee": [
-    19.9,
-    10,
-    38.8,
+    20.8,
+    8,
+    39.0,
     15,
-    18.9,
+    18.2,
     6,
     28
    ],
    "Ole Miss": [
-    17.4,
+    17.6,
     13,
-    41.6,
-    8,
-    24.2,
-    47,
+    41.4,
+    9,
+    23.8,
+    43,
     1
    ],
    "South Carolina": [
-    11.7,
-    27,
-    34.8,
-    26,
-    23.1,
-    37,
+    10.6,
+    31,
+    34.0,
+    28,
+    23.4,
+    38,
     22
    ],
    "Missouri": [
-    12.7,
-    24,
-    35.2,
-    24,
-    22.6,
-    31,
+    13.5,
+    22,
+    35.6,
+    22,
+    22.2,
+    30,
     11
    ],
    "Oklahoma": [
-    12.9,
-    21,
-    32.4,
-    36,
-    19.5,
+    14.7,
+    20,
+    33.4,
+    31,
+    18.7,
     8,
     7
    ],
    "Florida": [
-    12.8,
+    13.1,
     23,
-    37.1,
-    17,
+    37.3,
+    18,
     24.2,
-    47,
+    51,
     2
    ],
    "Texas A&M": [
-    11.3,
-    30,
-    32.0,
-    38,
-    20.7,
-    17,
+    9.9,
+    35,
+    30.8,
+    42,
+    20.9,
+    19,
     16
    ],
    "Kentucky": [
-    12.1,
-    29,
-    37.0,
-    21,
-    24.9,
-    51,
+    10.1,
+    33,
+    34.1,
+    27,
+    24.0,
+    47,
     8
    ],
    "Auburn": [
-    11.0,
-    32,
+    11.4,
+    28,
     34.0,
     28,
-    23.0,
-    36,
+    22.6,
+    32,
     3
    ],
    "Mississippi State": [
-    7.5,
+    5.0,
+    48,
+    30.6,
     44,
-    33.7,
-    34,
-    26.2,
-    64,
+    25.6,
+    68,
     1
    ],
    "Arkansas": [
-    1.8,
-    65,
-    28.1,
-    62,
-    26.3,
+    3.1,
+    55,
+    28.6,
+    57,
+    25.5,
     67,
     10
    ],
    "Vanderbilt": [
-    1.5,
-    67,
-    28.2,
-    61,
-    26.6,
-    74,
+    2.1,
+    63,
+    28.0,
+    60,
+    25.9,
+    73,
     19
    ]
   },
-  "manualNote": "TSR, offense/defense rating, RQI and SOS for 12 SEC teams entered by hand from pearatings.com on Nov 19; other rows are from Nov 11"
+  "manualNote": "TSR and offense/defense ratings for all 16 SEC teams entered by hand from pearatings.com (Week 13) on Nov 22. SOS ranks, other rating lines and the Vanderbilt projection are from earlier in the season. PEAR blocks the automatic fetch."
  }
 };
