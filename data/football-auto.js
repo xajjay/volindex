@@ -1685,7 +1685,7 @@ window.SITE_AUTO.football = {
    "kick": "2026-11-21T20:30Z"
   },
   "Vanderbilt": {
-   "tv": null,
+   "tv": "ESPN",
    "kick": "2026-11-28T05:00Z",
    "win": 88.3
   }
@@ -1735,7 +1735,7 @@ window.SITE_AUTO.football = {
     "Completion %",
     "Passing",
     63.8,
-    55,
+    56,
     10,
     false
    ],
@@ -1843,7 +1843,7 @@ window.SITE_AUTO.football = {
     "4th down conversion %",
     "Downs",
     75.0,
-    4,
+    5,
     1,
     false
    ],
@@ -1996,7 +1996,7 @@ window.SITE_AUTO.football = {
     "Kick return average",
     "Returning",
     16.2,
-    125,
+    124,
     15,
     false
    ],
@@ -2005,7 +2005,7 @@ window.SITE_AUTO.football = {
     "Punt return average",
     "Returning",
     12.2,
-    34,
+    33,
     6,
     false
    ],
