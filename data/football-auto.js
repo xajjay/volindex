@@ -1690,7 +1690,7 @@ window.SITE_AUTO.football = {
    "line": "TENN -13.5",
    "ou": 44.5,
    "ml": "-520",
-   "book": "DraftKings",
+   "book": "Draft Kings",
    "win": 87.7
   }
  },
