@@ -20,8 +20,9 @@ def proxy_weight(power, wl, cfp_top):
         if c > best: best, bw = c, w
     return bw, best
 
-def run(power_raw, season, cfp_top, b0, sd, hfa=HFA_FALLBACK, team="Tennessee", n=20000, seed=7, force=None):
-    """force: optional {opponent: "W"|"L"} to condition the team's remaining games (what-if scenarios)."""
+def run(power_raw, season, cfp_top, b0, sd, hfa=HFA_FALLBACK, team="Tennessee", n=20000, seed=7, force=None, tally=None):
+    """force: optional {opponent: "W"|"L"} to condition the team's remaining games (what-if scenarios).
+    tally: optional dict; when given it is filled with per-team counts (field, bye, seed histogram, semifinal, title, champ, avg wins) over all sims."""
     force = force or ({k: v for k, v in (x.split(":") for x in os.environ["VI_FORCE"].split(","))} if os.environ.get("VI_FORCE") else {})
     g = pd.read_parquet(os.path.join(CF, "games.parquet")); g = g[(g.season == season) & (g.seasonType == "regular")]
     fbs = lambda c: str(c).lower() == "fbs"
@@ -59,6 +60,9 @@ def run(power_raw, season, cfp_top, b0, sd, hfa=HFA_FALLBACK, team="Tennessee", 
     w, corr = proxy_weight(power_raw, cur_wl, cfp_top)
     ut = idx[team]; out = dict(wins=0.0, winOut=0, conf=0, playoff=0, mk=0, nc=0); wins_hist = []
     confs = sorted(set(conf.values())); members = {c: [idx[t] for t in teams if conf.get(t) == c] for c in confs}
+    if tally is not None:
+        for k_ in ("field", "bye", "sf", "nc", "champ", "wins"): tally[k_] = np.zeros(nT)
+        tally["seed"] = np.zeros((nT, 12)); tally["teams"] = teams; tally["n"] = n; tally["w0"] = W.copy(); tally["l0"] = L.copy()
     remaining_ut = [(k, x) for k, x in enumerate(gm) if x[0] == ut or x[1] == ut]
     for s in range(n):
         r = rng.random(len(gm)) < pwin_h
@@ -88,10 +92,12 @@ def run(power_raw, season, cfp_top, b0, sd, hfa=HFA_FALLBACK, team="Tennessee", 
         order = list(np.argsort(-score)); champset = set(champs.values())
         cc = [i for i in order if i in champset][:5]
         rest = [i for i in order if i not in cc][:7]; field = sorted(cc + rest, key=lambda i: -score[i])
-        if ut in field:
-            out["playoff"] += 1
-        else:
-            continue
+        if ut in field: out["playoff"] += 1
+        if tally is not None:
+            tally["wins"] += w_
+            for c_ in champset: tally["champ"][c_] += 1
+            for sd_, t_ in enumerate(field): tally["field"][t_] += 1; tally["seed"][t_, sd_] += 1; tally["bye"][t_] += sd_ < 4
+        elif ut not in field: continue
         # bracket (straight seeding)
         def play(a, b, neutral=True, home=None):
             d = P[a] - P[b] + (0 if neutral else (hfa if home == a else -hfa))
@@ -100,8 +106,13 @@ def run(power_raw, season, cfp_top, b0, sd, hfa=HFA_FALLBACK, team="Tennessee", 
         r1 = {5: play(s_[4], s_[11], False, s_[4]), 6: play(s_[5], s_[10], False, s_[5]), 7: play(s_[6], s_[9], False, s_[6]), 8: play(s_[7], s_[8], False, s_[7])}
         q = [play(s_[0], r1[8]), play(s_[1], r1[7]), play(s_[2], r1[6]), play(s_[3], r1[5])]
         sf = [play(q[0], q[3]), play(q[1], q[2])]
-        out["mk"] += ut in sf
-        out["nc"] += play(sf[0], sf[1]) == ut
+        ch_ = play(sf[0], sf[1])
+        if tally is not None:
+            for t_ in sf: tally["sf"][t_] += 1
+            tally["nc"][ch_] += 1
+        if ut in field:
+            out["mk"] += ut in sf
+            out["nc"] += ch_ == ut
     pc = lambda x: round(100 * x / n, 1)
     return dict(proj=f"{out['wins']/n:.1f}-{(len(done[(done.homeTeam==team)|(done.awayTeam==team)])+len(remaining_ut))-out['wins']/n:.1f}",
                 winOut=pc(out["winOut"]), winConf=pc(out["conf"]), playoff=pc(out["playoff"]), makeNC=pc(out["mk"]), winNC=pc(out["nc"]),
