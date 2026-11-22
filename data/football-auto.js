@@ -226,13 +226,13 @@ window.SITE_AUTO.football = {
     2
    ],
    "ypg": [
-    380.0,
-    68,
+    378.5,
+    69,
     10
    ],
    "rushYpg": [
-    214.5,
-    12,
+    213.0,
+    13,
     1
    ],
    "passYpg": [
@@ -247,7 +247,7 @@ window.SITE_AUTO.football = {
    ],
    "oRushYpg": [
     113.5,
-    28,
+    27,
     6
    ],
    "oPassYpg": [
@@ -348,7 +348,7 @@ window.SITE_AUTO.football = {
   },
   {
    "opp": "Vanderbilt",
-   "date": "2026-11-28",
+   "date": "2026-11-29",
    "site": "A"
   }
  ],
@@ -1174,8 +1174,8 @@ window.SITE_AUTO.football = {
   "DeSean Bishop": {
    "rush": [
     248,
-    1232,
-    5.0,
+    1215,
+    4.9,
     59,
     13
    ],
@@ -1359,39 +1359,39 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Sacks",
-     "rank": 25
+     "rank": 26
     }
    ],
    "Arion Carter": [
     {
      "stat": "Tackles for loss",
-     "rank": 35
+     "rank": 36
     },
     {
      "stat": "Sacks",
-     "rank": 77
+     "rank": 79
     }
    ],
    "Amare Campbell": [
     {
      "stat": "Tackles for loss",
-     "rank": 35
+     "rank": 36
     },
     {
      "stat": "Sacks",
-     "rank": 77
+     "rank": 79
     }
    ],
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 77
+     "rank": 79
     }
    ],
    "Tyree Weathersby": [
     {
      "stat": "Sacks",
-     "rank": 25
+     "rank": 26
     }
    ],
    "Ty Redmond": [
@@ -1409,25 +1409,25 @@ window.SITE_AUTO.football = {
    "TJ Metcalf": [
     {
      "stat": "Interceptions",
-     "rank": 75
+     "rank": 76
     }
    ],
    "Kayin Lee": [
     {
      "stat": "Interceptions",
-     "rank": 75
+     "rank": 76
     }
    ],
    "Mike Matthews": [
     {
      "stat": "Receiving yards",
-     "rank": 92
+     "rank": 93
     }
    ],
    "DeSean Bishop": [
     {
      "stat": "Rushing yards",
-     "rank": 9
+     "rank": 10
     },
     {
      "stat": "Rushing TD",
@@ -1686,8 +1686,12 @@ window.SITE_AUTO.football = {
   },
   "Vanderbilt": {
    "tv": "ESPN",
-   "kick": "2026-11-28T05:00Z",
-   "win": 88.3
+   "kick": "2026-11-29T00:00Z",
+   "line": "TENN -13.5",
+   "ou": 44.5,
+   "ml": "-520",
+   "book": "DraftKings",
+   "win": 87.7
   }
  },
  "teamSheet": {
@@ -1707,8 +1711,8 @@ window.SITE_AUTO.football = {
     "ypg",
     "Total yards per game",
     "Total offense",
-    380.0,
-    68,
+    378.5,
+    69,
     10,
     false
    ],
@@ -1716,8 +1720,8 @@ window.SITE_AUTO.football = {
     "ypp",
     "Yards per play",
     "Total offense",
-    5.53,
-    95,
+    5.51,
+    98,
     12,
     false
    ],
@@ -1735,7 +1739,7 @@ window.SITE_AUTO.football = {
     "Completion %",
     "Passing",
     63.8,
-    56,
+    55,
     10,
     false
    ],
@@ -1753,7 +1757,7 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     12.0,
-    106,
+    107,
     13,
     false
    ],
@@ -1779,8 +1783,8 @@ window.SITE_AUTO.football = {
     "rushYpg",
     "Rushing yards per game",
     "Rushing",
-    214.5,
-    12,
+    213.0,
+    13,
     1,
     false
    ],
@@ -1788,8 +1792,8 @@ window.SITE_AUTO.football = {
     "ypc",
     "Yards per carry",
     "Rushing",
-    4.84,
-    41,
+    4.8,
+    42,
     3,
     false
    ],
@@ -1798,7 +1802,7 @@ window.SITE_AUTO.football = {
     "Rushing TDs",
     "Rushing",
     26.0,
-    18,
+    19,
     3,
     false
    ],
@@ -1807,7 +1811,7 @@ window.SITE_AUTO.football = {
     "Receptions per game",
     "Receiving",
     15.5,
-    112,
+    113,
     16,
     false
    ],
@@ -1825,7 +1829,7 @@ window.SITE_AUTO.football = {
     "First downs per game",
     "Downs",
     20.7,
-    55,
+    53,
     8,
     false
    ],
@@ -1833,8 +1837,8 @@ window.SITE_AUTO.football = {
     "thirdPct",
     "3rd down conversion %",
     "Downs",
-    34.6,
-    112,
+    35.1,
+    107,
     16,
     false
    ],
@@ -1843,7 +1847,7 @@ window.SITE_AUTO.football = {
     "4th down conversion %",
     "Downs",
     75.0,
-    5,
+    4,
     1,
     false
    ],
@@ -1870,7 +1874,7 @@ window.SITE_AUTO.football = {
     "Turnovers lost",
     "Downs",
     14.0,
-    70,
+    69,
     5,
     true
    ],
@@ -1933,7 +1937,7 @@ window.SITE_AUTO.football = {
     "Interceptions",
     "Pass defense",
     11.0,
-    15,
+    16,
     3,
     false
    ],
@@ -1951,7 +1955,7 @@ window.SITE_AUTO.football = {
     "Rushing yards allowed per game",
     "Run defense",
     113.5,
-    28,
+    27,
     6,
     true
    ],
@@ -1960,7 +1964,7 @@ window.SITE_AUTO.football = {
     "Yards per carry allowed",
     "Run defense",
     3.61,
-    38,
+    37,
     9,
     true
    ],
@@ -2023,19 +2027,19 @@ window.SITE_AUTO.football = {
    "kicking": [
     [
      "Field Goal Made",
-     "18"
+     "20"
     ],
     [
      "Field Goal Attempts",
-     "19"
+     "21"
     ],
     [
      "Field Goal Percentage",
-     "94.7"
+     "95.2"
     ],
     [
      "Long Field Goal Made",
-     "49"
+     "52"
     ],
     [
      "Field Goal Attempts 1-19",
@@ -2043,7 +2047,7 @@ window.SITE_AUTO.football = {
     ],
     [
      "Field Goal Attempts 20-29",
-     "3"
+     "4"
     ],
     [
      "Field Goal Attempts 30-39",
@@ -2055,15 +2059,15 @@ window.SITE_AUTO.football = {
     ],
     [
      "Field Goal Attempts 50+",
-     "1"
+     "2"
     ],
     [
      "Extra Points Made",
-     "36"
+     "39"
     ],
     [
      "Extra Point Attempts",
-     "36"
+     "39"
     ],
     [
      "Extra Point Percentage",
@@ -2075,7 +2079,7 @@ window.SITE_AUTO.football = {
     ],
     [
      "Field Goals Made 20-29",
-     "3"
+     "4"
     ],
     [
      "Field Goals Made 30-39",
@@ -2087,19 +2091,19 @@ window.SITE_AUTO.football = {
     ],
     [
      "Field Goals Made 50+",
-     "0"
+     "1"
     ],
     [
      "Total Kicking Points",
-     "90"
+     "99"
     ],
     [
      "Team Games Played",
-     "10"
+     "11"
     ],
     [
      "Touchback Percentage",
-     "80"
+     "81"
     ],
     [
      "Average Kickoff Return Yards",
@@ -2119,29 +2123,29 @@ window.SITE_AUTO.football = {
     ],
     [
      "FG: Good-Attempts",
-     "18-19"
+     "20-21"
     ]
    ],
    "punting": [
     [
      "Punts",
-     "42"
+     "50"
     ],
     [
      "Punt Yards",
-     "1,835"
+     "2,207"
     ],
     [
      "Long Punt",
-     "57"
+     "66"
     ],
     [
      "Gross Average Punt Yards",
-     "43.7"
+     "44.1"
     ],
     [
      "Net Average Punt Yards",
-     "43.7"
+     "44.1"
     ],
     [
      "Punts Blocked",
@@ -2149,19 +2153,19 @@ window.SITE_AUTO.football = {
     ],
     [
      "Punts Inside 20",
-     "18"
+     "24"
     ],
     [
      "Touchbacks",
-     "2"
+     "3"
     ],
     [
      "Fair Catches",
-     "22"
+     "23"
     ],
     [
      "Punt Returns",
-     "10"
+     "11"
     ],
     [
      "Punt Return Yards",
@@ -2173,11 +2177,11 @@ window.SITE_AUTO.football = {
     ],
     [
      "Team Games Played",
-     "10"
+     "11"
     ],
     [
      "Punt: Total Yards",
-     "42-1,835"
+     "50-2,207"
     ]
    ]
   }
@@ -16254,11 +16258,11 @@ window.SITE_AUTO.football = {
      21.8
     ],
     "ypg": [
-     380.0,
+     378.5,
      334.9
     ],
     "ypp": [
-     5.53,
+     5.51,
      5.2
     ],
     "passYpg": [
@@ -16286,11 +16290,11 @@ window.SITE_AUTO.football = {
      26.0
     ],
     "rushYpg": [
-     214.5,
+     213.0,
      109.1
     ],
     "ypc": [
-     4.84,
+     4.8,
      3.31
     ],
     "rushTD": [
@@ -16310,7 +16314,7 @@ window.SITE_AUTO.football = {
      17.6
     ],
     "thirdPct": [
-     34.6,
+     35.1,
      36.8
     ],
     "fourthPct": [
@@ -16467,7 +16471,7 @@ window.SITE_AUTO.football = {
      "name": "DeSean Bishop",
      "pos": "RB",
      "what": "rushing",
-     "line": "1232 rush yds, 13 TD"
+     "line": "1215 rush yds, 13 TD"
     },
     {
      "name": "Mike Matthews",

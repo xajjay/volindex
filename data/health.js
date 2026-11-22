@@ -1,13 +1,13 @@
 /* Written by tools/health_check.py. Do not edit by hand. */
 window.SITE_HEALTH = {
- "checked": "2026-11-21",
+ "checked": "2026-11-22",
  "counts": {
   "baseball": 57,
   "football": 12,
   "mbb": 34,
   "soccer": 20,
   "softball": 33,
-  "volleyball": 28,
+  "volleyball": 29,
   "wbb": 33
  },
  "findings": [
@@ -19,18 +19,18 @@ window.SITE_HEALTH = {
   {
    "area": "manual",
    "level": "warn",
-   "msg": "Volleyball lineup last edited 40 days ago (check every 21). Re-check the projected lineup."
+   "msg": "Volleyball lineup last edited 41 days ago (check every 21). Re-check the projected lineup."
   },
   {
    "area": "manual",
    "level": "warn",
-   "msg": "Soccer lineup last edited 40 days ago (check every 21). Re-check the projected lineup."
+   "msg": "Soccer lineup last edited 41 days ago (check every 21). Re-check the projected lineup."
   }
  ],
  "manual": [
   {
    "active": true,
-   "ageDays": 3,
+   "ageDays": 4,
    "edited": "2026-11-18",
    "file": "data/recruiting.js",
    "label": "On3 / recruiting rankings",
@@ -38,7 +38,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 3,
+   "ageDays": 4,
    "edited": "2026-11-18",
    "file": "data/bb-ratings-manual.js",
    "label": "KenPom / Torvik / EvanMiya ratings",
@@ -46,7 +46,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 2,
+   "ageDays": 3,
    "edited": "2026-11-19",
    "file": "data/football-depth.js",
    "label": "Football depth chart",
@@ -54,7 +54,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 3,
+   "ageDays": 4,
    "edited": "2026-11-18",
    "file": "data/mbb-lineup.js",
    "label": "Men's basketball lineup",
@@ -62,7 +62,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 3,
+   "ageDays": 4,
    "edited": "2026-11-18",
    "file": "data/wbb-lineup.js",
    "label": "Women's basketball lineup",
@@ -70,7 +70,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 40,
+   "ageDays": 41,
    "edited": "2026-10-12",
    "file": "data/volleyball-lineup.js",
    "label": "Volleyball lineup",
@@ -78,7 +78,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": true,
-   "ageDays": 40,
+   "ageDays": 41,
    "edited": "2026-10-12",
    "file": "data/soccer-lineup.js",
    "label": "Soccer lineup",
@@ -86,7 +86,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": false,
-   "ageDays": 36,
+   "ageDays": 37,
    "edited": "2026-10-16",
    "file": "data/baseball-lineup.js",
    "label": "Baseball lineup",
@@ -94,7 +94,7 @@ window.SITE_HEALTH = {
   },
   {
    "active": false,
-   "ageDays": 40,
+   "ageDays": 41,
    "edited": "2026-10-12",
    "file": "data/softball-lineup.js",
    "label": "Softball lineup",
@@ -109,7 +109,7 @@ window.SITE_HEALTH = {
    "key": "football",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-21"
+   "updated": "2026-11-22"
   },
   {
    "ageDays": 0,
@@ -117,7 +117,7 @@ window.SITE_HEALTH = {
    "key": "mbb",
    "poll": "AP Top 25",
    "pollDate": "2026-11-16",
-   "updated": "2026-11-21"
+   "updated": "2026-11-22"
   },
   {
    "ageDays": 0,
@@ -125,7 +125,7 @@ window.SITE_HEALTH = {
    "key": "wbb",
    "poll": "AP Top 25",
    "pollDate": "2026-11-16",
-   "updated": "2026-11-21"
+   "updated": "2026-11-22"
   },
   {
    "ageDays": 0,
@@ -133,7 +133,7 @@ window.SITE_HEALTH = {
    "key": "baseball",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-21"
+   "updated": "2026-11-22"
   },
   {
    "ageDays": 0,
@@ -141,15 +141,15 @@ window.SITE_HEALTH = {
    "key": "softball",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-21"
+   "updated": "2026-11-22"
   },
   {
    "ageDays": 0,
-   "games": 28,
+   "games": 29,
    "key": "volleyball",
    "poll": "AVCA Coaches Poll",
    "pollDate": "2026-11-15",
-   "updated": "2026-11-21"
+   "updated": "2026-11-22"
   },
   {
    "ageDays": 0,
@@ -157,7 +157,7 @@ window.SITE_HEALTH = {
    "key": "soccer",
    "poll": "United Soccer Coaches",
    "pollDate": "2026-11-10",
-   "updated": "2026-11-21"
+   "updated": "2026-11-22"
   }
  ],
  "warnings": 2
