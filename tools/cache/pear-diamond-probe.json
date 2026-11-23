@@ -10,16 +10,16 @@
   ],
   "head": [
    {
-    "Team": "Texas",
-    "power_rating": 6.67,
+    "Team": "Auburn",
+    "power_rating": 6.72,
     "PCR": 1,
     "pcr_score": null,
     "Conference": "SEC",
     "Season": 2027
    },
    {
-    "Team": "Auburn",
-    "power_rating": 6.66,
+    "Team": "Texas",
+    "power_rating": 6.6,
     "PCR": 2,
     "pcr_score": null,
     "Conference": "SEC",
@@ -27,7 +27,7 @@
    },
    {
     "Team": "Mississippi St.",
-    "power_rating": 6.37,
+    "power_rating": 6.52,
     "PCR": 3,
     "pcr_score": null,
     "Conference": "SEC",
@@ -64,10 +64,10 @@
     "away_team": "Iowa",
     "home_score": null,
     "away_score": null,
-    "home_win_prob": 0.3763,
-    "Spread": -1.58,
-    "PEAR": "Iowa -1.58",
-    "GQI": 7.3,
+    "home_win_prob": 0.3793,
+    "Spread": -1.54,
+    "PEAR": "Iowa -1.54",
+    "GQI": 7.2,
     "is_conference_game": false,
     "neutral": true
    },
@@ -79,10 +79,10 @@
     "away_team": "UMES",
     "home_score": null,
     "away_score": null,
-    "home_win_prob": 0.3838,
-    "Spread": -1.48,
-    "PEAR": "UMES -1.48",
-    "GQI": 2.5,
+    "home_win_prob": 0.3876,
+    "Spread": -1.43,
+    "PEAR": "UMES -1.43",
+    "GQI": 2.6,
     "is_conference_game": false,
     "neutral": true
    },
@@ -94,15 +94,15 @@
     "away_team": "Oklahoma",
     "home_score": null,
     "away_score": null,
-    "home_win_prob": 0.3088,
-    "Spread": -2.52,
-    "PEAR": "Oklahoma -2.52",
+    "home_win_prob": 0.3143,
+    "Spread": -2.44,
+    "PEAR": "Oklahoma -2.44",
     "GQI": 8.4,
     "is_conference_game": false,
     "neutral": true
    }
   ],
-  "rows": 4748
+  "rows": 4762
  },
  "softball_ratings": {
   "columns": [
@@ -116,7 +116,7 @@
   "head": [
    {
     "Team": "Oklahoma",
-    "power_rating": 12.26,
+    "power_rating": 12.77,
     "PCR": 1,
     "pcr_score": null,
     "Conference": "SEC",
@@ -124,7 +124,7 @@
    },
    {
     "Team": "Texas",
-    "power_rating": 12.13,
+    "power_rating": 12.48,
     "PCR": 2,
     "pcr_score": null,
     "Conference": "SEC",
@@ -132,7 +132,7 @@
    },
    {
     "Team": "Arkansas",
-    "power_rating": 11.84,
+    "power_rating": 12.14,
     "PCR": 3,
     "pcr_score": null,
     "Conference": "SEC",
@@ -169,9 +169,9 @@
     "away_team": "Texas St.",
     "home_score": null,
     "away_score": null,
-    "home_win_prob": 0.8731,
-    "Spread": 6.03,
-    "PEAR": "Alabama -6.03",
+    "home_win_prob": 0.879,
+    "Spread": 6.2,
+    "PEAR": "Alabama -6.2",
     "GQI": 7.9,
     "is_conference_game": false,
     "neutral": true
@@ -184,10 +184,10 @@
     "away_team": "Weber St.",
     "home_score": null,
     "away_score": null,
-    "home_win_prob": 0.9659,
-    "Spread": 10.46,
-    "PEAR": "Arizona -10.46",
-    "GQI": 5.1,
+    "home_win_prob": 0.9684,
+    "Spread": 10.7,
+    "PEAR": "Arizona -10.7",
+    "GQI": 4.7,
     "is_conference_game": false,
     "neutral": false
    },
@@ -199,14 +199,14 @@
     "away_team": "Nebraska",
     "home_score": null,
     "away_score": null,
-    "home_win_prob": 0.2732,
-    "Spread": -3.06,
-    "PEAR": "Nebraska -3.06",
-    "GQI": 8.6,
+    "home_win_prob": 0.2397,
+    "Spread": -3.61,
+    "PEAR": "Nebraska -3.61",
+    "GQI": 8.5,
     "is_conference_game": false,
     "neutral": true
    }
   ],
-  "rows": 3053
+  "rows": 3026
  }
 }
