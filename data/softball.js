@@ -328,89 +328,205 @@ window.SITE.softball = {
   "note"
  ],
  "schedule": [
-  {
-   "date": "2027-03-12",
-   "opp": "Texas A&M",
-   "site": "A",
-   "loc": "College Station, Texas",
-   "time": null,
-   "tv": null,
-   "kind": "conf"
-  },
-  {
-   "date": "2027-03-19",
-   "opp": "Texas",
-   "site": "H",
-   "loc": "Sherri Parker Lee Stadium",
-   "time": null,
-   "tv": null,
-   "kind": "conf"
-  },
-  {
-   "date": "2027-03-26",
-   "opp": "LSU",
-   "site": "A",
-   "loc": "Baton Rouge, La.",
-   "time": null,
-   "tv": null,
-   "kind": "conf"
-  },
-  {
-   "date": "2027-04-02",
-   "opp": "Oklahoma",
-   "site": "H",
-   "loc": "Sherri Parker Lee Stadium",
-   "time": null,
-   "tv": null,
-   "kind": "conf"
-  },
-  {
-   "date": "2027-04-09",
-   "opp": "Auburn",
-   "site": "A",
-   "loc": "Auburn, Ala.",
-   "time": null,
-   "tv": null,
-   "kind": "conf"
-  },
-  {
-   "date": "2027-04-23",
-   "opp": "Georgia",
-   "site": "H",
-   "loc": "Sherri Parker Lee Stadium",
-   "time": null,
-   "tv": null,
-   "kind": "conf"
-  },
-  {
-   "date": "2027-04-30",
-   "opp": "Arkansas",
-   "site": "A",
-   "loc": "Fayetteville, Ark.",
-   "time": null,
-   "tv": null,
-   "kind": "conf"
-  },
-  {
-   "date": "2027-05-06",
-   "opp": "Missouri",
-   "site": "H",
-   "loc": "Sherri Parker Lee Stadium",
-   "time": null,
-   "tv": null,
-   "kind": "conf"
-  },
-  {
-   "date": "2027-05-11",
-   "opp": "SEC Tournament",
-   "site": "N",
-   "loc": "Toyota Field · Madison, Ala.",
-   "time": null,
-   "tv": null,
-   "kind": "nonconf"
-  }
+   {
+     "date": "2027-02-11",
+     "opp": "NFCA Leadoff Classic (Feb. 11-14)",
+     "site": "N",
+     "loc": null,
+     "time": null,
+     "tv": null,
+     "kind": "nonconf",
+     "manual": true,
+     "event": "Tournament"
+   },
+   {
+     "date": "2027-02-19",
+     "opp": "USF tournament (Feb. 19-21)",
+     "site": "N",
+     "loc": null,
+     "time": null,
+     "tv": null,
+     "kind": "nonconf",
+     "manual": true,
+     "event": "Tournament"
+   },
+   {
+     "date": "2027-02-25",
+     "opp": "Mary Nutter Collegiate Classic (Feb. 25-27)",
+     "site": "N",
+     "loc": "Cathedral City, Calif.",
+     "time": null,
+     "tv": null,
+     "kind": "nonconf",
+     "manual": true,
+     "event": "Tournament"
+   },
+   {
+     "date": "2027-03-05",
+     "opp": "Tennessee tournament (Mar. 5-7)",
+     "site": "H",
+     "loc": "Sherri Parker Lee Stadium",
+     "time": null,
+     "tv": null,
+     "kind": "nonconf",
+     "manual": true,
+     "event": "Tournament"
+   },
+   {
+     "date": "2027-03-10",
+     "opp": "Texas State",
+     "site": "A",
+     "loc": "San Marcos, Texas",
+     "time": null,
+     "tv": null,
+     "kind": "nonconf",
+     "manual": true
+   },
+   {
+     "date": "2027-03-12",
+     "opp": "Texas A&M",
+     "site": "A",
+     "loc": "College Station, Texas",
+     "time": null,
+     "tv": null,
+     "kind": "conf"
+   },
+   {
+     "date": "2027-03-17",
+     "opp": "Western Kentucky",
+     "site": "H",
+     "loc": "Sherri Parker Lee Stadium",
+     "time": null,
+     "tv": null,
+     "kind": "nonconf",
+     "manual": true
+   },
+   {
+     "date": "2027-03-19",
+     "opp": "Texas",
+     "site": "H",
+     "loc": "Sherri Parker Lee Stadium",
+     "time": null,
+     "tv": null,
+     "kind": "conf"
+   },
+   {
+     "date": "2027-03-23",
+     "opp": "Jacksonville State",
+     "site": "H",
+     "loc": "Sherri Parker Lee Stadium",
+     "time": null,
+     "tv": null,
+     "kind": "nonconf",
+     "manual": true
+   },
+   {
+     "date": "2027-03-26",
+     "opp": "LSU",
+     "site": "A",
+     "loc": "Baton Rouge, La.",
+     "time": null,
+     "tv": null,
+     "kind": "conf"
+   },
+   {
+     "date": "2027-03-30",
+     "opp": "Middle Tennessee",
+     "site": "H",
+     "loc": "Sherri Parker Lee Stadium",
+     "time": null,
+     "tv": null,
+     "kind": "nonconf",
+     "manual": true
+   },
+   {
+     "date": "2027-04-02",
+     "opp": "Oklahoma",
+     "site": "H",
+     "loc": "Sherri Parker Lee Stadium",
+     "time": null,
+     "tv": null,
+     "kind": "conf"
+   },
+   {
+     "date": "2027-04-09",
+     "opp": "Auburn",
+     "site": "A",
+     "loc": "Auburn, Ala.",
+     "time": null,
+     "tv": null,
+     "kind": "conf"
+   },
+   {
+     "date": "2027-04-13",
+     "opp": "Belmont",
+     "site": "A",
+     "loc": "Nashville, Tenn.",
+     "time": null,
+     "tv": null,
+     "kind": "nonconf",
+     "manual": true
+   },
+   {
+     "date": "2027-04-16",
+     "opp": "Tennessee Tech",
+     "site": "H",
+     "loc": "Sherri Parker Lee Stadium",
+     "time": null,
+     "tv": null,
+     "kind": "nonconf",
+     "manual": true
+   },
+   {
+     "date": "2027-04-20",
+     "opp": "Marshall",
+     "site": "A",
+     "loc": "Huntington, W.Va.",
+     "time": null,
+     "tv": null,
+     "kind": "nonconf",
+     "manual": true
+   },
+   {
+     "date": "2027-04-23",
+     "opp": "Georgia",
+     "site": "H",
+     "loc": "Sherri Parker Lee Stadium",
+     "time": null,
+     "tv": null,
+     "kind": "conf"
+   },
+   {
+     "date": "2027-04-30",
+     "opp": "Arkansas",
+     "site": "A",
+     "loc": "Fayetteville, Ark.",
+     "time": null,
+     "tv": null,
+     "kind": "conf"
+   },
+   {
+     "date": "2027-05-06",
+     "opp": "Missouri",
+     "site": "H",
+     "loc": "Sherri Parker Lee Stadium",
+     "time": null,
+     "tv": null,
+     "kind": "conf"
+   },
+   {
+     "date": "2027-05-11",
+     "opp": "SEC Tournament (May 11-15)",
+     "site": "N",
+     "loc": "Toyota Field · Madison, Ala.",
+     "time": null,
+     "tv": null,
+     "kind": "nonconf",
+     "manual": true,
+     "event": "Tournament"
+   }
  ],
- "scheduleNote": "Only SEC series are announced so far; the full 2027 schedule comes out in the winter.",
+ "scheduleNote": "Full 2027 schedule released Nov. 23, 2026: 20 listed dates, including tournaments and midweek games. Game times and TV are announced later.",
  "ratings": {
   "intro": "Preseason polls (NFCA/USA Today, ESPN/USA Softball, D1Softball, Softball America) come out in late January. PEAR and RPI rate teams all season.",
   "rows": [
