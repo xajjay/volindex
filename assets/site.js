@@ -840,7 +840,7 @@ ${part('next')}
       <div class="controls">${recSeg()}</div></div>
       <div class="tiles" style="margin-bottom:16px"><div class="tile"><b>${r.length}</b><span>Commits</span></div>${st.map(([s, c]) => `<div class="tile"><b>${c}</b><span>${s}-star</span></div>`).join('')}${recYear === 2027 ? `<div class="tile"><b>${F.recruitClass.rank247}</b><span>247 class rank</span></div><div class="tile"><b>${F.transferClassRank}</b><span>2026 transfer class rank</span></div>` : ''}</div>
       <div class="tablewrap"><table><thead><tr><th>Name</th><th>Pos</th><th>Rating</th><th class="n">Nat'l</th><th class="n">Pos</th><th class="n">State</th><th class="hide-sm">School</th><th class="hide-sm">Ht / Wt</th><th class="hide-sm">Committed</th></tr></thead>
-      <tbody>${r.map(x => `<tr class="click" data-player="${esc(x.name)}"><td><b>${esc(x.name)}</b></td><td>${x.pos}</td><td>${rateBadge({ src: '247', grade: x.grade, stars: x.stars })}</td>
+      <tbody>${r.map(x => `<tr class="click" data-player="${esc(x.name)}"><td><b>${esc(x.name)}</b></td><td>${x.pos}</td><td>${x.grade ? rateBadge({ src: '247', grade: x.grade, stars: x.stars }) : '<span class="rate" title="Specialists are not rated by 247Sports"><span class="g">NR</span></span>'}</td>
         <td class="n">${x.nat || '—'}</td><td class="n">${x.posRank || '—'}</td><td class="n">${x.stateRank || '—'}</td>
         <td class="hide-sm">${esc(x.hs)}<br><span class="dim small">${esc(x.home)}</span></td><td class="hide-sm num">${x.ht} / ${x.wt}</td><td class="hide-sm num">${fmtDate(x.committed, { month: 'short', day: 'numeric', year: 'numeric' })}</td></tr>`).join('')}</tbody></table></div>`;
   }

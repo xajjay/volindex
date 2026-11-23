@@ -1520,7 +1520,7 @@ window.SITE.football = {
    "home": "Smyrna, Tenn.",
    "hs": "Smyrna",
    "prev": null,
-   "honors": ["SEC Defensive Player of the Week: Kentucky (13 tkl, 2 sacks, 4 TFL)", "Walter Camp National Defensive Player of the Week, Bednarik and Nagurski Defensive Player of the Week: Kentucky", "Walter Camp Player of the Year semifinalist (Nov. 11)", "Butkus Award semifinalist (Nov. 1)", "Jason Witten Collegiate Man of the Year semifinalist (one of 20; Oct. 21)", "William V. Campbell Trophy semifinalist (NFF; Sept. 23)", "Butkus Award preseason watch list", "Lott IMPACT Trophy watch list", "No. 6 on Bruce Feldman's Freaks List (The Athletic)", "Preseason Coaches All-SEC 3rd team"],
+   "honors": ["SEC Co-Defensive Player of the Week: LSU (Nov. 23)", "SEC Defensive Player of the Week: Kentucky (13 tkl, 2 sacks, 4 TFL)", "Walter Camp National Defensive Player of the Week, Bednarik and Nagurski Defensive Player of the Week: Kentucky", "Walter Camp Player of the Year semifinalist (Nov. 11)", "Butkus Award semifinalist (Nov. 1)", "Jason Witten Collegiate Man of the Year semifinalist (one of 20; Oct. 21)", "William V. Campbell Trophy semifinalist (NFF; Sept. 23)", "Butkus Award preseason watch list", "Lott IMPACT Trophy watch list", "No. 6 on Bruce Feldman's Freaks List (The Athletic)", "Preseason Coaches All-SEC 3rd team"],
    "stats": {
     "def": {
      "gp": 5,
@@ -1882,6 +1882,7 @@ window.SITE.football = {
    "hs": "Grimsley",
    "prev": null,
    "honors": [
+    "SEC Freshman of the Week: LSU (Nov. 23)",
     "SEC Freshman of the Week — Furman (13/17, 226 yds, 3 TD pass; 68 yds, 2 TD rush) and Georgia Tech",
     "Shaun Alexander Freshman of the Year Award — Hot 37 watch list"
    ],
@@ -5369,7 +5370,7 @@ window.SITE.football = {
    "home": "Melbourne, Australia",
    "hs": "Haileybury College",
    "prev": null,
-   "honors": ["Ray Guy Award preseason watch list", "SEC Co-Special Teams Player of the Week: Auburn"],
+   "honors": ["Ray Guy Award preseason watch list", "SEC Special Teams Player of the Week: LSU (Nov. 23)", "SEC Co-Special Teams Player of the Week: Auburn"],
    "stats": {
     "punt": [
      24,
@@ -5720,11 +5721,27 @@ window.SITE.football = {
    "posRank": "3",
    "stateRank": "31",
    "committed": "2026-05-22"
+  },
+  {
+   "id": "brandin-gallaway",
+   "name": "Brandin Gallaway",
+   "pos": "P",
+   "hs": "Palmetto",
+   "home": "Palmetto, FL",
+   "ht": "6-4",
+   "wt": 190,
+   "grade": null,
+   "stars": null,
+   "nat": null,
+   "posRank": null,
+   "stateRank": null,
+   "committed": "2026-11-23",
+   "note": "Punter/kicker; flipped from Clemson. Kohl's Kicking: No. 1 punter, No. 4 kicker in the 2027 class."
   }
  ],
  "recruitClass": {
   "year": 2027,
-  "commits": 18,
+  "commits": 19,
   "rank247": 24
  },
  "recruits2028": [
