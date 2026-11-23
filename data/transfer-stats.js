@@ -573,7 +573,7 @@ window.SITE_AUTO.transfers = {
   },
   "Landon Mack": {
    "dom": "scarletknights.com",
-   "len": 1931855,
+   "len": 1931856,
    "tables": [
     [
      "#",

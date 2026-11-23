@@ -1,13 +1,13 @@
-/* Written by tools/update_data.py on 2026-11-22. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-23. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-22",
+ "updated": "2026-11-23",
  "team": {
   "record": "9-2",
   "sec": "6-2",
-  "pollWeek": "Week 12",
-  "coaches": 9,
-  "ap": 9,
+  "pollWeek": "Week 13",
+  "coaches": 7,
+  "ap": 7,
   "apTop25": [
    [
     1,
@@ -23,39 +23,39 @@ window.SITE_AUTO.football = {
    ],
    [
     4,
-    "UCLA"
-   ],
-   [
-    5,
     "Miami"
    ],
    [
-    6,
-    "Indiana"
-   ],
-   [
-    7,
-    "Alabama"
-   ],
-   [
-    8,
+    5,
     "Texas"
    ],
    [
-    9,
+    6,
+    "Alabama"
+   ],
+   [
+    7,
     "Tennessee"
    ],
    [
-    10,
+    8,
     "Wake Forest"
    ],
    [
-    11,
+    9,
     "Texas Tech"
    ],
    [
-    12,
+    10,
+    "UCLA"
+   ],
+   [
+    11,
     "BYU"
+   ],
+   [
+    12,
+    "Indiana"
    ],
    [
     13,
@@ -67,49 +67,91 @@ window.SITE_AUTO.football = {
    ],
    [
     15,
-    "Boise State"
-   ],
-   [
-    16,
-    "Ohio State"
-   ],
-   [
-    17,
-    "Kentucky"
-   ],
-   [
-    18,
     "USC"
    ],
    [
-    19,
+    16,
     "Arizona"
    ],
    [
-    20,
+    17,
     "Houston"
    ],
    [
-    21,
+    18,
     "Louisville"
    ],
    [
-    22,
-    "Liberty"
+    19,
+    "Oklahoma"
    ],
    [
-    23,
+    20,
     "Florida"
    ],
    [
+    21,
+    "Liberty"
+   ],
+   [
+    22,
+    "Boise State"
+   ],
+   [
+    23,
+    "Ole Miss"
+   ],
+   [
     24,
-    "Memphis"
+    "Missouri"
    ],
    [
     25,
-    "Ole Miss"
+    "Ohio State"
    ]
   ],
+  "ranks": {
+   "ppg": [
+    31.0,
+    41,
+    7
+   ],
+   "oppg": [
+    14.2,
+    7,
+    2
+   ],
+   "ypg": [
+    378.5,
+    69,
+    10
+   ],
+   "rushYpg": [
+    213.0,
+    13,
+    1
+   ],
+   "passYpg": [
+    165.5,
+    124,
+    16
+   ],
+   "oypg": [
+    283.0,
+    11,
+    3
+   ],
+   "oRushYpg": [
+    113.5,
+    27,
+    6
+   ],
+   "oPassYpg": [
+    169.5,
+    10,
+    2
+   ]
+  },
   "cfp": 9,
   "cfpWeek": "Week 12",
   "cfpTop25": [
@@ -213,49 +255,7 @@ window.SITE_AUTO.football = {
     25,
     "Ole Miss"
    ]
-  ],
-  "ranks": {
-   "ppg": [
-    31.0,
-    41,
-    7
-   ],
-   "oppg": [
-    14.2,
-    7,
-    2
-   ],
-   "ypg": [
-    378.5,
-    69,
-    10
-   ],
-   "rushYpg": [
-    213.0,
-    13,
-    1
-   ],
-   "passYpg": [
-    165.5,
-    124,
-    16
-   ],
-   "oypg": [
-    283.0,
-    11,
-    3
-   ],
-   "oRushYpg": [
-    113.5,
-    27,
-    6
-   ],
-   "oPassYpg": [
-    169.5,
-    10,
-    2
-   ]
-  }
+  ]
  },
  "schedule": [
   {
@@ -1687,9 +1687,9 @@ window.SITE_AUTO.football = {
   "Vanderbilt": {
    "tv": "ESPN",
    "kick": "2026-11-29T00:00Z",
-   "line": "TENN -12.5",
+   "line": "TENN -13.5",
    "ou": 43.5,
-   "ml": "-440",
+   "ml": "-550",
    "book": "DraftKings",
    "win": 87.7
   }
