@@ -6,7 +6,7 @@ window.SITE_HEALTH = {
   "football": 12,
   "mbb": 34,
   "soccer": 20,
-  "softball": 33,
+  "softball": 49,
   "volleyball": 30,
   "wbb": 33
  },
@@ -137,7 +137,7 @@ window.SITE_HEALTH = {
   },
   {
    "ageDays": 0,
-   "games": 33,
+   "games": 49,
    "key": "softball",
    "poll": null,
    "pollDate": null,
@@ -148,7 +148,7 @@ window.SITE_HEALTH = {
    "games": 30,
    "key": "volleyball",
    "poll": "AVCA Coaches Poll",
-   "pollDate": "2026-11-15",
+   "pollDate": "2026-11-22",
    "updated": "2026-11-23"
   },
   {
