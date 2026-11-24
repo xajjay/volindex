@@ -1,5 +1,5 @@
 window.SITE_PEAR = {
- "fetched": "2026-11-23",
+ "fetched": "2026-11-24",
  "baseball": {
   "asOf": "January 01, 2027",
   "tennessee": {
@@ -322,7 +322,7 @@ window.SITE_PEAR = {
    [
     "2027-04-13",
     "Queens (NC)",
-    266,
+    265,
     95.8
    ],
    [
