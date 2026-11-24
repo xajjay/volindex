@@ -956,7 +956,7 @@ window.SITE.football = {
    "home": "Montgomery Village, Md.",
    "hs": "Quince Orchard",
    "prev": "Penn State",
-   "honors": ["Bednarik Award semifinalist (one of 18; Nov. 10)", "Lombardi Award semifinalist (one of 12; Nov. 4)"],
+   "honors": ["Midseason First-Team All-American (AP, The Athletic, CBS Sports, On3, Sporting News, Sports Illustrated)", "Bednarik Award semifinalist (one of 18; Nov. 10)", "Lombardi Award semifinalist (one of 12; Nov. 4)"],
    "stats": {
     "def": {
      "gp": 6,
@@ -1520,7 +1520,7 @@ window.SITE.football = {
    "home": "Smyrna, Tenn.",
    "hs": "Smyrna",
    "prev": null,
-   "honors": ["SEC Co-Defensive Player of the Week: LSU (Nov. 23)", "SEC Defensive Player of the Week: Kentucky (13 tkl, 2 sacks, 4 TFL)", "Walter Camp National Defensive Player of the Week, Bednarik and Nagurski Defensive Player of the Week: Kentucky", "Walter Camp Player of the Year semifinalist (Nov. 11)", "Butkus Award semifinalist (Nov. 1)", "Jason Witten Collegiate Man of the Year semifinalist (one of 20; Oct. 21)", "William V. Campbell Trophy semifinalist (NFF; Sept. 23)", "Butkus Award preseason watch list", "Lott IMPACT Trophy watch list", "No. 6 on Bruce Feldman's Freaks List (The Athletic)", "Preseason Coaches All-SEC 3rd team"],
+   "honors": ["SEC Co-Defensive Player of the Week: LSU (Nov. 23)", "SEC Defensive Player of the Week: Kentucky (13 tkl, 2 sacks, 4 TFL)", "Walter Camp National Defensive Player of the Week, Bednarik and Nagurski Defensive Player of the Week: Kentucky", "Walter Camp Player of the Year semifinalist (Nov. 11)", "Butkus Award semifinalist (Nov. 1)", "Jason Witten Collegiate Man of the Year semifinalist (one of 20; Oct. 21)", "William V. Campbell Trophy finalist (NFF) and member of the NFF National Scholar-Athlete Class", "Butkus Award preseason watch list", "Lott IMPACT Trophy watch list", "No. 6 on Bruce Feldman's Freaks List (The Athletic)", "Preseason Coaches All-SEC 3rd team"],
    "stats": {
     "def": {
      "gp": 5,
@@ -2517,7 +2517,7 @@ window.SITE.football = {
    "home": "Knoxville, Tenn.",
    "hs": "Karns",
    "prev": null,
-   "honors": ["Walter Camp Player of the Year semifinalist (Nov. 11)", "Maxwell Award semifinalist (one of 18; Nov. 10)", "Burlsworth Trophy semifinalist, second straight year (one of 10; finalists Nov. 17)", "Maxwell Award, Walter Camp and Burlsworth preseason watch lists", "SEC Co-Offensive Player of the Week: Auburn", "Preseason Coaches All-SEC 3rd team"],
+   "honors": ["Midseason First-Team All-American (The Athletic, CBS Sports, On3, Sporting News)", "Walter Camp Player of the Year semifinalist (Nov. 11)", "Maxwell Award semifinalist (one of 18; Nov. 10)", "Burlsworth Trophy semifinalist, second straight year (one of 10; finalists Nov. 17)", "Maxwell Award, Walter Camp and Burlsworth preseason watch lists", "SEC Co-Offensive Player of the Week: Auburn", "Preseason Coaches All-SEC 3rd team"],
    "stats": {
     "rush": [
      107,

@@ -49,7 +49,7 @@
     if (P.sp && P.sp.ut && P.sp.opp && P.sp.ut[0] != null && P.sp.opp[0] != null) src.push({ k: 'SP+', ut: +P.sp.ut[0], opp: +P.sp.opp[0] });
     if (P.fpi && P.fpi.ut && P.fpi.opp && P.fpi.ut[0] != null && P.fpi.opp[0] != null) src.push({ k: 'FPI', ut: +P.fpi.ut[0], opp: +P.fpi.opp[0] });
     if (sec[UT] && sec[opp]) src.push({ k: 'PEAR', ut: +sec[UT][0], opp: +sec[opp][0] });
-    const MF = root.MODEL_FB, mg = MF && (MF.games || []).find(x => x.date === g.date && x.opp === opp), pw = MF && MF.powerAll;
+    const MF = root.MODEL_FB, mg = MF && (MF.games || []).find(x => x.opp === opp && g.date && Math.abs(Date.parse(x.date + 'T12:00:00Z') - Date.parse(g.date + 'T12:00:00Z')) <= 2 * 864e5), pw = MF && MF.powerAll;
     if (pw && pw[UT] != null && pw[opp] != null) src.push({ k: 'Play-by-play model', ut: +pw[UT], opp: +pw[opp] });
     const c = P.compare;
     if (!src.length && c && c.ppg && c.oppg) src.push({ k: 'Scoring margin', ut: (c.ppg[0] - c.oppg[0]) * 0.7, opp: (c.ppg[1] - c.oppg[1]) * 0.7 });

@@ -58,9 +58,20 @@
   const clsLabel = p => { const r = rsOf(p); return r ? 'RS ' + RS[r] : p.cls; };
   const nextLabel = p => { const r = rsOf(p); return r ? (RS_NEXT[r] ? 'RS ' + RS_NEXT[r] : '—') : NEXT_CLASS[p.cls]; };
   const TIPS = {
+    VI: "Vol Index power rating: our own model built from margin-of-victory results, team talent and opponent-adjusted efficiency, on the same points-vs-average-team scale as SP+ and FPI.",
     FPI: "ESPN's Football Power Index: how many points better (or worse) a team is than an average FBS team on a neutral field. ESPN's game win chances and season projections come from it.",
     'SP+': "Bill Connelly's tempo- and opponent-adjusted efficiency rating, in points per game vs. an average FBS team.",
     PEAR: "PEAR Ratings' team strength rating: points better than an average FBS team on a neutral field.",
+  };
+  /* Vol Index (VI) model helpers: our own power rating, rank and game lines (data/model-fb.js) */
+  const VI = {
+    M: () => window.MODEL_FB || null,
+    power: team => { const M = VI.M(); return M && M.powerAll && M.powerAll[team] != null ? M.powerAll[team] : null; },
+    rank: team => { const M = VI.M(), v = VI.power(team); return v == null ? null : 1 + Object.values(M.powerAll).filter(x => x > v).length; },
+    of: () => { const M = VI.M(); return M && M.powerAll ? Object.keys(M.powerAll).length : 0; },
+    game: g => { const M = VI.M(); if (!M || !g || !g.date) return null; const d = x => Date.parse(x + 'T12:00:00Z'); const o = String(g.opp).replace(/^(at|vs\.?) /, '');
+      return (M.games || []).find(x => x.opp === o && Math.abs(d(x.date) - d(g.date)) <= 2 * 864e5) || null; },
+    line: m => m.margin >= 0 ? 'Tennessee -' + m.margin.toFixed(1) : m.opp + ' -' + (-m.margin).toFixed(1),
   };
   const tip = (label, key) => `<span class="tip" tabindex="0" data-tip="${esc(TIPS[key || label])}">${esc(label)}<i aria-hidden="true">?</i></span>`;
   const n1 = v => (v === undefined || v === null || v === '') ? '—' : (typeof v === 'number' && !Number.isInteger(v) ? v.toFixed(1) : v);
@@ -336,6 +347,7 @@
         <div><b>${t.record}</b><small>Overall</small></div>
         <div><b>${t.sec}</b><small>SEC</small></div>
         <div><b>${t.cfp || t.ap}</b><small>${t.cfp ? 'CFP rank' : 'AP poll'}</small></div>
+        <div class="hide-sm"><b>${VI.rank('Tennessee') || '—'}</b><small>${tip('VI')} rank</small></div>
         <div class="hide-sm"><b>${F.advanced.fpi.rank}</b><small>${tip('FPI')}</small></div>
       </div>
       <nav class="tabs" aria-label="Football sections">${TABS.map(([k, l]) => `<a href="#football-${k}" aria-current="${k === tab ? 'page' : 'false'}">${l}</a>`).join('')}<a href="#games-football">Games</a></nav>
@@ -421,11 +433,14 @@
         ${E.win != null ? `<div class="wp"><div class="wp-l"><span>ESPN win chance</span><span>${E.line ? 'Line: <b>' + esc(E.line) + '</b>' : 'Line not posted yet'}${E.ou ? ' · O/U ' + E.ou : ''}</span></div>
           <div class="wp-bar" role="img" aria-label="Tennessee ${E.win}% chance to win"><i style="width:${E.win}%"></i></div>
           <div class="wp-l mono"><b class="ut">UT ${E.win.toFixed(1)}%</b><b>${esc(abbr(next.opp))} ${(100 - E.win).toFixed(1)}%</b></div></div>` : ''}
+        ${(m => m ? `<div class="wp"><div class="wp-l"><span>VI Model win chance</span><span>Line: <b>${esc(VI.line(m))}</b> · Score ${m.ptsU.toFixed(0)}–${m.ptsO.toFixed(0)}</span></div>
+          <div class="wp-bar" role="img" aria-label="Tennessee ${(m.win * 100).toFixed(0)}% chance to win (VI Model)"><i style="width:${(m.win * 100).toFixed(1)}%"></i></div>
+          <div class="wp-l mono"><b class="ut">UT ${(m.win * 100).toFixed(1)}%</b><b>${esc(abbr(next.opp))} ${(100 - m.win * 100).toFixed(1)}%</b></div></div>` : '')(VI.game(next))}
         <div class="golink" style="margin-top:10px">Matchup preview: impact players, team numbers, series history ›</div></div>` : ''}
       ${window.resultsBox({ games: played.map(g => ({ date: g.date, opp: g.opp, site: g.site, result: g.result, us: g.us, them: g.them, attr: `data-game="${esc(g.opp)}"` })), record: t.record,
         sub: (sp => sp && sp.conf && !sp.final ? sp.conf + ' SEC' : '')(window.secPlace && window.secPlace('football')),
         more: played.length > 5 ? [window.VI_ROUTER ? window.VI_ROUTER.href('football-schedule') : '#football-schedule', 'Full schedule and results'] : null,
-        meta: `${t.cfp ? 'CFP No. ' + t.cfp + ' · ' : ''}AP No. ${t.ap} · Coaches No. ${t.coaches} (${t.pollWeek}) · ${tip('FPI')} No. ${F.advanced.fpi.rank} · projected ${F.advanced.fpi.proj}` })}
+        meta: `${t.cfp ? 'CFP No. ' + t.cfp + ' · ' : ''}AP No. ${t.ap} · Coaches No. ${t.coaches} (${t.pollWeek}) · ${VI.rank('Tennessee') ? tip('VI') + ' No. ' + VI.rank('Tennessee') + ' · ' : ''}${tip('FPI')} No. ${F.advanced.fpi.rank} · projected ${(window.MODEL_FB && window.MODEL_FB.season && window.MODEL_FB.season.proj) || F.advanced.fpi.proj}` })}
     </div>
     <div class="section"><h3>Team numbers <small>per game through ${played.length} games, with national (FBS) and SEC rank</small></h3>
       <div class="tiles four">
@@ -655,11 +670,11 @@ ${part('next')}
   function schedule() {
     const rows = F.schedule.map(g => { const e = g.espn || {}; return `<tr class="click" data-game="${esc(g.opp)}" tabindex="0" title="${g.result ? 'Box score' : 'Matchup preview'}"><td class="num">${fmtDate(g.date)}</td><td><b>${g.site === 'A' ? 'at ' : ''}${esc(g.opp)}</b>${g.sec ? ' <span class="chip">SEC</span>' : ''}</td>
       <td class="hide-sm">${esc(g.loc)}</td><td class="num">${g.result ? `<span class="${g.result}">${g.result}</span> ${g.us}–${g.them}` : esc(kick(g))}</td><td class="hide-sm">${esc(e.tv || (g.result ? '' : 'TBA'))}</td>
-      <td class="num">${g.result ? '' : esc(e.line || '—')}</td><td>${!g.result && e.win != null ? winBar(e.win) : ''}</td><td class="n"><span class="golink">${g.result ? 'Box score' : 'Preview'} ›</span></td></tr>`; }).join('');
+      <td class="num hide-sm">${VI.rank(g.opp) || '—'}</td><td class="num">${g.result ? '' : (m => m ? esc(VI.line(m)) : '—')(VI.game(g))}</td><td>${!g.result ? (m => m ? winBar(m.win * 100) : '')(VI.game(g)) : ''}</td><td class="num">${g.result ? '' : esc(e.line || '—')}</td><td>${!g.result && e.win != null ? winBar(e.win) : ''}</td><td class="n"><span class="golink">${g.result ? 'Box score' : 'Preview'} ›</span></td></tr>`; }).join('');
     const n = F.schedule2027;
-    return `<div class="panel-head"><div><h2>Schedule & Standings</h2><p>Click any game: finished games open the full box score, upcoming games open a matchup preview. Lines and win chances come from ESPN (DraftKings line, ESPN FPI matchup predictor). TV networks and kickoff times are announced 6–12 days before each game.${(sp => sp ? ` <a href="#standings" class="jump" data-goto-stand>Tennessee is ${sp.text} in the SEC${sp.final ? ' (' + sp.season + ' final)' : ''}${sp.conf ? ', ' + sp.conf : ''} ›</a>` : '')(window.secPlace && window.secPlace('football'))}</p></div><div class="controls">${window.standSwitch ? window.standSwitch() : ''}</div></div>
+    return `<div class="panel-head"><div><h2>Schedule & Standings</h2><p>Click any game: finished games open the full box score, upcoming games open a matchup preview. VI line and VI win are our own model (the Vol Index); the ESPN columns are the DraftKings line and ESPN's FPI matchup predictor. TV networks and kickoff times are announced 6–12 days before each game.${(sp => sp ? ` <a href="#standings" class="jump" data-goto-stand>Tennessee is ${sp.text} in the SEC${sp.final ? ' (' + sp.season + ' final)' : ''}${sp.conf ? ', ' + sp.conf : ''} ›</a>` : '')(window.secPlace && window.secPlace('football'))}</p></div><div class="controls">${window.standSwitch ? window.standSwitch() : ''}</div></div>
       <div data-view="standings" ${window.standCur && window.standCur() !== 'standings' ? 'hidden' : ''}>${window.standingsHtml ? window.standingsHtml('football') : ''}</div>
-      <div data-view="schedule" ${window.standCur && window.standCur() !== 'schedule' ? 'hidden' : ''}><div class="tablewrap"><table><thead><tr><th>Date</th><th>Opponent</th><th class="hide-sm">Location</th><th>Result / Time</th><th class="hide-sm">TV</th><th>Line</th><th>Win chance</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+      <div data-view="schedule" ${window.standCur && window.standCur() !== 'schedule' ? 'hidden' : ''}><div class="tablewrap"><table><thead><tr><th>Date</th><th>Opponent</th><th class="hide-sm">Location</th><th>Result / Time</th><th class="hide-sm">TV</th><th class="hide-sm" title="Opponent Vol Index rank">Opp. VI</th><th>VI line</th><th>VI win</th><th>ESPN line</th><th>ESPN win</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
       <div class="section"><h3>2027 schedule <small>Opponents announced; SEC dates not yet released</small></h3>
         <div class="grid g2">
           <div class="box"><div class="lb"><h4>Home <span>Neyland Stadium</span></h4></div><ul class="list">${n.filter(g => g.site === 'H').map(g => `<li><span class="grow"><b>${esc(g.opp)}</b>${g.sec ? ' <span class="chip">SEC</span>' : ''}</span><span class="dim">${g.date ? fmtDate(g.date) : 'Date TBA'}</span></li>`).join('')}</ul></div>
@@ -755,7 +770,6 @@ ${part('next')}
     draw();
   }
 
-  /* advanced */
   function rankBar(rank, total = 136) {
     const pct = Math.max(2, (1 - (rank - 1) / total) * 100);
     const tone = rank <= 25 ? 'good' : rank <= 70 ? 'mid' : 'low';
@@ -766,31 +780,38 @@ ${part('next')}
   }
   function advanced() {
     const A = F.advanced, P = A.pear, f = Object.assign({}, A.fpi, ((window.MODEL_FB || {}).season) || {});   // projected record, win-out, conference, playoff and title odds come from our own season simulation (data/model-fb.js)
-    const sec = A.sec.slice().sort((a, b) => a[2] - b[2]);
+    const sec = A.sec.slice().sort((a, b) => (VI.power(b[0]) == null ? -99 : VI.power(b[0])) - (VI.power(a[0]) == null ? -99 : VI.power(a[0])) || a[2] - b[2]);
     const tnSec = sec.findIndex(r => r[0] === 'Tennessee') + 1;
+    const viRk = VI.rank('Tennessee'), viPw = VI.power('Tennessee'), viSec = viPw == null ? 0 : 1 + A.sec.filter(r => r[0] !== 'Tennessee' && (VI.power(r[0]) || -99) > viPw).length;
+    const viGames = (F.schedule || []).filter(g => !g.result).map(g => ({ g, m: VI.game(g) })).filter(x => x.m);
     const fpiSec = A.sec.slice().sort((a, b) => a[9] - b[9]).findIndex(r => r[0] === 'Tennessee') + 1;
-    return `<div class="panel-head"><div><h2>Advanced</h2><p>Computer ratings, efficiency metrics and projections from PEAR Ratings and ESPN's Football Power Index (FPI), with Tennessee's rank nationally and in the SEC.</p></div></div>
+    return `<div class="panel-head"><div><h2>Advanced</h2><p>Our own Vol Index (VI) model first, then ESPN's Football Power Index (FPI) and PEAR Ratings: ratings, efficiency metrics and projections, with Tennessee's rank nationally and in the SEC.</p></div></div>
       <div class="tiles" style="margin-bottom:16px">
-        <div class="tile"><b>${P.ratings[0][2]}</b><span>${tip('PEAR')} TSR rank</span><em>${ord(tnSec)} in SEC</em></div>
+        <div class="tile"><b>${viRk || '—'}</b><span>${tip('VI')} Model rank${viPw != null ? ' (' + viPw.toFixed(1) + ')' : ''}</span><em>${viSec ? ord(viSec) + ' in SEC' : 'Vol Index power rating'}</em></div>
         <div class="tile"><b>${f.rank}</b><span>${tip('FPI')} rank (${f.fpi})</span><em>${ord(fpiSec)} in SEC</em></div>
-        <div class="tile"><b>${f.proj}</b><span>Projected record (Vol Index model)</span><em>Win out: ${f.winOut}%</em></div>
-        <div class="tile"><b>${f.playoff}%</b><span>Playoff chance (Vol Index model)</span><em>Win SEC: ${f.winConf}%</em></div>
-        <div class="tile"><b>${f.winNC}%</b><span>Win national title (model)</span><em>Reach title game: ${f.makeNC}%</em></div>
+        <div class="tile"><b>${P.ratings[0][2]}</b><span>${tip('PEAR')} TSR rank</span><em>${ord(tnSec)} in SEC</em></div>
+        <div class="tile"><b>${f.proj}</b><span>Projected record (VI Model)</span><em>Win out: ${f.winOut}%</em></div>
+        <div class="tile"><b>${f.playoff}%</b><span>Playoff chance (VI Model)</span><em>Win SEC: ${f.winConf}% · Title: ${f.winNC}%</em></div>
       </div>
       <div class="grid g3x">
         ${metricList('Computer ratings', P.ratings)}
         ${metricList('Offense', P.offense)}
         ${metricList('Defense', P.defense)}
       </div>
+      ${viGames.length ? `<div class="section"><h3>Remaining games: VI Model <small>Our own projected line, score and Tennessee win chance (power rating, home field and availability); click a game on the Schedule tab for the full breakdown</small></h3>
+        <div class="tablewrap"><table><thead><tr><th>Opponent</th><th class="n">Opp. VI rank</th><th>VI line</th><th class="n">VI proj. score (UT–Opp)</th><th>VI win chance</th><th class="n hide-sm">ESPN</th><th class="n hide-sm">PEAR</th></tr></thead>
+        <tbody>${viGames.map(({ g, m }) => { const pg = (P.games || []).find(x => x[0].replace(/^(at|vs\.?) /, '') === g.opp); return `<tr><td><b>${g.site === 'A' ? 'at ' : ''}${esc(g.opp)}</b></td><td class="n">${VI.rank(g.opp) || '—'}</td><td>${esc(VI.line(m))}</td><td class="n">${m.ptsU.toFixed(1)}–${m.ptsO.toFixed(1)}</td><td>${winBar(m.win * 100)}</td><td class="n hide-sm">${g.espn && g.espn.win != null ? g.espn.win.toFixed(0) + '%' : '—'}</td><td class="n hide-sm">${pg ? pg[4] + '%' : '—'}</td></tr>`; }).join('')}</tbody></table></div>
+        <p class="dim small">Expected wins in remaining games: <b>${viGames.reduce((a, x) => a + x.m.win, 0).toFixed(1)}</b> (sum of VI win chances). Projected season record: <b>${f.proj}</b>.</p></div>` : ''}
       <div class="section"><h3>Remaining games: PEAR model <small>PEAR's own projected line, score and Tennessee win chance (the Schedule tab shows ESPN's)</small></h3>
         <div class="tablewrap"><table><thead><tr><th>Opponent</th><th class="n">Opp. rank</th><th>Line</th><th class="n">Proj. score (UT–Opp)</th><th>Win chance</th></tr></thead>
         <tbody>${P.games.map(g => `<tr><td><b>${esc(g[0])}</b></td><td class="n">${g[1]}</td><td>${esc(g[2])}</td><td class="n">${esc(g[3])}</td><td>${winBar(g[4])}</td></tr>`).join('')}</tbody></table></div>
         <p class="dim small">Expected wins in remaining games: <b>${(P.games.reduce((a, g) => a + g[4], 0) / 100).toFixed(1)}</b> (sum of win chances), for a projected finish near ${5 + Math.round(P.games.reduce((a, g) => a + g[4], 0) / 100)}-${1 + 6 - Math.round(P.games.reduce((a, g) => a + g[4], 0) / 100)}.</p></div>
-      <div class="section"><h3>Tennessee vs. the SEC <small>Sorted by PEAR team rating. Ranks are national (FBS).</small></h3>
-        <div class="tablewrap"><table><thead><tr><th>Team</th><th class="n">PEAR</th><th class="n">Nat'l</th><th class="n">Off. (rk)</th><th class="n">Def. (rk)</th><th class="n">SOS rk</th><th class="n">FPI</th><th class="n">FPI rk</th><th class="n">FPI proj.</th><th class="n">Win SEC</th><th class="n">Playoff</th></tr></thead>
-        <tbody>${sec.map(r => `<tr class="${r[0] === 'Tennessee' ? 'me' : ''}"><td><b>${esc(r[0])}</b></td><td class="n">${r[1].toFixed(1)}</td><td class="n">${r[2]}</td><td class="n">${r[3].toFixed(1)} (${r[4]})</td><td class="n">${r[5].toFixed(1)} (${r[6]})</td><td class="n">${r[7]}</td><td class="n">${r[8].toFixed(1)}</td><td class="n">${r[9]}</td><td class="n">${r[10]}</td><td class="n">${r[11].toFixed(1)}%</td><td class="n">${r[12].toFixed(1)}%</td></tr>`).join('')}</tbody></table></div>
+      <div class="section"><h3>Tennessee vs. the SEC <small>Sorted by VI power rating. Ranks are national (FBS).</small></h3>
+        <div class="tablewrap"><table><thead><tr><th>Team</th><th class="n">VI</th><th class="n">VI rk</th><th class="n">PEAR</th><th class="n">Nat'l</th><th class="n">Off. (rk)</th><th class="n">Def. (rk)</th><th class="n">SOS rk</th><th class="n">FPI</th><th class="n">FPI rk</th><th class="n">FPI proj.</th><th class="n">Win SEC</th><th class="n">Playoff</th></tr></thead>
+        <tbody>${sec.map(r => `<tr class="${r[0] === 'Tennessee' ? 'me' : ''}"><td><b>${esc(r[0])}</b></td><td class="n">${VI.power(r[0]) != null ? VI.power(r[0]).toFixed(1) : '—'}</td><td class="n">${VI.rank(r[0]) || '—'}</td><td class="n">${r[1].toFixed(1)}</td><td class="n">${r[2]}</td><td class="n">${r[3].toFixed(1)} (${r[4]})</td><td class="n">${r[5].toFixed(1)} (${r[6]})</td><td class="n">${r[7]}</td><td class="n">${r[8].toFixed(1)}</td><td class="n">${r[9]}</td><td class="n">${r[10]}</td><td class="n">${r[11].toFixed(1)}%</td><td class="n">${r[12].toFixed(1)}%</td></tr>`).join('')}</tbody></table></div>
         <p class="dim small">PEAR offense rating: higher is better. PEAR defense rating: points allowed to an average offense, lower is better.</p></div>
       ${glossary([
+        ['VI', 'Vol Index power rating: our own rating built from margin-of-victory results, team talent and opponent-adjusted play-by-play efficiency, shown on the same points-vs-average-team scale as SP+ and FPI.'],
         ['TSR', 'PEAR\'s team strength rating: roughly how many points better than an average FBS team on a neutral field.'],
         ['SP+', 'Bill Connelly\'s tempo- and opponent-adjusted efficiency rating, in points per game vs. an average team.'],
         ['FPI', 'ESPN\'s Football Power Index: expected point margin vs. an average team. Powers ESPN\'s win chances.'],
