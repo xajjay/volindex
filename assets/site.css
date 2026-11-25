@@ -896,3 +896,4 @@ body.trk-lock { overflow: hidden; }
 @media (min-width: 900px) { .trk-side { grid-template-columns: repeat(2, minmax(0, 1fr)); } .trk-side .trk-box { grid-column: 1 / -1; } }
 .trk-box h4 { margin: 12px 0 4px; padding-left: 8px; border-left: 4px solid var(--orange); font-size: 14px; }
 .trk-bt { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; } .trk-bt th, .trk-bt td { padding: 5px 6px; white-space: nowrap; } .trk-bt td:first-child, .trk-bt th:first-child { text-align: left; position: sticky; left: 0; background: var(--surface); } .trk-bt .n { text-align: right; }
+.livecard .golink a.btn.primary { color: #FFFFFF; }
