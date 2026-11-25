@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-24. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-25. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-24",
+ "updated": "2026-11-25",
  "team": {
   "record": "9-2",
   "sec": "6-2",
@@ -110,6 +110,110 @@ window.SITE_AUTO.football = {
     "Ohio State"
    ]
   ],
+  "cfp": 5,
+  "cfpWeek": "Week 13",
+  "cfpTop25": [
+   [
+    1,
+    "Georgia"
+   ],
+   [
+    2,
+    "Utah"
+   ],
+   [
+    3,
+    "Texas"
+   ],
+   [
+    4,
+    "Notre Dame"
+   ],
+   [
+    5,
+    "Tennessee"
+   ],
+   [
+    6,
+    "Alabama"
+   ],
+   [
+    7,
+    "Miami"
+   ],
+   [
+    8,
+    "Wake Forest"
+   ],
+   [
+    9,
+    "UCLA"
+   ],
+   [
+    10,
+    "BYU"
+   ],
+   [
+    11,
+    "Texas Tech"
+   ],
+   [
+    12,
+    "Oregon"
+   ],
+   [
+    13,
+    "Iowa"
+   ],
+   [
+    14,
+    "Indiana"
+   ],
+   [
+    15,
+    "USC"
+   ],
+   [
+    16,
+    "Arizona"
+   ],
+   [
+    17,
+    "Oklahoma"
+   ],
+   [
+    18,
+    "Houston"
+   ],
+   [
+    19,
+    "Louisville"
+   ],
+   [
+    20,
+    "Florida"
+   ],
+   [
+    21,
+    "Ohio State"
+   ],
+   [
+    22,
+    "Ole Miss"
+   ],
+   [
+    23,
+    "Missouri"
+   ],
+   [
+    24,
+    "Washington"
+   ],
+   [
+    25,
+    "Nebraska"
+   ]
+  ],
   "ranks": {
    "ppg": [
     31.0,
@@ -151,111 +255,7 @@ window.SITE_AUTO.football = {
     10,
     2
    ]
-  },
-  "cfp": 9,
-  "cfpWeek": "Week 12",
-  "cfpTop25": [
-   [
-    1,
-    "Georgia"
-   ],
-   [
-    2,
-    "Utah"
-   ],
-   [
-    3,
-    "Alabama"
-   ],
-   [
-    4,
-    "UCLA"
-   ],
-   [
-    5,
-    "Texas"
-   ],
-   [
-    6,
-    "Notre Dame"
-   ],
-   [
-    7,
-    "Miami"
-   ],
-   [
-    8,
-    "Indiana"
-   ],
-   [
-    9,
-    "Tennessee"
-   ],
-   [
-    10,
-    "BYU"
-   ],
-   [
-    11,
-    "Wake Forest"
-   ],
-   [
-    12,
-    "Texas Tech"
-   ],
-   [
-    13,
-    "Oregon"
-   ],
-   [
-    14,
-    "Ohio State"
-   ],
-   [
-    15,
-    "Iowa"
-   ],
-   [
-    16,
-    "Kentucky"
-   ],
-   [
-    17,
-    "Boise State"
-   ],
-   [
-    18,
-    "USC"
-   ],
-   [
-    19,
-    "Arizona"
-   ],
-   [
-    20,
-    "Houston"
-   ],
-   [
-    21,
-    "South Carolina"
-   ],
-   [
-    22,
-    "Oklahoma"
-   ],
-   [
-    23,
-    "Louisville"
-   ],
-   [
-    24,
-    "Florida"
-   ],
-   [
-    25,
-    "Ole Miss"
-   ]
-  ]
+  }
  },
  "schedule": [
   {

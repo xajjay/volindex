@@ -104,60 +104,60 @@ window.SITE_HEALTH = {
  "ok": false,
  "sports": [
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 12,
    "key": "football",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-24"
+   "updated": "2026-11-25"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 34,
    "key": "mbb",
    "poll": "AP Top 25",
    "pollDate": "2026-11-23",
-   "updated": "2026-11-24"
+   "updated": "2026-11-25"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 33,
    "key": "wbb",
    "poll": "AP Top 25",
    "pollDate": "2026-11-23",
-   "updated": "2026-11-24"
+   "updated": "2026-11-25"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 57,
    "key": "baseball",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-24"
+   "updated": "2026-11-25"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 49,
    "key": "softball",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-24"
+   "updated": "2026-11-25"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 30,
    "key": "volleyball",
    "poll": "AVCA Coaches Poll",
    "pollDate": "2026-11-22",
-   "updated": "2026-11-24"
+   "updated": "2026-11-25"
   },
   {
-   "ageDays": 0,
+   "ageDays": -1,
    "games": 20,
    "key": "soccer",
    "poll": "United Soccer Coaches",
    "pollDate": "2026-11-10",
-   "updated": "2026-11-24"
+   "updated": "2026-11-25"
   }
  ],
  "warnings": 2
