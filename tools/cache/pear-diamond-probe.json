@@ -102,7 +102,7 @@
     "neutral": true
    }
   ],
-  "rows": 4891
+  "rows": 5036
  },
  "softball_ratings": {
   "columns": [
@@ -179,7 +179,7 @@
    {
     "game_id": "S1-2027-02559",
     "Date": "2027-02-11",
-    "Time": "TBA",
+    "Time": "7:00 PM CT",
     "home_team": "Arizona",
     "away_team": "Weber St.",
     "home_score": null,
@@ -207,6 +207,6 @@
     "neutral": true
    }
   ],
-  "rows": 3026
+  "rows": 3463
  }
 }
