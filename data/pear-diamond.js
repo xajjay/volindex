@@ -1,5 +1,5 @@
 window.SITE_PEAR = {
- "fetched": "2026-11-25",
+ "fetched": "2026-11-26",
  "baseball": {
   "asOf": "January 01, 2027",
   "tennessee": {
@@ -58,7 +58,7 @@ window.SITE_PEAR = {
    [
     "Georgia",
     8,
-    5.92,
+    5.91,
     8.0,
     null
    ],
@@ -121,7 +121,7 @@ window.SITE_PEAR = {
    [
     "Missouri",
     51,
-    2.98,
+    2.97,
     51.0,
     null
    ]
@@ -353,19 +353,19 @@ window.SITE_PEAR = {
     "2027-04-22",
     "Georgia",
     8,
-    57.2
+    57.3
    ],
    [
     "2027-04-23",
     "Georgia",
     8,
-    57.2
+    57.3
    ],
    [
     "2027-04-24",
     "Georgia",
     8,
-    57.2
+    57.3
    ],
    [
     "2027-04-27",

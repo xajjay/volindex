@@ -57,6 +57,21 @@
   ],
   "head": [
    {
+    "game_id": "B1-2027-05275",
+    "Date": "2027-02-19",
+    "Time": "3:00 PM CT",
+    "home_team": "Abilene Christian",
+    "away_team": "Northern Colo.",
+    "home_score": null,
+    "away_score": null,
+    "home_win_prob": 0.7294,
+    "Spread": 3.1,
+    "PEAR": "Abilene Christian -3.1",
+    "GQI": 3.9,
+    "is_conference_game": false,
+    "neutral": false
+   },
+   {
     "game_id": "B1-2027-03567",
     "Date": "2027-02-19",
     "Time": "5:00 PM CT",
@@ -85,24 +100,9 @@
     "GQI": 2.6,
     "is_conference_game": false,
     "neutral": true
-   },
-   {
-    "game_id": "B1-2027-00001",
-    "Date": "2027-02-19",
-    "Time": "11:00 AM CT",
-    "home_team": "Arizona",
-    "away_team": "Oklahoma",
-    "home_score": null,
-    "away_score": null,
-    "home_win_prob": 0.3143,
-    "Spread": -2.44,
-    "PEAR": "Oklahoma -2.44",
-    "GQI": 8.4,
-    "is_conference_game": false,
-    "neutral": true
    }
   ],
-  "rows": 5036
+  "rows": 5286
  },
  "softball_ratings": {
   "columns": [
@@ -164,7 +164,7 @@
    {
     "game_id": "S1-2027-00001",
     "Date": "2027-02-11",
-    "Time": "TBA",
+    "Time": "12:00 PM CT",
     "home_team": "Alabama",
     "away_team": "Texas St.",
     "home_score": null,
@@ -207,6 +207,6 @@
     "neutral": true
    }
   ],
-  "rows": 3463
+  "rows": 3550
  }
 }
