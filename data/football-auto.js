@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-25. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-26. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-25",
+ "updated": "2026-11-26",
  "team": {
   "record": "9-2",
   "sec": "6-2",
@@ -1359,7 +1359,7 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Sacks",
-     "rank": 26
+     "rank": 27
     }
    ],
    "Arion Carter": [
@@ -1391,13 +1391,13 @@ window.SITE_AUTO.football = {
    "Tyree Weathersby": [
     {
      "stat": "Sacks",
-     "rank": 26
+     "rank": 27
     }
    ],
    "Ty Redmond": [
     {
      "stat": "Passes defended",
-     "rank": 3
+     "rank": 4
     }
    ],
    "Dejuan Lane": [
@@ -1421,7 +1421,7 @@ window.SITE_AUTO.football = {
    "Mike Matthews": [
     {
      "stat": "Receiving yards",
-     "rank": 93
+     "rank": 94
     }
    ],
    "DeSean Bishop": [
@@ -1431,7 +1431,7 @@ window.SITE_AUTO.football = {
     },
     {
      "stat": "Rushing TD",
-     "rank": 11
+     "rank": 12
     }
    ]
   }
@@ -1688,10 +1688,10 @@ window.SITE_AUTO.football = {
    "tv": "ESPN",
    "kick": "2026-11-29T00:00Z",
    "line": "TENN -13.5",
-   "ou": 43.5,
+   "ou": 42.5,
    "ml": "-550",
    "book": "DraftKings",
-   "win": 87.3
+   "win": 87.2
   }
  },
  "teamSheet": {
@@ -1739,7 +1739,7 @@ window.SITE_AUTO.football = {
     "Completion %",
     "Passing",
     63.8,
-    55,
+    54,
     10,
     false
    ],
@@ -1757,7 +1757,7 @@ window.SITE_AUTO.football = {
     "Passing TDs",
     "Passing",
     12.0,
-    107,
+    108,
     13,
     false
    ],
@@ -1766,7 +1766,7 @@ window.SITE_AUTO.football = {
     "Interceptions thrown",
     "Passing",
     5.0,
-    27,
+    26,
     4,
     true
    ],
@@ -1838,7 +1838,7 @@ window.SITE_AUTO.football = {
     "3rd down conversion %",
     "Downs",
     35.1,
-    107,
+    106,
     16,
     false
    ],
@@ -1964,7 +1964,7 @@ window.SITE_AUTO.football = {
     "Yards per carry allowed",
     "Run defense",
     3.61,
-    37,
+    36,
     9,
     true
    ],
