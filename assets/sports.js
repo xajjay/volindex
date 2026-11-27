@@ -665,7 +665,7 @@
     const n = nextGame(D);
     const ptk = playersToKnow(D); const E = X(D);
     const hon = Object.entries(E.honors || {}), pro = Object.entries(E.draft || {});
-    return `<div class="box quick"><div class="eyebrow">The quick read</div><ul>${D.quick.map(q => `<li>${q}</li>`).join('')}</ul></div>
+    return `<div class="box quick"><div class="eyebrow">The quick read</div><ul>${D.quick.slice(0, 5).map(q => `<li>${q}</li>`).join('')}</ul></div>
       <div class="grid g2">
         ${n ? `<div class="box nextgame matchup click" data-sg="${D.schedule.indexOf(n)}" tabindex="0" role="button"><div class="eyebrow">${n.kind === 'exh' ? 'Next exhibition' : 'Next up'} · ${fmtDate(n.date, { weekday: 'long', month: 'long', day: 'numeric' })}${n.time ? ' · ' + esc(n.time) + ' ET' : ''}${n.tv ? ' · ' + esc(n.tv) : ''}</div>
           <div class="vs">${vsat(n)} ${esc(n.opp)}</div><div class="meta">${esc(n.loc)} ${kindChip(n)}</div>
