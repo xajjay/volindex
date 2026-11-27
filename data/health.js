@@ -99,12 +99,12 @@ window.SITE_HEALTH = {
  "ok": false,
  "sports": [
   {
-   "ageDays": 1,
+   "ageDays": 0,
    "games": 12,
    "key": "football",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-26"
+   "updated": "2026-11-27"
   },
   {
    "ageDays": 0,
@@ -123,36 +123,36 @@ window.SITE_HEALTH = {
    "updated": "2026-11-27"
   },
   {
-   "ageDays": 2,
+   "ageDays": 0,
    "games": 57,
    "key": "baseball",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-25"
+   "updated": "2026-11-27"
   },
   {
-   "ageDays": 2,
+   "ageDays": 0,
    "games": 49,
    "key": "softball",
    "poll": null,
    "pollDate": null,
-   "updated": "2026-11-25"
+   "updated": "2026-11-27"
   },
   {
-   "ageDays": 2,
+   "ageDays": 0,
    "games": 30,
    "key": "volleyball",
    "poll": "AVCA Coaches Poll",
    "pollDate": "2026-11-22",
-   "updated": "2026-11-25"
+   "updated": "2026-11-27"
   },
   {
-   "ageDays": 2,
+   "ageDays": 0,
    "games": 20,
    "key": "soccer",
    "poll": "United Soccer Coaches",
    "pollDate": "2026-11-10",
-   "updated": "2026-11-25"
+   "updated": "2026-11-27"
   }
  ],
  "warnings": 1

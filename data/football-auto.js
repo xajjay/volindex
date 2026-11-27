@@ -1,7 +1,7 @@
-/* Written by tools/update_data.py on 2026-11-26. Do not edit by hand; rerun the updater. */
+/* Written by tools/update_data.py on 2026-11-27. Do not edit by hand; rerun the updater. */
 window.SITE_AUTO = window.SITE_AUTO || {};
 window.SITE_AUTO.football = {
- "updated": "2026-11-26",
+ "updated": "2026-11-27",
  "team": {
   "record": "9-2",
   "sec": "6-2",
@@ -227,7 +227,7 @@ window.SITE_AUTO.football = {
    ],
    "ypg": [
     378.5,
-    69,
+    68,
     10
    ],
    "rushYpg": [
@@ -247,7 +247,7 @@ window.SITE_AUTO.football = {
    ],
    "oRushYpg": [
     113.5,
-    27,
+    26,
     6
    ],
    "oPassYpg": [
@@ -1355,43 +1355,43 @@ window.SITE_AUTO.football = {
    "Xavier Gilliam": [
     {
      "stat": "Tackles for loss",
-     "rank": 20
+     "rank": 21
     },
     {
      "stat": "Sacks",
-     "rank": 27
+     "rank": 29
     }
    ],
    "Arion Carter": [
     {
      "stat": "Tackles for loss",
-     "rank": 36
+     "rank": 37
     },
     {
      "stat": "Sacks",
-     "rank": 79
+     "rank": 82
     }
    ],
    "Amare Campbell": [
     {
      "stat": "Tackles for loss",
-     "rank": 36
+     "rank": 37
     },
     {
      "stat": "Sacks",
-     "rank": 79
+     "rank": 82
     }
    ],
    "Mariyon Dye": [
     {
      "stat": "Sacks",
-     "rank": 79
+     "rank": 82
     }
    ],
    "Tyree Weathersby": [
     {
      "stat": "Sacks",
-     "rank": 27
+     "rank": 29
     }
    ],
    "Ty Redmond": [
@@ -1421,7 +1421,7 @@ window.SITE_AUTO.football = {
    "Mike Matthews": [
     {
      "stat": "Receiving yards",
-     "rank": 94
+     "rank": 97
     }
    ],
    "DeSean Bishop": [
@@ -1688,7 +1688,7 @@ window.SITE_AUTO.football = {
    "tv": "ESPN",
    "kick": "2026-11-29T00:00Z",
    "line": "TENN -13.5",
-   "ou": 42.5,
+   "ou": 43.5,
    "ml": "-550",
    "book": "DraftKings",
    "win": 87.2
@@ -1712,7 +1712,7 @@ window.SITE_AUTO.football = {
     "Total yards per game",
     "Total offense",
     378.5,
-    69,
+    68,
     10,
     false
    ],
@@ -1739,7 +1739,7 @@ window.SITE_AUTO.football = {
     "Completion %",
     "Passing",
     63.8,
-    54,
+    55,
     10,
     false
    ],
@@ -1793,7 +1793,7 @@ window.SITE_AUTO.football = {
     "Yards per carry",
     "Rushing",
     4.8,
-    42,
+    40,
     3,
     false
    ],
@@ -1802,7 +1802,7 @@ window.SITE_AUTO.football = {
     "Rushing TDs",
     "Rushing",
     26.0,
-    19,
+    21,
     3,
     false
    ],
@@ -1820,7 +1820,7 @@ window.SITE_AUTO.football = {
     "Yards per reception",
     "Receiving",
     10.64,
-    118,
+    120,
     16,
     false
    ],
@@ -1829,7 +1829,7 @@ window.SITE_AUTO.football = {
     "First downs per game",
     "Downs",
     20.7,
-    53,
+    54,
     8,
     false
    ],
@@ -1856,7 +1856,7 @@ window.SITE_AUTO.football = {
     "Penalty yards per game",
     "Downs",
     61.0,
-    102,
+    101,
     11,
     true
    ],
@@ -1901,7 +1901,7 @@ window.SITE_AUTO.football = {
     "Yards per play allowed",
     "Yards allowed",
     4.58,
-    12,
+    11,
     4,
     true
    ],
@@ -1955,7 +1955,7 @@ window.SITE_AUTO.football = {
     "Rushing yards allowed per game",
     "Run defense",
     113.5,
-    27,
+    26,
     6,
     true
    ],
@@ -1964,7 +1964,7 @@ window.SITE_AUTO.football = {
     "Yards per carry allowed",
     "Run defense",
     3.61,
-    36,
+    35,
     9,
     true
    ],
@@ -2018,7 +2018,7 @@ window.SITE_AUTO.football = {
     "Return TDs",
     "Returning",
     1.0,
-    19,
+    20,
     5,
     false
    ]
